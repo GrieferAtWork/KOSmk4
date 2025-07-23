@@ -234,8 +234,6 @@ old_bitmask_buffer_init(struct old_bitmask_buffer *__restrict self,
 	memset(&self->bmb_pal._vp_tree, 0xcc, sizeof(self->bmb_pal._vp_tree));
 	memset(&self->bmb_pal.vp_destroy, 0xcc, sizeof(self->bmb_pal.vp_destroy));
 #endif /* !NDEBUG */
-	/*assert(video_format_pixel2color(&self->vb_format, 0) == bg_fg_colors[0]);
-	assert(video_format_pixel2color(&self->vb_format, 1) == bg_fg_colors[1]);*/
 	return self;
 }
 

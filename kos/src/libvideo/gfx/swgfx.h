@@ -222,9 +222,9 @@ struct gfx_swdrv {
 #define _video_swgfx_x_setpixel_xyswap(self, x, y, pixel) \
 	(*video_swgfx_getcdrv(self)->xsw_setpixel)(self, y, x, pixel)
 #define _video_swgfx_x_absline_llhh_xyswap(self, x, y, size_x, size_y, color) \
-	(*video_swgfx_getcdrv(self)->xsw_absline_llhh)(self, y, x, size_x, size_y, color)
+	(*video_swgfx_getcdrv(self)->xsw_absline_llhh)(self, y, x, size_y, size_x, color)
 #define _video_swgfx_x_absline_lhhl_xyswap(self, x, y, size_x, size_y, color) \
-	(*video_swgfx_getcdrv(self)->xsw_absline_lhhl)(self, y, x, size_x, size_y, color)
+	(*video_swgfx_getcdrv(self)->xsw_absline_lhhl)(self, (y) - (size_y) + 1, (x) + (size_x) - 1, size_y, size_x, color)
 #define _video_swgfx_x_absline_h_xyswap(self, x, y, length, color) \
 	(*video_swgfx_getcdrv(self)->xsw_absline_v)(self, y, x, length, color)
 #define _video_swgfx_x_absline_v_xyswap(self, x, y, length, color) \

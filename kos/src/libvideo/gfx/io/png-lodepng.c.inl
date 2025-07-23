@@ -157,15 +157,15 @@ libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
 		goto handle_error;
 	stride = get_lodepng_stride(w, state.info_png.color.colortype,
 	                            state.info_png.color.bitdepth);
-	result = video_domain_formem(domain_hint, &format, w, h, out, stride,
-	                             &png_release_mem_free, NULL,
-	                             VIDEO_DOMAIN_FORMEM_F_NORMAL);
+	result = _video_domain_formem(domain_hint, &format, w, h, out, stride,
+	                              &png_release_mem_free, NULL,
+	                              VIDEO_DOMAIN_FORMEM_F_NORMAL);
 	if unlikely(!result) {
 		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain)
 			goto err_out;
-		result = video_domain_formem(domain_hint, &format, w, h, out, stride,
-		                             &png_release_mem_free, NULL,
-		                             VIDEO_DOMAIN_FORMEM_F_NORMAL);
+		result = _video_domain_formem(domain_hint, &format, w, h, out, stride,
+		                              &png_release_mem_free, NULL,
+		                              VIDEO_DOMAIN_FORMEM_F_NORMAL);
 		if unlikely(!result)
 			goto err_out;
 	}

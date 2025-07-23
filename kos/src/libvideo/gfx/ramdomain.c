@@ -234,11 +234,11 @@ NOTHROW(FCC rambuffer_formem__revoke)(struct video_buffer *__restrict self) {
 
 
 
-#define ASSERT_SUBREGION_RECT(self, rect)                              \
-	(assert(((rect)->vcr_xmin + (rect)->vcr_xdim) > (rect)->vcr_xmin), \
-	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) > (rect)->vcr_ymin), \
-	 assert(((rect)->vcr_xmin + (rect)->vcr_xdim) <= (self)->vb_xdim), \
-	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) <= (self)->vb_ydim))
+#define ASSERT_SUBREGION_RECT(self, rect)                                         \
+	(assert(((rect)->vcr_xmin + (rect)->vcr_xdim) > (rect)->vcr_xmin),            \
+	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) > (rect)->vcr_ymin),            \
+	 assert(((rect)->vcr_xmin + (rect)->vcr_xdim) <= video_buffer_getxdim(self)), \
+	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) <= video_buffer_getydim(self)))
 
 
 /* Common base for creation a sub-region. Caller must still:

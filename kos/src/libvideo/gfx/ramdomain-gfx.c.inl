@@ -295,45 +295,45 @@ LOCAL_ramgfx__putcolor_noblend(struct video_gfx const *__restrict self,
 }
 
 #ifndef __INTELLISENSE__
-#define DEFINE_LOCAL_ramgfx__putcolor_FOO(name, mode)                              \
-	INTERN ATTR_IN(1) void CC                                                      \
-	LOCAL_ramgfx__(putcolor_##name)(struct video_gfx const *__restrict self,       \
-	                                video_coord_t x, video_coord_t y,              \
-	                                video_color_t color) {                         \
-		video_pixel_t op, np;                                                      \
-		video_color_t oc, nc;                                                      \
-		byte_t *line;                                                              \
-		x += LOCAL_GFX_XOFF;                                                       \
-		LOCAL_GFX_LOCK();                                                          \
-		line = LOCAL_GFX_DATA + y * LOCAL_GFX_STRIDE;                              \
-		op   = (*LOCAL_GFX_CODEC->vc_getpixel)(line, x);                           \
+#define DEFINE_LOCAL_ramgfx__putcolor_FOO(name, mode)                             \
+	INTERN ATTR_IN(1) void CC                                                     \
+	LOCAL_ramgfx__(putcolor_##name)(struct video_gfx const *__restrict self,      \
+	                                video_coord_t x, video_coord_t y,             \
+	                                video_color_t color) {                        \
+		video_pixel_t op, np;                                                     \
+		video_color_t oc, nc;                                                     \
+		byte_t *line;                                                             \
+		x += LOCAL_GFX_XOFF;                                                      \
+		LOCAL_GFX_LOCK();                                                         \
+		line = LOCAL_GFX_DATA + y * LOCAL_GFX_STRIDE;                             \
+		op   = (*LOCAL_GFX_CODEC->vc_getpixel)(line, x);                          \
 		oc   = (*LOCAL_GFX_CODEC->vc_pixel2color)(video_gfx_assurface(self), op); \
-		nc   = gfx_blendcolors(oc, color, mode);                                   \
+		nc   = gfx_blendcolors(oc, color, mode);                                  \
 		np   = (*LOCAL_GFX_CODEC->vc_color2pixel)(video_gfx_assurface(self), nc); \
-		(*LOCAL_GFX_CODEC->vc_setpixel)(line, x, np);                              \
-		LOCAL_GFX_UNLOCK();                                                        \
+		(*LOCAL_GFX_CODEC->vc_setpixel)(line, x, np);                             \
+		LOCAL_GFX_UNLOCK();                                                       \
 	}
 GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_LOCAL_ramgfx__putcolor_FOO)
 #undef DEFINE_LOCAL_ramgfx__putcolor_FOO
 
-#define DEFINE_LOCAL_ramgfx__putcolor_FOO(name, mode)                              \
-	INTERN ATTR_IN(1) void CC                                                      \
-	LOCAL_ramgfx__(putcolor_##name)(struct video_gfx const *__restrict self,       \
-	                                video_coord_t x, video_coord_t y,              \
-	                                video_color_t color) {                         \
-		video_pixel_t op, np;                                                      \
-		video_color_t oc, nc, cc;                                                  \
-		byte_t *line;                                                              \
-		x += LOCAL_GFX_XOFF;                                                       \
-		LOCAL_GFX_LOCK();                                                          \
-		line = LOCAL_GFX_DATA + y * LOCAL_GFX_STRIDE;                              \
-		op   = (*LOCAL_GFX_CODEC->vc_getpixel)(line, x);                           \
+#define DEFINE_LOCAL_ramgfx__putcolor_FOO(name, mode)                             \
+	INTERN ATTR_IN(1) void CC                                                     \
+	LOCAL_ramgfx__(putcolor_##name)(struct video_gfx const *__restrict self,      \
+	                                video_coord_t x, video_coord_t y,             \
+	                                video_color_t color) {                        \
+		video_pixel_t op, np;                                                     \
+		video_color_t oc, nc, cc;                                                 \
+		byte_t *line;                                                             \
+		x += LOCAL_GFX_XOFF;                                                      \
+		LOCAL_GFX_LOCK();                                                         \
+		line = LOCAL_GFX_DATA + y * LOCAL_GFX_STRIDE;                             \
+		op   = (*LOCAL_GFX_CODEC->vc_getpixel)(line, x);                          \
 		oc   = (*LOCAL_GFX_CODEC->vc_pixel2color)(video_gfx_assurface(self), op); \
-		cc   = GFX_BLENDMODE_GET_COLOR(self->vx_blend);                            \
-		nc   = gfx_blendcolors_constant(oc, color, mode, cc);                      \
+		cc   = GFX_BLENDMODE_GET_COLOR(self->vx_blend);                           \
+		nc   = gfx_blendcolors_constant(oc, color, mode, cc);                     \
 		np   = (*LOCAL_GFX_CODEC->vc_color2pixel)(video_gfx_assurface(self), nc); \
-		(*LOCAL_GFX_CODEC->vc_setpixel)(line, x, np);                              \
-		LOCAL_GFX_UNLOCK();                                                        \
+		(*LOCAL_GFX_CODEC->vc_setpixel)(line, x, np);                             \
+		LOCAL_GFX_UNLOCK();                                                       \
 	}
 GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(DEFINE_LOCAL_ramgfx__putcolor_FOO)
 #undef DEFINE_LOCAL_ramgfx__putcolor_FOO

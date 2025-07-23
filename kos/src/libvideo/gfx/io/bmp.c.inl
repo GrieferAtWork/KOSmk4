@@ -550,11 +550,11 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 		if unlikely(!mapfile_cookie)
 			goto err_pal_codec;
 		mapfile_cookie = memcpy(mapfile_cookie, p_mapfile, sizeof(*p_mapfile));
-		result = video_domain_formem(out_hasalpha_if_nonzero ? _libvideo_ramdomain() : domain_hint,
-		                             &format, (size_t)(ULONG)biWidth, (size_t)(ULONG)biHeight,
-		                             bPixelData, dwPixelScanline,
-		                             &unmap_mapfile_release_mem, mapfile_cookie,
-		                             VIDEO_DOMAIN_FORMEM_F_NORMAL);
+		result = _video_domain_formem(out_hasalpha_if_nonzero ? _libvideo_ramdomain() : domain_hint,
+		                              &format, (size_t)(ULONG)biWidth, (size_t)(ULONG)biHeight,
+		                              bPixelData, dwPixelScanline,
+		                              &unmap_mapfile_release_mem, mapfile_cookie,
+		                              VIDEO_DOMAIN_FORMEM_F_NORMAL);
 		if unlikely(!result) {
 			free(mapfile_cookie);
 			goto err_pal_codec;

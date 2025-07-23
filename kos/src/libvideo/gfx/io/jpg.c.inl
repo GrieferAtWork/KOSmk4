@@ -416,15 +416,15 @@ err_wrong_fmt:
 	result_format.vbf_flags = VIDEO_GFX_F_NORMAL;
 
 	/* Allocate video buffer */
-	result = video_domain_newbuffer(domain_hint, &result_format,
-	                                result_size_x, result_size_y,
-	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+	result = _video_domain_newbuffer(domain_hint, &result_format,
+	                                 result_size_x, result_size_y,
+	                                 VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result) {
 		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain)
 			goto err_errno;
-		result = video_domain_newbuffer(_libvideo_ramdomain(), &result_format,
-		                                result_size_x, result_size_y,
-		                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+		result = _video_domain_newbuffer(_libvideo_ramdomain(), &result_format,
+		                                 result_size_x, result_size_y,
+		                                 VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!result)
 			goto err_errno;
 	}

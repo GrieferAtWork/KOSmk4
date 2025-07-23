@@ -1685,7 +1685,6 @@ local_compositor_update_overlay_counts_cb(void *cookie, struct local_window *win
 	return 0;
 }
 
-
 PRIVATE ATTR_NOINLINE WUNUSED ATTR_INOUT(1) int CC
 _local_window_ensure_not_passthru_impl(struct local_window *__restrict self) {
 	struct local_compositor *comp = local_window_comp(self);
@@ -2327,8 +2326,8 @@ local_compositor_setbuffer_locked(struct local_compositor *__restrict me,
 		struct video_rect whole_screen;
 		video_rect_setxmin(&whole_screen, 0);
 		video_rect_setymin(&whole_screen, 0);
-		video_rect_setxdim(&whole_screen, new_buffer->vb_xdim);
-		video_rect_setydim(&whole_screen, new_buffer->vb_ydim);
+		video_rect_setxdim(&whole_screen, video_surface_getxdim(video_buffer_assurface(new_buffer)));
+		video_rect_setydim(&whole_screen, video_surface_getydim(video_buffer_assurface(new_buffer)));
 		local_compositor_updaterect__nopropagate(me, &whole_screen);
 	}
 	return old_buffer;

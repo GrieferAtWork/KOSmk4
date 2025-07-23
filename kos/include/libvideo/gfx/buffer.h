@@ -200,6 +200,11 @@ video_domain_newbuffer(struct video_domain const *__restrict __self,
                        struct video_buffer_format const *__restrict __format,
                        video_dim_t __xdim, video_dim_t __ydim,
                        unsigned int __flags);
+extern __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
+_video_domain_newbuffer(struct video_domain const *__restrict __self,
+                        struct video_buffer_format const *__restrict __format,
+                        video_dim_t __buffer_xdim, video_dim_t __buffer_ydim,
+                        unsigned int __flags);
 
 /* Create  a video buffer  that interfaces with  a pre-existing buffer whose
  * base address is located at `mem' (which consists of `__stride * __size_y'
@@ -243,6 +248,12 @@ video_domain_formem(struct video_domain const *__restrict __self,
                     video_dim_t __xdim, video_dim_t __ydim, void *__mem, __size_t __stride,
                     void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
                     void *__release_mem_cookie, unsigned int __flags);
+extern __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
+_video_domain_formem(struct video_domain const *__restrict __self,
+                     struct video_buffer_format const *__format,
+                     video_dim_t __buffer_xdim, video_dim_t __buffer_ydim, void *__mem, __size_t __stride,
+                     void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
+                     void *__release_mem_cookie, unsigned int __flags);
 
 /* Return the closest (by criteria of features and appearance) supported codec to "__codec"
  * This  function never returns `NULL', even if the domain only supports a single codec, in
@@ -253,10 +264,16 @@ extern __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_NONNULL((1)) struct 
 video_domain_supported_codec(struct video_domain const *__restrict __self,
                              struct video_codec const *__restrict __codec);
 #else /* __INTELLISENSE__ */
-#define video_domain_newbuffer(self, xdim, ydim, format, flags) \
-	(*(self)->vd_newbuffer)(self, xdim, ydim, format, flags)
-#define video_domain_formem(self, xdim, ydim, format, mem, stride, release_mem, release_mem_cookie, flags) \
-	(*(self)->vd_formem)(self, xdim, ydim, format, mem, stride, release_mem, release_mem_cookie, flags)
+#define _video_domain_newbuffer(self, format, buffer_xdim, buffer_ydim, flags) \
+	(*(self)->vd_newbuffer)(self, format, buffer_xdim, buffer_ydim, flags)
+#define video_domain_newbuffer(self, format, xdim, ydim, flags)                                                       \
+	(__likely(!((format)->vbf_flags & VIDEO_GFX_F_XYSWAP)) ? _video_domain_newbuffer(self, format, xdim, ydim, flags) \
+	                                                       : _video_domain_newbuffer(self, format, ydim, xdim, flags))
+#define _video_domain_formem(self, format, buffer_xdim, buffer_ydim, mem, stride, release_mem, release_mem_cookie, flags) \
+	(*(self)->vd_formem)(self, format, buffer_xdim, buffer_ydim, mem, stride, release_mem, release_mem_cookie, flags)
+#define video_domain_formem(self, format, xdim, ydim, mem, stride, release_mem, release_mem_cookie, flags)                                                       \
+	(__likely(!((format)->vbf_flags & VIDEO_GFX_F_XYSWAP)) ? _video_domain_formem(self, format, xdim, ydim, mem, stride, release_mem, release_mem_cookie, flags) \
+	                                                       : _video_domain_formem(self, format, ydim, xdim, mem, stride, release_mem, release_mem_cookie, flags))
 #define video_domain_supported_codec(self, codec) \
 	(*(self)->vd_supported_codec)(self, codec)
 #endif /* !__INTELLISENSE__ */

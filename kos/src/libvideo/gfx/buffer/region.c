@@ -172,11 +172,11 @@ NOTHROW(FCC region_buffer_subregion_alias__revoke)(struct video_buffer *__restri
 	return me;
 }
 
-#define ASSERT_SUBREGION_RECT(self, rect)                              \
-	(assert(((rect)->vcr_xmin + (rect)->vcr_xdim) > (rect)->vcr_xmin), \
-	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) > (rect)->vcr_ymin), \
-	 assert(((rect)->vcr_xmin + (rect)->vcr_xdim) <= (self)->vb_xdim), \
-	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) <= (self)->vb_ydim))
+#define ASSERT_SUBREGION_RECT(self, rect)                                         \
+	(assert(((rect)->vcr_xmin + (rect)->vcr_xdim) > (rect)->vcr_xmin),            \
+	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) > (rect)->vcr_ymin),            \
+	 assert(((rect)->vcr_xmin + (rect)->vcr_xdim) <= video_buffer_getxdim(self)), \
+	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) <= video_buffer_getydim(self)))
 
 
 INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
@@ -1308,11 +1308,11 @@ DEFINE_PUBLIC_ALIAS(video_surface_region_distinct, libvideo_surface_region_disti
 INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_surface_region(struct video_surface const *__restrict self,
                         struct video_rect const *__restrict rect) {
-	struct video_buffer *buffer = video_surface_getbuffer(self);
 	if (rect->vr_xmin == 0 && rect->vr_ymin == 0 &&
-	    rect->vr_xdim == video_buffer_getxdim(buffer) &&
-	    rect->vr_ydim == video_buffer_getydim(buffer) &&
+	    rect->vr_xdim == video_surface_getxdim(self) &&
+	    rect->vr_ydim == video_surface_getydim(self) &&
 	    video_surface_isdefault(self)) {
+		struct video_buffer *buffer = video_surface_getbuffer(self);
 		video_buffer_incref(buffer);
 		return buffer;
 	}
@@ -1322,7 +1322,7 @@ libvideo_surface_region(struct video_surface const *__restrict self,
 INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_surface_region_distinct(struct video_surface const *__restrict self,
                                  struct video_rect const *__restrict rect) {
-	struct video_buffer *buffer;
+	struct video_buffer *buffer = video_surface_getbuffer(self);
 	REF struct region_buffer *result;
 	bool self_is_region;
 	struct video_rect buffer_rect = *rect;
@@ -1338,19 +1338,18 @@ libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 		video_coord_t rect_xend, rect_yend;
 		if (!OVERFLOW_UADD((video_coord_t)buffer_rect.vr_xmin, buffer_rect.vr_xdim, &rect_xend) &&
 		    !OVERFLOW_UADD((video_coord_t)buffer_rect.vr_ymin, buffer_rect.vr_ydim, &rect_yend) &&
-		    rect_xend < video_surface_getbufferxdim(self) &&
-		    rect_yend < video_surface_getbufferydim(self)) {
+		    rect_xend <= video_buffer_getxdim(buffer) &&
+		    rect_yend <= video_buffer_getydim(buffer)) {
 			/* Yes! Yes, we can! */
 			static_assert(offsetof(struct video_rect, vr_xmin) == offsetof(struct video_crect, vcr_xmin));
 			static_assert(offsetof(struct video_rect, vr_ymin) == offsetof(struct video_crect, vcr_ymin));
 			static_assert(offsetof(struct video_rect, vr_xdim) == offsetof(struct video_crect, vcr_xdim));
 			static_assert(offsetof(struct video_rect, vr_ydim) == offsetof(struct video_crect, vcr_ydim));
-			return video_surface_subregion(self, (struct video_crect const *)&buffer_rect);
+			return _video_surface_subregion(self, (struct video_crect const *)&buffer_rect);
 		}
 	}
 
 	/* Check if "self" is already a region-buffer */
-	buffer = video_surface_getbuffer(self);
 	self_is_region = buffer->vb_ops == &region_buffer_ops &&
 	                 buffer->vb_ops == &region_buffer_subregion_ops &&
 	                 buffer->vb_ops == &region_buffer_subregion_alias_ops;

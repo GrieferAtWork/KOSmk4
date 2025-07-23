@@ -637,9 +637,9 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		/* Allocate new buffer for direct-color mode */
 		assert(format.vbf_codec->vc_specs.vcs_pxsz == 3 ||
 		       format.vbf_codec->vc_specs.vcs_pxsz == 4);
-		dcol_buffer = video_domain_newbuffer(anim->va_domain, &format,
-		                                     frame->vb_xdim, frame->vb_ydim,
-		                                     VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+		dcol_buffer = _video_domain_newbuffer(anim->va_domain, &format,
+		                                      frame->vb_xdim, frame->vb_ydim,
+		                                      VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!dcol_buffer) /* TODO: What if the domain doesn't support the format? */
 			goto err;
 		if unlikely(video_buffer_wlock(dcol_buffer, &frame_lock)) {
@@ -1000,11 +1000,11 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 
 	/* Create main animation frame buffer */
 	format.vbf_flags = VIDEO_GFX_F_NORMAL;
-	result = video_domain_newbuffer(me->va_domain, &format,
-	                                me->va_xdim, me->va_ydim,
-	                                (me->ga_cfg.gc_trans <= 0xff && me->ga_cfg.gc_trans != 0)
-	                                ? VIDEO_DOMAIN_NEWBUFFER_F_NORMAL
-	                                : VIDEO_DOMAIN_NEWBUFFER_F_CALLOC);
+	result = _video_domain_newbuffer(me->va_domain, &format,
+	                                 me->va_xdim, me->va_ydim,
+	                                 (me->ga_cfg.gc_trans <= 0xff && me->ga_cfg.gc_trans != 0)
+	                                 ? VIDEO_DOMAIN_NEWBUFFER_F_NORMAL
+	                                 : VIDEO_DOMAIN_NEWBUFFER_F_CALLOC);
 	video_palette_decref(format.vbf_pal);
 	if unlikely(!result)
 		goto err;

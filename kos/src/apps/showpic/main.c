@@ -190,8 +190,8 @@ palettize(struct video_gfx const *self, video_pixel_t num_colors, unsigned int m
 	/* Allocate result buffer */
 	result = video_domain_newbuffer(video_gfx_getdomain(self),
 	                                &result_format,
-	                                video_gfx_getrawxdim(self),
-	                                video_gfx_getrawydim(self),
+	                                video_gfx_getxdim(self),
+	                                video_gfx_getydim(self),
 	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	video_palette_decref(result_format.vbf_pal);
 	if unlikely(!result)
@@ -596,14 +596,19 @@ int main(int argc, char *argv[]) {
 		position.vwp_attr.vwa_flags = VIDEO_WINDOW_F_PASSTHRU;
 		position.vwp_attr.vwa_rect.vr_xmin = 80;
 		position.vwp_attr.vwa_rect.vr_ymin = 80;
-		position.vwp_attr.vwa_rect.vr_xdim = bscreen->vb_xdim - 160;
-		position.vwp_attr.vwa_rect.vr_ydim = bscreen->vb_ydim - 160;
+#if 1 /* FIXME: This, plus the "VIDEO_GFX_F_XYSWAP" in "screen.c" breaks */
+		position.vwp_attr.vwa_rect.vr_xdim = video_buffer_getxdim(bscreen) - 160;
+		position.vwp_attr.vwa_rect.vr_ydim = video_buffer_getydim(bscreen) - 160;
+#else
+		position.vwp_attr.vwa_rect.vr_xdim = video_surface_getxdim(video_buffer_assurface(bscreen)) - 160;
+		position.vwp_attr.vwa_rect.vr_ydim = video_surface_getydim(video_buffer_assurface(bscreen)) - 160;
+#endif
 		window1 = video_compositor_newwindow(compositor, &position, NULL);
 		if unlikely(!window1)
 			err(EXIT_FAILURE, "Failed to allocate window1");
 
 		/* Create a second (small) window to interact with the first (big) one */
-		position.vwp_over = VIDEO_WINDOW_MOVE_OVER__FOREGROUND;
+		position.vwp_over = VIDEO_WINDOW_MOVE_OVER__BACKGROUND;
 		position.vwp_attr.vwa_flags = VIDEO_WINDOW_F_PASSTHRU | VIDEO_WINDOW_F_ALPHA;
 		position.vwp_attr.vwa_rect.vr_xmin = 10;
 		position.vwp_attr.vwa_rect.vr_ymin = 10;
@@ -651,13 +656,14 @@ int main(int argc, char *argv[]) {
 	 * - dst format caching: ~97% spent sleeping  (=> x30 pixel output possible) */
 #if 0
 	anim = video_anim_cached(anim, NULL, NULL);
-#elif 1
+#elif 0
 	{
 		struct video_buffer_format format;
 		video_buffer_getformat(bscreen, &format);
 		anim = video_anim_cached(anim, bscreen->vb_domain, &format);
 	}
 #endif
+
 	if unlikely(!anim)
 		err(EXIT_FAILURE, "Failed to cache animation");
 	frame = (struct video_anim_frame *)malloca(video_anim_sizeof_frame(anim));

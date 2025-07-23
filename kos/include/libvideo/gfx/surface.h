@@ -249,7 +249,7 @@ video_buffer_region_distinct(struct video_buffer *__restrict __self,
  * by the given `format' argument, which should be the case-insensitive extension
  * (without a leading ".") of the format (e.g. "png" for PNG files).
  *
- * If  rotation/mirroring/etc. are specified by `__self->vb_format', information
+ * If rotation/mirroring/etc.  are specified  by `__self->vb_surf',  information
  * about those is either also stored in the produced image file (if supported by
  * the respective image format), or `__self' is converted into a normalized form
  * first (using `video_buffer_convert()'), and then its pixel data is stored.
@@ -327,6 +327,7 @@ video_buffer_convert_distinct(struct video_buffer *__restrict __self,
 #define video_surface_getbuffer(self)                (self)->vs_buffer
 #define video_surface_getbufferxdim(self)            video_buffer_getxdim(video_surface_getbuffer(self))
 #define video_surface_getbufferydim(self)            video_buffer_getydim(video_surface_getbuffer(self))
+/* TODO: Change vb_xdim / vb_ydim into vb_dim[2] and use ((flags & VIDEO_GFX_F_XYSWAP) [^ 1]) as index */
 #define video_surface_getxdim(self)                  (__unlikely(video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) ? video_surface_getbufferydim(self) : video_surface_getbufferxdim(self))
 #define video_surface_getydim(self)                  (__unlikely(video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) ? video_surface_getbufferxdim(self) : video_surface_getbufferydim(self))
 #define video_surface_getpalette(self)               (self)->vs_pal

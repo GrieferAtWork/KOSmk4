@@ -119,19 +119,19 @@ again_font:
 	fontgfx = gfx;
 	if (render_mode == 0) {
 		/* Upper half + lower half */
-		fontgfx.clip(0, 0, screen->vb_xdim, screen->vb_ydim);
+		fontgfx.clip(0, 0, video_gfx_getxdim(&gfx), video_gfx_getydim(&gfx));
 		fontprinter_data.vfp_cury = 0;
 	} else if (render_mode == 1) {
 		/* lower half only (plus additional lines) */
 		fontgfx.clip(0,
 		             fontprinter_data.vfp_height / 2,
-		             screen->vb_xdim,
-		             screen->vb_ydim - (fontprinter_data.vfp_height / 2));
+		             video_gfx_getxdim(&gfx),
+		             video_gfx_getydim(&gfx) - (fontprinter_data.vfp_height / 2));
 		fontprinter_data.vfp_cury = -(video_offset_t)(fontprinter_data.vfp_height / 2);
 	} else {
 		/* upper half only */
 		fontgfx.clip(0, 0,
-		             screen->vb_xdim,
+		             video_gfx_getxdim(&gfx),
 		             fontprinter_data.vfp_height / 2);
 		fontprinter_data.vfp_cury = 0;
 	}
@@ -227,16 +227,16 @@ again_font:
 
 			case 'j': {
 				video_dim_t i;
-				video_offset_t x1 = rand() % screen->vb_xdim;
-				video_offset_t y1 = rand() % screen->vb_ydim;
+				video_offset_t x1 = rand() % video_gfx_getxdim(&gfx);
+				video_offset_t y1 = rand() % video_gfx_getydim(&gfx);
 				video_color_t color = rand_color();
 				for (i = 0; i < 100; ++i) {
 					video_dim_t xm = (x1 <= 0 ? 0 : x1) ?: 1;
-					video_dim_t xp = (video_dim_t)(x1 >= (video_offset_t)screen->vb_xdim ? 0 : (video_offset_t)screen->vb_xdim - x1) ?: 1;
+					video_dim_t xp = (video_dim_t)(x1 >= (video_offset_t)video_gfx_getxdim(&gfx) ? 0 : (video_offset_t)video_gfx_getxdim(&gfx) - x1) ?: 1;
 					video_dim_t ym = (y1 <= 0 ? 0 : y1) ?: 1;
-					video_dim_t yp = (video_dim_t)(y1 >= (video_offset_t)screen->vb_ydim ? 0 : (video_offset_t)screen->vb_ydim - y1) ?: 1;
-					int xsign = (rand() % (screen->vb_xdim)) < xm ? -1 : 1;
-					int ysign = (rand() % (screen->vb_ydim)) < ym ? -1 : 1;
+					video_dim_t yp = (video_dim_t)(y1 >= (video_offset_t)video_gfx_getydim(&gfx) ? 0 : (video_offset_t)video_gfx_getydim(&gfx) - y1) ?: 1;
+					int xsign = (rand() % (video_gfx_getxdim(&gfx))) < xm ? -1 : 1;
+					int ysign = (rand() % (video_gfx_getydim(&gfx))) < ym ? -1 : 1;
 					video_offset_t x2 = x1 + (xsign * (rand() % (xsign < 0 ? xm : xp)));
 					video_offset_t y2 = y1 + (ysign * (rand() % (ysign < 0 ? ym : yp)));
 					gfx.line(x1, y1, x2, y2, color);
@@ -282,38 +282,38 @@ step:
 		switch (action) {
 
 		case 0: {
-			gfx.rect((rand() % screen->vb_xdim) - 16,
-			         (rand() % screen->vb_ydim) - 16,
-			         rand() % screen->vb_xdim,
-			         rand() % screen->vb_ydim,
+			gfx.rect((rand() % video_gfx_getxdim(&gfx)) - 16,
+			         (rand() % video_gfx_getydim(&gfx)) - 16,
+			         rand() % video_gfx_getxdim(&gfx),
+			         rand() % video_gfx_getydim(&gfx),
 			         color);
 		}	break;
 
 		case 1: {
-			gfx.fill((rand() % screen->vb_xdim) - 16,
-			         (rand() % screen->vb_ydim) - 16,
-			         rand() % screen->vb_xdim,
-			         rand() % screen->vb_ydim,
+			gfx.fill((rand() % video_gfx_getxdim(&gfx)) - 16,
+			         (rand() % video_gfx_getydim(&gfx)) - 16,
+			         rand() % video_gfx_getxdim(&gfx),
+			         rand() % video_gfx_getydim(&gfx),
 			         color);
 		}	break;
 
 		case 2: {
-			gfx.stretch((rand() % screen->vb_xdim) - 16,
-			            (rand() % screen->vb_ydim) - 16,
-			            rand() % screen->vb_xdim,
-			            rand() % screen->vb_ydim,
+			gfx.stretch((rand() % video_gfx_getxdim(&gfx)) - 16,
+			            (rand() % video_gfx_getydim(&gfx)) - 16,
+			            rand() % video_gfx_getxdim(&gfx),
+			            rand() % video_gfx_getydim(&gfx),
 			            gfx,
-			            (rand() % screen->vb_xdim) - 16,
-			            (rand() % screen->vb_ydim) - 16,
-			            rand() % screen->vb_xdim,
-			            rand() % screen->vb_ydim);
+			            (rand() % video_gfx_getxdim(&gfx)) - 16,
+			            (rand() % video_gfx_getydim(&gfx)) - 16,
+			            rand() % video_gfx_getxdim(&gfx),
+			            rand() % video_gfx_getydim(&gfx));
 		}	break;
 
 		case 3: {
-			video_offset_t x = (rand() % screen->vb_xdim) - 16;
-			video_offset_t y = (rand() % screen->vb_ydim) - 16;
-			video_coord_t size_x = rand() % screen->vb_xdim;
-			video_coord_t size_y = rand() % screen->vb_ydim;
+			video_offset_t x = (rand() % video_gfx_getxdim(&gfx)) - 16;
+			video_offset_t y = (rand() % video_gfx_getydim(&gfx)) - 16;
+			video_coord_t size_x = rand() % video_gfx_getxdim(&gfx);
+			video_coord_t size_y = rand() % video_gfx_getydim(&gfx);
 			video_color_t colors[2][2];
 			colors[0][0] = rand_color();
 			colors[0][1] = rand_color();
@@ -323,30 +323,30 @@ step:
 		}	break;
 
 		case 4: {
-			video_offset_t x = (rand() % screen->vb_xdim) - 16;
-			video_offset_t y = (rand() % screen->vb_ydim) - 16;
-			video_coord_t size_x = rand() % screen->vb_xdim;
-			video_coord_t size_y = rand() % screen->vb_ydim;
+			video_offset_t x = (rand() % video_gfx_getxdim(&gfx)) - 16;
+			video_offset_t y = (rand() % video_gfx_getydim(&gfx)) - 16;
+			video_coord_t size_x = rand() % video_gfx_getxdim(&gfx);
+			video_coord_t size_y = rand() % video_gfx_getydim(&gfx);
 			video_color_t locolor = rand_color();
 			video_color_t hicolor = rand_color();
 			gfx.hgradient(x, y, size_x, size_y, locolor, hicolor);
 		}	break;
 
 		case 5: {
-			video_offset_t x = (rand() % screen->vb_xdim) - 16;
-			video_offset_t y = (rand() % screen->vb_ydim) - 16;
-			video_coord_t size_x = rand() % screen->vb_xdim;
-			video_coord_t size_y = rand() % screen->vb_ydim;
+			video_offset_t x = (rand() % video_gfx_getxdim(&gfx)) - 16;
+			video_offset_t y = (rand() % video_gfx_getydim(&gfx)) - 16;
+			video_coord_t size_x = rand() % video_gfx_getxdim(&gfx);
+			video_coord_t size_y = rand() % video_gfx_getydim(&gfx);
 			video_color_t locolor = rand_color();
 			video_color_t hicolor = rand_color();
 			gfx.vgradient(x, y, size_x, size_y, locolor, hicolor);
 		}	break;
 
 		default:
-			gfx.line(rand() % screen->vb_xdim,
-			         rand() % screen->vb_ydim,
-			         rand() % screen->vb_xdim,
-			         rand() % screen->vb_ydim,
+			gfx.line(rand() % video_gfx_getxdim(&gfx),
+			         rand() % video_gfx_getydim(&gfx),
+			         rand() % video_gfx_getxdim(&gfx),
+			         rand() % video_gfx_getydim(&gfx),
 			         color);
 			break;
 		}

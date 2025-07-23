@@ -367,13 +367,13 @@ do_rgb_format:
 
 	/* Allocate result video buffer. */
 	result_format.vbf_flags = VIDEO_GFX_F_NORMAL;
-	result = video_domain_newbuffer(domain_hint, &result_format,
-	                                width, height, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+	result = _video_domain_newbuffer(domain_hint, &result_format,
+	                                 width, height, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result) {
 		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain)
 			goto err_png_ptr_info_ptr_pal;
-		result = video_domain_newbuffer(_libvideo_ramdomain(), &result_format,
-		                                width, height, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+		result = _video_domain_newbuffer(_libvideo_ramdomain(), &result_format,
+		                                 width, height, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!result)
 			goto err_png_ptr_info_ptr_pal;
 	}

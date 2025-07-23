@@ -136,21 +136,12 @@ libvideo_surface_convert_distinct(struct video_surface const *__restrict self,
                                   struct video_buffer_format const *format) {
 	REF struct video_buffer *result;
 	struct video_gfx src_gfx, dst_gfx;
-	video_dim_t result_xdim, result_ydim;
-
-	/* Figure out fully transformed dimensions of new video buffer. */
 	video_surface_getgfx(self, &src_gfx, GFX_BLENDMODE_OVERRIDE);
-	result_xdim = video_gfx_getxdim(&src_gfx);
-	result_ydim = video_gfx_getydim(&src_gfx);
-	if (format->vbf_flags & VIDEO_GFX_F_XYSWAP) {
-		video_dim_t temp = result_xdim;
-		result_xdim = result_ydim;
-		result_ydim = temp;
-	}
 
-	/* Create a new video buffer */
+	/* Create a new video buffer. */
 	result = video_domain_newbuffer(domain, format,
-	                                result_xdim, result_ydim,
+	                                video_gfx_getxdim(&src_gfx),
+	                                video_gfx_getydim(&src_gfx),
 	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if likely(result) {
 		/* Blit the entirety of the source buffer into the target buffer. */
