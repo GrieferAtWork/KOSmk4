@@ -24,6 +24,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  */
 #ifndef GUARD_LIBVIDEO_GFX_IO_C
 #define GUARD_LIBVIDEO_GFX_IO_C 1
+#define __VIDEO_BUFFER_const /*nothing */
 #define _KOS_SOURCE 1
 
 #include "api.h"
@@ -128,9 +129,8 @@ convert_to_wanted_domain(struct video_domain const *__restrict domain,
                          /*inherit(always)*/ REF struct video_buffer *__restrict self) {
 	if unlikely(self->vb_domain != domain) {
 		REF struct video_buffer *converted;
-		struct video_format result_format;
-		result_format.vf_codec = video_domain_supported_codec(domain, self->vb_format.vf_codec);
-		result_format.vf_pal   = self->vb_format.vf_pal;
+		struct video_buffer_format result_format = self->vb_format;
+		result_format.vbf_codec = video_domain_supported_codec(domain, result_format.vbf_codec);
 		converted = libvideo_buffer_convert(self, domain, &result_format);
 		video_buffer_decref(self);
 		self = converted;

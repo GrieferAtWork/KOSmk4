@@ -161,9 +161,9 @@ libvideo_gfx_clip__generic(struct video_gfx *__restrict self,
 	/* Adjust clip rect */
 	self->vx_hdr.vxh_cxoff += clip_x;
 	self->vx_hdr.vxh_cyoff += clip_y;
-	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
 		self->vx_hdr.vxh_cxoff -= 2 * clip_x;
-	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
 		self->vx_hdr.vxh_cyoff -= 2 * clip_y;
 	self->vx_hdr.vxh_cxsiz = size_x;
 	self->vx_hdr.vxh_cysiz = size_y;
@@ -210,13 +210,13 @@ INTERN WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
 libvideo_gfx_offset2coord__generic(struct video_gfx const *__restrict self,
                                    video_offset_t x, video_offset_t y,
                                    video_coord_t coords[2]) {
-	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
-	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-	if (self->vx_flags & VIDEO_GFX_F_XWRAP)
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP)
 		x = wrap(x, self->vx_hdr.vxh_cxsiz);
-	if (self->vx_flags & VIDEO_GFX_F_YWRAP)
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP)
 		x = wrap(x, self->vx_hdr.vxh_cxsiz);
 	x += self->vx_hdr.vxh_cxoff;
 	y += self->vx_hdr.vxh_cyoff;
@@ -228,7 +228,7 @@ libvideo_gfx_offset2coord__generic(struct video_gfx const *__restrict self,
 		goto fail;
 	if unlikely((video_coord_t)y >= self->vx_hdr.vxh_byend)
 		goto fail;
-	if (self->vx_flags & VIDEO_GFX_F_XYSWAP) {
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP) {
 		video_offset_t temp;
 		temp = x;
 		x    = y;
@@ -251,7 +251,7 @@ INTERN WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
 libvideo_gfx_coord2offset__generic(struct video_gfx const *__restrict self,
                                    video_coord_t x, video_coord_t y,
                                    video_offset_t offsets[2]) {
-	if (self->vx_flags & VIDEO_GFX_F_XYSWAP) {
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP) {
 		video_coord_t temp;
 		temp = x;
 		x    = y;
@@ -267,9 +267,9 @@ libvideo_gfx_coord2offset__generic(struct video_gfx const *__restrict self,
 		goto fail;
 	x -= self->vx_hdr.vxh_cxoff;
 	y -= self->vx_hdr.vxh_cyoff;
-	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
-	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - 1) - y;
 	offsets[0] = (video_offset_t)x;
 	offsets[1] = (video_offset_t)y;
@@ -313,9 +313,9 @@ _libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
 #undef Tswap
 
 	/* Swap axis-specific flags */
-	self->vx_flags = (self->vx_flags & ~(GFX_XFLAGS | GFX_YFLAGS)) |
-	                 ((self->vx_flags & GFX_XFLAGS) << GFX_FLAGS_X_TO_Y_LSHIFT) |
-	                 ((self->vx_flags & GFX_YFLAGS) >> GFX_FLAGS_Y_TO_X_RSHIFT);
+	video_gfx_getflags(self) = (video_gfx_getflags(self) & ~(GFX_XFLAGS | GFX_YFLAGS)) |
+	                 ((video_gfx_getflags(self) & GFX_XFLAGS) << GFX_FLAGS_X_TO_Y_LSHIFT) |
+	                 ((video_gfx_getflags(self) & GFX_YFLAGS) >> GFX_FLAGS_Y_TO_X_RSHIFT);
 #undef GFX_YFLAGS
 #undef GFX_XFLAGS
 #undef GFX_FLAGS_Y_TO_X_RSHIFT
@@ -326,21 +326,21 @@ DEFINE_PUBLIC_ALIAS(video_gfx_xyswap, libvideo_gfx_xyswap);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
 	_libvideo_gfx_xyswap(self);
-	self->vx_flags ^= VIDEO_GFX_F_XYSWAP;
+	video_gfx_getflags(self) ^= VIDEO_GFX_F_XYSWAP;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_hmirror, libvideo_gfx_hmirror);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_hmirror(struct video_gfx *__restrict self) {
-	self->vx_flags ^= VIDEO_GFX_F_XMIRROR;
+	video_gfx_getflags(self) ^= VIDEO_GFX_F_XMIRROR;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_vmirror, libvideo_gfx_vmirror);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_vmirror(struct video_gfx *__restrict self) {
-	self->vx_flags ^= VIDEO_GFX_F_YMIRROR;
+	video_gfx_getflags(self) ^= VIDEO_GFX_F_YMIRROR;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
@@ -348,7 +348,7 @@ DEFINE_PUBLIC_ALIAS(video_gfx_lrot90, libvideo_gfx_lrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_lrot90(struct video_gfx *__restrict self) {
 	_libvideo_gfx_xyswap(self);
-	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
+	video_gfx_getflags(self) ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
@@ -358,16 +358,16 @@ libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
 	/* When rotated right, the virtual origin
 	 * >> vX=0, vY=0
 	 * maps to the physical origin at
-	 * >> pX=0, pY=self->vx_buffer->vb_ydim-1
+	 * >> pX=0, pY=video_gfx_getbuffer(self)->vb_ydim-1
 	 *
 	 * via the formula:
-	 * >> pX = vY, pY = (self->vx_buffer->vb_ydim - 1) - vX
+	 * >> pX = vY, pY = (video_gfx_getbuffer(self)->vb_ydim - 1) - vX
 	 *
-	 * Since  mirroring  always  happens  before   X/Y-swap,
-	 * and since `_libvideo_gfx_xyswap'  already made it  so
-	 * `self->vx_hdr.vxh_cxsiz = self->vx_buffer->vb_ydim-1'
-	 * (assuming no custom clip rect), we have to toggle the
-	 * XMIRROR flag here  (since mirror  happens before  X/Y
+	 * Since mirroring  always  happens  before  X/Y-swap,
+	 * and since `_libvideo_gfx_xyswap' already made it so
+	 * `self->vx_hdr.vxh_cxsiz = video_gfx_getbuffer(self)->vb_ydim-1'
+	 * (assuming  no  custom  clip  rect),  we  have  to  toggle   the
+	 * XMIRROR   flag   here   (since   mirror   happens   before  X/Y
 	 * swapping)
 	 *
 	 * This also means that rotating the screen 90° right actually
@@ -393,14 +393,14 @@ libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
 	 *      the BOTTOM LEFT (even though your old origin is now in
 	 *      the top left). */
 	_libvideo_gfx_xyswap(self);
-	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
+	video_gfx_getflags(self) ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_rot180, libvideo_gfx_rot180);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_rot180(struct video_gfx *__restrict self) {
-	self->vx_flags ^= (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR);
+	video_gfx_getflags(self) ^= (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 

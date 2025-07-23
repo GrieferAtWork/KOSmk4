@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
 	screen = screen_buffer_create(NULL);
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
-	screen->getgfx(gfx, GFX_BLENDMODE_ALPHA, VIDEO_GFX_F_LINEAR);
+	video_buffer_getgfx(screen, &gfx, GFX_BLENDMODE_ALPHA);
 
 	fontprinter_data.vfp_height          = 16;
 	fontprinter_data.vfp_font            = font;

@@ -2816,9 +2816,9 @@
 #define DEFINE_LIBICONV_SYMBOL_BINDING(T,n) T pdyn_##n=0;char const name_##n[]=#n;T libc_resolve_##n(){}
 #define DEFINE_SUPPLEMENTAL_LIBICONV_LIBRARY_BINDING(n) typedef void(*_PSUPENCODE_INIT_##n)(struct iconv_encode*self,struct iconv_printer*input);typedef void(*_PSUPDECODE_INIT_##n)(struct iconv_decode*self,struct iconv_printer*input);_PSUPENCODE_INIT_##n pdyn_iconv_##n##_encode_init=0;_PSUPDECODE_INIT_##n pdyn_iconv_##n##_decode_init=0;void*pdyn_libiconv_##n=0;bool load_libiconv_##n(){}
 #define DEFINE_CPUSTATE_GETTERS(get_struct_xcpustate,set_struct_xcpustate,libuw_unwind_getreg_xcpustate,b1,libuw_unwind_getreg_xcpustate_exclusive,libuw_unwind_setreg_xcpustate,b2,libuw_unwind_setreg_xcpustate_exclusive) unwind_errno_t libuw_unwind_getreg_xcpustate(get_struct_xcpustate self,unwind_regno_t dw_regno,void*dst){}unwind_errno_t libuw_unwind_setreg_xcpustate(set_struct_xcpustate self,unwind_regno_t dw_regno,void const*src){}unwind_errno_t libuw_unwind_getreg_xcpustate_exclusive(get_struct_xcpustate self,unwind_regno_t dw_regno,void*dst){}unwind_errno_t libuw_unwind_setreg_xcpustate_exclusive(set_struct_xcpustate self,unwind_regno_t dw_regno,void const*src){}
-#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union_type) video_pixel_t n##_color2pixel(struct video_format const*format,video_color_t color){}video_color_t n##_pixel2color(struct video_format const*format,video_pixel_t pixel){}
-#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union_type) video_pixel_t n##_color2pixel(struct video_format const*format,video_color_t color){}video_color_t n##_pixel2color(struct video_format const*format,video_pixel_t pixel){}
-#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(n,d,union_type)  video_pixel_t n##_color2pixel(struct video_format const*format,video_color_t color){}video_color_t n##_pixel2color(struct video_format const*format,video_pixel_t pixel){}
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union_type) video_pixel_t n##_color2pixel(struct video_surface const*surface,video_color_t color){}video_color_t n##_pixel2color(struct video_surface const*surface,video_pixel_t pixel){}
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union_type) video_pixel_t n##_color2pixel(struct video_surface const*surface,video_color_t color){}video_color_t n##_pixel2color(struct video_surface const*surface,video_pixel_t pixel){}
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(n,d,union_type)  video_pixel_t n##_color2pixel(struct video_surface const*surface,video_color_t color){}video_color_t n##_pixel2color(struct video_surface const*surface,video_pixel_t pixel){}
 #define DEFINE_FORMAT_PIXEL_UNION(n,d,...) union pixel_##n{d data;struct __VA_ARGS__;};
 #define DEFINE_FORMAT_CONVERTER_RGBA(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union pixel_##n)
 #define DEFINE_FORMAT_CONVERTER_RGBX(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union pixel_##n)
@@ -2857,9 +2857,9 @@
 #define DEFINE_vp_kd_treeN_find(N)void vp_kd_tree##N##_find(struct video_palette_tree const*node,video_color_t color,unsigned int chan_id,struct kd_tree_result*result){}
 #define LOCAL_IF_IMATRIX(x)
 #define LOCAL_ATTR
-#define DEFINE_PIXEL2COLOR64_WRAPPER32(d,_,x)video_color64_t x(struct video_format const*__restrict format,video_pixel64_t pixel){}
-#define DEFINE_COLOR2PIXEL64_WRAPPER32(d,_,x)video_pixel64_t x(struct video_format const*__restrict format,video_color64_t color){}
-#define DEFINE_PIXEL64_WRAPPERS(d,x)video_color64_t x##_pixel2color64(struct video_format const*__restrict format,video_pixel64_t pixel){}video_pixel64_t x##_color2pixel64(struct video_format const*__restrict format,video_color64_t color){}
+#define DEFINE_PIXEL2COLOR64_WRAPPER32(d,_,x)video_color64_t x(struct video_surface const*__restrict surface,video_pixel64_t pixel){}
+#define DEFINE_COLOR2PIXEL64_WRAPPER32(d,_,x)video_pixel64_t x(struct video_surface const*__restrict surface,video_color64_t color){}
+#define DEFINE_PIXEL64_WRAPPERS(d,x)video_color64_t x##_pixel2color64(struct video_surface const*__restrict surface,video_pixel64_t pixel){}video_pixel64_t x##_color2pixel64(struct video_surface const*__restrict surface,video_color64_t color){}
 #define LOCAL_FUNC64(x) x##_64
 #define DEFINE_GENERIC_linefill__with__setpixel(f,...)static void f(byte_t*__restrict line,video_coord_t x,video_pixel_t pixel,video_dim_t num_pixels){}
 #define DEFINE_GENERIC_vertfill__with__setpixel(f,...)static void f(byte_t*__restrict line,video_coord_t x,size_t stride,video_pixel_t pixel,video_dim_t num_pixels){}
@@ -2906,3 +2906,4 @@
 	void libvideo_swgfx_preblend__fillstretchmask_n__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t dst_size_x,video_dim_t dst_size_y,video_color_t const bg_fg_colors[2],video_dim_t src_size_x,video_dim_t src_size_y,struct video_bitmask const*__restrict bm){}
 #define GFX_FOREACH_DEDICATED_PREBLENDMODE(cb)cb(alpha,0,alpha_premultiplied,gfx_preblend_alpha)cb(alpha_factor,0,alpha_premultiplied,gfx_preblend_alpha_factor)cb(alpha_override,0,alpha_premultiplied,gfx_preblend_alpha_override)cb(add,0,add_premultiplied,gfx_preblend_add)
 #define DEFINE_VIDEO_BUFFER_TYPE(name,...) struct video_buffer_ops name={};struct video_buffer_ops const*_##name(void){}
+#define __VIDEO_CODEC_const const

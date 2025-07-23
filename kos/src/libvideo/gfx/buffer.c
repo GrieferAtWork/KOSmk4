@@ -103,18 +103,16 @@ NOTHROW(FCC libvideo_buffer_generic_unlockregion)(struct video_buffer *__restric
 /* Convert `self' into the specified domain and format.
  * @return: * : The converted video buffer.
  * @return: NULL: [errno=ENOMEM]  Insufficient memory (either regular RAM, or V-RAM)
- * @return: NULL: [errno=ENOTSUP] Given `format->vf_codec' is not supported by `domain ?: self->vb_domain'
+ * @return: NULL: [errno=ENOTSUP] Given `format->vbf_codec' is not supported by `domain ?: self->vb_domain'
  * @return: NULL: [errno=*] Failed to convert buffer for some reason (s.a. `errno') */
 DEFINE_PUBLIC_ALIAS(video_buffer_convert, libvideo_buffer_convert);
 INTERN WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
 libvideo_buffer_convert(struct video_buffer *__restrict self,
                         struct video_domain const *domain,
-                        struct video_format const *format) {
+                        struct video_buffer_format const *format) {
 	/* Check for simple case: buffer is already in the expected format. */
 	if (self->vb_domain == domain &&
-	    self->vb_format.vf_codec == format->vf_codec &&
-	    (self->vb_format.vf_pal == format->vf_pal ||
-	     self->vb_format.vf_pal == NULL)) {
+	    video_buffer_format_equals(&self->vb_format, format)) {
 		video_buffer_incref(self);
 		return self;
 	}
@@ -125,16 +123,28 @@ DEFINE_PUBLIC_ALIAS(video_buffer_convert_or_copy, libvideo_buffer_convert_or_cop
 INTERN WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
 libvideo_buffer_convert_or_copy(struct video_buffer *__restrict self,
                                 struct video_domain const *domain,
-                                struct video_format const *format) {
-	/* Create a new video buffer */
+                                struct video_buffer_format const *format) {
 	REF struct video_buffer *result;
-	result = video_domain_newbuffer(domain, self->vb_xdim, self->vb_ydim,
-	                                format, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+	struct video_gfx src_gfx, dst_gfx;
+	video_dim_t result_xdim, result_ydim;
+
+	/* Figure out fully transformed dimensions of new video buffer. */
+	video_buffer_getgfx(self, &src_gfx, GFX_BLENDMODE_OVERRIDE);
+	result_xdim = video_gfx_getclipw(&src_gfx);
+	result_ydim = video_gfx_getcliph(&src_gfx);
+	if (format->vbf_flags & VIDEO_GFX_F_XYSWAP) {
+		video_dim_t temp = result_xdim;
+		result_xdim = result_ydim;
+		result_ydim = temp;
+	}
+
+	/* Create a new video buffer */
+	result = video_domain_newbuffer(domain, format,
+	                                result_xdim, result_ydim,
+	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if likely(result) {
 		/* Blit the entirety of the source buffer into the target buffer. */
-		struct video_gfx src_gfx, dst_gfx;
-		video_buffer_getgfx(self, &src_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-		video_buffer_getgfx(result, &dst_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+		video_buffer_getgfx(result, &dst_gfx, GFX_BLENDMODE_OVERRIDE);
 		assert(video_gfx_getclipw(&dst_gfx) == video_gfx_getclipw(&src_gfx));
 		assert(video_gfx_getcliph(&dst_gfx) == video_gfx_getcliph(&src_gfx));
 		video_gfx_bitblit(&dst_gfx, 0, 0,

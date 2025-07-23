@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_BUFFER_REGION_C
 #define GUARD_LIBVIDEO_GFX_BUFFER_REGION_C 1
+#define __VIDEO_BUFFER_const /* nothing */
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -44,8 +45,9 @@
 #include <libvideo/color.h>
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
-#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface-defs.h>
+#include <libvideo/gfx/surface.h>
 #include <libvideo/rect.h>
 #include <libvideo/types.h>
 
@@ -94,9 +96,8 @@ region_buffer__destroy(struct video_buffer *__restrict self) {
 	struct region_buffer *me = (struct region_buffer *)self;
 	assert(LIST_EMPTY(&me->rbf_child_list));
 	assert(me->rbf_inuse == 0);
-	if (me->vb_format.vf_pal)
-		video_palette_decref(me->vb_format.vf_pal);
 	video_buffer_decref(me->rbf_base);
+	__video_buffer_fini_common(me);
 	free(me);
 }
 
@@ -178,14 +179,13 @@ NOTHROW(FCC region_buffer_subregion_alias__revoke)(struct video_buffer *__restri
 	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) <= (self)->vb_ydim))
 
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-region_buffer__subregion(struct video_buffer *__restrict self,
-                         struct video_crect const *__restrict rect,
-                         video_gfx_flag_t gfx_flags) {
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+region_buffer__subregion(struct video_surface const *__restrict self,
+                         struct video_crect const *__restrict rect) {
 	struct video_rect old_rect, new_rect, result_rect, base_iorect;
 	REF struct region_buffer_subregion *result;
 	REF struct video_buffer *base;
-	struct region_buffer *me = (struct region_buffer *)self;
+	struct region_buffer *me = (struct region_buffer *)video_surface_getbuffer(self);
 	ASSERT_SUBREGION_RECT(me, rect);
 	old_rect.vr_xmin = me->rbf_cxoff;
 	old_rect.vr_ymin = me->rbf_cyoff;
@@ -211,9 +211,6 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 	if (!video_rect_intersect_overflow(&base_iorect, &result_rect, &base_iorect))
 		goto do_return_empty_buffer_base;
 
-	/* Combine "gfx_flags" with those of "me" */
-	gfx_flags = video_gfx_flag_combine(me->rbf_gfx, gfx_flags);
-
 	/* Check if this whole thing has once again turned into a sub-region-only buffer.
 	 * If it has, then we should create a `region_buffer_subregion_alias_ops' buffer. */
 	if (result_rect.vr_xmin == base_iorect.vr_xmin &&
@@ -222,7 +219,9 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 	    result_rect.vr_ydim == base_iorect.vr_ydim) {
 		REF struct video_buffer *result_base;
 		REF struct region_buffer_subregion_alias *alias_result;
-		result_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect, gfx_flags);
+		struct video_surface base_surface;
+		video_surface_frombuffer(&base_surface, base);
+		result_base = video_surface_subregion(&base_surface, (struct video_crect const *)&base_iorect);
 		if unlikely(!result_base)
 			goto err_base;
 		video_buffer_decref(base);
@@ -232,13 +231,15 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 			goto err_base;
 		alias_result->vb_ops    = _region_buffer_subregion_alias_ops();
 		alias_result->vb_domain = me->vb_domain;
-		alias_result->vb_format = base->vb_format;
-		alias_result->vb_xdim   = base->vb_xdim;
-		alias_result->vb_ydim   = base->vb_ydim;
+		alias_result->vb_format.vbf_codec    = video_buffer_getcodec(base);
+		alias_result->vb_format.vbf_pal      = video_surface_getpalette(self);
+		alias_result->vb_format.vbf_flags    = video_surface_getflags(self);
+		alias_result->vb_format.vbf_colorkey = video_surface_getcolorkey(self);
+		alias_result->vb_xdim   = video_buffer_getxdim(base);
+		alias_result->vb_ydim   = video_buffer_getydim(base);
 		alias_result->vb_refcnt = 1;
 		alias_result->rbf_cxoff = 0;
 		alias_result->rbf_cyoff = 0;
-		alias_result->rbf_gfx   = 0;
 		alias_result->rbf_base  = base; /* Inherit reference */
 		alias_result->rbf_orig  = base;
 		alias_result->rbf_inuse = 0;
@@ -246,8 +247,7 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 		atomic_lock_init(&alias_result->rbf_child_lock);
 		alias_result->brbsr_parent = me;
 		video_buffer_incref(me);
-		if (alias_result->vb_format.vf_pal)
-			video_palette_incref(alias_result->vb_format.vf_pal);
+		__video_buffer_init_common(alias_result);
 		atomic_lock_acquire(&me->rbf_child_lock);
 		LIST_INSERT_HEAD(&me->rbf_child_list, alias_result, brbsr_chain);
 		atomic_lock_release(&me->rbf_child_lock);
@@ -260,7 +260,9 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 	    base_iorect.vr_xdim < base->vb_xdim ||
 	    base_iorect.vr_ydim < base->vb_ydim) {
 		REF struct video_buffer *result_base;
-		result_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect, gfx_flags);
+		struct video_surface base_surface;
+		video_surface_frombuffer(&base_surface, base);
+		result_base = video_surface_subregion(&base_surface, (struct video_crect const *)&base_iorect);
 		if unlikely(!result_base)
 			goto err_base;
 		video_buffer_decref(base);
@@ -275,13 +277,15 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 		goto err_base;
 	result->vb_ops    = _region_buffer_subregion_ops();
 	result->vb_domain = me->vb_domain;
-	result->vb_format = base->vb_format;
+	result->vb_format.vbf_codec    = video_buffer_getcodec(base);
+	result->vb_format.vbf_pal      = video_surface_getpalette(self);
+	result->vb_format.vbf_flags    = video_surface_getflags(self);
+	result->vb_format.vbf_colorkey = video_surface_getcolorkey(self);
 	result->vb_xdim   = result_rect.vr_xdim;
 	result->vb_ydim   = result_rect.vr_ydim;
 	result->vb_refcnt = 1;
 	result->rbf_cxoff = result_rect.vr_xmin;
 	result->rbf_cyoff = result_rect.vr_ymin;
-	result->rbf_gfx   = gfx_flags;
 	result->rbf_base  = base; /* Inherit reference */
 	result->rbf_orig  = base;
 	result->rbf_inuse = 0;
@@ -289,8 +293,7 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 	atomic_lock_init(&result->rbf_child_lock);
 	result->brbsr_parent = me;
 	video_buffer_incref(me);
-	if (result->vb_format.vf_pal)
-		video_palette_incref(result->vb_format.vf_pal);
+	__video_buffer_init_common(result);
 	atomic_lock_acquire(&me->rbf_child_lock);
 	LIST_INSERT_HEAD(&me->rbf_child_list, result, brbsr_chain);
 	atomic_lock_release(&me->rbf_child_lock);
@@ -307,28 +310,31 @@ err_base:
 	return NULL;
 }
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-region_buffer_subregion_alias__subregion(struct video_buffer *__restrict self,
-                                         struct video_crect const *__restrict rect,
-                                         video_gfx_flag_t gfx_flags) {
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+region_buffer_subregion_alias__subregion(struct video_surface const *__restrict self,
+                                         struct video_crect const *__restrict rect) {
 	REF struct video_buffer *result_base;
 	REF struct region_buffer_subregion_alias *result;
-	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)self;
+	struct video_surface base_surface;
+	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)video_surface_getbuffer(self);
 	result = (REF struct region_buffer_subregion_alias *)malloc(sizeof(struct region_buffer_subregion_alias));
 	if unlikely(!result)
 		goto err;
-	result_base = video_buffer_subregion(me->rbf_base, rect, gfx_flags);
+	video_surface_frombuffer(&base_surface, me->rbf_base);
+	result_base = video_surface_subregion(&base_surface, rect);
 	if unlikely(!result_base)
 		goto err_r;
 	result->vb_ops    = me->vb_ops;
 	result->vb_domain = me->vb_domain;
-	result->vb_format = result_base->vb_format;
+	result->vb_format.vbf_codec    = video_buffer_getcodec(result_base);
+	result->vb_format.vbf_pal      = video_surface_getpalette(self);
+	result->vb_format.vbf_flags    = video_surface_getflags(self);
+	result->vb_format.vbf_colorkey = video_surface_getcolorkey(self);
 	result->vb_xdim   = result_base->vb_xdim;
 	result->vb_ydim   = result_base->vb_ydim;
 	result->vb_refcnt = 1;
 	result->rbf_cxoff = 0;
 	result->rbf_cyoff = 0;
-	result->rbf_gfx   = 0;
 	result->rbf_base  = result_base; /* Inherit reference */
 	result->rbf_orig  = result_base;
 	result->rbf_inuse = 0;
@@ -336,8 +342,7 @@ region_buffer_subregion_alias__subregion(struct video_buffer *__restrict self,
 	atomic_lock_init(&result->rbf_child_lock);
 	result->brbsr_parent = me;
 	video_buffer_incref(me);
-	if (result->vb_format.vf_pal)
-		video_palette_incref(result->vb_format.vf_pal);
+	__video_buffer_init_common(result);
 	atomic_lock_acquire(&me->rbf_child_lock);
 	LIST_INSERT_HEAD(&me->rbf_child_list, result, brbsr_chain);
 	atomic_lock_release(&me->rbf_child_lock);
@@ -469,16 +474,16 @@ region_buffer__initgfx(struct video_gfx *__restrict self) {
 	struct region_buffer *me = (struct region_buffer *)self;
 	struct video_buffer *base;
 	atomic_inc(&me->rbf_inuse);
-	self->vx_buffer = base = atomic_read(&me->rbf_base);
+	self->vx_surf.vs_buffer = base = atomic_read(&me->rbf_base);
 	self->_vx_driver[REGION_GFX_SUBOPS] = NULL;
 	self = (*base->vb_ops->vi_initgfx)(self);
 	self = (*self->vx_hdr.vxh_ops->vgfo_clip)(self, me->rbf_cxoff, me->rbf_cyoff,
 	                                          me->vb_xdim, me->vb_ydim);
-	if likely(self->vx_buffer == base && self->_vx_driver[REGION_GFX_SUBOPS] == NULL) {
+	if likely(self->vx_surf.vs_buffer == base && self->_vx_driver[REGION_GFX_SUBOPS] == NULL) {
 		/* GFX-reuse optimizations */
 		self->_vx_driver[REGION_GFX_SUBOPS] = (void *)self->vx_hdr.vxh_ops;
 		self->vx_hdr.vxh_ops = _region_gfx_subops_ops();
-		self->vx_buffer = me;
+		self->vx_surf.vs_buffer = me;
 	} else {
 		/* No GFX-reuse optimizations :( */
 		self->vx_hdr.vxh_ops = _region_gfx_subgfx_ops();
@@ -497,13 +502,13 @@ region_buffer__updategfx(struct video_gfx *__restrict self, unsigned int what) {
 		if likely(base == me->rbf_orig) {
 			self->vx_hdr.vxh_ops = (struct video_gfx_ops *)self->_vx_driver[REGION_GFX_SUBOPS];
 			self->_vx_driver[REGION_GFX_SUBOPS] = NULL;
-			self->vx_buffer = base;
+			self->vx_surf.vs_buffer = base;
 			self = (*base->vb_ops->vi_updategfx)(self, what);
-			if likely(self->vx_buffer == base && self->_vx_driver[REGION_GFX_SUBOPS] == NULL) {
+			if likely(self->vx_surf.vs_buffer == base && self->_vx_driver[REGION_GFX_SUBOPS] == NULL) {
 				/* Keep doing GFX-reuse optimizations */
 				self->_vx_driver[REGION_GFX_SUBOPS] = (void *)self->vx_hdr.vxh_ops;
 				self->vx_hdr.vxh_ops = &region_gfx_subops_ops;
-				self->vx_buffer = me;
+				self->vx_surf.vs_buffer = me;
 			} else {
 				/* Can no longer do GFX-reuse optimization :( */
 				self->vx_hdr.vxh_ops = _region_gfx_subgfx_ops();
@@ -519,10 +524,9 @@ region_buffer__updategfx(struct video_gfx *__restrict self, unsigned int what) {
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 region_buffer_subregion_alias__initgfx(struct video_gfx *__restrict self) {
-	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)self->vx_buffer;
-	self->vx_buffer = me->rbf_base; /* Fast-forward to the underlying buffer */
-	self->vx_flags  = video_gfx_flag_combine(me->rbf_gfx, self->vx_flags);
-	self = (*self->vx_buffer->vb_ops->vi_initgfx)(self);
+	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)video_gfx_getbuffer(self);
+	self->vx_surf.vs_buffer = me->rbf_base; /* Fast-forward to the underlying buffer */
+	self = (*video_gfx_getbuffer(self)->vb_ops->vi_initgfx)(self);
 	return self;
 }
 
@@ -530,10 +534,10 @@ INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 region_buffer_subregion_alias__updategfx(struct video_gfx *__restrict self,
                                          unsigned int what) {
 	/* Shouldn't actually get here, but just fix-up the buffer pointer and fast-forward */
-	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)self->vx_buffer;
+	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)video_gfx_getbuffer(self);
 	assert(me != me->rbf_base);
-	self->vx_buffer = me->rbf_base; /* Fast-forward to the underlying buffer */
-	return (*self->vx_buffer->vb_ops->vi_updategfx)(self, what);
+	self->vx_surf.vs_buffer = me->rbf_base; /* Fast-forward to the underlying buffer */
+	return (*video_gfx_getbuffer(self)->vb_ops->vi_updategfx)(self, what);
 }
 
 
@@ -672,46 +676,47 @@ _region_blitter3_subops_ops(void) {
 
 
 
-#define SUBGFX_BEGIN(subgfx_name, self)                                       \
-	struct video_gfx subgfx_name;                                             \
-	struct region_buffer *_sg_me = (struct region_buffer *)(self)->vx_buffer; \
-	struct video_buffer *base;                                                \
-	atomic_inc(&_sg_me->rbf_inuse);                                           \
-	base = atomic_read(&_sg_me->rbf_base);                                    \
-	video_buffer_getgfx(base, &subgfx_name,                                   \
-	                    (self)->vx_blend,                                     \
-	                    (self)->vx_flags,                                     \
-	                    (self)->vx_colorkey);                                 \
-	/* Load I/O and Clip Rects of our own GFX into the underlying GFX */      \
-	video_gfx_clip(&subgfx_name,                                              \
-	               (self)->vx_hdr.vxh_bxmin,                                  \
-	               (self)->vx_hdr.vxh_bymin,                                  \
-	               (self)->vx_hdr.vxh_bxend - (self)->vx_hdr.vxh_bxmin,       \
-	               (self)->vx_hdr.vxh_byend - (self)->vx_hdr.vxh_bymin);      \
-	video_gfx_clip(&subgfx_name,                                              \
-	               (self)->vx_hdr.vxh_cxoff - (self)->vx_hdr.vxh_bxmin,       \
-	               (self)->vx_hdr.vxh_cyoff - (self)->vx_hdr.vxh_bymin,       \
-	               (self)->vx_hdr.vxh_cxsiz,                                  \
+#define SUBGFX_BEGIN(subgfx_name, self)                                               \
+	struct video_gfx subgfx_name;                                                     \
+	struct region_buffer *_sg_me = (struct region_buffer *)video_gfx_getbuffer(self); \
+	struct video_buffer *base;                                                        \
+	atomic_inc(&_sg_me->rbf_inuse);                                                   \
+	base = atomic_read(&_sg_me->rbf_base);                                            \
+	video_buffer_getgfx_ex(base, &subgfx_name,                                        \
+	                       video_gfx_getblend(self),                                  \
+	                       video_gfx_getpalette(self),                                \
+	                       video_gfx_getflags(self),                                  \
+	                       video_gfx_getcolorkey(self));                              \
+	/* Load I/O and Clip Rects of our own GFX into the underlying GFX */              \
+	video_gfx_clip(&subgfx_name,                                                      \
+	               (self)->vx_hdr.vxh_bxmin,                                          \
+	               (self)->vx_hdr.vxh_bymin,                                          \
+	               (self)->vx_hdr.vxh_bxend - (self)->vx_hdr.vxh_bxmin,               \
+	               (self)->vx_hdr.vxh_byend - (self)->vx_hdr.vxh_bymin);              \
+	video_gfx_clip(&subgfx_name,                                                      \
+	               (self)->vx_hdr.vxh_cxoff - (self)->vx_hdr.vxh_bxmin,               \
+	               (self)->vx_hdr.vxh_cyoff - (self)->vx_hdr.vxh_bymin,               \
+	               (self)->vx_hdr.vxh_cxsiz,                                          \
 	               (self)->vx_hdr.vxh_cysiz)
 #define SUBGFX_END() \
 	atomic_dec(&_sg_me->rbf_inuse)
 #define SUBOPS_BEGIN(self)                                                                            \
 	struct video_gfx *_mygfx = (struct video_gfx *)(self);                                            \
 	struct video_buffer *_so_base;                                                                    \
-	struct region_buffer *_so_me = (struct region_buffer *)_mygfx->vx_buffer;                         \
+	struct region_buffer *_so_me = (struct region_buffer *)video_gfx_getbuffer(_mygfx);               \
 	assert(_mygfx->vx_hdr.vxh_ops == &region_gfx_subops_ops);                                         \
 	atomic_inc(&_so_me->rbf_inuse);                                                                   \
 	_so_base = atomic_read(&_so_me->rbf_base);                                                        \
 	if likely(_so_base == _so_me->rbf_orig) {                                                         \
 		_mygfx->vx_hdr.vxh_ops = (struct video_gfx_ops const *)_mygfx->_vx_driver[REGION_GFX_SUBOPS]; \
 		_mygfx->_vx_driver[REGION_GFX_SUBOPS] = NULL;                                                 \
-		_mygfx->vx_buffer = _so_base
+		_mygfx->vx_surf.vs_buffer = _so_base
 #define SUBOPS_END()                                                            \
-		assert(_mygfx->vx_buffer == _so_base);                                  \
+		assert(_mygfx->vx_surf.vs_buffer == _so_base);                          \
 		assert(_mygfx->_vx_driver[REGION_GFX_SUBOPS] == NULL);                  \
 		_mygfx->_vx_driver[REGION_GFX_SUBOPS] = (void *)_mygfx->vx_hdr.vxh_ops; \
 		_mygfx->vx_hdr.vxh_ops = &region_gfx_subops_ops;                        \
-		_mygfx->vx_buffer = _so_me;                                             \
+		_mygfx->vx_surf.vs_buffer = _so_me;                                     \
 	} else {                                                                    \
 		_mygfx->vx_hdr.vxh_ops = &libvideo_emptygfx_ops;                        \
 	}                                                                           \
@@ -1303,8 +1308,8 @@ region_blitter3_subops__stretch(struct video_blitter3 const *__restrict self,
  * be  revoked, after which point it will never again make any access to pixel
  * data of `self'.
  *
- * When the given  `rect' is  actually a  sub-region of  `self', then  this
- * function will simply make use of `video_buffer_subregion()' and call the
+ * When  the  given `rect'  is actually  a sub-region  of `self',  then this
+ * function will simply make use of `video_surface_subregion()' and call the
  * dedicated video buffer operator for creating sub-regions.
  *
  * When the returned buffer isn't created as a true sub-region of  `self',
@@ -1312,24 +1317,14 @@ region_blitter3_subops__stretch(struct video_blitter3 const *__restrict self,
  *
  * @param: self: Video buffer to create a region of
  * @param: rect: region rect of `self' to-be returned
- * @param: gfx_flags: Flags to xor- toggle in GFX contexts created on  `return'.
- *                    These flags  are NOT  applied to  `rect', but  they  still
- *                    allow  you to create region buffers that will appear to be
- *                    natively  rotated in `struct video_gfx' contexts. Only the
- *                    following flags *should* be used here. All other flags can
- *                    still be used, but  many not necessarily produce  expected
- *                    results:
- *                    - VIDEO_GFX_F_XMIRROR
- *                    - VIDEO_GFX_F_YMIRROR
- *                    - VIDEO_GFX_F_XYSWAP
  * @return: * : The newly created region buffer
  * @return: NULL: [errno=ENOMEM] Insufficient memory
  * @return: NULL: [errno=*] Failed to create region for some other reason */
-DEFINE_PUBLIC_ALIAS(video_buffer_region, libvideo_buffer_region);
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *CC
-libvideo_buffer_region(struct video_buffer *__restrict self,
-                       struct video_rect const *__restrict rect,
-                       video_gfx_flag_t gfx_flags) {
+DEFINE_PUBLIC_ALIAS(video_surface_region, libvideo_surface_region);
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *CC
+libvideo_surface_region(struct video_surface const *__restrict self,
+                        struct video_rect const *__restrict rect) {
+	struct video_buffer *buffer;
 	REF struct region_buffer *result;
 	bool self_is_region;
 
@@ -1338,20 +1333,22 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 		video_coord_t rect_xend, rect_yend;
 		if (!OVERFLOW_UADD((video_coord_t)rect->vr_xmin, rect->vr_xdim, &rect_xend) &&
 		    !OVERFLOW_UADD((video_coord_t)rect->vr_ymin, rect->vr_ydim, &rect_yend) &&
-		    rect_xend < self->vb_xdim && rect_yend < self->vb_ydim) {
+		    rect_xend < video_surface_getxdim(self) &&
+		    rect_yend < video_surface_getydim(self)) {
 			/* Yes! Yes, we can! */
 			static_assert(offsetof(struct video_rect, vr_xmin) == offsetof(struct video_crect, vcr_xmin));
 			static_assert(offsetof(struct video_rect, vr_ymin) == offsetof(struct video_crect, vcr_ymin));
 			static_assert(offsetof(struct video_rect, vr_xdim) == offsetof(struct video_crect, vcr_xdim));
 			static_assert(offsetof(struct video_rect, vr_ydim) == offsetof(struct video_crect, vcr_ydim));
-			return video_buffer_subregion(self, (struct video_crect const *)rect, gfx_flags);
+			return video_surface_subregion(self, (struct video_crect const *)rect);
 		}
 	}
 
 	/* Check if "self" is already a region-buffer */
-	self_is_region = self->vb_ops == &region_buffer_ops &&
-	                 self->vb_ops == &region_buffer_subregion_ops &&
-	                 self->vb_ops == &region_buffer_subregion_alias_ops;
+	buffer = video_surface_getbuffer(self);
+	self_is_region = buffer->vb_ops == &region_buffer_ops &&
+	                 buffer->vb_ops == &region_buffer_subregion_ops &&
+	                 buffer->vb_ops == &region_buffer_subregion_alias_ops;
 
 	/* Allocate result buffer */
 	result = (REF struct region_buffer *)malloc(self_is_region
@@ -1362,7 +1359,10 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 
 	/* Start filling in basic data for `result' */
 	result->vb_domain = _libvideo_ramdomain();
-	result->vb_format = self->vb_format;
+	result->vb_format.vbf_codec    = video_buffer_getcodec(buffer);
+	result->vb_format.vbf_pal      = video_surface_getpalette(self);
+	result->vb_format.vbf_flags    = video_surface_getflags(self);
+	result->vb_format.vbf_colorkey = video_surface_getcolorkey(self);
 	result->vb_xdim   = rect->vr_xdim;
 	result->vb_ydim   = rect->vr_ydim;
 	result->vb_refcnt = 1;
@@ -1423,18 +1423,19 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 		/* Populate "ret" based on rect offsets */
 		ret->rbf_cxoff = ret_crect.vr_xmin;
 		ret->rbf_cyoff = ret_crect.vr_ymin;
-		gfx_flags = video_gfx_flag_combine(me->rbf_gfx, gfx_flags);
 
 		/* Check if we need to create a new sub-region buffer to enforce an I/O Rect */
 		if (base_iorect.vr_xmin > 0 || base_iorect.vr_ymin > 0 ||
 		    base_iorect.vr_xdim < base->vb_xdim ||
 		    base_iorect.vr_xdim < base->vb_ydim) {
 			REF struct video_buffer *used_base;
+			struct video_surface base_surface;
 			static_assert(offsetof(struct video_rect, vr_xmin) == offsetof(struct video_crect, vcr_xmin));
 			static_assert(offsetof(struct video_rect, vr_ymin) == offsetof(struct video_crect, vcr_ymin));
 			static_assert(offsetof(struct video_rect, vr_xdim) == offsetof(struct video_crect, vcr_xdim));
 			static_assert(offsetof(struct video_rect, vr_ydim) == offsetof(struct video_crect, vcr_ydim));
-			used_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect, gfx_flags);
+			video_surface_frombuffer(&base_surface, base);
+			used_base = video_surface_subregion(&base_surface, (struct video_crect const *)&base_iorect);
 			video_buffer_decref(base);
 			if unlikely(!used_base)
 				goto err_r;
@@ -1446,7 +1447,6 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 		}
 
 		ret->vb_ops   = &region_buffer_subregion_ops;
-		ret->rbf_gfx  = gfx_flags;
 		ret->rbf_base = base; /* Inherit reference */
 		ret->rbf_orig = ret->rbf_base;
 		ret->brbsr_parent = me;
@@ -1456,15 +1456,13 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 		atomic_lock_release(&me->rbf_child_lock);
 	} else {
 		result->vb_ops   = &region_buffer_ops;
-		result->rbf_gfx  = gfx_flags;
-		result->rbf_base = self;
+		result->rbf_base = buffer;
 		result->rbf_orig = result->rbf_base;
-		video_buffer_incref(self);
+		video_buffer_incref(buffer);
 	}
 
-	/* Finalize "result" */
-	if (result->vb_format.vf_pal)
-		video_palette_incref(result->vb_format.vf_pal);
+	/* Finish initializing "result" */
+	__video_buffer_init_common(result);
 	return result;
 do_return_empty_buffer_r:
 	free(result);

@@ -29,7 +29,6 @@
 
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/buffer.h>
-#include <libvideo/gfx/codec/format.h>
 
 DECL_BEGIN
 
@@ -52,7 +51,7 @@ libvideo_anim_fromframe(struct video_buffer *__restrict frame);
 INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) REF struct video_anim *CC
 libvideo_anim_cached(struct video_anim *__restrict self,
                      struct video_domain const *domain,
-                     struct video_format const *format);
+                     struct video_buffer_format const *format);
 
 DECL_END
 

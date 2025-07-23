@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_GFX_EMPTY_C
 #define GUARD_LIBVIDEO_GFX_GFX_EMPTY_C 1
+#define __VIDEO_BUFFER_const /* nothing */
 #define _KOS_SOURCE 1
 
 #include "api.h"
@@ -68,9 +69,9 @@ libvideo_emptygfx_clip(struct video_gfx *__restrict self,
                        video_dim_t size_x, video_dim_t size_y) {
 	self->vx_hdr.vxh_cxoff += clip_x;
 	self->vx_hdr.vxh_cyoff += clip_y;
-	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
 		self->vx_hdr.vxh_cxoff -= 2 * clip_x;
-	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
 		self->vx_hdr.vxh_cyoff -= 2 * clip_y;
 	self->vx_hdr.vxh_cxsiz = size_x;
 	self->vx_hdr.vxh_cysiz = size_y;
@@ -352,8 +353,8 @@ PRIVATE struct video_buffer libvideo_emptybuffer = {
 	.vb_ops    = NULL, /* Initialized lazily */
 	.vb_domain = NULL, /* Initialized lazily */
 	.vb_format = {
-		.vf_codec = NULL, /* Initialized lazily */
-		.vf_pal   = NULL,
+		.vbf_pal   = NULL,
+		.vbf_codec = NULL, /* Initialized lazily */
 	},
 	.vb_xdim = 0,
 	.vb_ydim = 0,
@@ -363,8 +364,8 @@ PRIVATE struct video_buffer libvideo_emptybuffer = {
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_emptybuffer(void) {
 	if (!libvideo_emptybuffer.vb_ops) {
 		libvideo_emptybuffer.vb_domain = _libvideo_ramdomain();
-		libvideo_emptybuffer.vb_format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
-		assertf(libvideo_emptybuffer.vb_format.vf_codec, "Built-in codec should have been recognized");
+		libvideo_emptybuffer.vb_format.vbf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
+		assertf(libvideo_emptybuffer.vb_format.vbf_codec, "Built-in codec should have been recognized");
 		COMPILER_WRITE_BARRIER();
 		libvideo_emptybuffer.vb_ops = _libvideo_emptybuffer_ops();
 		COMPILER_WRITE_BARRIER();

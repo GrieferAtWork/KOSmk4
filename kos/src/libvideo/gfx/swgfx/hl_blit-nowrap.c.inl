@@ -194,14 +194,14 @@ LOCAL_libvideo_swblitter_blit(LOCAL_struct_video_blitter const *__restrict self
 
 	/* Apply mirror rules to destination coords */
 #ifdef LOCAL_USE_IMATRIX
-	if (dst->vx_flags & VIDEO_GFX_F_XMIRROR)
+	if (dst->vx_surf.vs_flags & VIDEO_GFX_F_XMIRROR)
 		dst_x = (dst->vx_hdr.vxh_cxsiz - LOCAL_dst_size_x) - dst_x;
-	if (dst->vx_flags & VIDEO_GFX_F_YMIRROR)
+	if (dst->vx_surf.vs_flags & VIDEO_GFX_F_YMIRROR)
 		dst_y = (dst->vx_hdr.vxh_cysiz - LOCAL_dst_size_y) - dst_y;
 #ifdef LOCAL_USE_SWBLITTER3
-	if (out->vx_flags & VIDEO_GFX_F_XMIRROR)
+	if (out->vx_surf.vs_flags & VIDEO_GFX_F_XMIRROR)
 		out_x = (out->vx_hdr.vxh_cxsiz - LOCAL_dst_size_x) - out_x;
-	if (out->vx_flags & VIDEO_GFX_F_YMIRROR)
+	if (out->vx_surf.vs_flags & VIDEO_GFX_F_YMIRROR)
 		out_y = (out->vx_hdr.vxh_cysiz - LOCAL_dst_size_y) - out_y;
 #endif /* LOCAL_USE_SWBLITTER3 */
 #endif /* LOCAL_USE_IMATRIX */
@@ -390,11 +390,11 @@ LOCAL_libvideo_swblitter_blit(LOCAL_struct_video_blitter const *__restrict self
 		LOCAL_IF_STRETCH(dstpart = (srcpart * dst_size_x) / src_size_x);
 		LOCAL_IF_STRETCH(if unlikely(dstpart >= dst_size_x) return);
 		LOCAL_IF_STRETCH(dst_size_x -= dstpart);
-		LOCAL_IF_IMATRIX(if (!(dst->vx_flags & VIDEO_GFX_F_XMIRROR))) {
+		LOCAL_IF_IMATRIX(if (!(dst->vx_surf.vs_flags & VIDEO_GFX_F_XMIRROR))) {
 			dst_x += LOCAL_IF_STRETCH_ELSE(dstpart, srcpart);
 		}
 #ifdef LOCAL_USE_SWBLITTER3
-		LOCAL_IF_IMATRIX(if (!(out->vx_flags & VIDEO_GFX_F_XMIRROR))) {
+		LOCAL_IF_IMATRIX(if (!(out->vx_surf.vs_flags & VIDEO_GFX_F_XMIRROR))) {
 			out_x += LOCAL_IF_STRETCH_ELSE(dstpart, srcpart);
 		}
 #endif /* LOCAL_USE_SWBLITTER3 */
@@ -413,11 +413,11 @@ LOCAL_libvideo_swblitter_blit(LOCAL_struct_video_blitter const *__restrict self
 		LOCAL_IF_STRETCH(dstpart = (srcpart * dst_size_y) / src_size_y);
 		LOCAL_IF_STRETCH(if unlikely(dstpart >= dst_size_y) return);
 		LOCAL_IF_STRETCH(dst_size_y -= dstpart);
-		LOCAL_IF_IMATRIX(if (!(dst->vx_flags & VIDEO_GFX_F_YMIRROR))) {
+		LOCAL_IF_IMATRIX(if (!(dst->vx_surf.vs_flags & VIDEO_GFX_F_YMIRROR))) {
 			dst_y += LOCAL_IF_STRETCH_ELSE(dstpart, srcpart);
 		}
 #ifdef LOCAL_USE_SWBLITTER3
-		LOCAL_IF_IMATRIX(if (!(out->vx_flags & VIDEO_GFX_F_YMIRROR))) {
+		LOCAL_IF_IMATRIX(if (!(out->vx_surf.vs_flags & VIDEO_GFX_F_YMIRROR))) {
 			out_y += LOCAL_IF_STRETCH_ELSE(dstpart, srcpart);
 		}
 #endif /* LOCAL_USE_SWBLITTER3 */
@@ -485,16 +485,16 @@ LOCAL_libvideo_swblitter_blit(LOCAL_struct_video_blitter const *__restrict self
 	 * - dst: VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR
 	 * - dst: VIDEO_GFX_F_XYSWAP */
 #ifdef LOCAL_USE_SWBLITTER3
-#define LOCAL_dst_vx_flags out->vx_flags
+#define LOCAL_dst_flags video_gfx_getflags(out)
 #else /* LOCAL_USE_SWBLITTER3 */
-#define LOCAL_dst_vx_flags dst->vx_flags
+#define LOCAL_dst_flags video_gfx_getflags(dst)
 #endif /* !LOCAL_USE_SWBLITTER3 */
-	if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
+	if (src->vx_surf.vs_flags & VIDEO_GFX_F_XMIRROR) {
 		src_x -= src->vx_hdr.vxh_bxmin;
 		src_x = (_video_gfxhdr_bxsiz(&src->vx_hdr) - LOCAL_src_size_x) - src_x;
 		src_x += src->vx_hdr.vxh_bxmin;
 	}
-	if (src->vx_flags & VIDEO_GFX_F_YMIRROR) {
+	if (src->vx_surf.vs_flags & VIDEO_GFX_F_YMIRROR) {
 		src_y -= src->vx_hdr.vxh_bymin;
 		src_y = (_video_gfxhdr_bysiz(&src->vx_hdr) - LOCAL_src_size_y) - src_y;
 		src_y += src->vx_hdr.vxh_bymin;
@@ -502,23 +502,23 @@ LOCAL_libvideo_swblitter_blit(LOCAL_struct_video_blitter const *__restrict self
 
 	/* Load identity matrix */
 	src_matrix = VIDEO_IMATRIX2D_INIT(1, 0, 0, 1);
-	if ((src->vx_flags ^ LOCAL_dst_vx_flags) & VIDEO_GFX_F_XMIRROR) {
+	if ((src->vx_surf.vs_flags ^ LOCAL_dst_flags) & VIDEO_GFX_F_XMIRROR) {
 		src_matrix = VIDEO_IMATRIX2D_INIT(-1, 0, 0, 1);
 		src_x += LOCAL_src_size_x - 1;
 	}
-	if ((src->vx_flags ^ LOCAL_dst_vx_flags) & VIDEO_GFX_F_YMIRROR) {
+	if ((src->vx_surf.vs_flags ^ LOCAL_dst_flags) & VIDEO_GFX_F_YMIRROR) {
 		video_imatrix2d_set(&src_matrix, 1, 1, -1);
 		src_y += LOCAL_src_size_y - 1;
 	}
 
 	/* Apply X/Y-swap rules and finalize src_x/src_y coords */
 #define Tswap(T, a, b) { T _temp = (a); (a) = (b); (b) = _temp; }
-	if (src->vx_flags & VIDEO_GFX_F_XYSWAP) {
+	if (src->vx_surf.vs_flags & VIDEO_GFX_F_XYSWAP) {
 		video_imatrix2d_swap(&src_matrix, 0, 0, /**/ 1, 0);
 		video_imatrix2d_swap(&src_matrix, 1, 1, /**/ 0, 1);
 		Tswap(video_offset_t, src_x, src_y);
 	}
-	if (LOCAL_dst_vx_flags & VIDEO_GFX_F_XYSWAP) {
+	if (LOCAL_dst_flags & VIDEO_GFX_F_XYSWAP) {
 		video_imatrix2d_swap(&src_matrix, 0, 0, /**/ 0, 1);
 		video_imatrix2d_swap(&src_matrix, 1, 1, /**/ 1, 0);
 		Tswap(video_offset_t, dst_x, dst_y);
@@ -530,27 +530,27 @@ LOCAL_libvideo_swblitter_blit(LOCAL_struct_video_blitter const *__restrict self
 		Tswap(video_dim_t, LOCAL_src_size_x, LOCAL_src_size_y);
 #endif /* LOCAL_IS_STRETCH */
 	}
-#undef LOCAL_dst_vx_flags
+#undef LOCAL_dst_flags
 
 	/* Calculate dst->out transformation matrix */
 #ifdef LOCAL_USE_SWBLITTER3
 	dst_matrix = VIDEO_IMATRIX2D_INIT(1, 0, 0, 1);
-	if ((dst->vx_flags ^ out->vx_flags) & VIDEO_GFX_F_XMIRROR) {
+	if ((dst->vx_surf.vs_flags ^ out->vx_surf.vs_flags) & VIDEO_GFX_F_XMIRROR) {
 		dst_matrix = VIDEO_IMATRIX2D_INIT(-1, 0, 0, 1);
 		dst_x += LOCAL_dst_size_x - 1;
 	}
-	if ((dst->vx_flags ^ out->vx_flags) & VIDEO_GFX_F_YMIRROR) {
+	if ((dst->vx_surf.vs_flags ^ out->vx_surf.vs_flags) & VIDEO_GFX_F_YMIRROR) {
 		video_imatrix2d_set(&dst_matrix, 1, 1, -1);
 		dst_y += LOCAL_dst_size_y - 1;
 	}
 
 	/* Apply X/Y-swap rules and finalize dst_x/dst_y coords */
-	if (dst->vx_flags & VIDEO_GFX_F_XYSWAP) {
+	if (dst->vx_surf.vs_flags & VIDEO_GFX_F_XYSWAP) {
 		video_imatrix2d_swap(&dst_matrix, 0, 0, /**/ 1, 0);
 		video_imatrix2d_swap(&dst_matrix, 1, 1, /**/ 0, 1);
 		Tswap(video_offset_t, dst_x, dst_y);
 	}
-	if (out->vx_flags & VIDEO_GFX_F_XYSWAP) {
+	if (out->vx_surf.vs_flags & VIDEO_GFX_F_XYSWAP) {
 		video_imatrix2d_swap(&dst_matrix, 0, 0, /**/ 0, 1);
 		video_imatrix2d_swap(&dst_matrix, 1, 1, /**/ 1, 0);
 		Tswap(video_offset_t, dst_x, dst_y);

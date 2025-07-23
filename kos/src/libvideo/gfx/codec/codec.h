@@ -34,11 +34,11 @@ DECL_BEGIN
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported.
  * Don't declare as  ATTR_CONST; in  PIC-mode, needs  to do  one-time-init of  globals! */
-INTDEF /*ATTR_CONST*/ WUNUSED struct video_codec const *FCC
+INTDEF /*ATTR_CONST*/ WUNUSED struct video_codec *FCC
 libvideo_codec_lookup(video_codec_t codec);
 
 /* Same as `libvideo_codec_lookup()', but used for "extra" codecs */
-INTDEF /*ATTR_CONST*/ WUNUSED struct video_codec const *FCC
+INTDEF /*ATTR_CONST*/ WUNUSED struct video_codec *FCC
 libvideo_codec_lookup_extra(video_codec_t codec);
 
 struct video_codec_custom: video_codec {

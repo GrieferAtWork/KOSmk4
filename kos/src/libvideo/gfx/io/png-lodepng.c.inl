@@ -120,7 +120,7 @@ libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
 	unsigned int w, h, error, stride;
 	unsigned char *out;
 	REF struct video_buffer *result;
-	struct video_format format;
+	struct video_buffer_format format;
 	video_codec_t codec_name;
 	bzero(&state, sizeof(state));
 	error = lodepng_inspect(&w, &h, &state, (unsigned char const *)blob, blob_size);
@@ -130,7 +130,6 @@ libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
 	/* Determine preferred code based on the PNG's native format.
 	 * If the caller wants to use a custom codec, they'll need to
 	 * blit the PNG buffer into another buffer of their choosing. */
-	format.vf_pal = NULL;
 	switch (state.info_png.color.colortype) {
 	case LCT_GREY:
 		switch (state.info_png.color.bitdepth) {
@@ -156,8 +155,9 @@ libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
 		codec_name = VIDEO_CODEC_RGBA8888;
 		break;
 	}
-	format.vf_codec = libvideo_codec_lookup(codec_name);
-	assertf(format.vf_codec, "Built-in codec should have been recognized");
+	format.vbf_codec = libvideo_codec_lookup(codec_name);
+	format.vbf_flags = VIDEO_GFX_F_NORMAL;
+	assertf(format.vbf_codec, "Built-in codec should have been recognized");
 	error = lodepng_decode_memory(&out, &w, &h, (unsigned char const *)blob,
 	                              blob_size, state.info_png.color.colortype,
 	                              state.info_png.color.bitdepth);
@@ -165,13 +165,13 @@ libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
 		goto handle_error;
 	stride = get_lodepng_stride(w, state.info_png.color.colortype,
 	                            state.info_png.color.bitdepth);
-	result = video_domain_formem(domain_hint, w, h, &format, out, stride,
+	result = video_domain_formem(domain_hint, &format, w, h, out, stride,
 	                             &png_release_mem_free, NULL,
 	                             VIDEO_DOMAIN_FORMEM_F_NORMAL);
 	if unlikely(!result) {
 		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain)
 			goto err_out;
-		result = video_domain_formem(domain_hint, w, h, &format, out, stride,
+		result = video_domain_formem(domain_hint, &format, w, h, out, stride,
 		                             &png_release_mem_free, NULL,
 		                             VIDEO_DOMAIN_FORMEM_F_NORMAL);
 		if unlikely(!result)
@@ -225,11 +225,11 @@ video_lock_convert_stride(struct video_lock *__restrict self,
 /* Convert "self" into a RGB/RGBA buffer. */
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
 libvideo_buffer_convert_to_lodepng_rgb(struct video_buffer *__restrict self) {
-	struct video_format format;
-	bool has_alpha = self->vb_format.vf_codec->vc_specs.vcs_amask != 0;
-	format.vf_codec = libvideo_codec_lookup(has_alpha ? VIDEO_CODEC_RGBA8888 : VIDEO_CODEC_RGB888);
-	assertf(format.vf_codec, "Built-in codec should have been recognized");
-	format.vf_pal = NULL;
+	struct video_buffer_format format;
+	bool has_alpha = self->vb_format.vbf_codec->vc_specs.vcs_amask != 0;
+	format.vbf_codec = libvideo_codec_lookup(has_alpha ? VIDEO_CODEC_RGBA8888 : VIDEO_CODEC_RGB888);
+	assertf(format.vbf_codec, "Built-in codec should have been recognized");
+	format.vbf_flags = VIDEO_GFX_F_NORMAL;
 	return libvideo_buffer_convert(self, _libvideo_ramdomain(), &format);
 }
 
@@ -257,7 +257,7 @@ libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
 	unsigned char *out;
 	size_t out_size;
 	struct video_lock lock;
-	switch (self->vb_format.vf_codec->vc_codec) {
+	switch (self->vb_format.vbf_codec->vc_codec) {
 	case VIDEO_CODEC_L1_LSB:
 		colortype = LCT_GREY;
 		bitdepth  = 1;

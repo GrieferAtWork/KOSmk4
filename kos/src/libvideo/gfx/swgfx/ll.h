@@ -41,17 +41,17 @@
 #define _LL_absgradient_v      _video_swgfx_x_absgradient_v
 
 #define LL_assert_x(self, x) \
-	gfx_assertf((x) < (self)->vx_buffer->vb_xdim, "X coord too large (%" PRIuCRD " >= %" PRIuCRD ")", (x), (self)->vx_buffer->vb_xdim)
+	gfx_assertf((x) < (self)->vx_surf.vs_buffer->vb_xdim, "X coord too large (%" PRIuCRD " >= %" PRIuCRD ")", (x), (self)->vx_surf.vs_buffer->vb_xdim)
 #define LL_assert_y(self, y) \
-	gfx_assertf((y) < (self)->vx_buffer->vb_ydim, "Y coord too large (%" PRIuCRD " >= %" PRIuCRD ")", (y), (self)->vx_buffer->vb_ydim)
-#define LL_assert_sx(self, x, sx)                                          \
+	gfx_assertf((y) < (self)->vx_surf.vs_buffer->vb_ydim, "Y coord too large (%" PRIuCRD " >= %" PRIuCRD ")", (y), (self)->vx_surf.vs_buffer->vb_ydim)
+#define LL_assert_sx(self, x, sx)                                                        \
 	(gfx_assert(sx),                                                                     \
 	 gfx_assertf((x) + (sx) > (x), "X+SX overflows (%" PRIuCRD "+%" PRIuDIM ")", x, sx), \
-	 gfx_assertf((x) + (sx) <= (self)->vx_buffer->vb_xdim, "X+SX coord too large (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", x, sx, (x) + (sx), (self)->vx_buffer->vb_xdim))
-#define LL_assert_sy(self, y, sy)                                          \
+	 gfx_assertf((x) + (sx) <= (self)->vx_surf.vs_buffer->vb_xdim, "X+SX coord too large (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", x, sx, (x) + (sx), (self)->vx_surf.vs_buffer->vb_xdim))
+#define LL_assert_sy(self, y, sy)                                                        \
 	(gfx_assert(sy),                                                                     \
 	 gfx_assertf((y) + (sy) > (y), "Y+SY overflows (%" PRIuCRD "+%" PRIuDIM ")", y, sy), \
-	 gfx_assertf((y) + (sy) <= (self)->vx_buffer->vb_ydim, "Y+SY coord too large (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", y, sy, (y) + (sy), (self)->vx_buffer->vb_ydim))
+	 gfx_assertf((y) + (sy) <= (self)->vx_surf.vs_buffer->vb_ydim, "Y+SY coord too large (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", y, sy, (y) + (sy), (self)->vx_surf.vs_buffer->vb_ydim))
 #define LL_assert_xy(self, x, y)          (LL_assert_x(self, x), LL_assert_y(self, y))
 #define LL_assert_sxy(self, x, y, sx, sy) (LL_assert_sx(self, x, sx), LL_assert_sy(self, y, sy))
 

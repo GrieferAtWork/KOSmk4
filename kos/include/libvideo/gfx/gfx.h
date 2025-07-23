@@ -23,6 +23,7 @@
 #include "api.h"
 /**/
 
+#include <__crt.h> /* __FILE */
 #include <__stdinc.h>
 
 #include <hybrid/typecore.h>
@@ -32,7 +33,8 @@
 #include "../color.h"
 #include "../types.h"
 #include "blend.h" /* gfx_blendmode_t */
-#include "codec/format.h"
+#include "gfx-flags.h"
+#include "surface-defs.h"
 
 #ifdef __cplusplus
 #include <__stdcxx.h>
@@ -40,76 +42,23 @@
 
 #ifndef __INTELLISENSE__
 #include "../rect.h"
-#include <libc/string.h>
+#include "buffer.h"
 #endif /* !__INTELLISENSE__ */
-
-/* Video graphic flags.
- * [r]: Indicates a flag that affects the results when the associated
- *      GFX  context is used  as source, or  when reading pixel data.
- * [w]: Indicates a flag that affects the results of graphics operations
- *      that use  the associated  GFX context  as destination,  or  when
- *      writing pixel data. */
-#define VIDEO_GFX_F_NORMAL  0x0000 /* Normal render flags. */
-#define VIDEO_GFX_F_XWRAP   0x0001 /* [rw] OOB X coords wrap to the other side of the Clip Rect (else: coords are clamped) */
-#define VIDEO_GFX_F_YWRAP   0x0002 /* [rw] OOB Y coords wrap to the other side of the Clip Rect (else: coords are clamped) */
-#define VIDEO_GFX_F_XMIRROR 0x0004 /* [rw] X coords are horizontally mirrored relative to the Clip Rect */
-#define VIDEO_GFX_F_YMIRROR 0x0008 /* [rw] Y coords are vertically mirrored relative to the Clip Rect */
-#define VIDEO_GFX_F_XYSWAP  0x0010 /* [rw] Swap X/Y coords (width becoming height, and height becoming width)
-                                    * WARNING: Do not alter this flag directly; use `video_gfx_xyswap()'
-                                    * NOTE: Happens **after** VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR! */
-#define VIDEO_GFX_F_NEAREST 0x0000 /* [rw] Use nearest interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
-#define VIDEO_GFX_F_LINEAR  0x8000 /* [rw] Use linear interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
-
-
-
 
 /* Flags for `video_gfx_update()' */
 #define VIDEO_GFX_UPDATE_NOTHING  0 /* Nothing was changed */
 #define VIDEO_GFX_UPDATE_BLEND    1 /* `struct video_gfx::vx_blend' might have been changed */
-#define VIDEO_GFX_UPDATE_FLAGS    2 /* `struct video_gfx::vx_flags' might have been changed */
-#define VIDEO_GFX_UPDATE_COLORKEY 4 /* `struct video_gfx::vx_colorkey' might have been changed */
+#define VIDEO_GFX_UPDATE_FLAGS    2 /* `struct video_gfx::vx_surf.vs_flags' might have been changed */
+#define VIDEO_GFX_UPDATE_COLORKEY 4 /* `struct video_gfx::vx_surf.vs_colorkey' might have been changed, and `VIDEO_GFX_F_COLORKEY' is enabled */
+#define VIDEO_GFX_UPDATE_PALETTE  8 /* `struct video_gfx::vx_surf.vs_pal' might have been changed */
 #define VIDEO_GFX_UPDATE_ALL     \
-	(VIDEO_GFX_UPDATE_COLORKEY | \
+	(VIDEO_GFX_UPDATE_BLEND |    \
 	 VIDEO_GFX_UPDATE_FLAGS |    \
-	 VIDEO_GFX_UPDATE_BLEND)
+	 VIDEO_GFX_UPDATE_COLORKEY | \
+	 VIDEO_GFX_UPDATE_PALETTE)
 
 #ifdef __CC__
 __DECL_BEGIN
-
-
-/* Set of `VIDEO_GFX_F*' */
-typedef __UINT32_TYPE__ video_gfx_flag_t;
-
-
-#define _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT 1
-#define _VIDEO_GFX_FLAGS_Y_TO_X_RSHIFT _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT
-
-#define _VIDEO_GFX_XFLAGS    (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_XMIRROR)
-#define _VIDEO_GFX_YFLAGS    (VIDEO_GFX_F_YWRAP | VIDEO_GFX_F_YMIRROR)
-#define _VIDEO_GFX_AND_FLAGS (0)
-#define _VIDEO_GFX_OR_FLAGS  (VIDEO_GFX_F_LINEAR)
-#define _VIDEO_GFX_XOR_FLAGS (~(_VIDEO_GFX_AND_FLAGS | _VIDEO_GFX_OR_FLAGS))
-
-/* Combine pre-existing GFX flags `__old_flags' with `__more_flags' */
-__LOCAL __ATTR_CONST __ATTR_WUNUSED video_gfx_flag_t
-video_gfx_flag_combine(video_gfx_flag_t __old_flags, video_gfx_flag_t __more_flags) {
-	if (__old_flags & VIDEO_GFX_F_XYSWAP) {
-		__more_flags = (__more_flags & ~(_VIDEO_GFX_XFLAGS | _VIDEO_GFX_YFLAGS)) |
-		               ((__more_flags & _VIDEO_GFX_XFLAGS) << _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT) |
-		               ((__more_flags & _VIDEO_GFX_YFLAGS) >> _VIDEO_GFX_FLAGS_Y_TO_X_RSHIFT);
-	}
-	return 0 |
-#if _VIDEO_GFX_XOR_FLAGS != 0
-	       ((__old_flags ^ __more_flags) & _VIDEO_GFX_XOR_FLAGS) |
-#endif /* _VIDEO_GFX_XOR_FLAGS != 0 */
-#if _VIDEO_GFX_OR_FLAGS != 0
-	       ((__old_flags | __more_flags) & _VIDEO_GFX_OR_FLAGS) |
-#endif /* _VIDEO_GFX_OR_FLAGS != 0 */
-#if _VIDEO_GFX_AND_FLAGS != 0
-	       ((__old_flags & __more_flags) & _VIDEO_GFX_AND_FLAGS) |
-#endif /* _VIDEO_GFX_AND_FLAGS != 0 */
-	       0;
-}
 
 struct video_buffer;
 struct video_gfxhdr;
@@ -538,8 +487,9 @@ video_gfx_loadclip(struct video_gfx *__restrict self,
 
 /* Update operators of `__self' after certain behavioral flags were changed:
  * - VIDEO_GFX_UPDATE_BLEND:    `__self->vx_blend' may have changed
- * - VIDEO_GFX_UPDATE_FLAGS:    `__self->vx_flags' may have changed
- * - VIDEO_GFX_UPDATE_COLORKEY: `__self->vx_colorkey' may have changed
+ * - VIDEO_GFX_UPDATE_FLAGS:    `__self->vx_surf.vs_flags' may have changed
+ * - VIDEO_GFX_UPDATE_COLORKEY: `__self->vx_surf.vs_colorkey' may have changed
+ * - VIDEO_GFX_UPDATE_PALETTE:  `__self->vx_surf.vs_pal' may have changed
  * @param: __what: Set of `VIDEO_GFX_UPDATE_*'
  *
  * CAUTION: Do not use this operator when `__self' may be used by other threads! */
@@ -556,8 +506,30 @@ extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setflags(st
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_toggleflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_enableflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_disableflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
-extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) video_color_t video_gfx_getcolorkey(struct video_gfx const *__restrict __self);
-extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setcolorkey(struct video_gfx *__restrict __self, video_color_t __colorkey);
+extern __ATTR_PURE __ATTR_IN(1) video_pixel_t video_gfx_getcolorkey(struct video_gfx const *__restrict __self);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setcolorkey(struct video_gfx *__restrict __self, video_pixel_t __colorkey);
+
+#ifdef __cplusplus
+extern "C++" {
+extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct video_surface *video_gfx_getsurface(struct video_gfx *__restrict __self);
+extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct video_surface const *video_gfx_getsurface(struct video_gfx const *__restrict __self);
+} /* extern "C++" */
+#else /* __cplusplus */
+#define video_gfx_getsurface(self) (&(self)->vx_surf)
+#endif /* !__cplusplus */
+extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_domain const *video_gfx_getdomain(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_codec *video_gfx_getcodec(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_buffer *video_gfx_getbuffer(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) struct video_palette *video_gfx_getpalette(struct video_gfx const *__restrict __self);
+extern __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) struct video_gfx *video_gfx_setpalette(struct video_gfx *__restrict __self, struct video_palette *__palette);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_hascolorkey(struct video_gfx const *__restrict __self);
+extern __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct video_gfx *video_gfx_enablecolorkey(struct video_gfx *__restrict __self, video_pixel_t __colorkey);
+extern __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct video_gfx *video_gfx_disablecolorkey(struct video_gfx *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) struct video_palette *video_gfx_getdefaultpalette(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_gfx_flag_t video_gfx_getdefaultflags(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_pixel_t video_gfx_getdefaultcolorkey(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_hasdefaultcolorkey(struct video_gfx const *__restrict __self);
+
 
 /* Apply a clipping  rect to "self",  shrinking the  pixel
  * area relative to offsets specified by the given coords.
@@ -745,14 +717,14 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 #define video_blitter3_stretch(self, wrdst_x, wrdst_y, rddst_x, rddst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
 	(*(self)->vbt3_ops->vbt3o_stretch)(self, wrdst_x, wrdst_y, rddst_x, rddst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
 
-#define video_gfx_getclipw(self) (self)->vx_hdr.vxh_cxsiz
-#define video_gfx_getcliph(self) (self)->vx_hdr.vxh_cysiz
-#define video_gfx_saveclip(self, backup) (void)__libc_memcpy(backup, &(self)->vx_hdr, sizeof(video_gfx_clipinfo_t))
-#define video_gfx_loadclip(self, backup) (void)__libc_memcpy(&(self)->vx_hdr, backup, sizeof(video_gfx_clipinfo_t))
+#define video_gfx_getclipw(self) (self)->vx_hdr.vxh_cxsiz /* TODO: Rename to "video_gfx_getxdim" */
+#define video_gfx_getcliph(self) (self)->vx_hdr.vxh_cysiz /* TODO: Rename to "video_gfx_getydim" */
+#define video_gfx_saveclip(self, backup) (void)(*(backup) = (self)->vx_hdr)
+#define video_gfx_loadclip(self, backup) (void)((self)->vx_hdr = *(backup))
 #define video_gfx_update(self, what) \
-	(*(self)->vx_buffer->vb_ops->vi_updategfx)(self, what)
+	(*(self)->vx_surf.vs_buffer->vb_ops->vi_updategfx)(self, what)
 #define video_gfx_getblend(self)              ((self)->vx_blend)
-#define video_gfx_getflags(self)              ((self)->vx_flags)
+#define video_gfx_getflags(self)              ((self)->vx_surf.vs_flags)
 #define video_gfx_clip(self, clip_x, clip_y, size_x, size_y) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_clip)(self, clip_x, clip_y, size_x, size_y)
 #define video_gfx_cliprect(self, rect) \
@@ -761,13 +733,26 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 	(*(self)->vx_hdr.vxh_ops->vgfo_offset2coord)(self, x, y, coords)
 #define video_gfx_coord2offset(self, x, y, offsets) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_coord2offset)(self, x, y, offsets)
-#define video_gfx_getcolorkey(self)           ((self)->vx_colorkey)
+#define video_gfx_getcolorkey(self)           ((self)->vx_surf.vs_colorkey)
 #define video_gfx_setblend(self, mode)        ((self)->vx_blend = (mode), video_gfx_update(self, VIDEO_GFX_UPDATE_BLEND))
-#define video_gfx_setflags(self, flags)       ((self)->vx_flags = (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
-#define video_gfx_toggleflags(self, flags)    ((self)->vx_flags ^= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
-#define video_gfx_enableflags(self, flags)    ((self)->vx_flags |= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
-#define video_gfx_disableflags(self, flags)   ((self)->vx_flags &= ~(flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
-#define video_gfx_setcolorkey(self, colorkey) ((self)->vx_colorkey = (colorkey), video_gfx_update(self, VIDEO_GFX_UPDATE_COLORKEY))
+#define video_gfx_setflags(self, flags)       ((self)->vx_surf.vs_flags = (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_toggleflags(self, flags)    ((self)->vx_surf.vs_flags ^= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_enableflags(self, flags)    ((self)->vx_surf.vs_flags |= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_disableflags(self, flags)   ((self)->vx_surf.vs_flags &= ~(flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_setcolorkey(self, colorkey) ((self)->vx_surf.vs_colorkey = (colorkey), video_gfx_update(self, VIDEO_GFX_UPDATE_COLORKEY))
+#define video_gfx_getsurface(self)            (&(self)->vx_surf)
+#define video_gfx_getdomain(self)             video_buffer_getdomain(video_gfx_getbuffer(self))
+#define video_gfx_getcodec(self)              video_buffer_getcodec(video_gfx_getbuffer(self))
+#define video_gfx_getbuffer(self)             (self)->vx_surf.vs_buffer
+#define video_gfx_getpalette(self)            (self)->vx_surf.vs_pal
+#define video_gfx_setpalette(self, palette)   ((self)->vx_surf.vs_pal = (palette), video_gfx_update(self, VIDEO_GFX_UPDATE_PALETTE))
+#define video_gfx_hascolorkey(self)           ((video_gfx_getflags(self) & VIDEO_GFX_F_COLORKEY) != 0)
+#define video_gfx_enablecolorkey(self, colorkey)       \
+	((self)->vx_surf.vs_flags |= VIDEO_GFX_F_COLORKEY, \
+	 (self)->vx_surf.vs_colorkey = (colorkey),         \
+	 video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_COLORKEY))
+#define video_gfx_disablecolorkey(self) video_gfx_disableflags(self, VIDEO_GFX_UPDATE_COLORKEY)
+
 #define video_gfx_getcolor(self, x, y) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_getcolor)(self, x, y)
 #define video_gfx_putcolor(self, x, y, color) \
@@ -812,17 +797,49 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 #endif /* !__INTELLISENSE__ */
 
 
+/* Same as `video_buffer_*save', but  save pixel data from  the
+ * Clip Rect of `__self'. Values written for pixels outside the
+ * I/O Rect of `__self'  are format-specific, but those  pixels
+ * are probably going to be either black, or transparent.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_FSAVE)(struct video_gfx const *__self, char const *__format,
+                                    __FILE *__restrict __fp, char const *__options);
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_FDSAVE)(struct video_gfx const *__self, char const *__format,
+                                     __fd_t __fd, char const *__options);
+typedef /*__ATTR_WUNUSED_T*/ __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_SAVE)(struct video_gfx const *__self, char const *__filename,
+                                   char const *__options);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
+video_gfx_fsave(struct video_gfx const *__self, char const *__format,
+                __FILE *__restrict __fp, char const *__options);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
+video_gfx_fdsave(struct video_gfx const *__self, char const *__format,
+                 __fd_t __fd, char const *__options);
+LIBVIDEO_GFX_DECL /*__ATTR_WUNUSED*/ __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
+video_gfx_save(struct video_gfx const *__self, char const *__filename,
+               char const *__options);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
 
 #ifdef __cplusplus
 __CXXDECL_BEGIN
 #endif /* __cplusplus */
 
+#ifndef _VIDEO_CONVERTER_N_YDRIVER
+#define _VIDEO_CONVERTER_N_YDRIVER ((256 * __SIZEOF_VIDEO_PIXEL_T__) / __SIZEOF_POINTER__)
+#endif /* !_VIDEO_CONVERTER_N_YDRIVER */
+
 #define __VIDEO_BLITTER_N_DRIVER 8
 #define _VIDEO_BLITTER_N_DRIVER (__VIDEO_BLITTER_N_DRIVER + 1 + _VIDEO_CONVERTER_N_YDRIVER)
-#if _VIDEO_BLITTER_N_DRIVER < (__VIDEO_BLITTER_N_DRIVER + 6)
+#if _VIDEO_BLITTER_N_DRIVER < (__VIDEO_BLITTER_N_DRIVER + 3)
 #undef _VIDEO_BLITTER_N_DRIVER
-#define _VIDEO_BLITTER_N_DRIVER (__VIDEO_BLITTER_N_DRIVER + 6)
-#endif /* _VIDEO_BLITTER_N_DRIVER < (__VIDEO_BLITTER_N_DRIVER + 6) */
+#define _VIDEO_BLITTER_N_DRIVER (__VIDEO_BLITTER_N_DRIVER + 3)
+#endif /* _VIDEO_BLITTER_N_DRIVER < (__VIDEO_BLITTER_N_DRIVER + 3) */
 
 struct video_blitter {
 	struct video_blitter_ops const *vbt_ops;    /* Blitter operators */
@@ -962,7 +979,7 @@ struct video_gfxhdr {
 	 * - VIDEO_GFX_F_XMIRROR/*Y mirror the "I/O Rect"
 	 *
 	 * Coords of these rects are (in absolute "video_coord_t" coords):
-	 * - Buffer:    {xy: {0,0}, wh: {vx_buffer->vb_xdim,vx_buffer->vb_ydim}}
+	 * - Buffer:    {xy: {0,0}, wh: {vx_surf.vs_buffer->vb_xdim,vx_surf.vs_buffer->vb_ydim}}
 	 * - Clip Rect: {xy: {vxh_cxoff,vxh_cyoff}, wh: {vxh_cxsiz,vxh_cysiz}}
 	 * - I/O Rect:  {xy: {vxh_bxmin,vxh_bymin}, wh: {vxh_bxsiz,vxh_bysiz}}
 	 *
@@ -984,13 +1001,13 @@ struct video_gfxhdr {
 	 * Virtual -> Physical coord translation (currently) happens as follows.
 	 * Do no rely on this translation behavior; always use APIs to modify or
 	 * otherwise interact with Clip Rect infos.
-	 * >> if (vx_flags & VIDEO_GFX_F_XMIRROR)
+	 * >> if (vx_surf.vs_flags & VIDEO_GFX_F_XMIRROR)
 	 * >>     x = (vxh_cxsiz - 1) - x;
-	 * >> if (vx_flags & VIDEO_GFX_F_YMIRROR)
+	 * >> if (vx_surf.vs_flags & VIDEO_GFX_F_YMIRROR)
 	 * >>     y = (vxh_cysiz - 1) - y;
-	 * >> if (vx_flags & VIDEO_GFX_F_XWRAP)
+	 * >> if (vx_surf.vs_flags & VIDEO_GFX_F_XWRAP)
 	 * >>     x = wrap(x, vxh_cxsiz); // wrap(x, dim) = ((x % dim) + dim) % dim
-	 * >> if (vx_flags & VIDEO_GFX_F_YWRAP)
+	 * >> if (vx_surf.vs_flags & VIDEO_GFX_F_YWRAP)
 	 * >>     x = wrap(x, vxh_cxsiz); // ...
 	 * >> x += vxh_cxoff;
 	 * >> y += vxh_cyoff;
@@ -1002,93 +1019,35 @@ struct video_gfxhdr {
 	 * >>     return VOID;
 	 * >> if (y >= vxh_byend)
 	 * >>     return VOID;
-	 * >> if (vx_flags & VIDEO_GFX_F_XYSWAP) {
+	 * >> if (vx_surf.vs_flags & VIDEO_GFX_F_XYSWAP) {
 	 * >>     temp = x;
 	 * >>     x = y;
 	 * >>     y = temp;
 	 * >> }
 	 * >> return {x,y};
 	 */
-	video_offset_t              vxh_cxoff;    /* [const] Delta added to all X coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
-	video_offset_t              vxh_cyoff;    /* [const] Delta added to all Y coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
-	video_dim_t                 vxh_cxsiz;    /* [const] Absolute width of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
-	video_dim_t                 vxh_cysiz;    /* [const] Absolute height of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
+	video_offset_t              vxh_cxoff;    /* Delta added to all X coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
+	video_offset_t              vxh_cyoff;    /* Delta added to all Y coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
+	video_dim_t                 vxh_cxsiz;    /* Absolute width of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
+	video_dim_t                 vxh_cysiz;    /* Absolute height of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
 	/* I/O Rect: these values control the (absolute) pixel area where read/writes do something
 	 * NOTE: The I/O Rect is already pre-adjusted for VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR */
-	video_coord_t               vxh_bxmin;    /* [const][<= vxh_bxend][>= vxh_cxoff] Absolute buffer start coord in X (start of acc) */
-	video_coord_t               vxh_bymin;    /* [const][<= vxh_byend][>= vxh_cyoff] Absolute buffer start coord in Y */
-	video_coord_t               vxh_bxend;    /* [const][<= vx_buffer->vb_xdim] Absolute buffer end coord in X (<= `vx_buffer->vb_xdim') */
-	video_coord_t               vxh_byend;    /* [const][<= vx_buffer->vb_ydim] Absolute buffer end coord in Y (<= `vx_buffer->vb_ydim') */
-//	video_dim_t                 vxh_bxsiz;    /* [const][== vxh_bxend - vxh_bxmin][<= vxh_cxsiz] I/O Rect width */
-//	video_dim_t                 vxh_bysiz;    /* [const][== vxh_byend - vxh_bymin][<= vxh_cysiz] I/O Rect height */
+	video_coord_t               vxh_bxmin;    /* [<= vxh_bxend][>= vxh_cxoff] Absolute buffer start coord in X (start of acc) */
+	video_coord_t               vxh_bymin;    /* [<= vxh_byend][>= vxh_cyoff] Absolute buffer start coord in Y */
+	video_coord_t               vxh_bxend;    /* [<= vx_surf.vs_buffer->vb_xdim] Absolute buffer end coord in X (<= `vx_surf.vs_buffer->vb_xdim') */
+	video_coord_t               vxh_byend;    /* [<= vx_surf.vs_buffer->vb_ydim] Absolute buffer end coord in Y (<= `vx_surf.vs_buffer->vb_ydim') */
+//	video_dim_t                 vxh_bxsiz;    /* [== vxh_bxend - vxh_bxmin][<= vxh_cxsiz] I/O Rect width */
+//	video_dim_t                 vxh_bysiz;    /* [== vxh_byend - vxh_bymin][<= vxh_cysiz] I/O Rect height */
 };
 
 #define _video_gfxhdr_bxsiz(self) ((self)->vxh_bxend - (self)->vxh_bxmin)
 #define _video_gfxhdr_bysiz(self) ((self)->vxh_byend - (self)->vxh_bymin)
 
 struct video_gfx {
-	struct video_gfxhdr  vx_hdr;      /* GFX header (this part of the struct can be saved/restored in order to restore old Clip Rects) */
-	struct video_buffer *vx_buffer;   /* [1..1][const] The associated buffer. */
-	/* TODO: To get rid of "vgfo_fillmask" and "vgfo_fillstretchmask":
-	 * TLFT fonts will need to:
-	 * - load their character bitmasks using `video_domain_formem()' with:
-	 *   >> xdim = character_width
-	 *   >> ydim = num_characters * character_height
-	 *   >> codec = video_codec_lookup(VIDEO_CODEC_P1_MSB);
-	 * - render the I'th characters using:
-	 *   >> video_gfx_bitblit(dst, x, y, FONT_BUFFER, src_x: 0, src_y: I * character_height);
-	 *   But to do this render using custom colors,  there needs to be a way for doing  blits
-	 *   using custom source color palettes.
-	 * Currently, in order to do custom color blits, the font would need to re-load its entire
-	 * video buffer. Even more  general, palette-drive video buffers  should be able of  being
-	 * assigned a new video_palette **DURING** their  live-time, so just allowing a  different
-	 * palette to be used for singular GFX operations wouldn't even be enough here!
-	 *
-	 * The more I think about this, only the CODEC of a video buffer has to remain constant for
-	 * the duration of that buffer's life-time. The palette should be interchangeable as  often
-	 * as one pleases... Yet  that brings up the  problem that palettes are  reference-counted,
-	 * and yet they would **really** need to be stored in `struct video_gfx'. But I also really
-	 * don't  want to give `struct video_gfx' a finalizer, though it'd need one for the current
-	 * color palette if it couldn't rely on the associated buffer's palette remaining constant.
-	 *
-	 * ------------
-	 *
-	 * Thinking about this, the only *real* solution is to NOT have this field, but simply have
-	 * a second version of `video_blitter_bitblit()` that takes a source palette override as an
-	 * argument.
-	 */
-//	struct video_palette *vx_rdpalette; /* [0..1][(!= NULL) == (vx_buffer->vb_format.vf_pal != NULL)][const] Palette used for color reads and bitblit sources */
-	gfx_blendmode_t      vx_blend;    /* Blending mode. */
-	video_gfx_flag_t     vx_flags;    /* Additional rendering flags (Set of `VIDEO_GFX_F*'). */
-	/* TODO: Get rid of "vx_colorkey":
-	 * - Color keys must be represented as `video_pixel_t'
-	 * - Color keys must be defined by `video_buffer' (somehow?)
-	 * - Color keys only become relevant for `struct video_blitter[3]'
-	 *
-	 * TODO: There needs to be another intermediate layer between  `struct video_buffer'
-	 *       and `struct video_gfx': `struct video_surface'. This layer then defines all
-	 *       the runtime changeable attributes of a video buffer:
-	 * >> struct video_palette *vs_palette;  // [0..1] Color palette for use with `vs_buffer' (keep at offset=0, for faster pixel<=>color conversion)
-	 * >> struct video_buffer  *vs_buffer;   // [1..1][const] Linked buffer
-	 * >> video_pixel_t         vs_colorkey; // [valid_if(vs_flags & VIDEO_SURFACE_F_COLORKEY)] Color key
-	 * >> uint32_t              vs_flags;    // Set of `VIDEO_SURFACE_F_*'
-	 *
-	 * This structure is  managed by the  user on the  stack, just like  `video_gfx',
-	 * and  as a matter of fact, `video_gfx'  should just contain an inlined instance
-	 * of  this structure. This  structure is then passed  to codecs for pixel2color,
-	 * instead of `struct video_format', preventing the need for an extra indirection
-	 * when GFX wants  to access pixel  data, and also  allowing `vs_flags' above  to
-	 * also contain `vx_flags' of the GFX context.
-	 *
-	 * This way, `struct video_buffer' can easily define [const] default values for
-	 * stuff like palette or color-key, while still allowing the user to operate on
-	 * the buffer using non-default values for all of these.
-	 *
-	 * When the palette/color-key of the `video_surface' embedded within `video_gfx'
-	 * is changed, `VIDEO_GFX_UPDATE_PALETTE' and `VIDEO_GFX_UPDATE_COLOR_KEY'  must
-	 * be used to propagate such changes to the driver.
-	 */
-	video_color_t        vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
+	struct video_surface vx_surf;  /* Video surface with which to interact. */
+	/* TODO: Rename "video_gfxhdr" to something like "video_gfxclip" (and also rename `vx_hdr' to `vx_clip') */
+	struct video_gfxhdr  vx_hdr;   /* GFX header (this part of the struct can be saved/restored in order to restore old Clip Rects) */
+	gfx_blendmode_t      vx_blend; /* Blending mode. */
 #define _VIDEO_GFX_N_DRIVER 20
 	void *_vx_driver[_VIDEO_GFX_N_DRIVER]; /* [?..?] Driver-specific graphics data. */
 

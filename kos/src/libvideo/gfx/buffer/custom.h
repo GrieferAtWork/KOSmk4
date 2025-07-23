@@ -36,8 +36,8 @@
 #include <libvideo/color.h>
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
-#include <libvideo/gfx/codec/format.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface-defs.h>
 #include <libvideo/types.h>
 
 #include "../swgfx.h"
@@ -68,7 +68,6 @@ struct custom_buffer: custom_buffer_common {
 };
 
 struct custom_buffer_subregion: custom_buffer_common {
-	video_gfx_flag_t                    cbsr_gfx;    /* [const] GFX flags to apply during GFX init */
 	video_coord_t                       cbsr_xoff;   /* [const] X-offset to add to all pixel coords */
 	video_coord_t                       cbsr_yoff;   /* [const] Y-offset to add to all pixel coords */
 	size_t                              cbsr_bxoff;  /* [const] In-scanline byte offset for `cbsr_xoff' */
@@ -99,8 +98,8 @@ INTDEF NONNULL((1)) void FCC custom_buffer_subregion__destroy(struct video_buffe
 /* REVOKE+SUBREGION */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC custom_buffer__revoke)(struct video_buffer *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC custom_buffer_subregion__revoke)(struct video_buffer *__restrict self);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC custom_buffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t gfx_flags);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC custom_buffer_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t gfx_flags);
+INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC custom_buffer__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
+INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC custom_buffer_subregion__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
 
 /* LOCK */
 INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC custom_buffer__rlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
@@ -119,17 +118,9 @@ INTDEF ATTR_INOUT(1) NONNULL((2)) void NOTHROW(FCC custom_buffer_subregion__unlo
 /* GFX */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC custom_buffer__initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC custom_buffer_subregion__initgfx(struct video_gfx *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC custom_buffer_subregion_nooff__initgfx(struct video_gfx *__restrict self);
 
 
 /* GFX operators (built on-top of "SWGFX") */
-struct gfx_customdrv: gfx_swdrv {
-};
-#define video_customgfx_getdrv(self) \
-	((struct gfx_customdrv *)(self)->_vx_driver)
-#define video_customgfx_getcdrv(self) \
-	((struct gfx_customdrv const *)(self)->_vx_driver)
-
 INTDEF ATTR_IN(1) video_pixel_t CC custom_gfx__getpixel(struct video_gfx const *__restrict self, video_coord_t abs_x, video_coord_t abs_y);
 INTDEF ATTR_IN(1) void CC custom_gfx__setpixel(struct video_gfx const *__restrict self, video_coord_t abs_x, video_coord_t abs_y, video_pixel_t pixel);
 INTDEF ATTR_IN(1) video_pixel_t CC custom_gfx_subregion__getpixel(struct video_gfx const *__restrict self, video_coord_t abs_x, video_coord_t abs_y);
@@ -164,7 +155,7 @@ INTDEF ATTR_IN(1) void CC custom_gfx_subregion__setpixel(struct video_gfx const 
  * @param: cookie:       [?..?] Cookie argument passed to all user-supplied operators */
 INTDEF WUNUSED NONNULL((3, 4, 5)) REF struct video_buffer *CC
 libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
-                          struct video_format const *__restrict format,
+                          struct video_buffer_format const *__restrict format,
                           video_buffer_custom_getpixel_t getpixel,
                           video_buffer_custom_setpixel_t setpixel,
                           video_buffer_custom_destroy_t destroy,

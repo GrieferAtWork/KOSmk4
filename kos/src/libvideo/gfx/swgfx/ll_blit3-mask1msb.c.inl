@@ -255,10 +255,10 @@ LOCAL_libvideo_swblitter3__blit__mask1msb__vline(struct video_blitter3 const *__
                                                  byte_t const *dst_line, size_t dst_stride,
                                                  byte_t dst_mask, video_dim_t size_y) {
 #ifdef LOCAL_IS_SAMEFMT
-	video_codec_linecopy_t vc_linecopy = self->vbt3_wrdst->vx_buffer->vb_format.vf_codec->vc_linecopy;
+	video_codec_linecopy_t vc_linecopy = video_gfx_getcodec(self->vbt3_wrdst)->vc_linecopy;
 #else /* LOCAL_IS_SAMEFMT */
-	video_codec_setpixel_t vc_setpixel = self->vbt3_wrdst->vx_buffer->vb_format.vf_codec->vc_setpixel;
-	video_codec_getpixel_t vc_getpixel = self->vbt3_src->vx_buffer->vb_format.vf_codec->vc_getpixel;
+	video_codec_setpixel_t vc_setpixel = video_gfx_getcodec(self->vbt3_wrdst)->vc_setpixel;
+	video_codec_getpixel_t vc_getpixel = video_gfx_getcodec(self->vbt3_src)->vc_getpixel;
 #endif /* !LOCAL_IS_SAMEFMT */
 	LOCAL_load_conv;
 	gfx_assert(dst_mask != 0);
@@ -319,11 +319,11 @@ LOCAL_libvideo_swblitter3__blit__mask1msb(struct video_blitter3 const *__restric
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
 	            out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y);
 #ifdef LOCAL_IS_BLEND1
-	if (LL_wlockregion(out->vx_buffer, &out_lock, out_x, out_y, size_x, size_y)) {
+	if (LL_wlockregion(video_gfx_getbuffer(out), &out_lock, out_x, out_y, size_x, size_y)) {
 		struct video_regionlock dst_lock;
-		if (LL_rlockregion(dst->vx_buffer, &dst_lock, dst_x, dst_y, size_x, size_y)) {
+		if (LL_rlockregion(video_gfx_getbuffer(dst), &dst_lock, dst_x, dst_y, size_x, size_y)) {
 			struct video_regionlock src_lock;
-			if (LL_rlockregion(src->vx_buffer, &src_lock, src_x, src_y, size_x, size_y)) {
+			if (LL_rlockregion(video_gfx_getbuffer(src), &src_lock, src_x, src_y, size_x, size_y)) {
 				/* Use video locks */
 				video_coord_t used_src_x = src_lock.vrl_xbas;
 				video_coord_t used_dst_x = dst_lock.vrl_xbas;
@@ -332,10 +332,10 @@ LOCAL_libvideo_swblitter3__blit__mask1msb(struct video_blitter3 const *__restric
 				byte_t const *dst_line = dst_lock.vrl_lock.vl_data;
 				byte_t *out_line = out_lock.vrl_lock.vl_data;
 #ifdef LOCAL_IS_SAMEFMT
-				video_codec_linecopy_t vc_linecopy = out->vx_buffer->vb_format.vf_codec->vc_linecopy;
+				video_codec_linecopy_t vc_linecopy = video_gfx_getcodec(out)->vc_linecopy;
 #else  /* LOCAL_IS_SAMEFMT */
-				video_codec_setpixel_t vc_setpixel = out->vx_buffer->vb_format.vf_codec->vc_setpixel;
-				video_codec_getpixel_t vc_getpixel = src->vx_buffer->vb_format.vf_codec->vc_getpixel;
+				video_codec_setpixel_t vc_setpixel = video_gfx_getcodec(out)->vc_setpixel;
+				video_codec_getpixel_t vc_getpixel = video_gfx_getcodec(src)->vc_getpixel;
 #endif /* !LOCAL_IS_SAMEFMT */
 				LOCAL_load_conv;
 
@@ -457,14 +457,14 @@ LOCAL_libvideo_swblitter3__blit__mask1msb(struct video_blitter3 const *__restric
 					dst_line += dst_lock.vrl_lock.vl_stride;
 				} while (--size_y);
 done_lock:
-				LL_unlockregion(src->vx_buffer, &src_lock);
-				LL_unlockregion(dst->vx_buffer, &dst_lock);
-				LL_unlockregion(out->vx_buffer, &out_lock);
+				LL_unlockregion(video_gfx_getbuffer(src), &src_lock);
+				LL_unlockregion(video_gfx_getbuffer(dst), &dst_lock);
+				LL_unlockregion(video_gfx_getbuffer(out), &out_lock);
 				goto done;
 			}
-			LL_unlockregion(dst->vx_buffer, &dst_lock);
+			LL_unlockregion(video_gfx_getbuffer(dst), &dst_lock);
 		}
-		LL_unlockregion(out->vx_buffer, &out_lock);
+		LL_unlockregion(video_gfx_getbuffer(out), &out_lock);
 	}
 #endif /* LOCAL_IS_BLEND1 */
 	LOCAL_libvideo_swblitter3__blit__mask1msb__bypixel(self, out_x, out_y, dst_x, dst_y,

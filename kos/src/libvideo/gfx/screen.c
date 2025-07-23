@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_SCREEN_C
 #define GUARD_LIBVIDEO_GFX_SCREEN_C 1
+#define __VIDEO_BUFFER_const /* nothing */
 #define _KOS_SOURCE 1
 
 #include "api.h"
@@ -59,7 +60,6 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec-extra.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
 #include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/screen.h>
 
@@ -74,7 +74,6 @@ DECL_BEGIN
 struct svga_screen: video_rambuffer {
 	size_t                            ss_rbtotal;       /* [const] Ram buffer total size. */
 	struct screen_buffer_ops          ss_ops;           /* [const] Screen buffer operators. */
-	REF struct video_codec_handle    *ss_codec_handle;  /* [1..1][const] Custom codec keep-alive handle */
 	fd_t                              ss_vdlck;         /* [const] Video lock file */
 	void                             *ss_libphys;       /* [1..1][const] Handle for libphys */
 	PMMAPPHYS                         ss_libphys_map;   /* [1..1][const] Helper to map physical memory */
@@ -156,10 +155,7 @@ svga_screen_destroy(struct video_buffer *__restrict self) {
 	(void)dlclose(me->ss_libsvgadrv);
 	(void)dlclose(me->ss_libphys);
 	(void)close(me->ss_vdlck);
-	if (me->vb_format.vf_pal)
-		video_palette_decref(me->vb_format.vf_pal);
-	if (me->ss_codec_handle)
-		video_codec_handle_decref(me->ss_codec_handle);
+	__video_buffer_fini_common(me);
 	(void)free(me);
 }
 
@@ -432,29 +428,29 @@ find_hinted_mode:
 
 	/* Convert the SVGA video mode into libvideo codec specs. */
 	if (mode->smi_bits_per_pixel == 4) {
-		result->ss_codec_handle = NULL;
-		result->vb_format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_X_VBE16);
+		result->vb_format.vbf_codec = libvideo_codec_lookup(VIDEO_CODEC_X_VBE16);
 	} else {
 		svga_modeinfo_to_codec_specs(mode, &codec_specs);
 
 		/* Build a codec from the newly constructed specs. */
-		result->vb_format.vf_codec = libvideo_codec_fromspecs(&codec_specs, &result->ss_codec_handle);
+		result->vb_format.vbf_codec = libvideo_codec_fromspecs(&codec_specs);
 	}
-	if (!result->vb_format.vf_codec) {
+	if (!result->vb_format.vbf_codec) {
 		LOGERR("No codec for SVGA video mode\n");
 		errno = ENODEV;
 		goto err_svga_vdlck_libsvgadrv_r_cs_mode;
 	}
+	video_codec_incref(result->vb_format.vbf_codec);
 
 	/* If necessary, construct a palette controller for the codec, and populate
 	 * it with whatever is currently configured  by the chipset. In theory,  we
 	 * could also just come up with a  new palette here, but again: use  what's
 	 * already there, so another program can pre-configure it for us. */
-	result->vb_format.vf_pal = NULL;
-	if (result->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-		shift_t cbits = result->vb_format.vf_codec->vc_specs.vcs_cbits;
-		result->vb_format.vf_pal = svga_palette_new(&result->ss_cs, cbits);
-		if unlikely(!result->vb_format.vf_pal) {
+	result->vb_format.vbf_pal = NULL;
+	if (result->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		shift_t cbits = result->vb_format.vbf_codec->vc_specs.vcs_cbits;
+		result->vb_format.vbf_pal = svga_palette_new(&result->ss_cs, cbits);
+		if unlikely(!result->vb_format.vbf_pal) {
 			LOGERR("Failed to allocate palette controller: %m\n");
 			goto err_svga_vdlck_libsvgadrv_r_cs_mode_codec;
 		}
@@ -532,11 +528,11 @@ find_hinted_mode:
 err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys:
 	(void)dlclose(result->ss_libphys);
 err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal:
-	if (result->vb_format.vf_pal)
-		video_palette_decref(result->vb_format.vf_pal);
+	if (result->vb_format.vbf_pal)
+		video_palette_decref(result->vb_format.vbf_pal);
 err_svga_vdlck_libsvgadrv_r_cs_mode_codec:
-	if (result->ss_codec_handle)
-		video_codec_handle_decref(result->ss_codec_handle);
+	if (result->vb_format.vbf_codec)
+		video_codec_decref(result->vb_format.vbf_codec);
 err_svga_vdlck_libsvgadrv_r_cs_mode:
 	freea(mode);
 err_svga_vdlck_libsvgadrv_r_cs:

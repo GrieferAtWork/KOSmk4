@@ -38,7 +38,6 @@
 #include <libvideo/compositor/compositor.h>
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
-#include <libvideo/gfx/codec/format.h>
 #include <libvideo/gfx/display.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/rect.h>
@@ -194,11 +193,11 @@ struct local_compositor: video_compositor {
 	REF struct video_display  *lc_display;          /* [1..1][lock(lc_lock)] Output display */
 	REF struct video_buffer   *lc_buffer;           /* [1..1][lock(lc_lock)] Output buffer */
 	struct video_domain const *lc_domain;           /* [1..1][== lc_buffer->vb_domain][lock(lc_lock)] Output buffer */
-	struct video_format        lc_nalpha_format;    /* [lock(lc_lock)] Format used for windows without alpha */
-	struct video_format        lc_yalpha_format;    /* [lock(lc_lock)] Format used for windows with alpha */
+	struct video_buffer_format lc_nalpha_format;    /* [lock(lc_lock)] Format used for windows without alpha */
+	struct video_buffer_format lc_yalpha_format;    /* [lock(lc_lock)] Format used for windows with alpha */
 	struct video_gfx           lc_buffer_gfx_write; /* [lock(lc_lock)] Pre-calculated GFX content for `lc_buffer' (with GFX_BLENDMODE_OVERRIDE) */
 	struct video_gfx           lc_buffer_gfx_alpha; /* [lock(lc_lock)] Pre-calculated GFX content for `lc_buffer' (with GFX_BLENDMODE_ALPHA) */
-	struct video_format        lc_a1_format;        /* [const] Pointer to `VIDEO_CODEC_A1_MSB' codec (palette is always "NULL" here) */
+	struct video_buffer_format lc_a1_format;        /* [const] Pointer to `VIDEO_CODEC_A1_MSB' codec (palette is always "NULL" here) */
 	struct local_window_list   lc_passthru;         /* [0..n][lock(lc_lock)] List of windows where `lw_content' is a passthru to `lc_buffer' */
 	struct local_window_tailq  lc_zorder;           /* [0..n][lock(lc_lock)] List of all windows */
 	struct local_window_tailq  lc_zorder_visi;      /* [0..n][lock(lc_lock)] List of visible windows */

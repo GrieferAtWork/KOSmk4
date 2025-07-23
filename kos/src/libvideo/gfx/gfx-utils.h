@@ -38,9 +38,8 @@
 #include <libvideo/color.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/blendcolors.h>
-#include <libvideo/gfx/codec/format.h>
-#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
 #include "gfx-debug.h"
@@ -243,7 +242,7 @@ libvideo_gfx_allow_noblend_blit(struct video_gfx const *dst,
 			break;
 		ATTR_FALLTHROUGH
 	case GFX_BLENDMODE_ALPHA:
-		return !video_format_hasalpha(&src->vx_buffer->vb_format);
+		return !video_surface_hasalpha(video_gfx_getsurface(src));
 	case GFX_BLENDMODE_ALPHA_OVERRIDE(0):
 		return VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode));
 	default: break;
@@ -273,12 +272,12 @@ libvideo_gfx_allow_noblend_blit3(struct video_gfx const *wrdst,
 			ATTR_FALLTHROUGH
 		case GFX_BLENDMODE_ALPHA:
 			/* Result of ALPHA-blend always has alpha=1 when at least 1 source has alpha=1 */
-			return !video_format_hasalpha(&src->vx_buffer->vb_format) ||
-			       !video_format_hasalpha(&rddst->vx_buffer->vb_format);
+			return !video_surface_hasalpha(video_gfx_getsurface(src)) ||
+			       !video_surface_hasalpha(video_gfx_getsurface(rddst));
 		case GFX_BLENDMODE_ALPHA_OVERRIDE(0):
 			if (VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode)))
 				return true;
-			if (!video_format_hasalpha(&rddst->vx_buffer->vb_format))
+			if (!video_surface_hasalpha(video_gfx_getsurface(rddst)))
 				return true;
 			break;
 		default: break;

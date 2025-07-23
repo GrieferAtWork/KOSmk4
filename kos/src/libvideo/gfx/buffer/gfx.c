@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_BUFFER_GFX_C
 #define GUARD_LIBVIDEO_GFX_BUFFER_GFX_C 1
+#define __VIDEO_BUFFER_const /* nothing */
 #define _KOS_SOURCE 1
 
 #include "../api.h"
@@ -36,8 +37,9 @@
 #include <libvideo/crect.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
-#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface-defs.h>
+#include <libvideo/gfx/surface.h>
 #include <libvideo/rect.h>
 #include <libvideo/types.h>
 
@@ -63,9 +65,8 @@ DEFINE_VIDEO_BUFFER_TYPE(gfx_buffer_ops,
 INTERN NONNULL((1)) void FCC
 gfx_buffer_destroy(struct video_buffer *__restrict self) {
 	struct gfx_buffer *me = (struct gfx_buffer *)self;
-	if (me->vb_format.vf_pal)
-		video_palette_decref(me->vb_format.vf_pal);
 	video_buffer_decref(me->gxb_base);
+	__video_buffer_fini_common(me);
 	free(me);
 }
 
@@ -77,15 +78,14 @@ NOTHROW(FCC gfx_buffer__revoke)(struct video_buffer *__restrict self) {
 	return me;
 }
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-gfx_buffer__subregion(struct video_buffer *__restrict self,
-                      struct video_crect const *__restrict rect,
-                      video_gfx_flag_t gfx_flags) {
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+gfx_buffer__subregion(struct video_surface const *__restrict self,
+                      struct video_crect const *__restrict rect) {
 	/* NOTE: This  could be written much more efficiently, but this function isn't
 	 *       expected to be used all-too-often, so we're just not going to put any
 	 *       extra effort into it... */
 	struct video_gfx subgfx, *p_subgfx;
-	p_subgfx = video_buffer_getgfx(self, &subgfx, GFX_BLENDMODE_OVERRIDE, gfx_flags, 0);
+	p_subgfx = video_surface_getgfx(self, &subgfx, GFX_BLENDMODE_OVERRIDE);
 	p_subgfx = video_gfx_clip(p_subgfx, rect->vcr_xmin, rect->vcr_ymin, rect->vcr_xdim, rect->vcr_ydim);
 	return libvideo_buffer_fromgfx(p_subgfx);
 }
@@ -94,10 +94,9 @@ gfx_buffer__subregion(struct video_buffer *__restrict self,
 /* GFX */
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 gfx_buffer_initgfx(struct video_gfx *__restrict self) {
-	struct gfx_buffer *me = (struct gfx_buffer *)self->vx_buffer;
+	struct gfx_buffer *me = (struct gfx_buffer *)video_gfx_getbuffer(self);
 	struct video_buffer *base = me->gxb_base;
-	self->vx_buffer = base; /* This is allowed! */
-	self->vx_flags = video_gfx_flag_combine(me->gxb_flags, self->vx_flags);
+	self->vx_surf.vs_buffer = base; /* This is allowed! */
 	self = (*base->vb_ops->vi_initgfx)(self);
 
 	/* Adjust clip rect to re-create expected Clip- / I/O Rect */
@@ -114,9 +113,9 @@ gfx_buffer_initgfx(struct video_gfx *__restrict self) {
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 gfx_buffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
-	struct gfx_buffer *me = (struct gfx_buffer *)self->vx_buffer;
+	struct gfx_buffer *me = (struct gfx_buffer *)video_gfx_getbuffer(self);
 	struct video_buffer *base = me->gxb_base;
-	self->vx_buffer = base; /* This is allowed! */
+	self->vx_surf.vs_buffer = base; /* This is allowed! */
 	return (*base->vb_ops->vi_updategfx)(self, what);
 }
 
@@ -153,13 +152,13 @@ gfx_buffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 DEFINE_PUBLIC_ALIAS(video_buffer_fromgfx, libvideo_buffer_fromgfx);
 INTDEF WUNUSED ATTR_IN(1) REF struct video_buffer *CC
 libvideo_buffer_fromgfx(struct video_gfx const *__restrict self) {
+	REF struct video_buffer *result;
+	struct video_surface const *surface = video_gfx_getsurface(self);
 	struct video_crect io_rect;
 	struct video_rect clip_rect_after_io;
-	struct video_buffer *buffer = self->vx_buffer;
 	bool must_apply_io;
 	bool must_apply_clip;
 	bool must_use_gfx_buffer;
-	video_gfx_flag_t flags = self->vx_flags;
 
 	io_rect.vcr_xmin = self->vx_hdr.vxh_bxmin;
 	io_rect.vcr_ymin = self->vx_hdr.vxh_bymin;
@@ -174,15 +173,15 @@ libvideo_buffer_fromgfx(struct video_gfx const *__restrict self) {
 	}
 	assert((io_rect.vcr_xmin + io_rect.vcr_xdim) > io_rect.vcr_xmin);
 	assert((io_rect.vcr_ymin + io_rect.vcr_ydim) > io_rect.vcr_ymin);
-	assert((io_rect.vcr_xmin + io_rect.vcr_xdim) <= buffer->vb_xdim);
-	assert((io_rect.vcr_ymin + io_rect.vcr_ydim) <= buffer->vb_ydim);
+	assert((io_rect.vcr_xmin + io_rect.vcr_xdim) <= video_surface_getxdim(surface));
+	assert((io_rect.vcr_ymin + io_rect.vcr_ydim) <= video_surface_getydim(surface));
 
 	/* Check if GFX contains flags that require use of a `struct gfx_buffer' */
-	must_use_gfx_buffer = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR |
-	                                VIDEO_GFX_F_XYSWAP));
+	must_use_gfx_buffer = (video_surface_getflags(surface) &
+	                       (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP));
 	if (must_use_gfx_buffer) {
-		/* NOTE: Technically, the buffer here could  also be represented using 2  nestings
-		 *       of `libvideo_buffer_region()' (first for I/O-Rect, second for Clip-Rect),
+		/* NOTE: Technically,  the buffer here  could also be  represented using 2 nestings
+		 *       of `libvideo_surface_region()' (first for I/O-Rect, second for Clip-Rect),
 		 *       but we don't / can't do this for 2 reasons:
 		 * - We  can't do it because the resulting  buffer would still be lockable, and
 		 *   further still: its pixel data would represent the buffer's contents BEFORE
@@ -195,29 +194,30 @@ libvideo_buffer_fromgfx(struct video_gfx const *__restrict self) {
 			goto err;
 		result->vb_ops    = _gfx_buffer_ops();
 		result->vb_domain = _libvideo_ramdomain();
-		result->vb_format = buffer->vb_format;
+		result->vb_format.vbf_codec    = video_surface_getcodec(surface);
+		result->vb_format.vbf_pal      = video_surface_getpalette(surface);
+		result->vb_format.vbf_flags    = video_surface_getflags(surface);
+		result->vb_format.vbf_colorkey = video_surface_getcolorkey(surface);
 		result->vb_xdim   = self->vx_hdr.vxh_cxsiz;
 		result->vb_ydim   = self->vx_hdr.vxh_cysiz;
 		result->vb_refcnt = 1;
-		result->gxb_base  = buffer;
-		video_buffer_incref(buffer);
+		result->gxb_base  = video_surface_getbuffer(surface);
+		video_buffer_incref(result->gxb_base);
 		result->gxb_cxoff = self->vx_hdr.vxh_cxoff;
 		result->gxb_cyoff = self->vx_hdr.vxh_cyoff;
 		result->gxb_bxmin = self->vx_hdr.vxh_bxmin;
 		result->gxb_bymin = self->vx_hdr.vxh_bymin;
 		result->gxb_bxend = self->vx_hdr.vxh_bxend;
 		result->gxb_byend = self->vx_hdr.vxh_byend;
-		result->gxb_flags = flags;
-		if (result->vb_format.vf_pal)
-			video_palette_incref(result->vb_format.vf_pal);
+		__video_buffer_init_common(result);
 		return result;
 	}
 
 	/* Check if an I/O Rect needs to be applied */
 	must_apply_io = io_rect.vcr_xmin > 0 ||
 	                io_rect.vcr_ymin > 0 ||
-	                io_rect.vcr_xdim < buffer->vb_xdim ||
-	                io_rect.vcr_ydim < buffer->vb_ydim;
+	                io_rect.vcr_xdim < video_surface_getxdim(surface) ||
+	                io_rect.vcr_ydim < video_surface_getydim(surface);
 
 	/* Calculate Clip Rect (after I/O) */
 	clip_rect_after_io.vr_xmin = self->vx_hdr.vxh_cxoff - io_rect.vcr_xmin;
@@ -232,27 +232,28 @@ libvideo_buffer_fromgfx(struct video_gfx const *__restrict self) {
 	                  clip_rect_after_io.vr_ydim != io_rect.vcr_ydim;
 
 	/* Apply transformations */
-	video_buffer_incref(buffer);
-	if (must_apply_io || (!must_apply_clip && flags != VIDEO_GFX_F_NORMAL)) {
+	result = video_surface_getbuffer(surface);
+	video_buffer_incref(result);
+	if (must_apply_io || (!must_apply_clip && (video_surface_getflags(surface) !=
+	                                           video_buffer_getflags(result)))) {
 		REF struct video_buffer *new_buffer;
-		new_buffer = video_buffer_subregion(buffer, &io_rect, flags);
+		new_buffer = video_surface_subregion(surface, &io_rect);
 		if unlikely(!new_buffer)
-			goto err_buffer;
-		video_buffer_decref(buffer);
-		buffer = new_buffer;
-		flags  = VIDEO_GFX_F_NORMAL; /* Clear, so they're not applied again under `must_apply_clip' */
+			goto err_result;
+		video_buffer_decref(result);
+		result = new_buffer;
 	}
 	if (must_apply_clip) {
 		REF struct video_buffer *new_buffer;
-		new_buffer = libvideo_buffer_region(buffer, &clip_rect_after_io, flags);
+		new_buffer = libvideo_surface_region(surface, &clip_rect_after_io);
 		if unlikely(!new_buffer)
-			goto err_buffer;
-		video_buffer_decref(buffer);
-		buffer = new_buffer;
+			goto err_result;
+		video_buffer_decref(result);
+		result = new_buffer;
 	}
-	return buffer;
-err_buffer:
-	video_buffer_decref(buffer);
+	return result;
+err_result:
+	video_buffer_decref(result);
 err:
 	return NULL;
 }

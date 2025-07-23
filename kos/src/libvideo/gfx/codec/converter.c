@@ -38,8 +38,10 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <libvideo/color.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/converter.h>
 #include <libvideo/gfx/codec/palette.h>
+#include <libvideo/gfx/surface-defs.h>
+#include <libvideo/gfx/surface.h>
 
 #include "codec-utils.h"
 #include "converter.h"
@@ -49,6 +51,9 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #endif /* !BITSOF */
 
 DECL_BEGIN
+
+#define getdrv(T)  ((T *)self->_vcv_ydriver)
+#define getcdrv(T) ((T const *)self->_vcv_ydriver)
 
 /************************************************************************/
 /* PIXEL MAPPERS (COMMON)                                               */
@@ -60,70 +65,126 @@ map_identity(struct video_converter const *__restrict self, video_pixel_t from_p
 	return from_pixel;
 }
 
+/* X to X */
+struct data__map_x_to_x {
+	struct video_surface mx2x_from;
+	struct video_surface mx2x_to;
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_x_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
-	video_color_t color = video_format_pixel2color(&self->vcv_from, from_pixel);
-	return video_format_color2pixel(&self->vcv_to, color);
+	struct data__map_x_to_x const *drv = getcdrv(struct data__map_x_to_x);
+	video_color_t color = video_surface_pixel2color(&drv->mx2x_from, from_pixel);
+	return video_surface_color2pixel(&drv->mx2x_to, color);
 }
 
+/* X to P */
+struct data__map_x_to_p {
+	struct video_surface        mx2p_from;
+	struct video_palette const *mx2p_to;
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_x_to_p(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
-	video_color_t color = video_format_pixel2color(&self->vcv_from, from_pixel);
-	return video_palette_getpixel(self->vcv_to.vf_pal, color);
+	struct data__map_x_to_p const *drv = getcdrv(struct data__map_x_to_p);
+	video_color_t color = video_surface_pixel2color(&drv->mx2p_from, from_pixel);
+	return video_palette_getpixel(drv->mx2p_to, color);
 }
 
+/* X to RGBA8888 */
+struct data__map_x_to_rgba8888 {
+	struct video_surface mx2rgba8888_from;
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_x_to_rgba8888(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
-	return video_format_pixel2color(&self->vcv_from, from_pixel);
+	struct data__map_x_to_rgba8888 const *drv = getcdrv(struct data__map_x_to_rgba8888);
+	return video_surface_pixel2color(&drv->mx2rgba8888_from, from_pixel);
 }
 
+/* RGBA8888 to P */
+struct data__map_rgba8888_to_p {
+	struct video_palette const *mrgba88882p_to;
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rgba8888_to_p(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
-	return video_palette_getpixel(self->vcv_to.vf_pal, from_pixel);
+	struct data__map_rgba8888_to_p const *drv = getcdrv(struct data__map_rgba8888_to_p);
+	return video_palette_getpixel(drv->mrgba88882p_to, from_pixel);
 }
 
+/* RGBA8888 to X */
+struct data__map_rgba8888_to_x {
+	struct video_surface mrgba88882x_to;
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rgba8888_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
-	return video_format_color2pixel(&self->vcv_to, from_pixel);
+	struct data__map_rgba8888_to_x const *drv = getcdrv(struct data__map_rgba8888_to_x);
+	return video_surface_color2pixel(&drv->mrgba88882x_to, from_pixel);
 }
 
+/* RGBX8888 to P */
+struct data__map_rgbx8888_to_p {
+	struct video_palette const *mrgbx88882p_to;
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rgbx8888_to_p(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
+	struct data__map_rgbx8888_to_p const *drv = getcdrv(struct data__map_rgbx8888_to_p);
 	video_color_t color = from_pixel | VIDEO_COLOR_ALPHA_MASK;
-	return video_palette_getpixel(self->vcv_to.vf_pal, color);
+	return video_palette_getpixel(drv->mrgbx88882p_to, color);
 }
 
+/* RGBX8888 to X */
+struct data__map_rgbx8888_to_x {
+	struct video_surface mrgbx88882x_to;
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rgbx8888_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
+	struct data__map_rgbx8888_to_x const *drv = getcdrv(struct data__map_rgbx8888_to_x);
 	video_color_t color = from_pixel | VIDEO_COLOR_ALPHA_MASK;
-	return video_format_color2pixel(&self->vcv_to, color);
+	return video_surface_color2pixel(&drv->mrgbx88882x_to, color);
 }
 
 
 /************************************************************************/
 /* PIXEL MAPPERS (PALETTE SOURCE)                                       */
 /************************************************************************/
-#define video_converter__palmap(self) ((video_pixel_t *)(self)->_vcv_ydriver)
+
+struct data__map_p256 {
+	video_pixel_t mp256_pixels[256];
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_p256(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
-	return video_converter__palmap(self)[from_pixel & 0xff];
+	struct data__map_p256 const *drv = getcdrv(struct data__map_p256);
+	codec_assert(from_pixel < 256);
+	return drv->mp256_pixels[from_pixel];
 }
 
+struct data__map_p2p {
+	video_color_t const        *mp2p_from;
+	struct video_palette const *mp2p_to;
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_p_to_p(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
-	video_color_t color = video_palette_getcolor(self->vcv_from.vf_pal, from_pixel);
-	return video_palette_getpixel(self->vcv_to.vf_pal, color);
+	struct data__map_p2p const *drv = getcdrv(struct data__map_p2p);
+	video_color_t color = drv->mp2p_from[from_pixel];
+	return video_palette_getpixel(drv->mp2p_to, color);
 }
 
+struct data__map_p2x {
+	video_color_t const *mp2x_from;
+	struct video_surface mp2x_to;
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_p_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
-	video_color_t color = video_palette_getcolor(self->vcv_from.vf_pal, from_pixel);
-	return video_format_color2pixel(&self->vcv_to, color);
+	struct data__map_p2x const *drv = getcdrv(struct data__map_p2x);
+	video_color_t color = drv->mp2x_from[from_pixel];
+	return video_surface_color2pixel(&drv->mp2x_to, color);
 }
 
+struct data__map_p2rgba8888 {
+	video_color_t const *mp2x_from;
+};
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_p_to_rgba8888(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
-	return video_palette_getcolor(self->vcv_from.vf_pal, from_pixel);
+	struct data__map_p2rgba8888 const *drv = getcdrv(struct data__map_p2rgba8888);
+	return drv->mp2x_from[from_pixel];
 }
 
 
@@ -274,24 +335,52 @@ map_bswap_rol16_plus_drv0(struct video_converter const *__restrict self, video_p
 
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_generic(struct video_converter *__restrict self) {
-	if (self->vcv_from.vf_codec == self->vcv_to.vf_codec &&
-	    self->vcv_from.vf_pal == self->vcv_to.vf_pal) {
+	struct video_surface const *from = self->vcv_from;
+	struct video_surface const *to = self->vcv_to;
+	struct video_codec const *from_codec = video_surface_getcodec(from);
+	struct video_codec const *to_codec = video_surface_getcodec(to);
+	if (from_codec == to_codec && (video_surface_getpalette(from) ==
+	                               video_surface_getpalette(to))) {
 		self->vcv_mappixel = &map_identity; /* No conversion is happening */
-	} else if (self->vcv_to.vf_codec->vc_color2pixel == &pal_color2pixel) {
-		if (self->vcv_from.vf_codec->vc_pixel2color == &identity_pixel2color) {
+	} else if (from_codec->vc_specs.vcs_bpp <= 8) {
+		/* Use map256 conversion */
+		video_pixel_t i, count = 1 << from_codec->vc_specs.vcs_bpp;
+		struct data__map_p256 *drv = getdrv(struct data__map_p256);
+		self->vcv_mappixel = &map_p256;
+		for (i = 0; i < count; ++i) {
+			video_color_t color = video_surface_pixel2color(from, i);
+			video_pixel_t pixel = video_surface_color2pixel(to, color);
+			drv->mp256_pixels[i] = pixel;
+		}
+	} else if (to_codec->vc_color2pixel == &pal_color2pixel) {
+		if (from_codec->vc_pixel2color == &identity_pixel2color) {
+			struct data__map_rgba8888_to_p *drv = getdrv(struct data__map_rgba8888_to_p);
+			drv->mrgba88882p_to = video_surface_getpalette(to);
 			self->vcv_mappixel = &map_rgba8888_to_p; /* RGBA8888 to palette */
-		} else if (self->vcv_from.vf_codec->vc_pixel2color == &rgbx8888_pixel2color) {
+		} else if (from_codec->vc_pixel2color == &rgbx8888_pixel2color) {
+			struct data__map_rgbx8888_to_p *drv = getdrv(struct data__map_rgbx8888_to_p);
+			drv->mrgbx88882p_to = video_surface_getpalette(to);
 			self->vcv_mappixel = &map_rgbx8888_to_p; /* RGBX8888 to palette */
 		} else {
+			struct data__map_x_to_p *drv = getdrv(struct data__map_x_to_p);
+			drv->mx2p_from = *from, drv->mx2p_to = video_surface_getpalette(to);
 			self->vcv_mappixel = &map_x_to_p; /* Anything to palette */
 		}
-	} else if (self->vcv_to.vf_codec->vc_color2pixel == &identity_color2pixel) {
+	} else if (to_codec->vc_color2pixel == &identity_color2pixel) {
+		struct data__map_x_to_rgba8888 *drv = getdrv(struct data__map_x_to_rgba8888);
+		drv->mx2rgba8888_from = *from;
 		self->vcv_mappixel = &map_x_to_rgba8888; /* Anything to RGBA8888 */
-	} else if (self->vcv_from.vf_codec->vc_pixel2color == &identity_pixel2color) {
+	} else if (from_codec->vc_pixel2color == &identity_pixel2color) {
+		struct data__map_rgba8888_to_x *drv = getdrv(struct data__map_rgba8888_to_x);
+		drv->mrgba88882x_to = *to;
 		self->vcv_mappixel = &map_rgba8888_to_x; /* RGBA8888 to anything */
-	} else if (self->vcv_from.vf_codec->vc_pixel2color == &rgbx8888_pixel2color) {
+	} else if (from_codec->vc_pixel2color == &rgbx8888_pixel2color) {
+		struct data__map_rgbx8888_to_x *drv = getdrv(struct data__map_rgbx8888_to_x);
+		drv->mrgbx88882x_to = *to;
 		self->vcv_mappixel = &map_rgbx8888_to_x; /* RGBX8888 to anything */
 	} else {
+		struct data__map_x_to_x *drv = getdrv(struct data__map_x_to_x);
+		drv->mx2x_from = *from, drv->mx2x_to = *to;
 		self->vcv_mappixel = &map_x_to_x; /* Anything to anything */
 	}
 	return self;
@@ -299,40 +388,32 @@ initconv_from_generic(struct video_converter *__restrict self) {
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_p(struct video_converter *__restrict self) {
-	struct video_palette *srcpal;
-	if unlikely(self->vcv_from.vf_codec->vc_pixel2color != &pal_pixel2color)
+	struct video_surface const *from = self->vcv_from;
+	struct video_surface const *to = self->vcv_to;
+	struct video_codec const *from_codec = video_surface_getcodec(from);
+	struct video_codec const *to_codec = video_surface_getcodec(to);
+	struct video_palette const *from_pal = video_surface_getpalette(from);
+	if unlikely(from_codec->vc_pixel2color != &pal_pixel2color ||
+	            from_codec->vc_specs.vcs_bpp <= 8) /* Let generic conversion do map256 */
 		return initconv_from_generic(self);
-	srcpal = self->vcv_from.vf_pal;
-	if (srcpal == self->vcv_to.vf_pal) {
+	if (from_pal == video_surface_getpalette(to)) {
 		self->vcv_mappixel = &map_identity;
 		goto done;
 	}
 
-	/* For palettes with indices that fit into a single
-	 * byte, we  can precalculate  a conversion  table. */
-	if (srcpal->vp_cnt <= 256) {
-		/* Precalculate pixel conversion map */
-		video_pixel_t srpxl;
-		struct video_format dstfmt = self->vcv_to;
-		/* TODO: This sort of lookup-based pixel conversion also works
-		 *       for  any non-palette-based pixel format with <= 8bpp! */
-		for (srpxl = 0; srpxl < srcpal->vp_cnt; ++srpxl) {
-			video_color_t color = srcpal->vp_pal[srpxl];
-			video_pixel_t dspxl = video_format_color2pixel(&dstfmt, color);
-			video_converter__palmap(self)[srpxl] = dspxl;
-		}
-		for (; srpxl < 256; ++srpxl)
-			video_converter__palmap(self)[srpxl] = 0;
-		self->vcv_mappixel = &map_p256;
-		goto done;
-	}
-
 	/* Fallback for large palettes. */
-	if (self->vcv_to.vf_codec->vc_color2pixel == &pal_color2pixel) {
+	if (to_codec->vc_color2pixel == &pal_color2pixel) {
+		struct data__map_p2p *drv = getdrv(struct data__map_p2p);
+		drv->mp2p_from = from_pal->vp_pal;
+		drv->mp2p_to = video_surface_getpalette(to);
 		self->vcv_mappixel = &map_p_to_p;
-	} else if (self->vcv_to.vf_codec->vc_color2pixel == &identity_color2pixel) {
+	} else if (to_codec->vc_color2pixel == &identity_color2pixel) {
+		struct data__map_p2rgba8888 *drv = getdrv(struct data__map_p2rgba8888);
+		drv->mp2x_from = from_pal->vp_pal;
 		self->vcv_mappixel = &map_p_to_rgba8888;
 	} else {
+		struct data__map_p2x *drv = getdrv(struct data__map_p2x);
+		drv->mp2x_from = from_pal->vp_pal, drv->mp2x_to = *to;
 		self->vcv_mappixel = &map_p_to_x;
 	}
 done:
@@ -367,8 +448,8 @@ initconv_from_a(struct video_converter *__restrict self) {
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_rgb(struct video_converter *__restrict self) {
-	struct video_codec const *from_codec = self->vcv_from.vf_codec;
-	struct video_codec const *to_codec = self->vcv_to.vf_codec;
+	struct video_codec const *from_codec = video_surface_getcodec(self->vcv_from);
+	struct video_codec const *to_codec = video_surface_getcodec(self->vcv_to);
 
 	/* Optimizations for similar direct-color codecs, where pixels can  be
 	 * converted using simple bit operations like bswap and shift / rotate */
@@ -444,8 +525,8 @@ done:
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_rgba(struct video_converter *__restrict self) {
-	struct video_codec const *from_codec = self->vcv_from.vf_codec;
-	struct video_codec const *to_codec = self->vcv_to.vf_codec;
+	struct video_codec const *from_codec = video_surface_getcodec(self->vcv_from);
+	struct video_codec const *to_codec = video_surface_getcodec(self->vcv_to);
 
 	/* Optimizations for similar direct-color codecs, where pixels can  be
 	 * converted using simple bit operations like bswap and shift / rotate */

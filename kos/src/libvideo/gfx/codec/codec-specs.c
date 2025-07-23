@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_CODEC_CODEC_SPECS_C
 #define GUARD_LIBVIDEO_GFX_CODEC_CODEC_SPECS_C 1
+#define __VIDEO_CODEC_const /* nothing */
 #define _KOS_SOURCE 1
 
 #include "../api.h"
@@ -50,7 +51,7 @@ DECL_BEGIN
  *
  * NOTE: This function doesn't need `vcs_pxsz' or `vcs_cbits' to be initialized. */
 DEFINE_PUBLIC_ALIAS(video_codec_lookup_specs, libvideo_codec_lookup_specs);
-INTERN WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *FCC
+INTERN WUNUSED ATTR_PURE ATTR_IN(1) struct video_codec *FCC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 	video_codec_t codec = VIDEO_CODEC_NONE;
 	if (specs->vcs_flags & (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_PAL)) {
@@ -440,21 +441,11 @@ nope:
 }
 
 
-PRIVATE struct video_codec_handle dummy_handle = {
-	.vch_refcnt  = 0x7fff,
-	.vch_destroy = (void (FCC *)(struct video_codec_handle *__restrict))(void *)-1,
-};
-
-
-struct video_codec_custom_handle: video_codec_handle {
-	struct video_codec_custom vcch_aligned;
-	struct video_codec_custom vcch_unaligned;
-};
-
 PRIVATE NONNULL((1)) void FCC
-video_codec_custom_handle_destroy(struct video_codec_handle *__restrict self) {
-	struct video_codec_custom_handle *me;
-	me = (struct video_codec_custom_handle *)self;
+custom_codec_destroy(struct video_codec *__restrict self) {
+	struct video_codec_custom *me = (struct video_codec_custom *)self;
+	if (me->vc_nalgn != me)
+		video_codec_decref(me->vc_nalgn);
 	free(me);
 }
 
@@ -476,56 +467,55 @@ video_codec_custom_handle_destroy(struct video_codec_handle *__restrict self) {
  * @return: NULL: [ENOMEM] Out-of-memory
  * @return: NULL: [*] Error */
 DEFINE_PUBLIC_ALIAS(video_codec_fromspecs, libvideo_codec_fromspecs);
-INTERN WUNUSED NONNULL((1, 2)) struct video_codec const *FCC
-libvideo_codec_fromspecs(struct video_codec_specs const *__restrict specs,
-                         /*out*/ REF struct video_codec_handle **__restrict p_handle) {
-	struct video_codec_custom_handle *custom;
-	struct video_codec const *builtin;
+INTERN WUNUSED ATTR_IN(1) REF struct video_codec *FCC
+libvideo_codec_fromspecs(struct video_codec_specs const *__restrict specs) {
+	struct video_codec *builtin;
+	REF struct video_codec_custom *result;
 
 	/* Check if the codec is available as a built-in */
 	builtin = libvideo_codec_lookup_specs(specs);
 	if (builtin) {
-		*p_handle = &dummy_handle;
-		video_codec_handle_incref(&dummy_handle);
+		video_codec_incref(builtin);
 		return builtin;
 	}
 
 	/* Allocate a custom codec handle (aligned-only for now) */
-	custom = (struct video_codec_custom_handle *)malloc(offsetafter(struct video_codec_custom_handle, vcch_aligned));
-	if unlikely(!custom)
-		return NULL;
+	result = (struct video_codec_custom *)malloc(sizeof(struct video_codec_custom));
+	if unlikely(!result)
+		goto err;
 
 	/* Populate the new codec's specs. */
-	memcpy(&custom->vcch_aligned.vc_specs, specs,
-	       sizeof(struct video_codec_specs));
-	if unlikely(!libvideo_codec_populate_custom(&custom->vcch_aligned, false))
+	memcpy(&result->vc_specs, specs, sizeof(struct video_codec_specs));
+	if unlikely(!libvideo_codec_populate_custom(result, false))
 		goto err_inval;
 
 	/* Check if we also need the unaligned version of the codec. */
-	if (custom->vcch_aligned.vc_nalgn == NULL) {
-		struct video_codec_custom_handle *full_custom;
-		full_custom = (struct video_codec_custom_handle *)realloc(custom, sizeof(struct video_codec_custom_handle));
-		if unlikely(!full_custom) {
-			free(custom);
+	if (result->vc_nalgn == NULL) {
+		REF struct video_codec_custom *nalign_result;
+		nalign_result = (struct video_codec_custom *)malloc(sizeof(struct video_codec_custom));
+		if unlikely(!nalign_result) {
+			free(result);
 			return NULL;
 		}
-		custom = full_custom;
-		memcpy(&custom->vcch_unaligned.vc_specs, specs,
-		       sizeof(struct video_codec_specs));
-		if unlikely(!libvideo_codec_populate_custom(&custom->vcch_unaligned, true))
+		memcpy(&nalign_result->vc_specs, specs, sizeof(struct video_codec_specs));
+		if unlikely(!libvideo_codec_populate_custom(nalign_result, true)) {
+			free(nalign_result);
 			goto err_inval;
-		assert(custom->vcch_unaligned.vc_nalgn == &custom->vcch_unaligned);
-		custom->vcch_aligned.vc_nalgn = &custom->vcch_unaligned;
+		}
+		assert(nalign_result->vc_nalgn == nalign_result);
+		result->vc_nalgn = nalign_result;
+		nalign_result->vc_refcnt  = 1;
+		nalign_result->vc_destroy = &custom_codec_destroy;
 	}
 
 	/* Finish initialization & return the aligned version of the codec. */
-	custom->vch_refcnt  = 1;
-	custom->vch_destroy = &video_codec_custom_handle_destroy;
-	*p_handle = custom;
-	return &custom->vcch_aligned;
+	result->vc_destroy = &custom_codec_destroy;
+	result->vc_refcnt  = 1;
+	return result;
 err_inval:
-	free(custom);
+	free(result);
 	errno = EINVAL;
+err:
 	return NULL;
 }
 

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_BUFFER_BITMASK_C
 #define GUARD_LIBVIDEO_GFX_BUFFER_BITMASK_C 1
+#define __VIDEO_BUFFER_const /* nothing */
 
 /* TODO: REMOVE THIS FILE */
 
@@ -103,7 +104,7 @@ bitmask_lockregion(struct video_buffer *__restrict self,
 PRIVATE ATTR_IN(1) video_pixel_t CC
 bitmask_gfx__getpixel(struct video_gfx const *__restrict self,
                       video_coord_t x, video_coord_t y) {
-	struct old_bitmask_buffer *me = (struct old_bitmask_buffer *)self->vx_buffer;
+	struct old_bitmask_buffer *me = (struct old_bitmask_buffer *)video_gfx_getbuffer(self);
 	uintptr_t bitoff = me->bmb_bm.vbm_skip + x + y * me->bmb_bm.vbm_scan;
 	byte_t const *bm = (byte_t const *)me->bmb_bm.vbm_mask;
 	return (bm[bitoff >> 3] >> (7 - (bitoff & 7))) & 1;
@@ -113,7 +114,7 @@ PRIVATE ATTR_IN(1) void CC
 bitmask_gfx__setpixel(struct video_gfx const *__restrict self,
                       video_coord_t x, video_coord_t y,
                       video_pixel_t pixel) {
-	struct old_bitmask_buffer *me = (struct old_bitmask_buffer *)self->vx_buffer;
+	struct old_bitmask_buffer *me = (struct old_bitmask_buffer *)video_gfx_getbuffer(self);
 	uintptr_t bitoff = me->bmb_bm.vbm_skip + x + y * me->bmb_bm.vbm_scan;
 	byte_t mask, value, *bm = (byte_t *)me->bmb_bm.vbm_mask;
 	bm += bitoff >> 3;
@@ -144,8 +145,8 @@ PRIVATE ATTR_INOUT(1) void CC
 bitmask_gfx_optimize(struct video_gfx *__restrict self) {
 	/* When no blending is being done, speed up color lookup by directly translating bits */
 	struct gfx_bitmaskdrv *drv = video_bitmaskgfx_getdrv(self);
-	if likely(drv->xsw_getcolor == &libvideo_swgfx_generic__getcolor_noblend) {
-		struct old_bitmask_buffer *me = (struct old_bitmask_buffer *)self->vx_buffer;
+	if likely(drv->xsw_getcolor == &libvideo_swgfx_generic__getcolor) {
+		struct old_bitmask_buffer *me = (struct old_bitmask_buffer *)video_gfx_getbuffer(self);
 		drv->xsw_getcolor = &bitmask_gfx__getcolor;
 		drv->gbmd_pal[0] = me->bmb_pal.vp_pal[0];
 		drv->gbmd_pal[1] = me->bmb_pal.vp_pal[1];
@@ -218,9 +219,11 @@ old_bitmask_buffer_init(struct old_bitmask_buffer *__restrict self,
 	self->bmb_pal.vp_pal[0] = bg_fg_colors[0];
 	self->bmb_pal.vp_pal[1] = bg_fg_colors[1];
 	self->vb_ops = _old_bitmask_ops();
-	self->vb_format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_P1_MSB);
-	self->vb_format.vf_pal = libvideo_palette_optimize((struct video_palette *)&self->bmb_pal); /* For "vp_color2pixel" */
-	assert(self->vb_format.vf_codec);
+	self->vb_format.vbf_codec    = libvideo_codec_lookup(VIDEO_CODEC_P1_MSB);
+	self->vb_format.vbf_pal      = libvideo_palette_optimize((struct video_palette *)&self->bmb_pal); /* For "vp_color2pixel" */
+	self->vb_format.vbf_flags    = VIDEO_GFX_F_NORMAL;
+	/*self->vb_format.vbf_colorkey = 0;*/
+	assert(self->vb_format.vbf_codec);
 	self->vb_xdim = size_x;
 	self->vb_ydim = size_y;
 #ifndef NDEBUG

@@ -364,7 +364,7 @@ INTERN ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
 libvideo_buffer_open_jpg(struct video_domain const *__restrict domain_hint,
                          void const *blob, size_t blob_size) {
 	video_codec_t result_codec_id;
-	struct video_format result_format;
+	struct video_buffer_format result_format;
 	REF struct video_buffer *result;
 	struct video_lock vid_lock;
 	size_t result_size_x, result_size_y;
@@ -409,18 +409,20 @@ err_wrong_fmt:
 	case 4: result_codec_id = VIDEO_CODEC_RGBX8888; break; /* ??? */
 	default: goto err_wrong_fmt;
 	}
-	result_format.vf_codec = libvideo_codec_lookup(result_codec_id);
-	assertf(result_format.vf_codec, "Built-in codec should have been recognized");
-	result_format.vf_pal = NULL;
+	result_format.vbf_codec = libvideo_codec_lookup(result_codec_id);
+	assertf(result_format.vbf_codec, "Built-in codec should have been recognized");
+	result_format.vbf_flags = VIDEO_GFX_F_NORMAL;
 
 	/* Allocate video buffer */
-	result = video_domain_newbuffer(domain_hint, result_size_x, result_size_y,
-	                                &result_format, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+	result = video_domain_newbuffer(domain_hint, &result_format,
+	                                result_size_x, result_size_y,
+	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result) {
 		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain)
 			goto err_errno;
-		result = video_domain_newbuffer(_libvideo_ramdomain(), result_size_x, result_size_y,
-		                                &result_format, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+		result = video_domain_newbuffer(_libvideo_ramdomain(), &result_format,
+		                                result_size_x, result_size_y,
+		                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!result)
 			goto err_errno;
 	}
@@ -475,7 +477,7 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 		return -1;
 	}
 
-	in_codec_id = self->vb_format.vf_codec->vc_codec;
+	in_codec_id = self->vb_format.vbf_codec->vc_codec;
 	switch (in_codec_id) {
 
 	case VIDEO_CODEC_L8:
@@ -491,14 +493,14 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 	default: {
 		/* Fallback: convert to most appropriate fallback codec, and then save it as a buffer */
 		int result;
-		struct video_format in_format;
+		struct video_buffer_format in_format;
 		struct video_buffer *conv_buffer;
-		in_codec_id = (self->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_LUM)
+		in_codec_id = (self->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_LUM)
 		              ? VIDEO_CODEC_L8
 		              : VIDEO_CODEC_RGB888;
-		in_format.vf_codec = libvideo_codec_lookup(in_codec_id);
-		assertf(in_format.vf_codec, "Built-in codec should have been recognized");
-		in_format.vf_pal = NULL;
+		in_format.vbf_codec = libvideo_codec_lookup(in_codec_id);
+		assertf(in_format.vbf_codec, "Built-in codec should have been recognized");
+		in_format.vbf_flags = VIDEO_GFX_F_NORMAL;
 		conv_buffer = libvideo_buffer_convert(self, _libvideo_ramdomain(), &in_format);
 		if unlikely(!conv_buffer)
 			return -1;

@@ -605,7 +605,7 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 	}
 
 	/* Check if we need to convert from a palette-based output buffer to a direct-color one */
-	codec = frame->vb_format.vf_codec;
+	codec = frame->vb_format.vbf_codec;
 	if ((self->gb_lct != lct) &&
 	    (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) &&
 	    /* When the old frame gets disposed, then we also don't need DCOL mode */
@@ -616,8 +616,8 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		video_coord_t iter_y;
 		struct video_lock pal_lock;
 		REF struct video_buffer *dcol_buffer;
-		struct video_format format;
-		struct video_palette *pal = frame->vb_format.vf_pal;
+		struct video_buffer_format format;
+		struct video_palette *pal = frame->vb_format.vbf_pal;
 		assert(pal);
 
 		/* Only the transparency-config of the first frame (i.e. the "gobal transparency")
@@ -628,17 +628,18 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		 * use "GIF_DISPOSE_RESTORE_BACKGROUND" to make *all* pixels transparent, and then
 		 * proceed to re-paint the entire canvas, or use "GIF_DISPOSE_RESTORE_PREVIOUS" to
 		 * restore a previous frame that had transparency at the intended locations. */
-		format.vf_pal   = NULL;
-		format.vf_codec = libvideo_codec_lookup(anim->ga_cfg.gc_trans <= 0xff
+		format.vbf_codec = libvideo_codec_lookup(anim->ga_cfg.gc_trans <= 0xff
 		                                        ? VIDEO_CODEC_RGBA8888
 		                                        : VIDEO_CODEC_RGB888);
-		assertf(format.vf_codec, "Built-in codec should have been recognized");
+		assertf(format.vbf_codec, "Built-in codec should have been recognized");
+		format.vbf_flags = VIDEO_GFX_F_NORMAL;
 
 		/* Allocate new buffer for direct-color mode */
-		assert(format.vf_codec->vc_specs.vcs_pxsz == 3 ||
-		       format.vf_codec->vc_specs.vcs_pxsz == 4);
-		dcol_buffer = video_domain_newbuffer(anim->va_domain, frame->vb_xdim, frame->vb_ydim,
-		                                     &format, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+		assert(format.vbf_codec->vc_specs.vcs_pxsz == 3 ||
+		       format.vbf_codec->vc_specs.vcs_pxsz == 4);
+		dcol_buffer = video_domain_newbuffer(anim->va_domain, &format,
+		                                     frame->vb_xdim, frame->vb_ydim,
+		                                     VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!dcol_buffer) /* TODO: What if the domain doesn't support the format? */
 			goto err;
 		if unlikely(video_buffer_wlock(dcol_buffer, &frame_lock)) {
@@ -655,7 +656,7 @@ err_dcol_buffer:
 		pal_line  = pal_lock.vl_data;
 		dcol_line = frame_lock.vl_data;
 		iter_y    = frame->vb_ydim;
-		if (format.vf_codec->vc_specs.vcs_pxsz == 3) {
+		if (format.vbf_codec->vc_specs.vcs_pxsz == 3) {
 			do {
 				video_coord_t iter_x = frame->vb_xdim;
 				byte_t *dcol_iter = dcol_line;
@@ -695,11 +696,11 @@ err_dcol_buffer:
 		free(self->gb_restore);
 		self->gb_restore = NULL;
 		self->vaf_colorkey = 0;
-		assert(pal == frame->vb_format.vf_pal);
+		assert(pal == frame->vb_format.vbf_pal);
 		assert(self->vaf_frame == frame);
 		video_buffer_decref(frame);            /* Decref old (palette) frame */
 		self->vaf_frame = frame = dcol_buffer; /* Inherit reference */
-		codec = frame->vb_format.vf_codec;
+		codec = frame->vb_format.vbf_codec;
 	} else {
 		if unlikely(video_buffer_wlock(frame, &frame_lock))
 			goto err;
@@ -719,7 +720,7 @@ err_dcol_buffer:
 			if (!self->gb_restore) {
 				byte_t *backup;
 				struct video_rambuffer_requirements req;
-				(*frame->vb_format.vf_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
+				(*frame->vb_format.vbf_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
 				backup = (byte_t *)malloc(req.vbs_bufsize);
 				if unlikely(!backup)
 					goto err_frame_lock;
@@ -752,7 +753,7 @@ err_dcol_buffer:
 		if (!self->gb_restore) {
 			byte_t *backup;
 			struct video_rambuffer_requirements req;
-			(*frame->vb_format.vf_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
+			(*frame->vb_format.vbf_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
 			backup = (byte_t *)malloc(req.vbs_bufsize);
 			if unlikely(!backup)
 				goto err_frame_lock;
@@ -789,7 +790,7 @@ check_for_global_transparency:
 			 * canvas. */
 			if (frame_x > 0 || frame_y > 0 || frame_w < frame->vb_xdim || frame_h < frame->vb_ydim) {
 set_has_global_transparency:
-				self->vaf_colorkey = frame->vb_format.vf_pal->vp_pal[anim->ga_cfg.gc_trans];
+				self->vaf_colorkey = frame->vb_format.vbf_pal->vp_pal[anim->ga_cfg.gc_trans];
 				break;
 			}
 			ATTR_FALLTHROUGH
@@ -933,7 +934,7 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	struct video_lock result_lock;
 	byte_t const *reader = me->ga_frame1;
 	byte_t const *eof = me->ga_eof;
-	struct video_format format;
+	struct video_buffer_format format;
 	byte_t ctrl;
 	uint16_t frame_x, frame_y;
 	uint16_t frame_w, frame_h;
@@ -977,10 +978,10 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	}
 
 	/* First frame can always be rendered using a palette */
-	format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_P8);
-	assertf(format.vf_codec, "Built-in codec should have been recognized");
-	format.vf_pal = libvideo_palette_create(256);
-	if unlikely(!format.vf_pal)
+	format.vbf_codec = libvideo_codec_lookup(VIDEO_CODEC_P8);
+	assertf(format.vbf_codec, "Built-in codec should have been recognized");
+	format.vbf_pal = libvideo_palette_create(256);
+	if unlikely(!format.vbf_pal)
 		goto err;
 	{
 		video_pixel_t i;
@@ -989,20 +990,22 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 			byte_t r = *lct_reader++;
 			byte_t g = *lct_reader++;
 			byte_t b = *lct_reader++;
-			format.vf_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
+			format.vbf_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
 			if (i == me->ga_cfg.gc_trans)
-				format.vf_pal->vp_pal[i] = 0;
+				format.vbf_pal->vp_pal[i] = 0;
 		}
 		/* Optimize palette after it was populated */
-		format.vf_pal = libvideo_palette_optimize(format.vf_pal);
+		format.vbf_pal = libvideo_palette_optimize(format.vbf_pal);
 	}
 
 	/* Create main animation frame buffer */
-	result = video_domain_newbuffer(me->va_domain, me->va_xdim, me->va_ydim, &format,
+	format.vbf_flags = VIDEO_GFX_F_NORMAL;
+	result = video_domain_newbuffer(me->va_domain, &format,
+	                                me->va_xdim, me->va_ydim,
 	                                (me->ga_cfg.gc_trans <= 0xff && me->ga_cfg.gc_trans != 0)
 	                                ? VIDEO_DOMAIN_NEWBUFFER_F_NORMAL
 	                                : VIDEO_DOMAIN_NEWBUFFER_F_CALLOC);
-	video_palette_decref(format.vf_pal);
+	video_palette_decref(format.vbf_pal);
 	if unlikely(!result)
 		goto err;
 	if unlikely(video_buffer_wlock(result, &result_lock))
@@ -1011,7 +1014,7 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 
 	/* Fill with global transparency, or "0" if not defined */
 	if (me->ga_cfg.gc_trans <= 0xff && me->ga_cfg.gc_trans != 0) {
-		(*format.vf_codec->vc_rectfill)(result_lock.vl_data, 0, result_lock.vl_stride,
+		(*format.vbf_codec->vc_rectfill)(result_lock.vl_data, 0, result_lock.vl_stride,
 		                                me->ga_cfg.gc_trans, result->vb_xdim, result->vb_ydim);
 	}
 
@@ -1065,7 +1068,7 @@ set_have_global_trans:
 	case GIF_ANIM_FRAME1_GLOBAL_TRANS__YES:
 have_global_trans:
 		/* Use special operators to force a color key into a GFX context */
-		frame->vaf_colorkey = result->vb_format.vf_pal->vp_pal[me->ga_cfg.gc_trans];
+		frame->vaf_colorkey = result->vb_format.vbf_pal->vp_pal[me->ga_cfg.gc_trans];
 		break;
 
 	case GIF_ANIM_FRAME1_GLOBAL_TRANS__NO:

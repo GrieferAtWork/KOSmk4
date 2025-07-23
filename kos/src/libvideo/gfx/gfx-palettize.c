@@ -24,6 +24,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  */
 #ifndef GUARD_LIBVIDEO_GFX_GFX_PALETTIZE_C
 #define GUARD_LIBVIDEO_GFX_GFX_PALETTIZE_C 1
+#define __VIDEO_BUFFER_const /* nothing -- TODO: This shouldn't be in this file! */
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -502,14 +503,13 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer_base *result,
 /*	result->vb_refcnt          = 1;*/ /* Unused */
 /*	result->vb_domain          = _libvideo_ramdomain();*/ /* Unused */
 	result->vb_ops             = _rambuffer_ops();
-	result->vb_format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
-	result->vb_format.vf_pal   = NULL;
+	result->vb_format.vbf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
+	result->vb_format.vbf_pal   = NULL;
 	result->vb_xdim            = video_gfx_getclipw(&gfx);
 	result->vb_ydim            = video_gfx_getcliph(&gfx);
-	assertf(result->vb_format.vf_codec, "Built-in codec should have been recognized");
+	assertf(result->vb_format.vbf_codec, "Built-in codec should have been recognized");
 	video_buffer_getgfx(result, &result_gfx,
-	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_F_NORMAL, 0);
+	                    GFX_BLENDMODE_OVERRIDE);
 	video_gfx_bitblit(&result_gfx, 0, 0, &gfx, 0, 0,
 	                  video_gfx_getclipw(&gfx),
 	                  video_gfx_getcliph(&gfx));
@@ -525,26 +525,26 @@ median_cut_start(struct video_gfx const *__restrict self,
                  video_color_t constant_alpha) {
 	struct median_io io;
 	struct video_rambuffer_base rgba_buf;
-	if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888 &&
-	    /* TODO: This actually works for any XXXX8888 codec. Just need  to
-	     *       "self->vx_buffer->vb_format.vf_codec->vc_color2pixel" the
-	     *       produced  palette entries afterwards, and always pass the
+	if (video_gfx_getbuffer(self)->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_RGBA8888 &&
+	    /* TODO: This  actually  works   for  any  XXXX8888   codec.  Just  need   to
+	     *       "video_gfx_getbuffer(self)->vb_format.vbf_codec->vc_color2pixel" the
+	     *       produced   palette   entries   afterwards,  and   always   pass  the
 	     *       codec's alpha-mask instead of "constant_alpha". */
 	    self->vx_hdr.vxh_bxmin == 0 &&
 	    self->vx_hdr.vxh_bymin == 0 &&
-	    self->vx_hdr.vxh_bxend == self->vx_buffer->vb_xdim &&
-	    self->vx_hdr.vxh_byend == self->vx_buffer->vb_ydim) {
+	    self->vx_hdr.vxh_bxend == video_gfx_getbuffer(self)->vb_xdim &&
+	    self->vx_hdr.vxh_byend == video_gfx_getbuffer(self)->vb_ydim) {
 		struct video_lock lock;
-		if (video_buffer_rlock(self->vx_buffer, &lock) == 0) {
+		if (video_buffer_rlock(video_gfx_getbuffer(self), &lock) == 0) {
 			if (lock.vl_stride == (self->vx_hdr.vxh_byend * 4)) {
 				io.mio_cookie = lock.vl_data;
 				io.mio_getcolor = &median_io_buf;
 				median_cut_start_impl(&io, gfx_indices, io_pixels,
 				                      pal, pal_depth, constant_alpha);
-				video_buffer_unlock(self->vx_buffer, &lock);
+				video_buffer_unlock(video_gfx_getbuffer(self), &lock);
 				return;
 			}
-			video_buffer_unlock(self->vx_buffer, &lock);
+			video_buffer_unlock(video_gfx_getbuffer(self), &lock);
 		}
 	}
 

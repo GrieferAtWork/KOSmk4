@@ -24,6 +24,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  */
 #ifndef GUARD_LIBVIDEO_GFX_SWGFX_LL_C
 #define GUARD_LIBVIDEO_GFX_SWGFX_LL_C 1
+#define __VIDEO_BUFFER_const /* nothing */
 
 #include "api.h"
 /**/

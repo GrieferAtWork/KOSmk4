@@ -17,26 +17,31 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_CODEC_CONVERTER_H
-#define GUARD_LIBVIDEO_GFX_CODEC_CONVERTER_H 1
+#ifndef _LIBVIDEO_GFX_SURFACE_DEFS_H
+#define _LIBVIDEO_GFX_SURFACE_DEFS_H 1
 
-#include "../api.h"
+#include "api.h"
 /**/
 
-#include <hybrid/compiler.h>
+#include "../color.h"
+#include "gfx-flags.h"
 
-#include <libvideo/gfx/codec/converter.h>
+#ifdef __CC__
+__DECL_BEGIN
 
-DECL_BEGIN
+struct video_palette;
+struct video_buffer;
 
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_p(struct video_converter *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_pa(struct video_converter *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_l(struct video_converter *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_la(struct video_converter *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_a(struct video_converter *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_rgb(struct video_converter *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_rgba(struct video_converter *__restrict self);
+/* Wrapper around  `struct video_buffer'  that  allows  users  to
+ * directly override the palette and color key of a video buffer. */
+struct video_surface {
+	struct video_palette *vs_pal;      /* [0..1] Used color palette */
+	struct video_buffer  *vs_buffer;   /* [1..1] Video buffer. */
+	video_gfx_flag_t      vs_flags;    /* Special buffer flags */
+	video_pixel_t         vs_colorkey; /* [valid_if(vs_flags & VIDEO_GFX_F_COLORKEY)] Color key */
+};
 
-DECL_END
+__DECL_END
+#endif /* __CC__ */
 
-#endif /* !GUARD_LIBVIDEO_GFX_CODEC_CONVERTER_H */
+#endif /* !_LIBVIDEO_GFX_SURFACE_DEFS_H */

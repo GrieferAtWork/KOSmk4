@@ -24,6 +24,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  */
 #ifndef GUARD_LIBVIDEO_GFX_SWGFX_HL_C
 #define GUARD_LIBVIDEO_GFX_SWGFX_HL_C 1
+#define __VIDEO_BUFFER_const /* nothing -- TODO: This shouldn't be in this file! */
 #define _KOS_SOURCE 1
 
 /************************************************************************/
@@ -119,7 +120,7 @@ libvideo_swgfx_fillmask_wrap(struct video_gfx const *__restrict self,
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = size_x;
 	video_dim_t yinb = size_y;
-	if (self->vx_flags & VIDEO_GFX_F_XWRAP) {
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
 		dst_x = wrap(dst_x, self->vx_hdr.vxh_cxsiz);
 		if (size_x > self->vx_hdr.vxh_cxsiz)
@@ -131,7 +132,7 @@ libvideo_swgfx_fillmask_wrap(struct video_gfx const *__restrict self,
 			xinb = self->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
 		}
 	}
-	if (self->vx_flags & VIDEO_GFX_F_YWRAP) {
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
 		dst_y = wrap(dst_y, self->vx_hdr.vxh_cysiz);
 		if (size_y > self->vx_hdr.vxh_cysiz)
@@ -262,7 +263,7 @@ libvideo_swgfx_fillstretchmask_wrap(struct video_gfx const *__restrict self,
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = dst_size_x;
 	video_dim_t yinb = dst_size_y;
-	if (self->vx_flags & VIDEO_GFX_F_XWRAP) {
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
 		dst_x = wrap(dst_x, self->vx_hdr.vxh_cxsiz);
 		if (dst_size_x > self->vx_hdr.vxh_cxsiz) {
@@ -276,7 +277,7 @@ libvideo_swgfx_fillstretchmask_wrap(struct video_gfx const *__restrict self,
 			xinb = self->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
 		}
 	}
-	if (self->vx_flags & VIDEO_GFX_F_YWRAP) {
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
 		dst_y = wrap(dst_y, self->vx_hdr.vxh_cysiz);
 		if (dst_size_y > self->vx_hdr.vxh_cysiz) {
@@ -334,7 +335,7 @@ libvideo_swgfx_fillmask_byblit(struct video_gfx const *__restrict self,
 	struct video_gfx bm_gfx, *pgfx;
 	struct old_bitmask_buffer temp, *pbuf;
 	pbuf = old_bitmask_buffer_init(&temp, size_x, size_y, bm, bg_fg_colors);
-	pgfx = video_buffer_getgfx(pbuf, &bm_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	pgfx = video_buffer_getgfx(pbuf, &bm_gfx, GFX_BLENDMODE_OVERRIDE);
 	video_gfx_bitblit(self, dst_x, dst_y, pgfx, 0, 0, size_x, size_y);
 	old_bitmask_buffer_fini(pbuf);
 }
@@ -350,7 +351,7 @@ libvideo_swgfx_fillstretchmask_byblit(struct video_gfx const *__restrict self,
 	struct video_gfx bm_gfx, *pgfx;
 	struct old_bitmask_buffer temp, *pbuf;
 	pbuf = old_bitmask_buffer_init(&temp, src_size_x, src_size_y, bm, bg_fg_colors);
-	pgfx = video_buffer_getgfx(pbuf, &bm_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	pgfx = video_buffer_getgfx(pbuf, &bm_gfx, GFX_BLENDMODE_OVERRIDE);
 	video_gfx_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y,
 	                  pgfx, 0, 0, src_size_x, src_size_y);
 	old_bitmask_buffer_fini(pbuf);

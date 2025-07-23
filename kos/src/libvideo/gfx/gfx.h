@@ -73,12 +73,12 @@ LOCAL ATTR_INOUT(1) void CC
 libvideo_gfx_init_fullclip(struct video_gfx *__restrict self) {
 	self->vx_hdr.vxh_bxmin = self->vx_hdr.vxh_cxoff = 0;
 	self->vx_hdr.vxh_bymin = self->vx_hdr.vxh_cyoff = 0;
-	if (self->vx_flags & VIDEO_GFX_F_XYSWAP) {
-		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = self->vx_buffer->vb_ydim;
-		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = self->vx_buffer->vb_xdim;
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP) {
+		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = video_gfx_getbuffer(self)->vb_ydim;
+		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = video_gfx_getbuffer(self)->vb_xdim;
 	} else {
-		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = self->vx_buffer->vb_xdim;
-		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = self->vx_buffer->vb_ydim;
+		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = video_gfx_getbuffer(self)->vb_xdim;
+		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = video_gfx_getbuffer(self)->vb_ydim;
 	}
 }
 

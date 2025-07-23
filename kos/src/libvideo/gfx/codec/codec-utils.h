@@ -39,12 +39,12 @@
 #include <libvideo/color.h>
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/surface-defs.h>
 #include <libvideo/types.h>
 
 DECL_BEGIN
 
-#if defined(NDEBUG) || 1
+#if defined(NDEBUG) || defined(NDEBUG_CODEC) || 1
 #if 1 /* Turn codec assertions into compile-time assumptions for max speed */
 #ifdef __CRT_UBSAN_BUILTIN_UNREACHABLE
 #undef __CRT_UBSAN_BUILTIN_UNREACHABLE
@@ -81,17 +81,17 @@ DECL_BEGIN
 #define DEFINE_COLOR2PIXEL64_WRAPPER32(decl, foo_color2pixel, foo_color2pixel64) /* nothing */
 #define DEFINE_PIXEL64_IO_WRAPPERS(f, f_, f64, f64_)                             /* nothing */
 #else                                                                            /* !CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
-#define DEFINE_PIXEL2COLOR64_WRAPPER32(decl, foo_pixel2color, foo_pixel2color64)             \
-	decl WUNUSED NONNULL((1)) video_color64_t FCC                                            \
-	foo_pixel2color64(struct video_format const *__restrict format, video_pixel64_t pixel) { \
-		video_color_t c = foo_pixel2color(format, (video_pixel_t)pixel);                     \
-		return VIDEO_COLOR64_FROM_COLOR(c);                                                  \
+#define DEFINE_PIXEL2COLOR64_WRAPPER32(decl, foo_pixel2color, foo_pixel2color64)               \
+	decl WUNUSED NONNULL((1)) video_color64_t FCC                                              \
+	foo_pixel2color64(struct video_surface const *__restrict surface, video_pixel64_t pixel) { \
+		video_color_t c = foo_pixel2color(surface, (video_pixel_t)pixel);                      \
+		return VIDEO_COLOR64_FROM_COLOR(c);                                                    \
 	}
-#define DEFINE_COLOR2PIXEL64_WRAPPER32(decl, foo_color2pixel, foo_color2pixel64)             \
-	decl WUNUSED NONNULL((1)) video_pixel64_t FCC                                            \
-	foo_color2pixel64(struct video_format const *__restrict format, video_color64_t color) { \
-		video_color_t c = VIDEO_COLOR_FROM_COLOR64(color);                                   \
-		return (video_pixel64_t)foo_color2pixel(format, c);                                  \
+#define DEFINE_COLOR2PIXEL64_WRAPPER32(decl, foo_color2pixel, foo_color2pixel64)               \
+	decl WUNUSED NONNULL((1)) video_pixel64_t FCC                                              \
+	foo_color2pixel64(struct video_surface const *__restrict surface, video_color64_t color) { \
+		video_color_t c = VIDEO_COLOR_FROM_COLOR64(color);                                     \
+		return (video_pixel64_t)foo_color2pixel(surface, c);                                   \
 	}
 #define DEFINE_PIXEL64_IO_WRAPPERS(decl, f, f_, f64, f64_)                                 \
 	decl ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC                      \
@@ -182,6 +182,14 @@ DECL_BEGIN
 #define SET_vc_setpixel3_INITIALIZER(p, v)     /* nothing */
 #endif /* !VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
+#ifdef NDEBUG
+#define static__vc_refcnt 0x7fff
+#else /* NDEBUG */
+#define static__vc_refcnt 1
+#endif /* !NDEBUG */
+#define undefined__vc_destroy ((void (LIBVIDEO_GFX_FCC *)(struct video_codec *__restrict))(void *)-1)
+
+
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
 #define _UNPACK_CODEC_SPECS(flags, bpp, cbits, rmask, gmask, bmask, amask) \
 	{ flags, CEILDIV(bpp, NBBY), bpp, cbits, 0, rmask, gmask, bmask, amask }
@@ -194,7 +202,9 @@ DECL_BEGIN
                           getpixel, setpixel, rectcopy, rectmove,         \
                           linecopy, linefill, vertfill, rectfill,         \
                           pixel2color, color2pixel, initconverter)        \
-		PRIVATE struct video_codec const name = {                         \
+		PRIVATE struct video_codec name = {                               \
+			/* .vc_refcnt                 = */ static__vc_refcnt,         \
+			/* .vc_destroy                = */ undefined__vc_destroy,     \
 			/* .vc_codec                  = */ codec,                     \
 			/* .vc_specs                  = */ _UNPACK_CODEC_SPECS specs, \
 			/* .vc_align                  = */ 1,                         \
@@ -229,7 +239,9 @@ DECL_BEGIN
                           unaligned_linecopy, unaligned_linefill,         \
                           unaligned_vertfill, unaligned_rectfill,         \
                           pixel2color, color2pixel, initconverter)        \
-		PRIVATE struct video_codec const unaligned_##name = {             \
+		PRIVATE struct video_codec unaligned_##name = {                   \
+			/* .vc_refcnt                 = */ static__vc_refcnt,         \
+			/* .vc_destroy                = */ undefined__vc_destroy,     \
 			/* .vc_codec                  = */ codec,                     \
 			/* .vc_specs                  = */ _UNPACK_CODEC_SPECS specs, \
 			/* .vc_align                  = */ 1,                         \
@@ -255,7 +267,9 @@ DECL_BEGIN
 			SET_vc_vertfill64_STATIC_INITIALIZER(&unaligned_vertfill##_64) \
 			SET_vc_rectfill64_STATIC_INITIALIZER(&unaligned_rectfill##_64) \
 		};                                                                \
-		PRIVATE struct video_codec const name = {                         \
+		PRIVATE struct video_codec name = {                               \
+			/* .vc_refcnt                 = */ static__vc_refcnt,         \
+			/* .vc_destroy                = */ undefined__vc_destroy,     \
 			/* .vc_codec                  = */ codec,                     \
 			/* .vc_specs                  = */ _UNPACK_CODEC_SPECS specs, \
 			/* .vc_align                  = */ align,                     \
@@ -287,9 +301,11 @@ DECL_BEGIN
                           linecopy, linefill, vertfill, rectfill,       \
                           pixel2color, color2pixel, initconverter)      \
 		PRIVATE struct video_codec name = {                             \
-			/* .vc_codec = */ codec,                                    \
-			/* .vc_specs = */ _UNPACK_CODEC_SPECS specs,                \
-			/* .vc_align = */ 1,                                        \
+			/* .vc_refcnt  = */ static__vc_refcnt,                      \
+			/* .vc_destroy = */ undefined__vc_destroy,                  \
+			/* .vc_codec   = */ codec,                                  \
+			/* .vc_specs   = */ _UNPACK_CODEC_SPECS specs,              \
+			/* .vc_align   = */ 1,                                      \
 		};                                                              \
 		if (!name.vc_rambuffer_requirements) {                          \
 			name.vc_nalgn         = &name;                              \
@@ -326,14 +342,18 @@ DECL_BEGIN
                           unaligned_vertfill, unaligned_rectfill,                 \
                           pixel2color, color2pixel, initconverter)                \
 		PRIVATE struct video_codec unaligned_##name = {                           \
-			/* .vc_codec = */ codec,                                              \
-			/* .vc_specs = */ _UNPACK_CODEC_SPECS specs,                          \
-			/* .vc_align = */ 1,                                                  \
+			/* .vc_refcnt  = */ static__vc_refcnt,                                \
+			/* .vc_destroy = */ undefined__vc_destroy,                            \
+			/* .vc_codec   = */ codec,                                            \
+			/* .vc_specs   = */ _UNPACK_CODEC_SPECS specs,                        \
+			/* .vc_align   = */ 1,                                                \
 		};                                                                        \
 		PRIVATE struct video_codec name = {                                       \
-			/* .vc_codec = */ codec,                                              \
-			/* .vc_specs = */ _UNPACK_CODEC_SPECS specs,                          \
-			/* .vc_align = */ align,                                              \
+			/* .vc_refcnt  = */ static__vc_refcnt,                                \
+			/* .vc_destroy = */ undefined__vc_destroy,                            \
+			/* .vc_codec   = */ codec,                                            \
+			/* .vc_specs   = */ _UNPACK_CODEC_SPECS specs,                        \
+			/* .vc_align   = */ align,                                            \
 		};                                                                        \
 		if (!name.vc_rambuffer_requirements) {                                    \
 			unaligned_##name.vc_nalgn                  = &unaligned_##name;       \
@@ -420,7 +440,7 @@ DECL_BEGIN
 /************************************************************************/
 
 #define DEFINE_GENERIC_linefill__with__setpixel(linefill, setpixel) \
-	PRIVATE NONNULL((1)) void FCC                                    \
+	PRIVATE NONNULL((1)) void FCC                                   \
 	linefill(byte_t *__restrict line, video_coord_t x,              \
 	         video_pixel_t pixel, video_dim_t num_pixels) {         \
 		do {                                                        \
@@ -429,7 +449,7 @@ DECL_BEGIN
 		} while (--num_pixels);                                     \
 	}
 #define DEFINE_GENERIC_vertfill__with__setpixel(vertfill, setpixel)   \
-	PRIVATE NONNULL((1)) void FCC                                      \
+	PRIVATE NONNULL((1)) void FCC                                     \
 	vertfill(byte_t *__restrict line, video_coord_t x, size_t stride, \
 	         video_pixel_t pixel, video_dim_t num_pixels) {           \
 		do {                                                          \
@@ -438,7 +458,7 @@ DECL_BEGIN
 		} while (--num_pixels);                                       \
 	}
 #define DEFINE_GENERIC_rectfill__with__linefill(rectfill, linefill)         \
-	PRIVATE NONNULL((1)) void FCC                                            \
+	PRIVATE NONNULL((1)) void FCC                                           \
 	rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,       \
 	         video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) { \
 		do {                                                                \
@@ -447,7 +467,7 @@ DECL_BEGIN
 		} while (--size_y);                                                 \
 	}
 #define DEFINE_GENERIC_linecopy__with__getpixel__and__setpixel(linecopy, getpixel, setpixel) \
-	PRIVATE NONNULL((1, 3)) void FCC                                                          \
+	PRIVATE NONNULL((1, 3)) void FCC                                                         \
 	linecopy(byte_t *__restrict dst_line, video_coord_t dst_x,                               \
 	         byte_t const *__restrict src_line, video_coord_t src_x,                         \
 	         video_dim_t size_x) {                                                           \
@@ -460,7 +480,7 @@ DECL_BEGIN
 		} while (--size_x);                                                                  \
 	}
 #define DEFINE_GENERIC_rectcopy__with__getpixel__and__setpixel(rectcopy, getpixel, setpixel) \
-	PRIVATE NONNULL((1, 4)) void FCC                                                          \
+	PRIVATE NONNULL((1, 4)) void FCC                                                         \
 	rectcopy(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,            \
 	         byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,      \
 	         video_dim_t size_x, video_dim_t size_y) {                                       \
@@ -476,7 +496,7 @@ DECL_BEGIN
 		} while (--size_y);                                                                  \
 	}
 #define DEFINE_GENERIC_rectmove__with__getpixel__and__setpixel(rectmove, getpixel, setpixel) \
-	PRIVATE NONNULL((1, 3)) void FCC                                                          \
+	PRIVATE NONNULL((1, 3)) void FCC                                                         \
 	rectmove(byte_t *__restrict dst_line, video_coord_t dst_x,                               \
 	         byte_t const *__restrict src_line, video_coord_t src_x,                         \
 	         size_t stride, video_dim_t size_x, video_dim_t size_y) {                        \
@@ -545,19 +565,19 @@ DECL_BEGIN
 /************************************************************************/
 
 #define identity_pixel2color identity_color2pixel
-INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC identity_color2pixel(struct video_format const *__restrict format, video_color_t value);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC pal_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC pal_color2pixel(struct video_format const *__restrict format, video_color_t color);
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC identity_color2pixel(struct video_surface const *__restrict surface, video_color_t value);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC pal_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC pal_color2pixel(struct video_surface const *__restrict surface, video_color_t color);
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
 #define identity_pixel2color64 identity_color2pixel64
-INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC identity_color2pixel64(struct video_format const *__restrict format, video_color64_t value);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_color64_t FCC pal_pixel2color64(struct video_format const *__restrict format, video_pixel64_t pixel);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC pal_color2pixel64(struct video_format const *__restrict format, video_color64_t color);
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC identity_color2pixel64(struct video_surface const *__restrict surface, video_color64_t value);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_color64_t FCC pal_pixel2color64(struct video_surface const *__restrict surface, video_pixel64_t pixel);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC pal_color2pixel64(struct video_surface const *__restrict surface, video_color64_t color);
 #endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 
-INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC rgbx8888_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel);
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC rgbx8888_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel);
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
-INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC rgbx8888_pixel2color64(struct video_format const *__restrict format, video_pixel64_t pixel);
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC rgbx8888_pixel2color64(struct video_surface const *__restrict surface, video_pixel64_t pixel);
 #endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 
 

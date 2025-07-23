@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_BUFFER_CUSTOM_C
 #define GUARD_LIBVIDEO_GFX_BUFFER_CUSTOM_C 1
+#define __VIDEO_BUFFER_const /* nothing */
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -43,9 +44,9 @@
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
-#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface-defs.h>
+#include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
 #include "../buffer.h"
@@ -74,7 +75,7 @@ DEFINE_VIDEO_BUFFER_TYPE(custom_buffer_subregion_norem_ops,
                          custom_buffer_subregion__rlockregion, custom_buffer_subregion__wlockregion, custom_buffer_subregion__unlockregion,
                          custom_buffer_subregion__revoke, custom_buffer_subregion__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(custom_buffer_subregion_nooff_ops,
-                         custom_buffer_subregion__destroy, custom_buffer_subregion_nooff__initgfx, libvideo_buffer_swgfx_updategfx,
+                         custom_buffer_subregion__destroy, custom_buffer__initgfx, libvideo_buffer_swgfx_updategfx,
                          custom_buffer__rlock, custom_buffer__wlock, custom_buffer__unlock,
                          custom_buffer__rlockregion, custom_buffer__wlockregion, custom_buffer__unlockregion,
                          custom_buffer_subregion__revoke, custom_buffer_subregion__subregion);
@@ -89,6 +90,7 @@ custom_buffer__destroy(struct video_buffer *__restrict self) {
 	assert(me->cbc_inuse == 0);
 	if (me->cb_destroy)
 		(*me->cb_destroy)(me->cbc_cookie);
+	__video_buffer_fini_common(me);
 	free(self);
 }
 
@@ -103,6 +105,7 @@ custom_buffer_subregion__destroy(struct video_buffer *__restrict self) {
 		atomic_lock_release(&parent->cbc_subregion_lock);
 		video_buffer_decref(parent);
 	}
+	__video_buffer_fini_common(me);
 	free(me);
 }
 
@@ -181,25 +184,27 @@ NOTHROW(FCC custom_buffer_subregion__revoke)(struct video_buffer *__restrict sel
 	return me;
 }
 
-PRIVATE WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-custom_buffer__subregion_impl(struct custom_buffer_common *__restrict parent,
+PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) ATTR_IN(3) REF struct video_buffer *FCC
+custom_buffer__subregion_impl(struct video_surface const *__restrict surface,
+                              struct custom_buffer_common *__restrict parent,
                               struct video_crect const *__restrict rect,
-                              video_gfx_flag_t gfx_flags,
                               video_coord_t parent_xoff,
                               video_coord_t parent_yoff) {
 	REF struct custom_buffer_subregion *result;
 	result = (REF struct custom_buffer_subregion *)malloc(sizeof(struct custom_buffer_subregion));
 	if unlikely(!result)
 		goto err;
-	result->vb_domain  = parent->vb_domain;
-	result->vb_format  = parent->vb_format;
+	result->vb_domain  = video_buffer_getdomain(parent);
+	result->vb_format.vbf_pal      = video_surface_getpalette(surface);
+	result->vb_format.vbf_codec    = video_buffer_getcodec(parent);
+	result->vb_format.vbf_flags    = video_surface_getflags(surface);
+	result->vb_format.vbf_colorkey = video_surface_getcolorkey(surface);
 	result->vb_xdim    = rect->vcr_xdim;
 	result->vb_ydim    = rect->vcr_ydim;
 	result->vb_refcnt  = 1;
 	result->cbsr_xoff  = parent_xoff + rect->vcr_xmin;
 	result->cbsr_yoff  = parent_yoff + rect->vcr_ymin;
-	result->cbsr_gfx   = gfx_flags;
-	video_codec_xcoord_to_offset(result->vb_format.vf_codec, result->cbsr_xoff,
+	video_codec_xcoord_to_offset(result->vb_format.vbf_codec, result->cbsr_xoff,
 	                             &result->cbsr_bxoff, &result->cbsr_bxrem);
 	result->vb_ops = !result->cbsr_xoff && !result->cbsr_yoff
 	                 ? _custom_buffer_subregion_nooff_ops()
@@ -212,6 +217,7 @@ custom_buffer__subregion_impl(struct custom_buffer_common *__restrict parent,
 	result->cbc_cookie       = parent->cbc_cookie;
 	LIST_INIT(&result->cbc_subregion_list);
 	atomic_lock_init(&result->cbc_subregion_lock);
+	__video_buffer_init_common(result);
 	atomic_lock_acquire(&parent->cbc_subregion_lock);
 	COMPILER_WRITE_BARRIER();
 	result->cbc_getpixel     = atomic_read(&parent->cbc_getpixel);
@@ -223,30 +229,23 @@ custom_buffer__subregion_impl(struct custom_buffer_common *__restrict parent,
 	COMPILER_WRITE_BARRIER();
 	LIST_INSERT_HEAD(&parent->cbc_subregion_list, result, cbsr_link);
 	atomic_lock_release(&parent->cbc_subregion_lock);
-	if (result->vb_format.vf_pal)
-		video_palette_incref(result->vb_format.vf_pal);
 	return result;
 err:
 	return NULL;
 }
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-custom_buffer__subregion(struct video_buffer *__restrict self,
-                         struct video_crect const *__restrict rect,
-                         video_gfx_flag_t gfx_flags) {
-	struct custom_buffer *me = (struct custom_buffer *)self;
-	return custom_buffer__subregion_impl(me, rect, gfx_flags, 0, 0);
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+custom_buffer__subregion(struct video_surface const *__restrict self,
+                         struct video_crect const *__restrict rect) {
+	struct custom_buffer *me = (struct custom_buffer *)video_surface_getbuffer(self);
+	return custom_buffer__subregion_impl(self, me, rect, 0, 0);
 }
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-custom_buffer_subregion__subregion(struct video_buffer *__restrict self,
-                                   struct video_crect const *__restrict rect,
-                                   video_gfx_flag_t gfx_flags) {
-	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
-	return custom_buffer__subregion_impl(me, rect,
-	                                     video_gfx_flag_combine(me->cbsr_gfx, gfx_flags),
-	                                     me->cbsr_xoff,
-	                                     me->cbsr_yoff);
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+custom_buffer_subregion__subregion(struct video_surface const *__restrict self,
+                                   struct video_crect const *__restrict rect) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)video_surface_getbuffer(self);
+	return custom_buffer__subregion_impl(self, me, rect, me->cbsr_xoff, me->cbsr_yoff);
 }
 
 /* LOCK */
@@ -371,7 +370,7 @@ custom_buffer__rlockregion(struct video_buffer *__restrict self,
 	if (rlock) {
 		int result;
 		size_t xoff;
-		video_codec_xcoord_to_offset(me->vb_format.vf_codec,
+		video_codec_xcoord_to_offset(me->vb_format.vbf_codec,
 		                             lock->_vrl_rect.vcr_xmin,
 		                             &xoff, &lock->vrl_xbas);
 		result = (*rlock)(me->cbc_cookie, &lock->vrl_lock);
@@ -406,7 +405,7 @@ custom_buffer__wlockregion(struct video_buffer *__restrict self,
 	if (wlock) {
 		int result;
 		size_t xoff;
-		video_codec_xcoord_to_offset(me->vb_format.vf_codec,
+		video_codec_xcoord_to_offset(me->vb_format.vbf_codec,
 		                             lock->_vrl_rect.vcr_xmin,
 		                             &xoff, &lock->vrl_xbas);
 		result = (*wlock)(me->cbc_cookie, &lock->vrl_lock);
@@ -431,7 +430,7 @@ NOTHROW(FCC custom_buffer__unlockregion)(struct video_buffer *__restrict self,
 	} else if (me->cbc_unlock) {
 		size_t xoff;
 		video_coord_t xrem;
-		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
+		video_codec_xcoord_to_offset(self->vb_format.vbf_codec,
 		                             lock->_vrl_rect.vcr_xmin,
 		                             &xoff, &xrem);
 		assert(xrem == lock->vrl_xbas);
@@ -510,9 +509,7 @@ custom_buffer__initgfx(struct video_gfx *__restrict self) {
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 custom_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
-	struct custom_buffer_subregion *me  = (struct custom_buffer_subregion *)self->vx_buffer;
 	struct gfx_swdrv *drv = video_swgfx_getdrv(self);
-	self->vx_flags = video_gfx_flag_combine(me->cbsr_gfx, self->vx_flags);
 	libvideo_gfx_init_fullclip(self);
 
 	/* Default pixel accessors */
@@ -524,19 +521,12 @@ custom_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
 	return self;
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-custom_buffer_subregion_nooff__initgfx(struct video_gfx *__restrict self) {
-	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self->vx_buffer;
-	self->vx_flags = video_gfx_flag_combine(me->cbsr_gfx, self->vx_flags);
-	return custom_buffer__initgfx(self);
-}
-
 
 INTERN ATTR_IN(1) video_pixel_t CC
 custom_gfx__getpixel(struct video_gfx const *__restrict self,
                      video_coord_t abs_x, video_coord_t abs_y) {
 	video_pixel_t result;
-	struct custom_buffer_common *me = (struct custom_buffer_common *)self->vx_buffer;
+	struct custom_buffer_common *me = (struct custom_buffer_common *)video_gfx_getbuffer(self);
 	video_buffer_custom_getpixel_t getpixel;
 	atomic_inc(&me->cbc_inuse);
 	getpixel = atomic_read(&me->cbc_getpixel);
@@ -549,7 +539,7 @@ INTERN ATTR_IN(1) void CC
 custom_gfx__setpixel(struct video_gfx const *__restrict self,
                      video_coord_t abs_x, video_coord_t abs_y,
                      video_pixel_t pixel) {
-	struct custom_buffer_common *me = (struct custom_buffer_common *)self->vx_buffer;
+	struct custom_buffer_common *me = (struct custom_buffer_common *)video_gfx_getbuffer(self);
 	video_buffer_custom_setpixel_t setpixel;
 	atomic_inc(&me->cbc_inuse);
 	setpixel = atomic_read(&me->cbc_setpixel);
@@ -561,7 +551,7 @@ INTERN ATTR_IN(1) video_pixel_t CC
 custom_gfx_subregion__getpixel(struct video_gfx const *__restrict self,
                                video_coord_t abs_x, video_coord_t abs_y) {
 	video_pixel_t result;
-	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self->vx_buffer;
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)video_gfx_getbuffer(self);
 	video_buffer_custom_getpixel_t getpixel;
 	abs_x += me->cbsr_xoff;
 	abs_y += me->cbsr_yoff;
@@ -576,7 +566,7 @@ INTERN ATTR_IN(1) void CC
 custom_gfx_subregion__setpixel(struct video_gfx const *__restrict self,
                                video_coord_t abs_x, video_coord_t abs_y,
                                video_pixel_t pixel) {
-	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self->vx_buffer;
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)video_gfx_getbuffer(self);
 	video_buffer_custom_setpixel_t setpixel;
 	abs_x += me->cbsr_xoff;
 	abs_y += me->cbsr_yoff;
@@ -615,7 +605,7 @@ custom_gfx_subregion__setpixel(struct video_gfx const *__restrict self,
 DEFINE_PUBLIC_ALIAS(video_buffer_forcustom, libvideo_buffer_forcustom);
 INTERN WUNUSED NONNULL((3, 4, 5)) REF struct video_buffer *CC
 libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
-                          struct video_format const *__restrict format,
+                          struct video_buffer_format const *__restrict format,
                           video_buffer_custom_getpixel_t getpixel,
                           video_buffer_custom_setpixel_t setpixel,
                           video_buffer_custom_destroy_t destroy,
@@ -634,13 +624,11 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
 	result->vb_ops    = _custom_buffer_ops();
 	result->vb_domain = _libvideo_ramdomain();
 	result->vb_format = *format;
-	if (format->vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-		result->vb_format.vf_pal = NULL;
-	} else if (!result->vb_format.vf_pal) {
+	if (format->vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		result->vb_format.vbf_pal = NULL;
+	} else if (!result->vb_format.vbf_pal) {
 		errno = EINVAL;
 		goto err_r;
-	} else {
-		video_palette_incref(result->vb_format.vf_pal);
 	}
 	result->vb_xdim          = size_x;
 	result->vb_ydim          = size_y;
@@ -659,6 +647,7 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
 	atomic_lock_init(&result->cbc_subregion_lock);
 	result->cb_destroy = destroy;
 	result->cb_revoke  = revoke;
+	__video_buffer_init_common(result);
 	return result;
 err_r:
 	free(result);

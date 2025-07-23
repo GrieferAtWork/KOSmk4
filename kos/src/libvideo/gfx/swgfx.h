@@ -33,7 +33,7 @@
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/converter.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
@@ -657,8 +657,7 @@ struct blt3_swdrv {
 /************************************************************************/
 
 /* Low-level, Generic, always-valid GFX color functions (using only `xsw_getpixel' + `xsw_setpixel') */
-INTDEF ATTR_IN(1) video_color_t CC libvideo_swgfx_generic__getcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_swgfx_generic__getcolor_with_key(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF ATTR_IN(1) video_color_t CC libvideo_swgfx_generic__getcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__putcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__putcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__putcolor_alpha_factor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
@@ -1012,20 +1011,18 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 	 * - vx_hdr.vxh_ops */
 	if (what & VIDEO_GFX_UPDATE_FLAGS) {
 		/* Select generic operators based on wrapping rules */
-		self->vx_hdr.vxh_ops = libvideo_swgfx_ops_of(self->vx_flags);
+		self->vx_hdr.vxh_ops = libvideo_swgfx_ops_of(video_gfx_getflags(self));
 	}
 
 	/* Update:
 	 * - drv->xsw_getcolor */
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_COLORKEY)) {
 		/* Select how colors should be read. */
-		if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
-			drv->xsw_getcolor = &libvideo_swgfx_generic__getcolor_with_key;
-		} else if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+		if (video_gfx_getbuffer(self)->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
 			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
 			drv->xsw_getcolor = drv->xsw_getpixel;
 		} else {
-			drv->xsw_getcolor = &libvideo_swgfx_generic__getcolor_noblend;
+			drv->xsw_getcolor = &libvideo_swgfx_generic__getcolor;
 		}
 	}
 
@@ -1062,7 +1059,7 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 			/* No blending is being done -> link operators that try to make use of direct memory access. */
 
 			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
-			if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+			if (video_gfx_getbuffer(self)->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
 				drv->xsw_putcolor = drv->xsw_setpixel;
 			} else {
 				drv->xsw_putcolor = &libvideo_swgfx_generic__putcolor_noblend;
@@ -1072,7 +1069,7 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 			drv->xsw_absline_v   = &libvideo_swgfx_noblend__absline_v;
 			drv->xsw_absfill     = &libvideo_swgfx_noblend__absfill;
 			drv->xsw_absfillmask = &libvideo_swgfx_noblend__fillmask;
-			if (self->vx_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+			if (video_gfx_getbuffer(self)->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
 				drv->xsw_absgradient   = &libvideo_swgfx_noblend_interp8888__absgradient;
 				drv->xsw_absgradient_h = &libvideo_swgfx_noblend_interp8888__absgradient_h;
 				drv->xsw_absgradient_v = &libvideo_swgfx_noblend_interp8888__absgradient_v;
@@ -1129,7 +1126,7 @@ after_blend:;
 		/* Select based on linear vs. Nearest interpolation, and blending */
 		switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
 		case GFX_BLENDMODE_OVERRIDE:
-			if (self->vx_flags & VIDEO_GFX_F_LINEAR)
+			if (video_gfx_getflags(self) & VIDEO_GFX_F_LINEAR)
 				goto set_generic_linear_blend_operators;
 			drv->xsw_absfillstretchmask = &libvideo_swgfx_noblend__fillstretchmask_n;
 			drv->xsw_absline_llhh       = &libvideo_swgfx_noblend__absline_llhh;
@@ -1144,7 +1141,7 @@ after_blend:;
 GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_libvideo_swgfx_generic__render_preblend_FOO)
 #undef LINK_libvideo_swgfx_generic__render_preblend_FOO
 		default:
-			if (self->vx_flags & VIDEO_GFX_F_LINEAR) {
+			if (video_gfx_getflags(self) & VIDEO_GFX_F_LINEAR) {
 set_generic_linear_blend_operators:
 				drv->xsw_absfillstretchmask = &libvideo_swgfx_generic__fillstretchmask_l;
 				drv->xsw_absline_llhh       = &libvideo_swgfx_generic__absline_llhh_l;
@@ -1166,10 +1163,8 @@ set_generic_linear_blend_operators:
  * The caller must have already initialized:
  * - video_swgfx_getdrv(self)->xsw_getpixel
  * - video_swgfx_getdrv(self)->xsw_setpixel
- * - self->vx_flags     (if in "vi_initgfx", already done by *your* caller)
- * - self->vx_colorkey  (if in "vi_initgfx", already done by *your* caller)
- * - self->vx_blend     (if in "vi_initgfx", already done by *your* caller)
- * - self->vx_buffer    (if in "vi_initgfx", already done by *your* caller) */
+ * - self->vx_surf     (if in "vi_initgfx", already done by *your* caller)
+ * - self->vx_blend    (if in "vi_initgfx", already done by *your* caller) */
 LOCAL ATTR_INOUT(1) void CC
 libvideo_swgfx_populate(struct video_gfx *__restrict self) {
 	libvideo_swgfx_update(self, VIDEO_GFX_UPDATE_ALL);
@@ -1180,12 +1175,12 @@ libvideo_swgfx_populate(struct video_gfx *__restrict self) {
 LOCAL ATTR_INOUT(1) void CC
 video_swblitter_setops(struct video_blitter *__restrict ctx) {
 	/* Select operators based on wrapping flags of src/dst */
-	video_gfx_flag_t flags = ctx->vbt_dst->vx_flags | ctx->vbt_src->vx_flags;
-	if (ctx->vbt_dst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	video_gfx_flag_t flags = ctx->vbt_dst->vx_surf.vs_flags | ctx->vbt_src->vx_surf.vs_flags;
+	if (ctx->vbt_dst->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		               ? &libvideo_swblitter_ops_wrap_imatrix
 		               : &libvideo_swblitter_ops_wrap;
-	} else if (ctx->vbt_src->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	} else if (ctx->vbt_src->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		               ? &libvideo_swblitter_ops_rdwrap_imatrix
 		               : &libvideo_swblitter_ops_rdwrap;
@@ -1199,11 +1194,11 @@ video_swblitter_setops(struct video_blitter *__restrict ctx) {
 LOCAL ATTR_INOUT(1) void CC
 video_swblitter3_setops(struct video_blitter3 *__restrict ctx) {
 	/* Select operators based on wrapping flags of src/dst */
-	video_gfx_flag_t flags = ctx->vbt3_rddst->vx_flags |
-	                         ctx->vbt3_wrdst->vx_flags |
-	                         ctx->vbt3_src->vx_flags;
-	if (ctx->vbt3_rddst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
-		if (ctx->vbt3_wrdst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	video_gfx_flag_t flags = ctx->vbt3_rddst->vx_surf.vs_flags |
+	                         ctx->vbt3_wrdst->vx_surf.vs_flags |
+	                         ctx->vbt3_src->vx_surf.vs_flags;
+	if (ctx->vbt3_rddst->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+		if (ctx->vbt3_wrdst->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 			ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 			                ? &libvideo_swblitter3_ops_wrap1_imatrix
 			                : &libvideo_swblitter3_ops_wrap1;
@@ -1212,11 +1207,11 @@ video_swblitter3_setops(struct video_blitter3 *__restrict ctx) {
 			                ? &libvideo_swblitter3_ops_rdwrap1_imatrix
 			                : &libvideo_swblitter3_ops_rdwrap1;
 		}
-	} else if (ctx->vbt3_wrdst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	} else if (ctx->vbt3_wrdst->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		                ? &libvideo_swblitter3_ops_wrap_imatrix
 		                : &libvideo_swblitter3_ops_wrap;
-	} else if (ctx->vbt3_src->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	} else if (ctx->vbt3_src->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		                ? &libvideo_swblitter3_ops_rdwrap_imatrix
 		                : &libvideo_swblitter3_ops_rdwrap;

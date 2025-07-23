@@ -71,11 +71,6 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_palette, vp_refcnt, video_palette_destroy
  * thus producing the best-looking results for those bipedal fellas. */
 #define video_palette_getpixel(self, color) \
 	((*(self)->vp_color2pixel)(self, color))
-/* TODO: Use `struct video_surface' to enforce color palettes large enough
- *       for any codec pixel value. That way, we can get rid of the branch
- *       check here, which serve to speed up palette lookups. */
-#define video_palette_getcolor(self, pixel) \
-	(__likely((pixel) < (self)->vp_cnt) ? (self)->vp_pal[pixel] : VIDEO_COLOR_RGB(0, 0, 0))
 
 
 /* Create a new (uninitialized) palette for `__count' colors.

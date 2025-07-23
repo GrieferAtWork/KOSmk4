@@ -24,6 +24,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  */
 #ifndef GUARD_LIBVIDEO_GFX_CODEC_CODEC_C
 #define GUARD_LIBVIDEO_GFX_CODEC_CODEC_C 1
+#define __VIDEO_CODEC_const /* nothing */
 #define _KOS_SOURCE 1
 
 #include "../api.h"
@@ -51,8 +52,9 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/color.h>
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
 #include <libvideo/gfx/codec/palette.h>
+#include <libvideo/gfx/surface-defs.h>
+#include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
 #include "codec-specs.h"
@@ -1580,21 +1582,21 @@ union color_data {
 
 
 INTERN ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-identity_color2pixel(struct video_format const *__restrict UNUSED(format),
+identity_color2pixel(struct video_surface const *__restrict UNUSED(surface),
                      video_color_t value) {
 	return value;
 }
 
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
 INTERN ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
-identity_color2pixel64(struct video_format const *__restrict UNUSED(format),
+identity_color2pixel64(struct video_surface const *__restrict UNUSED(surface),
                        video_color64_t value) {
 	return value;
 }
 #endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 
 INTERN ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-rgbx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+rgbx8888_pixel2color(struct video_surface const *__restrict UNUSED(surface),
                      video_pixel_t pixel) {
 	return pixel | VIDEO_COLOR_ALPHA_MASK;
 }
@@ -1605,7 +1607,7 @@ DEFINE_PIXEL2COLOR64_WRAPPER32(INTERN ATTR_CONST, rgbx8888_pixel2color, rgbx8888
 #define rgb888_pixel2color64 rgbx8888_pixel2color64
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-rgb888_pixel2color(struct video_format const *__restrict UNUSED(format),
+rgb888_pixel2color(struct video_surface const *__restrict UNUSED(surface),
                    video_pixel_t pixel) {
 	return (pixel << 8) | VIDEO_COLOR_ALPHA_MASK;
 }
@@ -1617,7 +1619,7 @@ DEFINE_PIXEL2COLOR64_WRAPPER32(PRIVATE ATTR_CONST, rgb888_pixel2color, rgb888_pi
 #define rgb888_color2pixel64 identity_color2pixel64
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-rgb888_color2pixel(struct video_format const *__restrict UNUSED(format),
+rgb888_color2pixel(struct video_surface const *__restrict UNUSED(surface),
                    video_color_t color) {
 	return color >> 8;
 }
@@ -1627,34 +1629,34 @@ DEFINE_COLOR2PIXEL64_WRAPPER32(PRIVATE ATTR_CONST, rgb888_color2pixel, rgb888_co
 
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-argb8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+argb8888_pixel2color(struct video_surface const *__restrict UNUSED(surface),
                      video_pixel_t pixel) {
 	return BIGENDIAN_SHL((uint32_t)pixel, 8) |
 	       BIGENDIAN_SHR((uint32_t)pixel, 24);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-argb8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+argb8888_color2pixel(struct video_surface const *__restrict UNUSED(surface),
                      video_color_t color) {
 	return BIGENDIAN_SHR((uint32_t)color, 8) |
 	       BIGENDIAN_SHL((uint32_t)color, 24);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-xrgb8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+xrgb8888_pixel2color(struct video_surface const *__restrict UNUSED(surface),
                      video_pixel_t pixel) {
 	return BIGENDIAN_SHL((uint32_t)pixel, 8) | VIDEO_COLOR_ALPHA_MASK;
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-xrgb8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+xrgb8888_color2pixel(struct video_surface const *__restrict UNUSED(surface),
                      video_color_t color) {
 	return BIGENDIAN_SHR((uint32_t)color, 8);
 }
 
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-abgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+abgr8888_pixel2color(struct video_surface const *__restrict UNUSED(surface),
                      video_pixel_t pixel) {
 	return VIDEO_COLOR_RGBA(PIXEL32_B1(pixel),
 	                        PIXEL32_B2(pixel),
@@ -1663,7 +1665,7 @@ abgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-abgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+abgr8888_color2pixel(struct video_surface const *__restrict UNUSED(surface),
                      video_color_t color) {
 	return PIXEL32(VIDEO_COLOR_GET_ALPHA(color),
 	               VIDEO_COLOR_GET_BLUE(color),
@@ -1672,7 +1674,7 @@ abgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-xbgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+xbgr8888_pixel2color(struct video_surface const *__restrict UNUSED(surface),
                      video_pixel_t pixel) {
 	return VIDEO_COLOR_RGB(PIXEL32_B3(pixel),
 	                       PIXEL32_B2(pixel),
@@ -1680,7 +1682,7 @@ xbgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-xbgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+xbgr8888_color2pixel(struct video_surface const *__restrict UNUSED(surface),
                      video_color_t color) {
 	return PIXEL32(0 /* undefined */,
 	               VIDEO_COLOR_GET_BLUE(color),
@@ -1690,7 +1692,7 @@ xbgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-bgra8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+bgra8888_pixel2color(struct video_surface const *__restrict UNUSED(surface),
                      video_pixel_t pixel) {
 	return VIDEO_COLOR_RGBA(PIXEL32_B2(pixel),
 	                        PIXEL32_B1(pixel),
@@ -1699,7 +1701,7 @@ bgra8888_pixel2color(struct video_format const *__restrict UNUSED(format),
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-bgra8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+bgra8888_color2pixel(struct video_surface const *__restrict UNUSED(surface),
                      video_color_t color) {
 	return PIXEL32(VIDEO_COLOR_GET_BLUE(color),
 	               VIDEO_COLOR_GET_GREEN(color),
@@ -1708,7 +1710,7 @@ bgra8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-bgrx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+bgrx8888_pixel2color(struct video_surface const *__restrict UNUSED(surface),
                      video_pixel_t pixel) {
 	return VIDEO_COLOR_RGB(PIXEL32_B2(pixel),
 	                       PIXEL32_B1(pixel),
@@ -1716,7 +1718,7 @@ bgrx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+bgrx8888_color2pixel(struct video_surface const *__restrict UNUSED(surface),
                      video_color_t color) {
 	return PIXEL32(VIDEO_COLOR_GET_BLUE(color),
 	               VIDEO_COLOR_GET_GREEN(color),
@@ -2521,227 +2523,227 @@ ASSERT_N_TO_COLOR(7, 127, 0xff);
 
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-l1_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+l1_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK | lumen1_tocolor(pixel & 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-l1_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+l1_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return color_getlumen1(color);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-l2_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+l2_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK | lumen2_tocolor(pixel & 0x3);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-l2_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+l2_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return color_getlumen2(color);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-l4_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+l4_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK | lumen4_tocolor(pixel & 0xf);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-l4_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+l4_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return color_getlumen4(color);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-l8_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+l8_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK | lumen8_tocolor(pixel & 0xff);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-l8_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+l8_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return color_getlumen8(color);
 }
 
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-a1_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+a1_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return alpha1_tocolor(pixel & 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-a1_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+a1_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return color_getalpha1(color);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-a2_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+a2_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return alpha2_tocolor(pixel & 0x3);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-a2_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+a2_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return color_getalpha2(color);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-a4_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+a4_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return alpha4_tocolor(pixel & 0xf);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-a4_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+a4_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return color_getalpha4(color);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-a8_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+a8_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return alpha8_tocolor(pixel & 0xff);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-a8_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+a8_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return color_getalpha8(color);
 }
 
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-al11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+al11_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       lumen1_tocolor((pixel >> 1) & 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-al11_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+al11_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getlumen1(color) << 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-la11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+la11_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return lumen1_tocolor((pixel) & 1) |
 	       alpha1_tocolor((pixel >> 1) & 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-la11_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+la11_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getlumen1(color)) |
 	       ((video_pixel_t)color_getalpha1(color) << 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-al22_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+al22_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return alpha2_tocolor((pixel) & 3) |
 	       lumen2_tocolor((pixel >> 2) & 3);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-al22_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+al22_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getalpha2(color)) |
 	       ((video_pixel_t)color_getlumen2(color) << 2);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-la22_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+la22_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return lumen2_tocolor((pixel) & 3) |
 	       alpha2_tocolor((pixel >> 2) & 3);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-la22_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+la22_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getlumen2(color)) |
 	       ((video_pixel_t)color_getalpha2(color) << 2);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-al13_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+al13_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       lumen3_tocolor((pixel >> 1) & 7);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-al13_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+al13_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getlumen3(color) << 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-la31_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+la31_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return lumen3_tocolor((pixel) & 7) |
 	       alpha1_tocolor((pixel >> 3) & 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-la31_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+la31_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getlumen3(color)) |
 	       ((video_pixel_t)color_getalpha1(color) << 3);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-al44_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+al44_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return alpha4_tocolor((pixel) & 0xf) |
 	       lumen4_tocolor((pixel >> 4) & 0xf);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-al44_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+al44_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getalpha4(color)) |
 	       ((video_pixel_t)color_getlumen4(color) << 4);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-la44_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+la44_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return lumen4_tocolor((pixel) & 0xf) |
 	       alpha4_tocolor((pixel >> 4) & 0xf);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-la44_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+la44_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getlumen4(color)) |
 	       ((video_pixel_t)color_getalpha4(color) << 4);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-al17_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+al17_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       lumen7_tocolor((pixel >> 1) & 127);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-al17_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+al17_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getlumen7_shl1(color));
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-la71_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+la71_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return lumen7_tocolor((pixel) & 127) |
 	       alpha1_tocolor((pixel >> 7) & 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-la71_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+la71_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getlumen7(color)) |
 	       ((video_pixel_t)color_getalpha1_shl7(color));
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-al88_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+al88_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return alpha8_tocolor((pixel) & 0xff) |
 	       lumen8_tocolor((pixel >> 8) & 0xff);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-al88_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+al88_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getalpha8(color)) |
 	       ((video_pixel_t)color_getlumen8(color) << 8);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-la88_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+la88_pixel2color(struct video_surface const *__restrict UNUSED(surface), video_pixel_t pixel) {
 	return lumen8_tocolor((pixel) & 0xff) |
 	       alpha8_tocolor((pixel >> 8) & 0xff);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-la88_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+la88_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_color_t color) {
 	return ((video_pixel_t)color_getlumen8(color)) |
 	       ((video_pixel_t)color_getalpha8(color) << 8);
 }
@@ -2772,8 +2774,8 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 /* Cross-byte pixel format coverters */
 #define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(name, datatype, union_type,     \
                                                          r_bits, g_bits, b_bits, a_bits) \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC                             \
-	name##_color2pixel(struct video_format const *__restrict UNUSED(format),             \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC                            \
+	name##_color2pixel(struct video_surface const *__restrict UNUSED(surface),           \
 	                   video_color_t color) {                                            \
 		union_type px;                                                                   \
 		px.r = color_getred##r_bits(color);                                              \
@@ -2782,8 +2784,8 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 		px.a = color_getalpha##a_bits(color);                                            \
 		return px.data;                                                                  \
 	}                                                                                    \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC                             \
-	name##_pixel2color(struct video_format const *__restrict UNUSED(format),             \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC                            \
+	name##_pixel2color(struct video_surface const *__restrict UNUSED(surface),           \
 	                   video_pixel_t pixel) {                                            \
 		union_type px;                                                                   \
 		px.data = (datatype)pixel;                                                       \
@@ -2796,8 +2798,8 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 
 #define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(name, datatype, union_type, \
                                                          r_bits, g_bits, b_bits)     \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC                         \
-	name##_color2pixel(struct video_format const *__restrict UNUSED(format),         \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC                        \
+	name##_color2pixel(struct video_surface const *__restrict UNUSED(surface),       \
 	                   video_color_t color) {                                        \
 		union_type px;                                                               \
 		px.r = color_getred##r_bits(color);                                          \
@@ -2806,8 +2808,8 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 		px.x = 0;                                                                    \
 		return px.data;                                                              \
 	}                                                                                \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC                         \
-	name##_pixel2color(struct video_format const *__restrict UNUSED(format),         \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC                        \
+	name##_pixel2color(struct video_surface const *__restrict UNUSED(surface),       \
 	                   video_pixel_t pixel) {                                        \
 		union_type px;                                                               \
 		px.data = (datatype)pixel;                                                   \
@@ -2820,8 +2822,8 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 
 #define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(name, datatype, union_type, \
                                                         r_bits, g_bits, b_bits)     \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC                        \
-	name##_color2pixel(struct video_format const *__restrict UNUSED(format),        \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC                       \
+	name##_color2pixel(struct video_surface const *__restrict UNUSED(surface),      \
 	                   video_color_t color) {                                       \
 		union_type px;                                                              \
 		px.r = color_getred##r_bits(color);                                         \
@@ -2829,8 +2831,8 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 		px.b = color_getblue##b_bits(color);                                        \
 		return px.data;                                                             \
 	}                                                                               \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC                        \
-	name##_pixel2color(struct video_format const *__restrict UNUSED(format),        \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC                       \
+	name##_pixel2color(struct video_surface const *__restrict UNUSED(surface),      \
 	                   video_pixel_t pixel) {                                       \
 		union_type px;                                                              \
 		px.data = (datatype)pixel;                                                  \
@@ -3084,34 +3086,35 @@ DEFINE_FORMAT_CONVERTER_RGBX(xbgr2222, uint8_t, 2, 2, 2, (
 
 
 
-INTERN ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pal_pixel2color(struct video_format const *__restrict format,
-                video_pixel_t pixel) {
-	struct video_palette *pal = format->vf_pal;
-	return video_palette_getcolor(pal, pixel);
+INTERN ATTR_PURE WUNUSED NONNULL((1)) video_color_t
+(FCC pal_pixel2color)(struct video_surface const *__restrict surface,
+                      video_pixel_t pixel) {
+	struct video_palette const *pal = surface->vs_pal;
+	codec_assert(pixel < pal->vp_cnt);
+	return pal->vp_pal[pixel];
 }
 
-#define pal_color2pixel(format, color) \
-	video_palette_getpixel(format->vf_pal, color)
+#define pal_color2pixel(surface, color) \
+	video_palette_getpixel(surface->vs_pal, color)
 INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t
-(FCC pal_color2pixel)(struct video_format const *__restrict format,
+(FCC pal_color2pixel)(struct video_surface const *__restrict surface,
                      video_color_t color) {
-	return video_palette_getpixel(format->vf_pal, color);
+	return video_palette_getpixel(surface->vs_pal, color);
 }
 
 
-#define paletN_tocolor(v, n) (pal_pixel2color(format, v) & ~VIDEO_COLOR_ALPHA_MASK)
-#define palet1_tocolor(v)    paletN_tocolor(v, 1)
-#define palet2_tocolor(v)    paletN_tocolor(v, 2)
-#define palet3_tocolor(v)    paletN_tocolor(v, 3)
-#define palet4_tocolor(v)    paletN_tocolor(v, 4)
-#define palet7_tocolor(v)    paletN_tocolor(v, 7)
-#define palet8_tocolor(v)    paletN_tocolor(v, 8)
+#define _paletN_tocolor(v, n) ((surface)->vs_pal->vp_pal[v] & ~VIDEO_COLOR_ALPHA_MASK)
+#define palet1_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 2), _paletN_tocolor(v, 1))
+#define palet2_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 4), _paletN_tocolor(v, 2))
+#define palet3_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 8), _paletN_tocolor(v, 3))
+#define palet4_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 16), _paletN_tocolor(v, 4))
+#define palet7_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 128), _paletN_tocolor(v, 7))
+#define palet8_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 256), _paletN_tocolor(v, 8))
 
 #if 1 /* Assume that the palette isn't too large (if it is, we'll encode bad pixel data) */
-#define color_getpaletN(v, mask) pal_color2pixel(format, color)
+#define color_getpaletN(v, mask) pal_color2pixel(surface, color)
 #else
-#define color_getpaletN(v, mask) (pal_color2pixel(format, color) & (mask))
+#define color_getpaletN(v, mask) (pal_color2pixel(surface, color) & (mask))
 #endif
 #define color_getpalet1(v) color_getpaletN(v, 1)
 #define color_getpalet2(v) color_getpaletN(v, 3)
@@ -3121,149 +3124,149 @@ INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t
 #define color_getpalet8(v) color_getpaletN(v, 0xff)
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-ap11_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+ap11_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       palet1_tocolor((pixel >> 1) & 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-ap11_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+ap11_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getpalet1(color) << 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-pa11_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+pa11_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return palet1_tocolor((pixel) & 1) |
 	       alpha1_tocolor((pixel >> 1) & 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-pa11_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+pa11_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getpalet1(color)) |
 	       ((video_pixel_t)color_getalpha1(color) << 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-ap22_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+ap22_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return alpha2_tocolor((pixel) & 3) |
 	       palet2_tocolor((pixel >> 2) & 3);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-ap22_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+ap22_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getalpha2(color)) |
 	       ((video_pixel_t)color_getpalet2(color) << 2);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-pa22_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+pa22_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return palet2_tocolor((pixel) & 3) |
 	       alpha2_tocolor((pixel >> 2) & 3);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-pa22_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+pa22_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getpalet2(color)) |
 	       ((video_pixel_t)color_getalpha2(color) << 2);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-ap13_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+ap13_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       palet3_tocolor((pixel >> 1) & 7);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-ap13_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+ap13_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getpalet3(color) << 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-pa31_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+pa31_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return palet3_tocolor((pixel) & 7) |
 	       alpha1_tocolor((pixel >> 3) & 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-pa31_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+pa31_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getpalet3(color)) |
 	       ((video_pixel_t)color_getalpha1(color) << 3);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-ap44_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+ap44_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return alpha4_tocolor((pixel) & 0xf) |
 	       palet4_tocolor((pixel >> 4) & 0xf);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-ap44_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+ap44_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getalpha4(color)) |
 	       ((video_pixel_t)color_getpalet4(color) << 4);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-pa44_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+pa44_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return palet4_tocolor((pixel) & 0xf) |
 	       alpha4_tocolor((pixel >> 4) & 0xf);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-pa44_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+pa44_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getpalet4(color)) |
 	       ((video_pixel_t)color_getalpha4(color) << 4);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-ap17_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+ap17_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       palet7_tocolor((pixel >> 1) & 127);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-ap17_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+ap17_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getpalet7(color) << 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-pa71_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+pa71_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return palet7_tocolor((pixel) & 127) |
 	       alpha1_tocolor((pixel >> 7) & 1);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-pa71_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+pa71_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getpalet7(color)) |
 	       ((video_pixel_t)color_getalpha1_shl7(color));
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-ap88_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+ap88_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return alpha8_tocolor((pixel) & 0xff) |
 	       palet8_tocolor((pixel >> 8) & 0xff);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-ap88_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+ap88_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getalpha8(color)) |
 	       ((video_pixel_t)color_getpalet8(color) << 8);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
-pa88_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
+pa88_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return palet8_tocolor((pixel) & 0xff) |
 	       alpha8_tocolor((pixel >> 8) & 0xff);
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
-pa88_color2pixel(struct video_format const *__restrict format, video_color_t color) {
+pa88_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getpalet8(color)) |
 	       ((video_pixel_t)color_getalpha8(color) << 8);
 }
-#undef paletN_tocolor
+#undef _paletN_tocolor
 #undef palet1_tocolor
 #undef palet2_tocolor
 #undef palet3_tocolor
@@ -3348,7 +3351,7 @@ buffer1_requirements(video_dim_t size_x, video_dim_t size_y,
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported.
  * Don't declare as  ATTR_CONST; in  PIC-mode, needs  to do  one-time-init of  globals! */
-INTERN /*ATTR_CONST*/ WUNUSED struct video_codec const *FCC
+INTERN /*ATTR_CONST*/ WUNUSED struct video_codec *FCC
 libvideo_codec_lookup(video_codec_t codec) {
 #define CASE_CODEC_AL1(codec, specs, rambuffer_requirements,        \
                        getpixel, setpixel, rectcopy, rectmove,      \
@@ -3385,7 +3388,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	}	break
 
 
-	struct video_codec const *result;
+	struct video_codec *result;
 	switch (codec) {
 
 	/* Grayscale (Luminance) formats. */
@@ -4898,20 +4901,25 @@ libvideo_codec_lookup(video_codec_t codec) {
 }
 
 
+#define video_surface_getccodec(self) \
+	((struct video_codec_custom const *)video_surface_getcodec(self))
+
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pext_pal_pixel2color(struct video_format const *__restrict format,
+pext_pal_pixel2color(struct video_surface const *__restrict surface,
                      video_pixel_t pixel) {
-	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
+	video_pixel_t mask = codec->vc_specs.vcs_rmask;
 	video_pixel_t pixl = PEXT(pixel, mask);
-	return pal_pixel2color(format, pixl);
+	return pal_pixel2color(surface, pixl);
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pdep_pal_color2pixel(struct video_format const *__restrict format,
+pdep_pal_color2pixel(struct video_surface const *__restrict surface,
                      video_color_t color) {
-	video_pixel_t pixl = pal_color2pixel(format, color);
-	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
+	video_pixel_t pixl = pal_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
+	video_pixel_t mask = codec->vc_specs.vcs_rmask;
 	return PDEP(pixl, mask);
 }
 
@@ -4938,11 +4946,10 @@ pdep_channel(video_channel_t chan,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pext_pal_pixel2color__withalpha(struct video_format const *__restrict format,
+pext_pal_pixel2color__withalpha(struct video_surface const *__restrict surface,
                                 video_pixel_t pixel) {
-	struct video_codec_custom const *codec;
-	video_color_t result = pext_pal_pixel2color(format, pixel);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_color_t result = pext_pal_pixel2color(surface, pixel);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
 	                       codec->vcc_miss_abits)
@@ -4951,11 +4958,10 @@ pext_pal_pixel2color__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pal_pixel2color__withalpha(struct video_format const *__restrict format,
+pal_pixel2color__withalpha(struct video_surface const *__restrict surface,
                            video_pixel_t pixel) {
-	struct video_codec_custom const *codec;
-	video_color_t result = pal_pixel2color(format, pixel);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_color_t result = pal_pixel2color(surface, pixel);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
 	                       codec->vcc_miss_abits)
@@ -4964,12 +4970,10 @@ pal_pixel2color__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pal_color2pixel__withalpha(struct video_format const *__restrict format,
+pal_color2pixel__withalpha(struct video_surface const *__restrict surface,
                            video_color_t color) {
-	video_pixel_t result;
-	struct video_codec_custom const *codec;
-	result = pal_color2pixel(format, color);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_pixel_t result = pal_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
 	                       codec->vcc_xtra_amask);
@@ -4977,12 +4981,10 @@ pal_color2pixel__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pdep_pal_color2pixel__withalpha(struct video_format const *__restrict format,
+pdep_pal_color2pixel__withalpha(struct video_surface const *__restrict surface,
                                 video_color_t color) {
-	video_pixel_t result;
-	struct video_codec_custom const *codec;
-	result = pdep_pal_color2pixel(format, color);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_pixel_t result = pdep_pal_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
 	                       codec->vcc_xtra_amask);
@@ -4992,62 +4994,66 @@ pdep_pal_color2pixel__withalpha(struct video_format const *__restrict format,
 
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pext_gray4_pixel2color(struct video_format const *__restrict format,
+pext_gray4_pixel2color(struct video_surface const *__restrict surface,
                        video_pixel_t pixel) {
-	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
+	video_pixel_t mask = codec->vc_specs.vcs_rmask;
 	video_pixel_t pixl = PEXT(pixel, mask);
-	return l2_pixel2color(format, pixl);
+	return l2_pixel2color(surface, pixl);
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pdep_gray4_color2pixel(struct video_format const *__restrict format,
+pdep_gray4_color2pixel(struct video_surface const *__restrict surface,
                        video_color_t color) {
-	video_pixel_t pixl = l2_color2pixel(format, color);
-	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
+	video_pixel_t pixl = l2_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
+	video_pixel_t mask = codec->vc_specs.vcs_rmask;
 	return PDEP(pixl, mask);
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pext_gray16_pixel2color(struct video_format const *__restrict format,
+pext_gray16_pixel2color(struct video_surface const *__restrict surface,
                         video_pixel_t pixel) {
-	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
+	video_pixel_t mask = codec->vc_specs.vcs_rmask;
 	video_pixel_t pixl = PEXT(pixel, mask);
-	return l4_pixel2color(format, pixl);
+	return l4_pixel2color(surface, pixl);
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pdep_gray16_color2pixel(struct video_format const *__restrict format,
+pdep_gray16_color2pixel(struct video_surface const *__restrict surface,
                         video_color_t color) {
-	video_pixel_t pixl = l4_color2pixel(format, color);
-	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
+	video_pixel_t pixl = l4_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
+	video_pixel_t mask = codec->vc_specs.vcs_rmask;
 	return PDEP(pixl, mask);
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pext_gray256_pixel2color(struct video_format const *__restrict format,
+pext_gray256_pixel2color(struct video_surface const *__restrict surface,
                          video_pixel_t pixel) {
-	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
+	video_pixel_t mask = codec->vc_specs.vcs_rmask;
 	video_pixel_t pixl = PEXT(pixel, mask);
-	return l8_pixel2color(format, pixl);
+	return l8_pixel2color(surface, pixl);
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pdep_gray256_color2pixel(struct video_format const *__restrict format,
+pdep_gray256_color2pixel(struct video_surface const *__restrict surface,
                          video_color_t color) {
-	video_pixel_t pixl = l8_color2pixel(format, color);
-	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
+	video_pixel_t pixl = l8_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
+	video_pixel_t mask = codec->vc_specs.vcs_rmask;
 	return PDEP(pixl, mask);
 }
 
 
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-gray2_pixel2color__withalpha(struct video_format const *__restrict format,
+gray2_pixel2color__withalpha(struct video_surface const *__restrict surface,
                              video_pixel_t pixel) {
-	video_color_t result;
-	struct video_codec_custom const *codec;
-	result = l1_pixel2color(format, pixel);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_color_t result = l1_pixel2color(surface, pixel);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
 	                       codec->vcc_miss_abits)
@@ -5056,12 +5062,10 @@ gray2_pixel2color__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-gray2_color2pixel__withalpha(struct video_format const *__restrict format,
+gray2_color2pixel__withalpha(struct video_surface const *__restrict surface,
                              video_color_t color) {
-	video_pixel_t result;
-	struct video_codec_custom const *codec;
-	result = l1_color2pixel(format, color);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_pixel_t result = l1_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
 	                       codec->vcc_xtra_amask);
@@ -5069,12 +5073,10 @@ gray2_color2pixel__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-gray4_pixel2color__withalpha(struct video_format const *__restrict format,
+gray4_pixel2color__withalpha(struct video_surface const *__restrict surface,
                              video_pixel_t pixel) {
-	video_color_t result;
-	struct video_codec_custom const *codec;
-	result = l2_pixel2color(format, pixel);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_color_t result = l2_pixel2color(surface, pixel);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
 	                       codec->vcc_miss_abits)
@@ -5083,12 +5085,10 @@ gray4_pixel2color__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pext_gray4_pixel2color__withalpha(struct video_format const *__restrict format,
+pext_gray4_pixel2color__withalpha(struct video_surface const *__restrict surface,
                                   video_pixel_t pixel) {
-	video_color_t result;
-	struct video_codec_custom const *codec;
-	result = pext_gray4_pixel2color(format, pixel);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_color_t result = pext_gray4_pixel2color(surface, pixel);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
 	                       codec->vcc_miss_abits)
@@ -5097,12 +5097,10 @@ pext_gray4_pixel2color__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-gray4_color2pixel__withalpha(struct video_format const *__restrict format,
+gray4_color2pixel__withalpha(struct video_surface const *__restrict surface,
                              video_color_t color) {
-	video_pixel_t result;
-	struct video_codec_custom const *codec;
-	result = l2_color2pixel(format, color);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_pixel_t result = l2_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
 	                       codec->vcc_xtra_amask);
@@ -5110,12 +5108,10 @@ gray4_color2pixel__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pdep_gray4_color2pixel__withalpha(struct video_format const *__restrict format,
+pdep_gray4_color2pixel__withalpha(struct video_surface const *__restrict surface,
                                   video_color_t color) {
-	video_pixel_t result;
-	struct video_codec_custom const *codec;
-	result = pdep_gray4_color2pixel(format, color);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_pixel_t result = pdep_gray4_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
 	                       codec->vcc_xtra_amask);
@@ -5123,12 +5119,10 @@ pdep_gray4_color2pixel__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-gray16_pixel2color__withalpha(struct video_format const *__restrict format,
+gray16_pixel2color__withalpha(struct video_surface const *__restrict surface,
                               video_pixel_t pixel) {
-	video_color_t result;
-	struct video_codec_custom const *codec;
-	result = l4_pixel2color(format, pixel);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_color_t result = l4_pixel2color(surface, pixel);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
 	                       codec->vcc_miss_abits)
@@ -5137,12 +5131,10 @@ gray16_pixel2color__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pext_gray16_pixel2color__withalpha(struct video_format const *__restrict format,
+pext_gray16_pixel2color__withalpha(struct video_surface const *__restrict surface,
                                    video_pixel_t pixel) {
-	video_color_t result;
-	struct video_codec_custom const *codec;
-	result = pext_gray16_pixel2color(format, pixel);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_color_t result = pext_gray16_pixel2color(surface, pixel);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
 	                       codec->vcc_miss_abits)
@@ -5151,12 +5143,10 @@ pext_gray16_pixel2color__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-gray16_color2pixel__withalpha(struct video_format const *__restrict format,
+gray16_color2pixel__withalpha(struct video_surface const *__restrict surface,
                               video_color_t color) {
-	video_pixel_t result;
-	struct video_codec_custom const *codec;
-	result = l4_color2pixel(format, color);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_pixel_t result = l4_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
 	                       codec->vcc_xtra_amask);
@@ -5164,12 +5154,10 @@ gray16_color2pixel__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pdep_gray16_color2pixel__withalpha(struct video_format const *__restrict format,
+pdep_gray16_color2pixel__withalpha(struct video_surface const *__restrict surface,
                                    video_color_t color) {
-	video_pixel_t result;
-	struct video_codec_custom const *codec;
-	result = pdep_gray16_color2pixel(format, color);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_pixel_t result = pdep_gray16_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
 	                       codec->vcc_xtra_amask);
@@ -5177,12 +5165,10 @@ pdep_gray16_color2pixel__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-gray256_pixel2color__withalpha(struct video_format const *__restrict format,
+gray256_pixel2color__withalpha(struct video_surface const *__restrict surface,
                                video_pixel_t pixel) {
-	video_color_t result;
-	struct video_codec_custom const *codec;
-	result = l8_pixel2color(format, pixel);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_color_t result = l8_pixel2color(surface, pixel);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
 	                       codec->vcc_miss_abits)
@@ -5191,12 +5177,10 @@ gray256_pixel2color__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pext_gray256_pixel2color__withalpha(struct video_format const *__restrict format,
+pext_gray256_pixel2color__withalpha(struct video_surface const *__restrict surface,
                                     video_pixel_t pixel) {
-	video_color_t result;
-	struct video_codec_custom const *codec;
-	result = pext_gray256_pixel2color(format, pixel);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_color_t result = pext_gray256_pixel2color(surface, pixel);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
 	                       codec->vcc_miss_abits)
@@ -5205,12 +5189,10 @@ pext_gray256_pixel2color__withalpha(struct video_format const *__restrict format
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-gray256_color2pixel__withalpha(struct video_format const *__restrict format,
+gray256_color2pixel__withalpha(struct video_surface const *__restrict surface,
                                video_color_t color) {
-	video_pixel_t result;
-	struct video_codec_custom const *codec;
-	result = l8_color2pixel(format, color);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_pixel_t result = l8_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
 	                       codec->vcc_xtra_amask);
@@ -5218,12 +5200,10 @@ gray256_color2pixel__withalpha(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pdep_gray256_color2pixel__withalpha(struct video_format const *__restrict format,
+pdep_gray256_color2pixel__withalpha(struct video_surface const *__restrict surface,
                                     video_color_t color) {
-	video_pixel_t result;
-	struct video_codec_custom const *codec;
-	result = pdep_gray256_color2pixel(format, color);
-	codec  = (struct video_codec_custom const *)format->vf_codec;
+	video_pixel_t result = pdep_gray256_color2pixel(surface, color);
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
 	                       codec->vcc_xtra_amask);
@@ -5232,9 +5212,9 @@ pdep_gray256_color2pixel__withalpha(struct video_format const *__restrict format
 
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pext_rgba_pixel2color(struct video_format const *__restrict format,
+pext_rgba_pixel2color(struct video_surface const *__restrict surface,
                       video_pixel_t pixel) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	video_channel_t r = pext_channel(pixel, codec->vcc_used_rmask, codec->vcc_miss_rbits);
 	video_channel_t g = pext_channel(pixel, codec->vcc_used_gmask, codec->vcc_miss_gbits);
 	video_channel_t b = pext_channel(pixel, codec->vcc_used_bmask, codec->vcc_miss_bbits);
@@ -5243,9 +5223,9 @@ pext_rgba_pixel2color(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pdep_rgba_color2pixel(struct video_format const *__restrict format,
+pdep_rgba_color2pixel(struct video_surface const *__restrict surface,
                       video_color_t color) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	video_channel_t r = VIDEO_COLOR_GET_RED(color);
 	video_channel_t g = VIDEO_COLOR_GET_GREEN(color);
 	video_channel_t b = VIDEO_COLOR_GET_BLUE(color);
@@ -5257,9 +5237,9 @@ pdep_rgba_color2pixel(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-pext_rgb_pixel2color(struct video_format const *__restrict format,
+pext_rgb_pixel2color(struct video_surface const *__restrict surface,
                      video_pixel_t pixel) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	video_channel_t r = pext_channel(pixel, codec->vcc_used_rmask, codec->vcc_miss_rbits);
 	video_channel_t g = pext_channel(pixel, codec->vcc_used_gmask, codec->vcc_miss_gbits);
 	video_channel_t b = pext_channel(pixel, codec->vcc_used_bmask, codec->vcc_miss_bbits);
@@ -5267,9 +5247,9 @@ pext_rgb_pixel2color(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-pdep_rgb_color2pixel(struct video_format const *__restrict format,
+pdep_rgb_color2pixel(struct video_surface const *__restrict surface,
                      video_color_t color) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	video_channel_t r = VIDEO_COLOR_GET_RED(color);
 	video_channel_t g = VIDEO_COLOR_GET_GREEN(color);
 	video_channel_t b = VIDEO_COLOR_GET_BLUE(color);
@@ -5312,9 +5292,9 @@ shft_channel_encode(video_channel_t chan,
 
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-shft_rgb_pixel2color(struct video_format const *__restrict format,
+shft_rgb_pixel2color(struct video_surface const *__restrict surface,
                      video_pixel_t pixel) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	video_channel_t r = shft_channel_decode(pixel, codec->vcc_used_rmask, codec->vcc_shft_rmask, codec->vcc_miss_rbits);
 	video_channel_t g = shft_channel_decode(pixel, codec->vcc_used_gmask, codec->vcc_shft_gmask, codec->vcc_miss_gbits);
 	video_channel_t b = shft_channel_decode(pixel, codec->vcc_used_bmask, codec->vcc_shft_bmask, codec->vcc_miss_bbits);
@@ -5322,9 +5302,9 @@ shft_rgb_pixel2color(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-shft_rgba_pixel2color(struct video_format const *__restrict format,
+shft_rgba_pixel2color(struct video_surface const *__restrict surface,
                       video_pixel_t pixel) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	video_channel_t r = shft_channel_decode(pixel, codec->vcc_used_rmask, codec->vcc_shft_rmask, codec->vcc_miss_rbits);
 	video_channel_t g = shft_channel_decode(pixel, codec->vcc_used_gmask, codec->vcc_shft_gmask, codec->vcc_miss_gbits);
 	video_channel_t b = shft_channel_decode(pixel, codec->vcc_used_bmask, codec->vcc_shft_bmask, codec->vcc_miss_bbits);
@@ -5334,9 +5314,9 @@ shft_rgba_pixel2color(struct video_format const *__restrict format,
 
 #ifdef HAVE_shft_channel_decode_nomiss
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-shft_rgb_pixel2color_nomiss(struct video_format const *__restrict format,
+shft_rgb_pixel2color_nomiss(struct video_surface const *__restrict surface,
                             video_pixel_t pixel) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	video_channel_t r = shft_channel_decode_nomiss(pixel, codec->vcc_used_rmask, codec->vcc_shft_rmask);
 	video_channel_t g = shft_channel_decode_nomiss(pixel, codec->vcc_used_gmask, codec->vcc_shft_gmask);
 	video_channel_t b = shft_channel_decode_nomiss(pixel, codec->vcc_used_bmask, codec->vcc_shft_bmask);
@@ -5344,9 +5324,9 @@ shft_rgb_pixel2color_nomiss(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
-shft_rgba_pixel2color_nomiss(struct video_format const *__restrict format,
+shft_rgba_pixel2color_nomiss(struct video_surface const *__restrict surface,
                              video_pixel_t pixel) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	video_channel_t r = shft_channel_decode_nomiss(pixel, codec->vcc_used_rmask, codec->vcc_shft_rmask);
 	video_channel_t g = shft_channel_decode_nomiss(pixel, codec->vcc_used_gmask, codec->vcc_shft_gmask);
 	video_channel_t b = shft_channel_decode_nomiss(pixel, codec->vcc_used_bmask, codec->vcc_shft_bmask);
@@ -5356,9 +5336,9 @@ shft_rgba_pixel2color_nomiss(struct video_format const *__restrict format,
 #endif /* HAVE_shft_channel_decode_nomiss */
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-shft_rgb_color2pixel(struct video_format const *__restrict format,
+shft_rgb_color2pixel(struct video_surface const *__restrict surface,
                      video_color_t color) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	video_channel_t r = VIDEO_COLOR_GET_RED(color);
 	video_channel_t g = VIDEO_COLOR_GET_GREEN(color);
 	video_channel_t b = VIDEO_COLOR_GET_BLUE(color);
@@ -5368,9 +5348,9 @@ shft_rgb_color2pixel(struct video_format const *__restrict format,
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
-shft_rgba_color2pixel(struct video_format const *__restrict format,
+shft_rgba_color2pixel(struct video_surface const *__restrict surface,
                       video_color_t color) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	struct video_codec_custom const *codec = video_surface_getccodec(surface);
 	video_channel_t r = VIDEO_COLOR_GET_RED(color);
 	video_channel_t g = VIDEO_COLOR_GET_GREEN(color);
 	video_channel_t b = VIDEO_COLOR_GET_BLUE(color);
@@ -5740,7 +5720,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			 *       pixel2color64 / color2pixel64 function actually do anything, and the non-64
 			 *       line/vert/rect-fill function have to do the actual pixel encoding...
 			 * XXX: But that won't work for custom codecs since those operators don't take the
-			 *      video_format as argument, meaning there'd need to be 1 function for  every
+			 *      video_surface as argument, meaning there'd need to be 1 function for every
 			 *      possible format, and we want to support arbitrary formats...
 			 * FIXME: Figure out a way to compress/uncompress 32/64-bit pixels in this case.
 			 *        It should be possible, since we know  that there will only be at  most

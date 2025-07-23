@@ -42,7 +42,6 @@ struct gfx_buffer: video_buffer {
 	video_coord_t            gxb_bymin; /* [const] s.a. `struct video_gfxhdr::vxh_bymin' */
 	video_coord_t            gxb_bxend; /* [const] s.a. `struct video_gfxhdr::vxh_bxend' */
 	video_coord_t            gxb_byend; /* [const] s.a. `struct video_gfxhdr::vxh_byend' */
-	video_gfx_flag_t         gxb_flags; /* [const] s.a. `struct video_gfx::vx_flags' */
 };
 
 /* GFX buffer operator types */
@@ -57,7 +56,7 @@ INTDEF NONNULL((1)) void FCC gfx_buffer_destroy(struct video_buffer *__restrict 
 
 /* REVOKE+SUBREGION */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC gfx_buffer__revoke)(struct video_buffer *__restrict self);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC gfx_buffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t gfx_flags);
+INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC gfx_buffer__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
 
 /* GFX */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC gfx_buffer_initgfx(struct video_gfx *__restrict self);

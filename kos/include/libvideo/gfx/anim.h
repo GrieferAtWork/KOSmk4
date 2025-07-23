@@ -40,7 +40,7 @@ __DECL_BEGIN
 
 struct video_buffer;
 struct video_domain;
-struct video_format;
+struct video_buffer_format;
 struct video_anim;
 
 typedef __uint32_t video_anim_frame_id;
@@ -54,6 +54,7 @@ struct video_anim_frame {
 	REF struct video_buffer *vaf_frame;    /* [1..1] Current frame (and previous frame during) */
 	struct __timeval64       vaf_showfor;  /* How long to display the frame before showing the next */
 	video_anim_frame_id      vaf_frameid;  /* ID of this frame */
+	/* TODO: Get rid of `vaf_colorkey' -- that one's embedded within video buffers now! */
 	video_color_t            vaf_colorkey; /* Frame color key, or "0" if not needed */
 
 	/* Animation-specific frame data goes here... */
@@ -187,12 +188,12 @@ video_anim_fromframe(struct video_buffer *__restrict __frame);
 typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_OPT_T(2) __ATTR_IN_OPT_T(3) __REF struct video_anim *
 (LIBVIDEO_GFX_CC *PVIDEO_ANIM_CACHED)(struct video_anim *__restrict __self,
                                       struct video_domain const *__domain,
-                                      struct video_format const *__format);
+                                      struct video_buffer_format const *__format);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN_OPT(2) __ATTR_IN_OPT(3) __REF struct video_anim *LIBVIDEO_GFX_CC
 video_anim_cached(struct video_anim *__restrict __self,
                   struct video_domain const *__domain,
-                  struct video_format const *__format);
+                  struct video_buffer_format const *__format);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_IO_BMP_C_INL
 #define GUARD_LIBVIDEO_GFX_IO_BMP_C_INL 1
+#define __VIDEO_BUFFER_const /*nothing */
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -56,12 +57,12 @@
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
 #include <libvideo/gfx/codec/palette.h>
 #include <libvideo/types.h>
 
 #include "../buffer.h"
 #include "../codec/codec.h"
+#include "../codec/codec-specs.h"
 #include "../codec/palette.h"
 #include "../gfx-utils.h"
 #include "../io-utils.h"
@@ -218,11 +219,9 @@ fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 	struct video_rambuffer_base *me = (struct video_rambuffer_base *)self;
 	assert(me->vb_domain == &libvideo_ramdomain);
 	assert(me->vb_ops == &rambuffer_ops ||
-	       me->vb_ops == &rambuffer_xcodec_ops ||
-	       me->vb_ops == &rambuffer_formem_ops ||
-	       me->vb_ops == &rambuffer_formem_xcodec_ops);
-	assert(me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888);
-	assert(me->vb_format.vf_pal == NULL);
+	       me->vb_ops == &rambuffer_formem_ops);
+	assert(me->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_RGBA8888);
+	assert(me->vb_format.vbf_pal == NULL);
 	for (y = 0; y < me->vb_ydim; ++y) {
 		struct pixel *iter, *end;
 		iter = (struct pixel *)(me->rb_data + y * me->rb_stride);
@@ -235,8 +234,8 @@ fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 
 	/* No alpha values -> use RGBX8888 instead.
 	 * Because we're a ram-buffer, we can simply change the codec like this! */
-	me->vb_format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBX8888);
-	assertf(me->vb_format.vf_codec, "Built-in codec should have been recognized");
+	me->vb_format.vbf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBX8888);
+	assertf(me->vb_format.vbf_codec, "Built-in codec should have been recognized");
 }
 
 struct bmp_masks {
@@ -330,7 +329,6 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	byte_t const *blobEOF = (byte_t const *)blob + blob_size;
 	byte_t const *reader;
 	REF struct video_buffer *result;
-	REF struct video_palette *result_pal;
 	struct video_lock result_lock;
 	struct bm_hdr {
 		BITMAPFILEHEADER bmFile;
@@ -348,6 +346,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	bool out_vflipped = true;
 	bool out_hasalpha_if_nonzero = false;
 	struct video_codec_specs out_specs;
+	struct video_buffer_format format;
 
 	/* Important stuff from `BITMAPINFOHEADER' */
 	DWORD biSize;
@@ -492,46 +491,52 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 		out_specs.vcs_gmask = out_specs.vcs_rmask;
 		out_specs.vcs_bmask = out_specs.vcs_rmask;
 
-		result_pal = libvideo_palette_create(biClrUsed);
-		if unlikely(!result_pal)
+		format.vbf_pal = libvideo_palette_create(biClrUsed);
+		if unlikely(!format.vbf_pal)
 			goto err;
 
 		/* Read palette */
 		if (biSize == 12) {
 			size_t i;
-			byte_t const *pal_end = reader + (result_pal->vp_cnt * 3);
+			byte_t const *pal_end = reader + (format.vbf_pal->vp_cnt * 3);
 			if unlikely(pal_end >= blobEOF)
 				Egoto(badfmt_pal);
-			for (i = 0; i < result_pal->vp_cnt; ++i) {
+			for (i = 0; i < format.vbf_pal->vp_cnt; ++i) {
 				uint8_t b = *reader++;
 				uint8_t g = *reader++;
 				uint8_t r = *reader++;
-				result_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
+				format.vbf_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
 			}
 		} else {
 			size_t i;
-			byte_t const *pal_end = reader + (result_pal->vp_cnt * 4);
+			byte_t const *pal_end = reader + (format.vbf_pal->vp_cnt * 4);
 			if unlikely(pal_end >= blobEOF)
 				Egoto(badfmt_pal);
-			for (i = 0; i < result_pal->vp_cnt; ++i) {
+			for (i = 0; i < format.vbf_pal->vp_cnt; ++i) {
 				uint8_t b = *reader++;
 				uint8_t g = *reader++;
 				uint8_t r = *reader++;
 				++reader; /* 4th element should be ignored */
-				result_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
+				format.vbf_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
 			}
 		}
-		result_pal = libvideo_palette_optimize(result_pal);
+		format.vbf_pal = libvideo_palette_optimize(format.vbf_pal);
 	} else {
 		/* Color-mask-driven format */
 		out_specs.vcs_flags = VIDEO_CODEC_FLAG_NORMAL;
 		out_specs.vcs_rmask = rmask;
 		out_specs.vcs_gmask = gmask;
 		out_specs.vcs_bmask = bmask;
-		result_pal = NULL;
+		format.vbf_pal = NULL;
 	}
 	out_specs.vcs_bpp   = biBitCount;
 	out_specs.vcs_amask = amask;
+
+	/* Lookup codec */
+	format.vbf_codec = libvideo_codec_fromspecs(&out_specs);
+	if unlikely(!format.vbf_codec)
+		goto err_pal;
+	format.vbf_flags = VIDEO_GFX_F_NORMAL;
 
 	/* Check for special case: try to inherit BMP file and use as-is as video buffer. */
 	if (p_mapfile && biCompression == BI_BITFIELDS &&
@@ -542,17 +547,20 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 			vflip_scanlines(bPixelData, dwPixelScanline, (size_t)(ULONG)biHeight);
 		mapfile_cookie = malloc(sizeof(struct mapfile));
 		if unlikely(!mapfile_cookie)
-			goto err_pal;
+			goto err_pal_codec;
 		mapfile_cookie = memcpy(mapfile_cookie, p_mapfile, sizeof(*p_mapfile));
-		result = video_domain_formem_ex(out_hasalpha_if_nonzero ? _libvideo_ramdomain() : domain_hint,
-		                                (size_t)(ULONG)biWidth, (size_t)(ULONG)biHeight,
-		                                &out_specs, result_pal, bPixelData, dwPixelScanline,
-		                                &unmap_mapfile_release_mem, mapfile_cookie,
-		                                VIDEO_DOMAIN_FORMEM_F_NORMAL);
+		result = video_domain_formem(out_hasalpha_if_nonzero ? _libvideo_ramdomain() : domain_hint,
+		                             &format, (size_t)(ULONG)biWidth, (size_t)(ULONG)biHeight,
+		                             bPixelData, dwPixelScanline,
+		                             &unmap_mapfile_release_mem, mapfile_cookie,
+		                             VIDEO_DOMAIN_FORMEM_F_NORMAL);
 		if unlikely(!result) {
 			free(mapfile_cookie);
-			goto err_pal;
+			goto err_pal_codec;
 		}
+		if (format.vbf_pal)
+			video_palette_decref(format.vbf_pal);
+		video_codec_decref(format.vbf_codec);
 		bzero(p_mapfile, sizeof(*p_mapfile)); /* Stolen by `mapfile_cookie' */
 		if (out_hasalpha_if_nonzero)
 			fix_missing_alpha_channel(result);
@@ -560,13 +568,14 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	}
 
 	/* Create result buffer */
-	result = video_domain_newbuffer_ex(out_hasalpha_if_nonzero ? _libvideo_ramdomain() : domain_hint,
-	                                   (size_t)(ULONG)biWidth, (size_t)(ULONG)biHeight,
-	                                   &out_specs, result_pal, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+	result = video_domain_newbuffer(out_hasalpha_if_nonzero ? _libvideo_ramdomain() : domain_hint, &format,
+	                                (size_t)(ULONG)biWidth, (size_t)(ULONG)biHeight,
+	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result)
-		goto err_pal;
-	if (result_pal)
-		video_palette_decref(result_pal);
+		goto err_pal_codec;
+	if (format.vbf_pal)
+		video_palette_decref(format.vbf_pal);
+	video_codec_decref(format.vbf_codec);
 	if unlikely(video_buffer_wlock(result, &result_lock))
 		goto err_r;
 
@@ -621,16 +630,18 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 		fix_missing_alpha_channel(result);
 	return result;
 badfmt_pal:
-	if (result_pal)
-		video_palette_decref(result_pal);
+	if (format.vbf_pal)
+		video_palette_decref(format.vbf_pal);
 badfmt:
 	return VIDEO_BUFFER_WRONG_FMT;
 err_r:
 	video_buffer_decref(result);
 	goto err;
+err_pal_codec:
+	video_codec_decref(format.vbf_codec);
 err_pal:
-	if (result_pal)
-		video_palette_decref(result_pal);
+	if (format.vbf_pal)
+		video_palette_decref(format.vbf_pal);
 err:
 	return NULL;
 #undef ADDRAFTER
@@ -655,8 +666,8 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		};
 	} hdr;
 	struct video_lock vid_lock;
-	struct video_codec const *codec = self->vb_format.vf_codec;
-	struct video_palette const *pal = self->vb_format.vf_pal;
+	struct video_codec const *codec = self->vb_format.vbf_codec;
+	struct video_palette const *pal = self->vb_format.vbf_pal;
 	DWORD dwPixelScanline = CEILDIV(self->vb_xdim * codec->vc_specs.vcs_bpp, NBBY);
 
 	/* From Wikipedia: """The size of each row is rounded up to a multiple of 4 bytes""" */
@@ -671,7 +682,7 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		int result;
 		REF struct video_buffer *converted_buffer;
 		video_codec_t preferred_codec_id;
-		struct video_format preferred_format;
+		struct video_buffer_format preferred_format;
 		if (codec->vc_specs.vcs_amask) {
 			if (pal || (codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM))) {
 				preferred_codec_id = VIDEO_CODEC_BGRA8888;
@@ -694,10 +705,10 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		} else {
 			preferred_codec_id = VIDEO_CODEC_BGRA8888;
 		}
-		preferred_format.vf_codec = libvideo_codec_lookup(preferred_codec_id);
-		assertf(preferred_format.vf_codec, "Built-in codec should have been recognized");
-		assert(preferred_format.vf_codec->vc_specs.vcs_bpp > 8);
-		preferred_format.vf_pal = NULL;
+		preferred_format.vbf_flags = VIDEO_GFX_F_NORMAL;
+		preferred_format.vbf_codec = libvideo_codec_lookup(preferred_codec_id);
+		assertf(preferred_format.vbf_codec, "Built-in codec should have been recognized");
+		assert(preferred_format.vbf_codec->vc_specs.vcs_bpp > 8);
 		converted_buffer = libvideo_buffer_convert(self, _libvideo_ramdomain(), &preferred_format);
 		if unlikely(!converted_buffer)
 			return -1;

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_BUFFER_LOCKABLE_C
 #define GUARD_LIBVIDEO_GFX_BUFFER_LOCKABLE_C 1
+#define __VIDEO_BUFFER_const /* nothing */
 #define _KOS_SOURCE 1
 
 #include "../api.h"
@@ -43,8 +44,9 @@
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface-defs.h>
+#include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
 #include "../buffer.h"
@@ -86,7 +88,7 @@ lockable_getdata(struct lockable_buffer_base *__restrict self) {
 	byte_t *result = atomic_read(&self->lbb_data);
 	if (!result) {
 		struct video_rambuffer_requirements req;
-		(*self->vb_format.vf_codec->vc_rambuffer_requirements)(self->vb_xdim, self->vb_ydim, &req);
+		(*self->vb_format.vbf_codec->vc_rambuffer_requirements)(self->vb_xdim, self->vb_ydim, &req);
 		result = (byte_t *)calloc(req.vbs_bufsize);
 		if unlikely(!result)
 			goto err;
@@ -110,10 +112,9 @@ INTERN NONNULL((1)) void FCC
 lockable_buffer__destroy(struct video_buffer *__restrict self) {
 	struct lockable_buffer *me = (struct lockable_buffer *)self;
 	assert(LIST_EMPTY(&me->lb_subregion_list));
-	if (me->vb_format.vf_pal)
-		video_palette_decref(me->vb_format.vf_pal);
 	video_buffer_decref(me->lbb_base);
 	free(me->lbb_data);
+	__video_buffer_fini_common(me);
 	free(me);
 }
 
@@ -121,9 +122,8 @@ INTERN NONNULL((1)) void FCC
 lockable_buffer_subregion__destroy(struct video_buffer *__restrict self) {
 	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)self;
 	assert(LIST_EMPTY(&me->lb_subregion_list));
-	if (me->vb_format.vf_pal)
-		video_palette_decref(me->vb_format.vf_pal);
 	video_buffer_decref(me->lbsb_parent);
+	__video_buffer_fini_common(me);
 	free(me);
 }
 
@@ -165,10 +165,10 @@ NOTHROW(FCC lockable_buffer_subregion__revoke)(struct video_buffer *__restrict s
 	return me;
 }
 
-PRIVATE WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-lockable_buffer__subregion_impl(struct lockable_buffer *__restrict self,
+PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) ATTR_IN(3) REF struct video_buffer *FCC
+lockable_buffer__subregion_impl(struct video_surface const *__restrict surface,
+                                struct lockable_buffer *__restrict self,
                                 struct video_crect const *__restrict rect,
-                                video_gfx_flag_t gfx_flags,
                                 video_coord_t base_xoff,
                                 video_coord_t base_yoff) {
 	REF struct lockable_buffer_subregion *result;
@@ -179,24 +179,25 @@ lockable_buffer__subregion_impl(struct lockable_buffer *__restrict self,
 		goto err;
 	result->lbb_data   = NULL;
 	result->vb_domain  = _libvideo_ramdomain();
-	result->vb_format  = self->vb_format;
+	result->vb_format.vbf_pal      = video_surface_getpalette(surface);
+	result->vb_format.vbf_codec    = video_buffer_getcodec(self);
+	result->vb_format.vbf_flags    = video_surface_getflags(surface);
+	result->vb_format.vbf_colorkey = video_surface_getcolorkey(surface);
 	result->vb_xdim    = rect->vcr_xdim;
 	result->vb_ydim    = rect->vcr_ydim;
 	result->vb_refcnt  = 1;
 	result->lbb_stride = self->lbb_stride;
 	result->lbb_data += base_yoff * result->lbb_stride;
 	result->lbb_data += base_yoff * result->lbb_stride;
-	video_codec_xcoord_to_offset(result->vb_format.vf_codec, base_xoff,
+	video_codec_xcoord_to_offset(result->vb_format.vbf_codec, base_xoff,
 	                             &result->lbsb_bxoff, &result->lbsb_bxrem);
 	result->lbsb_xoff   = base_xoff;
 	result->lbsb_yoff   = base_yoff;
-	result->lbsb_gfx    = gfx_flags;
 	result->lbsb_parent = self;
 	video_buffer_incref(self);
-	if (result->vb_format.vf_pal)
-		video_palette_incref(result->vb_format.vf_pal);
 	result->vb_ops = result->lbsb_bxrem ? _lockable_buffer_subregion_ops()
 	                                    : _lockable_buffer_subregion_norem_ops();
+	__video_buffer_init_common(result);
 	atomic_lock_acquire(&self->lb_subregion_lock);
 	LIST_INSERT_HEAD(&self->lb_subregion_list, result, lbsb_chain);
 	atomic_lock_release(&self->lb_subregion_lock);
@@ -206,22 +207,18 @@ err:
 }
 
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-lockable_buffer__subregion(struct video_buffer *__restrict self,
-                           struct video_crect const *__restrict rect,
-                           video_gfx_flag_t gfx_flags) {
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+lockable_buffer__subregion(struct video_surface const *__restrict self,
+                           struct video_crect const *__restrict rect) {
 	struct lockable_buffer *me = (struct lockable_buffer *)self;
-	return lockable_buffer__subregion_impl(me, rect, gfx_flags, 0, 0);
+	return lockable_buffer__subregion_impl(self, me, rect, 0, 0);
 }
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-lockable_buffer_subregion__subregion(struct video_buffer *__restrict self,
-                                     struct video_crect const *__restrict rect,
-                                     video_gfx_flag_t gfx_flags) {
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+lockable_buffer_subregion__subregion(struct video_surface const *__restrict self,
+                                     struct video_crect const *__restrict rect) {
 	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)self;
-	return lockable_buffer__subregion_impl(me, rect,
-	                                       video_gfx_flag_combine(me->lbsb_gfx, gfx_flags),
-	                                       me->lbsb_xoff, me->lbsb_yoff);
+	return lockable_buffer__subregion_impl(self, me, rect, me->lbsb_xoff, me->lbsb_yoff);
 }
 
 
@@ -254,8 +251,12 @@ lockable_readpixels(struct lockable_buffer_base const *__restrict self) {
 	struct video_gfx dstgfx, *p_dstgfx;
 	struct video_rambuffer_base dst;
 	lockable_asram(&dst, self);
-	p_srcgfx = video_buffer_getgfx(self->lbb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_srcgfx = video_buffer_getgfx_ex(self->lbb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(self->lbb_base),
+	                                  VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx_ex(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(&dst),
+	                                  VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, 0, 0,
@@ -271,8 +272,12 @@ lockable_writepixels(struct lockable_buffer_base const *__restrict self) {
 	struct video_gfx dstgfx, *p_dstgfx;
 	struct video_rambuffer_base src;
 	lockable_asram(&src, self);
-	p_srcgfx = video_buffer_getgfx(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-	p_dstgfx = video_buffer_getgfx(self->lbb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_srcgfx = video_buffer_getgfx_ex(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(&src),
+	                                  VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx_ex(self->lbb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(self->lbb_base),
+	                                  VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, 0, 0, p_srcgfx, 0, 0,
@@ -289,8 +294,12 @@ lockable_readpixels_region(struct lockable_buffer_base const *__restrict self,
 	struct video_gfx dstgfx, *p_dstgfx;
 	struct video_rambuffer_base dst;
 	lockable_asram(&dst, self);
-	p_srcgfx = video_buffer_getgfx(self->lbb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_srcgfx = video_buffer_getgfx_ex(self->lbb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(self->lbb_base),
+	                                  VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx_ex(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(&dst),
+	                                  VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, region->_vrl_rect.vcr_xmin, region->_vrl_rect.vcr_ymin,
@@ -307,8 +316,12 @@ lockable_writepixels_region(struct lockable_buffer_base const *__restrict self,
 	struct video_gfx dstgfx, *p_dstgfx;
 	struct video_rambuffer_base src;
 	lockable_asram(&src, self);
-	p_srcgfx = video_buffer_getgfx(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-	p_dstgfx = video_buffer_getgfx(self->lbb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_srcgfx = video_buffer_getgfx_ex(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(&src),
+	                                  VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx_ex(self->lbb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(self->lbb_base),
+	                                  VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, region->_vrl_rect.vcr_xmin, region->_vrl_rect.vcr_ymin,
@@ -458,8 +471,12 @@ lockable_subregion_readpixels(struct lockable_buffer_subregion const *__restrict
 	struct video_gfx dstgfx, *p_dstgfx;
 	struct video_rambuffer_base dst;
 	lockable_subregion_asram(&dst, self);
-	p_srcgfx = video_buffer_getgfx(self->lbb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_srcgfx = video_buffer_getgfx_ex(self->lbb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(self->lbb_base),
+	                                  VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx_ex(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(&dst),
+	                                  VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, self->lbsb_bxrem, 0,
@@ -475,8 +492,12 @@ lockable_subregion_writepixels(struct lockable_buffer_subregion const *__restric
 	struct video_gfx dstgfx, *p_dstgfx;
 	struct video_rambuffer_base src;
 	lockable_subregion_asram(&src, self);
-	p_srcgfx = video_buffer_getgfx(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-	p_dstgfx = video_buffer_getgfx(self->lbb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_srcgfx = video_buffer_getgfx_ex(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(&src),
+	                                  VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx_ex(self->lbb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(self->lbb_base),
+	                                  VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, self->lbsb_xoff, self->lbsb_yoff,
@@ -494,8 +515,12 @@ lockable_subregion_readpixels_region(struct lockable_buffer_subregion const *__r
 	struct video_gfx dstgfx, *p_dstgfx;
 	struct video_rambuffer_base dst;
 	lockable_subregion_asram(&dst, self);
-	p_srcgfx = video_buffer_getgfx(self->lbb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_srcgfx = video_buffer_getgfx_ex(self->lbb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(self->lbb_base),
+	                                  VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx_ex(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(&dst),
+	                                  VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx,
@@ -516,8 +541,12 @@ lockable_subregion_writepixels_region(struct lockable_buffer_subregion const *__
 	struct video_gfx dstgfx, *p_dstgfx;
 	struct video_rambuffer_base src;
 	lockable_subregion_asram(&src, self);
-	p_srcgfx = video_buffer_getgfx(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-	p_dstgfx = video_buffer_getgfx(self->lbb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_srcgfx = video_buffer_getgfx_ex(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(&src),
+	                                  VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx_ex(self->lbb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE,
+	                                  video_buffer_getpalette(self->lbb_base),
+	                                  VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx,
@@ -685,18 +714,17 @@ NOTHROW(FCC lockable_buffer_subregion__unlockregion)(struct video_buffer *__rest
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 lockable_buffer__initgfx(struct video_gfx *__restrict self) {
-	struct lockable_buffer_base *me = (struct lockable_buffer_base *)self->vx_buffer;
+	struct lockable_buffer_base *me = (struct lockable_buffer_base *)video_gfx_getbuffer(self);
 	struct video_buffer *base = me->lbb_base;
-	self->vx_buffer = base; /* This is allowed! */
+	self->vx_surf.vs_buffer = base; /* This is allowed! */
 	return (*base->vb_ops->vi_initgfx)(self);
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 lockable_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
-	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)self->vx_buffer;
+	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)video_gfx_getbuffer(self);
 	struct video_buffer *base = me->lbb_base;
-	self->vx_flags = video_gfx_flag_combine(me->lbsb_gfx, self->vx_flags);
-	self->vx_buffer = base; /* This is allowed! */
+	self->vx_surf.vs_buffer = base; /* This is allowed! */
 	self = (*base->vb_ops->vi_initgfx)(self);
 	/* Set clip rect to our relevant sub-region */
 	return video_gfx_clip(self, me->lbsb_xoff, me->lbsb_yoff,
@@ -706,9 +734,9 @@ lockable_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 lockable_buffer__updategfx(struct video_gfx *__restrict self, unsigned int what) {
-	struct lockable_buffer_base *me = (struct lockable_buffer_base *)self->vx_buffer;
+	struct lockable_buffer_base *me = (struct lockable_buffer_base *)video_gfx_getbuffer(self);
 	struct video_buffer *base = me->lbb_base;
-	self->vx_buffer = base; /* This is allowed! */
+	self->vx_surf.vs_buffer = base; /* This is allowed! */
 	return (*base->vb_ops->vi_updategfx)(self, what);
 }
 
@@ -724,15 +752,11 @@ video_buffer_islockable(struct video_buffer const *__restrict self) {
 			goto yes;
 		if (self->vb_ops == &rambuffer_ops)
 			goto yes;
-		if (self->vb_ops == &rambuffer_xcodec_ops)
-			goto yes;
 		if (self->vb_ops == &rambuffer_subregion_ops)
 			goto yes;
 		if (self->vb_ops == &rambuffer_subsubregion_ops)
 			goto yes;
 		if (self->vb_ops == &rambuffer_formem_ops)
-			goto yes;
-		if (self->vb_ops == &rambuffer_formem_xcodec_ops)
 			goto yes;
 		if (self->vb_ops == &rambuffer_formem_subregion_ops)
 			goto yes;
@@ -820,11 +844,10 @@ libvideo_buffer_lockable(struct video_buffer *__restrict self) {
 	result->lbb_base  = self;
 	result->lbb_data  = NULL;
 	result->lbb_edata = NULL;
-	if (result->vb_format.vf_pal)
-		video_palette_incref(result->vb_format.vf_pal);
 	DBG_memset(&result->lbb_stride, 0xcc, sizeof(result->lbb_stride));
 	LIST_INIT(&result->lb_subregion_list);
 	atomic_lock_init(&result->lb_subregion_lock);
+	__video_buffer_init_common(result);
 	return result;
 err:
 	return NULL;

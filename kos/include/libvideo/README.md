@@ -62,10 +62,6 @@ Abstraction between `video_monitor` and `video_window`:
 	- A `video_window` is resized, moved, becomes overlapped, ...
 - Indicate that LFB region was changed
 
-> struct video_format { };
-
-Combination of `struct video_codec` ([1..1]) and `struct video_palette` ([0..1])
-
 ---
 
 > struct video_codec { ... };

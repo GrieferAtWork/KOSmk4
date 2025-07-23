@@ -112,7 +112,7 @@ LOCAL_libvideo_swblitter_blit_rdwrap(LOCAL_struct_video_blitter const *__restric
 	video_dim_t src_maxsx = size_x; /* # of pixes after src_x before wrap */
 	video_dim_t src_maxsy = size_y; /* # of pixes after src_y before wrap */
 
-	if (src->vx_flags & VIDEO_GFX_F_XWRAP) {
+	if (video_gfx_getflags(src) & VIDEO_GFX_F_XWRAP) {
 		video_dim_t dst_endx;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -153,7 +153,7 @@ LOCAL_libvideo_swblitter_blit_rdwrap(LOCAL_struct_video_blitter const *__restric
 		src_maxsx = src->vx_hdr.vxh_cxsiz - (video_coord_t)src_x;
 	}
 
-	if (src->vx_flags & VIDEO_GFX_F_YWRAP) {
+	if (video_gfx_getflags(src) & VIDEO_GFX_F_YWRAP) {
 		video_dim_t dst_endy;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -226,8 +226,8 @@ LOCAL_libvideo_swblitter_blit_rdwrap(LOCAL_struct_video_blitter const *__restric
 		 * NOTE: Don't convert the entire "src" buffer; only the rect that will
 		 *       be accessed below needs to be copied! */
 		if ((size_x > src->vx_hdr.vxh_cxsiz || size_y > src->vx_hdr.vxh_cysiz) &&
-		    (src->vx_buffer->vb_format.vf_codec != dst->vx_buffer->vb_format.vf_codec ||
-		     src->vx_buffer->vb_format.vf_pal != dst->vx_buffer->vb_format.vf_pal)) {
+		    (src->vx_surf.vs_buffer->vb_format.vbf_codec != dst->vx_surf.vs_buffer->vb_format.vbf_codec ||
+		     src->vx_surf.vs_buffer->vb_format.vbf_pal != dst->vx_surf.vs_buffer->vb_format.vbf_pal)) {
 			/* TODO */
 		}
 #endif /* !LOCAL_USE_SWBLITTER3 */
@@ -356,7 +356,7 @@ LOCAL_libvideo_swblitter_stretch_rdwrap(LOCAL_struct_video_blitter const *__rest
 	video_dim_t src_maxsx = src_size_x; /* # of pixes after src_x before wrap */
 	video_dim_t src_maxsy = src_size_y; /* # of pixes after src_y before wrap */
 
-	if (src->vx_flags & VIDEO_GFX_F_XWRAP) {
+	if (video_gfx_getflags(src) & VIDEO_GFX_F_XWRAP) {
 		video_dim_t dst_endx;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -409,7 +409,7 @@ LOCAL_libvideo_swblitter_stretch_rdwrap(LOCAL_struct_video_blitter const *__rest
 		src_maxsx = src->vx_hdr.vxh_cxsiz - (video_coord_t)src_x;
 	}
 
-	if (src->vx_flags & VIDEO_GFX_F_YWRAP) {
+	if (video_gfx_getflags(src) & VIDEO_GFX_F_YWRAP) {
 		video_dim_t dst_endy;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -500,8 +500,8 @@ LOCAL_libvideo_swblitter_stretch_rdwrap(LOCAL_struct_video_blitter const *__rest
 		 * NOTE: Don't convert the entire "src" buffer; only the rect that will
 		 *       be accessed below needs to be copied! */
 		if ((src_size_x > src->vx_hdr.vxh_cxsiz || src_size_y > src->vx_hdr.vxh_cysiz) &&
-		    (src->vx_buffer->vb_format.vf_codec != dst->vx_buffer->vb_format.vf_codec ||
-		     src->vx_buffer->vb_format.vf_pal != dst->vx_buffer->vb_format.vf_pal)) {
+		    (src->vx_surf.vs_buffer->vb_format.vbf_codec != dst->vx_surf.vs_buffer->vb_format.vbf_codec ||
+		     src->vx_surf.vs_buffer->vb_format.vbf_pal != dst->vx_surf.vs_buffer->vb_format.vbf_pal)) {
 			/* TODO */
 		}
 #endif /* !LOCAL_USE_SWBLITTER3 */
@@ -715,7 +715,7 @@ LOCAL_libvideo_swblitter_blit_wrap(LOCAL_struct_video_blitter const *__restrict 
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = size_x;
 	video_dim_t yinb = size_y;
-	if (dst->vx_flags & VIDEO_GFX_F_XWRAP) {
+	if (video_gfx_getflags(dst) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
 		dst_x = wrap(dst_x, dst->vx_hdr.vxh_cxsiz);
 		if (size_x > dst->vx_hdr.vxh_cxsiz)
@@ -727,7 +727,7 @@ LOCAL_libvideo_swblitter_blit_wrap(LOCAL_struct_video_blitter const *__restrict 
 			xinb = dst->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
 		}
 	}
-	if (dst->vx_flags & VIDEO_GFX_F_YWRAP) {
+	if (video_gfx_getflags(dst) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
 		dst_y = wrap(dst_y, dst->vx_hdr.vxh_cysiz);
 		if (size_y > dst->vx_hdr.vxh_cysiz)
@@ -778,7 +778,7 @@ LOCAL_libvideo_swblitter_stretch_wrap(LOCAL_struct_video_blitter const *__restri
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = dst_size_x;
 	video_dim_t yinb = dst_size_y;
-	if (dst->vx_flags & VIDEO_GFX_F_XWRAP) {
+	if (video_gfx_getflags(dst) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
 		dst_x = wrap(dst_x, dst->vx_hdr.vxh_cxsiz);
 		if (dst_size_x > dst->vx_hdr.vxh_cxsiz) {
@@ -792,7 +792,7 @@ LOCAL_libvideo_swblitter_stretch_wrap(LOCAL_struct_video_blitter const *__restri
 			xinb = dst->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
 		}
 	}
-	if (dst->vx_flags & VIDEO_GFX_F_YWRAP) {
+	if (video_gfx_getflags(dst) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
 		dst_y = wrap(dst_y, dst->vx_hdr.vxh_cysiz);
 		if (dst_size_y > dst->vx_hdr.vxh_cysiz) {
@@ -858,7 +858,7 @@ LOCAL_libvideo_swblitter_blit_rdwrap1(LOCAL_struct_video_blitter const *__restri
 	video_dim_t dst_maxsx = size_x; /* # of pixes after dst_x before wrap */
 	video_dim_t dst_maxsy = size_y; /* # of pixes after dst_y before wrap */
 
-	if (dst->vx_flags & VIDEO_GFX_F_XWRAP) {
+	if (video_gfx_getflags(dst) & VIDEO_GFX_F_XWRAP) {
 		video_dim_t src_endx;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -895,7 +895,7 @@ LOCAL_libvideo_swblitter_blit_rdwrap1(LOCAL_struct_video_blitter const *__restri
 		dst_maxsx = dst->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
 	}
 
-	if (dst->vx_flags & VIDEO_GFX_F_YWRAP) {
+	if (video_gfx_getflags(dst) & VIDEO_GFX_F_YWRAP) {
 		video_dim_t src_endy;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -1064,7 +1064,7 @@ LOCAL_libvideo_swblitter_stretch_rdwrap1(LOCAL_struct_video_blitter const *__res
 	video_dim_t dst_maxsx = dst_size_x; /* # of pixes after dst_x before wrap */
 	video_dim_t dst_maxsy = dst_size_y; /* # of pixes after dst_y before wrap */
 
-	if (dst->vx_flags & VIDEO_GFX_F_XWRAP) {
+	if (video_gfx_getflags(dst) & VIDEO_GFX_F_XWRAP) {
 		video_dim_t out_endx;
 		/* Do some  preliminary clamping  on output  coords.
 		 * This is needed so we can properly calculate tiled
@@ -1093,7 +1093,7 @@ LOCAL_libvideo_swblitter_stretch_rdwrap1(LOCAL_struct_video_blitter const *__res
 		dst_maxsx = dst->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
 	}
 
-	if (dst->vx_flags & VIDEO_GFX_F_YWRAP) {
+	if (video_gfx_getflags(dst) & VIDEO_GFX_F_YWRAP) {
 		video_dim_t out_endy;
 		/* Do some  preliminary clamping  on output  coords.
 		 * This is needed so we can properly calculate tiled
@@ -1345,7 +1345,7 @@ LOCAL_libvideo_swblitter_blit_wrap1(LOCAL_struct_video_blitter const *__restrict
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = size_x;
 	video_dim_t yinb = size_y;
-	if (out->vx_flags & VIDEO_GFX_F_XWRAP) {
+	if (video_gfx_getflags(out) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
 		out_x = wrap(out_x, out->vx_hdr.vxh_cxsiz);
 		if (size_x > out->vx_hdr.vxh_cxsiz)
@@ -1357,7 +1357,7 @@ LOCAL_libvideo_swblitter_blit_wrap1(LOCAL_struct_video_blitter const *__restrict
 			xinb = out->vx_hdr.vxh_cxsiz - (video_coord_t)out_x;
 		}
 	}
-	if (out->vx_flags & VIDEO_GFX_F_YWRAP) {
+	if (video_gfx_getflags(out) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
 		out_y = wrap(out_y, out->vx_hdr.vxh_cysiz);
 		if (size_y > out->vx_hdr.vxh_cysiz)
@@ -1393,7 +1393,7 @@ LOCAL_libvideo_swblitter_stretch_wrap1(LOCAL_struct_video_blitter const *__restr
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = dst_size_x;
 	video_dim_t yinb = dst_size_y;
-	if (out->vx_flags & VIDEO_GFX_F_XWRAP) {
+	if (video_gfx_getflags(out) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
 		out_x = wrap(out_x, out->vx_hdr.vxh_cxsiz);
 		if (dst_size_x > out->vx_hdr.vxh_cxsiz) {
@@ -1407,7 +1407,7 @@ LOCAL_libvideo_swblitter_stretch_wrap1(LOCAL_struct_video_blitter const *__restr
 			xinb = out->vx_hdr.vxh_cxsiz - (video_coord_t)out_x;
 		}
 	}
-	if (out->vx_flags & VIDEO_GFX_F_YWRAP) {
+	if (video_gfx_getflags(out) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
 		out_y = wrap(out_y, out->vx_hdr.vxh_cysiz);
 		if (dst_size_y > out->vx_hdr.vxh_cysiz) {

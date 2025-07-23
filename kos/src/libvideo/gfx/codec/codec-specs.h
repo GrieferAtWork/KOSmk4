@@ -35,7 +35,7 @@ DECL_BEGIN
  * is  done via `specs', as opposed to the  caller having to provide the codec's ID.
  *
  * NOTE: This function doesn't need `vcs_pxsz' or `vcs_cbits' to be initialized. */
-INTDEF WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *FCC
+INTDEF WUNUSED ATTR_PURE ATTR_IN(1) struct video_codec *FCC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs);
 
 /* Same as `video_codec_lookup_specs()', but can also be used to construct
@@ -53,9 +53,8 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs);
  * @return: NULL: [EINVAL] Impossible codec
  * @return: NULL: [ENOMEM] Out-of-memory
  * @return: NULL: [*] Error */
-INTDEF WUNUSED NONNULL((1, 2)) struct video_codec const *FCC
-libvideo_codec_fromspecs(struct video_codec_specs const *__restrict specs,
-                         /*out*/ REF struct video_codec_handle **__restrict p_handle);
+INTDEF WUNUSED ATTR_IN(1) REF struct video_codec *FCC
+libvideo_codec_fromspecs(struct video_codec_specs const *__restrict specs);
 
 DECL_END
 

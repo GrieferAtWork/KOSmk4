@@ -31,13 +31,14 @@
 
 #include <assert.h>
 #include <atomic.h>
+#include <errno.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <string.h>
 
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/buffer.h>
-#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/codec/palette.h>
 
 #include "anim.h"
@@ -139,12 +140,12 @@ struct cached_frame {
 };
 
 struct cached_anim: video_anim {
-	struct shared_lock       ca_lock;   /* Lock for the cache */
-	video_anim_frame_id      ca_framec; /* [if(!ca_base, [>= 1])][const_if(!ca_base)][lock(ca_lock)] # of cached frames */
-	struct cached_frame     *ca_framev; /* [0..ca_framec][const_if(!ca_base)][owned][lock(ca_lock)] # Cached frames */
-	struct video_format      ca_fmt;    /* [lock(ca_lock)] Video format override for caches (unused when `.vf_codec' is `NULL') */
-	REF struct video_anim   *ca_base;   /* [0..1][lock(WRITE(ca_lock && CLEAR_ONCE), READ(ca_lock || ATOMIC))] Base animation, or "NULL" once fully cached */
-	struct video_anim_frame *ca_bbuf;   /* [0..1][owned][lock(ca_lock)] Base animation work buffer, or "NULL" if not loaded or done */
+	struct shared_lock         ca_lock;   /* Lock for the cache */
+	video_anim_frame_id        ca_framec; /* [if(!ca_base, [>= 1])][const_if(!ca_base)][lock(ca_lock)] # of cached frames */
+	struct cached_frame       *ca_framev; /* [0..ca_framec][const_if(!ca_base)][owned][lock(ca_lock)] # Cached frames */
+	struct video_buffer_format ca_fmt;    /* [lock(ca_lock)] Video format override for caches (unused when `.vbf_codec' is `NULL') */
+	REF struct video_anim     *ca_base;   /* [0..1][lock(WRITE(ca_lock && CLEAR_ONCE), READ(ca_lock || ATOMIC))] Base animation, or "NULL" once fully cached */
+	struct video_anim_frame   *ca_bbuf;   /* [0..1][owned][lock(ca_lock)] Base animation work buffer, or "NULL" if not loaded or done */
 };
 
 PRIVATE NONNULL((1)) void CC
@@ -153,8 +154,10 @@ cached_anim_destroy(struct video_anim *__restrict self) {
 	struct cached_anim *me = (struct cached_anim *)self;
 	for (i = 0; i < me->ca_framec; ++i)
 		video_buffer_decref(me->ca_framev[i].cf_frame);
-	if (me->ca_fmt.vf_pal)
-		video_palette_decref(me->ca_fmt.vf_pal);
+	if (me->ca_fmt.vbf_pal)
+		video_palette_decref(me->ca_fmt.vbf_pal);
+	if (me->ca_fmt.vbf_codec)
+		video_codec_decref(me->ca_fmt.vbf_codec);
 	if (me->ca_base)
 		video_anim_decref(me->ca_base);
 	if (me->ca_bbuf) {
@@ -169,7 +172,7 @@ PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(2) int CC
 cached_anim_firstframe(struct video_anim const *__restrict self,
                        struct video_anim_frame *__restrict frame) {
 	struct cached_frame *cframe;
-	struct video_format *frame_format;
+	struct video_buffer_format const *frame_format;
 	struct cached_anim *me = (struct cached_anim *)self;
 
 	/* Check for special case: animation was already fully loaded */
@@ -210,7 +213,7 @@ cached_anim_firstframe(struct video_anim const *__restrict self,
 	cframe->cf_showfor  = me->ca_bbuf->vaf_showfor;
 	cframe->cf_colorkey = me->ca_bbuf->vaf_colorkey;
 	frame_format = &me->ca_bbuf->vaf_frame->vb_format;
-	if (me->ca_fmt.vf_codec)
+	if (me->ca_fmt.vbf_codec)
 		frame_format = &me->ca_fmt;
 	cframe->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf->vaf_frame, me->va_domain, frame_format);
 	if unlikely(!cframe->cf_frame)
@@ -245,7 +248,7 @@ err_lock:
 PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) int CC
 cached_anim_nextframe(struct video_anim const *__restrict self,
                       struct video_anim_frame *__restrict frame) {
-	struct video_format *frame_format;
+	struct video_buffer_format const *frame_format;
 	struct cached_frame *cframe;
 	struct cached_anim *me = (struct cached_anim *)self;
 	video_anim_frame_id next_id = frame->vaf_frameid + 1;
@@ -345,7 +348,7 @@ return_next_cached_frame:
 
 	/* Convert output buffer formats. */
 	frame_format = &me->ca_bbuf->vaf_frame->vb_format;
-	if (me->ca_fmt.vf_codec)
+	if (me->ca_fmt.vbf_codec)
 		frame_format = &me->ca_fmt;
 	cframe->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf->vaf_frame, me->va_domain, frame_format);
 	if unlikely(!cframe->cf_frame) {
@@ -412,7 +415,7 @@ DEFINE_PUBLIC_ALIAS(video_anim_cached, libvideo_anim_cached);
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) REF struct video_anim *CC
 libvideo_anim_cached(struct video_anim *__restrict self,
                      struct video_domain const *domain,
-                     struct video_format const *format) {
+                     struct video_buffer_format const *format) {
 	REF struct cached_anim *result;
 	if (domain == NULL)
 		domain = self->va_domain;
@@ -421,9 +424,8 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 		struct cached_anim *me = (struct cached_anim *)self;
 		if (format == NULL)
 			format = &me->ca_fmt;
-		if (format->vf_codec == me->ca_fmt.vf_codec &&
-		    format->vf_pal == me->ca_fmt.vf_pal &&
-		    me->va_domain == domain) {
+		if (me->va_domain == domain &&
+		    video_buffer_format_equals(&me->ca_fmt, format)) {
 			video_anim_incref(me);
 			return me;
 		}
@@ -435,9 +437,8 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 		struct video_buffer *frame = me->ofa_frame;
 		if (format == NULL)
 			format = &frame->vb_format;
-		if (frame->vb_format.vf_codec == format->vf_codec &&
-		    frame->vb_format.vf_pal == format->vf_pal &&
-		    frame->vb_domain == domain) {
+		if (frame->vb_domain == domain &&
+		    video_buffer_format_equals(&frame->vb_format, format)) {
 			video_anim_incref(me);
 			return me;
 		}
@@ -460,17 +461,29 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 	shared_lock_init(&result->ca_lock);
 	result->ca_framec = 0;
 	result->ca_framev = NULL;
-	result->ca_fmt.vf_codec = NULL;
-	result->ca_fmt.vf_pal   = NULL;
+	result->ca_fmt.vbf_codec = NULL;
+	result->ca_fmt.vbf_pal   = NULL;
+	result->ca_fmt.vbf_flags = 0;
 	if (format) {
-		if (format->vf_pal)
-			video_palette_incref(format->vf_pal);
 		result->ca_fmt = *format;
+		if (result->ca_fmt.vbf_pal) {
+			if (result->ca_fmt.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+				video_palette_incref(result->ca_fmt.vbf_pal);
+			} else {
+				result->ca_fmt.vbf_pal = NULL;
+			}
+		} else if (result->ca_fmt.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+			errno = EINVAL;
+			goto err_r;
+		}
+		video_codec_incref(result->ca_fmt.vbf_codec);
 	}
 	video_anim_incref(self);
 	result->ca_base = self;
 	result->ca_bbuf = NULL;
 	return result;
+err_r:
+	free(result);
 err:
 	return NULL;
 }

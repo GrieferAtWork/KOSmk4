@@ -40,9 +40,6 @@
 #include <libvideo/color.h>
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
-#include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
-#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
@@ -61,7 +58,6 @@ DECL_BEGIN
 /************************************************************************/
 /* RAM DOMAIN                                                           */
 /************************************************************************/
-struct video_codec_handle;
 struct video_buffer_dummy;
 
 struct video_rambuffer_subregion;
@@ -79,10 +75,6 @@ struct video_rambuffer: video_rambuffer_base { /* vb_ops == &rambuffer_ops */
 #define _video_rambuffer_init(self)          \
 	(LIST_INIT(&(self)->rb_subregions_list), \
 	 atomic_lock_init(&(self)->rb_subregions_lock))
-
-struct video_rambuffer_xcodec: video_rambuffer { /* vb_ops == &rambuffer_xcodec_ops */
-	REF struct video_codec_handle *rbxc_codec;   /* [1..1][const] Codec handle */
-};
 
 struct video_rambuffer_revokable_gfx {
 	__REGISTER_TYPE__ rbrvg_inuse;  /* [lock(ATOMIC)] Non-zero while `rbrv_data' is being accessed */
@@ -103,7 +95,6 @@ struct video_rambuffer_revokable_subregion;
 LIST_HEAD(video_rambuffer_revokable_subregion_list, video_rambuffer_revokable_subregion);
 struct /*abstract*/ video_rambuffer_revokable_subregion: video_rambuffer_revokable {
 	video_coord_t                                   rbrvsr_xoff;   /* [const] Extra X-offset added to all pixel coords */
-	video_gfx_flag_t                                rbrvsr_xflags; /* [const] Flags to XOR with `video_gfx::vx_flags' during `video_buffer_getgfx()' */
 	LIST_ENTRY(video_rambuffer_revokable_subregion) rbrvsr_chain;  /* [lock([:rbsr_base,:rbssr_base,:rbfmsr_base]->rb_subregions_lock)] Link in chain of sub-regions of base */
 	struct video_rambuffer_revokable_subregion_list rbrvsr_subsubregions_list; /* [0..n][lock(rbrvsr_subsubregions_lock)] List of sub-subregions */
 	struct atomic_lock                              rbrvsr_subsubregions_lock; /* Lock for `rbrvsr_subsubregions_list' */
@@ -126,10 +117,6 @@ struct video_rambuffer_formem: video_rambuffer_revokable { /* vb_ops == &rambuff
 	struct atomic_lock                           rbfm_subregions_lock; /* Lock for `rbfm_subregions_list' */
 };
 
-struct video_rambuffer_formem_xcodec: video_rambuffer_formem { /* vb_ops == &rambuffer_formem_xcodec_ops */
-	REF struct video_codec_handle *rbfmxc_codec; /* [1..1][const] Codec handle */
-};
-
 struct video_rambuffer_formem_subregion: video_rambuffer_revokable_subregion { /* vb_ops == &rambuffer_formem_subregion_ops || vb_ops == &rambuffer_formem_subregion_xoff_ops */
 	REF struct video_rambuffer_formem *rbfmsr_base; /* [0..1][lock(ATOMIC && CLEAR_ONCE)] Underlying base buffer */
 };
@@ -139,24 +126,20 @@ struct video_rambuffer_formem_subregion: video_rambuffer_revokable_subregion { /
  * NOTE: None of these ever look at `video_buffer::vb_domain',
  *       so you're free to  re-use these at the  driver-level! */
 INTDEF struct video_buffer_ops rambuffer_ops;
-INTDEF struct video_buffer_ops rambuffer_xcodec_ops;
 INTDEF struct video_buffer_ops rambuffer_subregion_ops;
 INTDEF struct video_buffer_ops rambuffer_subregion_xoff_ops;
 INTDEF struct video_buffer_ops rambuffer_subsubregion_ops;
 INTDEF struct video_buffer_ops rambuffer_subsubregion_xoff_ops;
 INTDEF struct video_buffer_ops rambuffer_formem_ops;
-INTDEF struct video_buffer_ops rambuffer_formem_xcodec_ops;
 INTDEF struct video_buffer_ops rambuffer_formem_subregion_ops;
 INTDEF struct video_buffer_ops rambuffer_formem_subregion_xoff_ops;
 
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_xcodec_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_subregion_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_subregion_xoff_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_subsubregion_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_subsubregion_xoff_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_formem_ops(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_formem_xcodec_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_formem_subregion_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_formem_subregion_xoff_ops(void);
 
@@ -167,11 +150,9 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_form
 
 /* DESTROY */
 INTDEF NONNULL((1)) void FCC rambuffer__destroy(struct video_buffer *__restrict self);
-INTDEF NONNULL((1)) void FCC rambuffer_xcodec__destroy(struct video_buffer *__restrict self);
 INTDEF NONNULL((1)) void FCC rambuffer_subregion__destroy(struct video_buffer *__restrict self);
 INTDEF NONNULL((1)) void FCC rambuffer_subsubregion__destroy(struct video_buffer *__restrict self);
 INTDEF NONNULL((1)) void FCC rambuffer_formem__destroy(struct video_buffer *__restrict self);
-INTDEF NONNULL((1)) void FCC rambuffer_formem_xcodec__destroy(struct video_buffer *__restrict self);
 INTDEF NONNULL((1)) void FCC rambuffer_formem_subregion__destroy(struct video_buffer *__restrict self);
 
 /* REVOKE+SUBREGION */
@@ -180,11 +161,11 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC rambuffer_
 #define rambuffer_subsubregion__revoke rambuffer_subregion__revoke
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC rambuffer_formem__revoke)(struct video_buffer *__restrict self);
 #define rambuffer_formem_subregion__revoke rambuffer_subregion__revoke
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t gfx_flags);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t gfx_flags);
+INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
+INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_subregion__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
 #define rambuffer_subsubregion__subregion rambuffer_subregion__subregion
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_formem__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t gfx_flags);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_formem_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t gfx_flags);
+INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_formem__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
+INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_formem_subregion__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
 
 /* LOCK */
 INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC rambuffer__lock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
@@ -203,7 +184,6 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable__
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable__updategfx(struct video_gfx *__restrict self, unsigned int what);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable_xoff__initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable_xoff__updategfx(struct video_gfx *__restrict self, unsigned int what);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_subregion__initgfx(struct video_gfx *__restrict self);
 
 /* Helpers for setting video buffer operators for ram-buffer-compatible buffers */
 
@@ -235,8 +215,8 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_subregion__
 #define video_ramgfx_getcdrv_common(self) \
 	((struct gfx_ramdrv_common const *)(self)->_vx_driver)
 struct gfx_ramdrv_common: gfx_swdrv {
-	struct video_format const *grdc_format; /* [const][== &((struct video_rambuffer *):vx_buffer)->vb_format] */
-	size_t                     grdc_stride; /* [const][== ((struct video_rambuffer *):vx_buffer)->rb_stride] */
+	struct video_codec const *grdc_codec;  /* [const][== video_gfx_getcodec(:this)] */
+	size_t                    grdc_stride; /* [const][== ((struct video_rambuffer *)video_gfx_getbuffer(:this))->rb_stride] */
 };
 
 #define video_ramgfx_getdrv(self) \
@@ -244,7 +224,7 @@ struct gfx_ramdrv_common: gfx_swdrv {
 #define video_ramgfx_getcdrv(self) \
 	((struct gfx_ramdrv const *)(self)->_vx_driver)
 struct gfx_ramdrv: gfx_ramdrv_common {
-	byte_t *grd_data;   /* [const][== ((struct video_rambuffer *):vx_buffer)->rb_data] */
+	byte_t *grd_data;   /* [const][== ((struct video_rambuffer *):vx_surf.vs_buffer)->rb_data] */
 };
 
 #define video_ramgfx_getdrv_revokable(self) \
@@ -252,7 +232,7 @@ struct gfx_ramdrv: gfx_ramdrv_common {
 #define video_ramgfx_getcdrv_revokable(self) \
 	((struct gfx_ramdrv_revokable const *)(self)->_vx_driver)
 struct gfx_ramdrv_revokable: gfx_ramdrv_common {
-	struct video_rambuffer_revokable_gfx *grdrv_gfx; /* [const][== &((struct video_rambuffer_revokable *):vx_buffer)->rbrv_gfx] */
+	struct video_rambuffer_revokable_gfx *grdrv_gfx; /* [const][== &((struct video_rambuffer_revokable *):vx_surf.vs_buffer)->rbrv_gfx] */
 };
 
 #define video_ramgfx_getdrv_revokable_xoff(self) \
@@ -260,15 +240,12 @@ struct gfx_ramdrv_revokable: gfx_ramdrv_common {
 #define video_ramgfx_getcdrv_revokable_xoff(self) \
 	((struct gfx_ramdrv_revokable_xoff const *)(self)->_vx_driver)
 struct gfx_ramdrv_revokable_xoff: gfx_ramdrv_revokable {
-	video_coord_t grdrvx_xoff; /* [const][== &((struct video_rambuffer_revokable_subregion *):vx_buffer)->rbrvsr_xoff] */
+	video_coord_t grdrvx_xoff; /* [const][== &((struct video_rambuffer_revokable_subregion *):vx_surf.vs_buffer)->rbrvsr_xoff] */
 };
 
-INTDEF ATTR_IN(1) video_color_t CC ramgfx__getcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
-INTDEF ATTR_IN(1) video_color_t CC ramgfx__getcolor_withkey(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
-INTDEF ATTR_IN(1) video_color_t CC ramgfx_revokable__getcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
-INTDEF ATTR_IN(1) video_color_t CC ramgfx_revokable__getcolor_withkey(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
-INTDEF ATTR_IN(1) video_color_t CC ramgfx_revokable_xoff__getcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
-INTDEF ATTR_IN(1) video_color_t CC ramgfx_revokable_xoff__getcolor_withkey(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF ATTR_IN(1) video_color_t CC ramgfx__getcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF ATTR_IN(1) video_color_t CC ramgfx_revokable__getcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF ATTR_IN(1) video_color_t CC ramgfx_revokable_xoff__getcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF ATTR_IN(1) void CC ramgfx__putcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 INTDEF ATTR_IN(1) void CC ramgfx__putcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 INTDEF ATTR_IN(1) void CC ramgfx_revokable__putcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
@@ -317,30 +294,17 @@ INTDEF ATTR_IN(1) void CC ramgfx_revokable_xoff__setpixel32(struct video_gfx con
 
 
 
-
-
-INTDEF WUNUSED ATTR_IN(4) NONNULL((1)) REF struct video_buffer *CC
+INTDEF WUNUSED NONNULL((1)) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
-                             video_dim_t xdim, video_dim_t ydim,
-                             struct video_format const *format,
-                             unsigned int flags);
-INTDEF WUNUSED ATTR_IN(4) NONNULL((1)) REF struct video_buffer *CC
-libvideo_ramdomain_newbuffer_ex(struct video_domain const *__restrict self,
-                                video_dim_t xdim, video_dim_t ydim,
-                                struct video_codec_specs const *__restrict codec_specs,
-                                struct video_palette *palette, unsigned int flags);
-INTDEF WUNUSED ATTR_IN(4) NONNULL((1, 5)) REF struct video_buffer *CC
-libvideo_ramdomain_formem(struct video_domain const *__restrict self, video_dim_t xdim, video_dim_t ydim,
-                          struct video_format const *format, void *mem, size_t stride,
+                             struct video_buffer_format const *__restrict format,
+                             video_dim_t xdim, video_dim_t ydim, unsigned int flags);
+INTDEF WUNUSED NONNULL((1, 5)) ATTR_IN(2) REF struct video_buffer *CC
+libvideo_ramdomain_formem(struct video_domain const *__restrict self,
+                          struct video_buffer_format const *__restrict format,
+                          video_dim_t xdim, video_dim_t ydim, void *mem, size_t stride,
                           void (CC *release_mem)(void *cookie, void *mem),
                           void *release_mem_cookie, unsigned int flags);
-INTDEF WUNUSED ATTR_IN(4) NONNULL((1, 6)) REF struct video_buffer *CC
-libvideo_ramdomain_formem_ex(struct video_domain const *__restrict self, video_dim_t xdim, video_dim_t ydim,
-                             struct video_codec_specs const *__restrict codec_specs,
-                             struct video_palette *palette, void *mem, size_t stride,
-                             void (CC *release_mem)(void *cookie, void *mem),
-                             void *release_mem_cookie, unsigned int flags);
-INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(2) NONNULL((1)) struct video_codec const *CC
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(2) NONNULL((1)) struct video_codec *CC
 libvideo_ramdomain_supported_codec(struct video_domain const *__restrict self,
                                    struct video_codec const *__restrict codec);
 /************************************************************************/

@@ -41,8 +41,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface.h>
 
 #include "gfx-empty.h"
 #include "gfx-utils.h"
@@ -116,8 +116,8 @@ INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
 libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	struct video_gfx const *src_gfx = ctx->vbt_src;
 	struct video_gfx const *dst_gfx = ctx->vbt_dst;
-	struct video_buffer const *src_buffer = src_gfx->vx_buffer;
-	struct video_buffer const *dst_buffer = dst_gfx->vx_buffer;
+	struct video_buffer const *src_buffer = src_gfx->vx_surf.vs_buffer;
+	struct video_buffer const *dst_buffer = dst_gfx->vx_surf.vs_buffer;
 	struct blt_swdrv *drv = video_swblitter_getdrv(ctx);
 	video_swblitter_setops(ctx);
 
@@ -125,14 +125,14 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	if (video_gfx_getclipw(src_gfx) == 0 || video_gfx_getcliph(src_gfx) == 0) {
 		ctx->vbt_ops = &libvideo_emptyblitter_ops;
 	} else if (src_buffer == dst_buffer) {
-		if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+		if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
 			drv->bsw_stretch         = &libvideo_swblitter_samebuf__stretch_l;
 			drv->bsw_stretch_imatrix = &libvideo_swblitter_samebuf__stretch_imatrix_l;
 		} else {
 			drv->bsw_stretch         = &libvideo_swblitter_samebuf__stretch_n;
 			drv->bsw_stretch_imatrix = &libvideo_swblitter_samebuf__stretch_imatrix_n;
 		}
-		if (VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey) &&
+		if (VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_surf.vs_colorkey) &&
 		    libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
 			drv->bsw_blit         = &libvideo_swblitter_noblend_samebuf__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samebuf__blit_imatrix;
@@ -145,18 +145,18 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			drv->bsw_blit_imatrix = &libvideo_swblitter_samebuf__blit_imatrix;
 		}
 	} else if (libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
-		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey))
+		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_surf.vs_colorkey))
 			goto set_generic_operators;
-		if (noblend_blit_compatible(dst_buffer->vb_format.vf_codec,
-		                            src_buffer->vb_format.vf_codec) &&
-		    src_buffer->vb_format.vf_pal == dst_buffer->vb_format.vf_pal) {
+		if (noblend_blit_compatible(dst_buffer->vb_format.vbf_codec,
+		                            src_buffer->vb_format.vbf_codec) &&
+		    src_buffer->vb_format.vbf_pal == dst_buffer->vb_format.vbf_pal) {
 			/* Special optimization when not doing any blending, and both GFX contexts
 			 * share the same codec: in this case,  we can try to directly copy  pixel
 			 * data, either through video locks, or by directly reading/writing pixels */
 			drv->bsw_blit         = &libvideo_swblitter_noblend_samefmt__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samefmt__blit_imatrix;
-			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
-				if (src_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+			if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
+				if (src_buffer->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
 					drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt_interp8888__stretch_l;
 					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt_interp8888__stretch_imatrix_l;
 				} else {
@@ -172,12 +172,12 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			 * share the same codec: in this case,  we can try to directly copy  pixel
 			 * data, either through video locks, or by directly reading/writing pixels */
 			video_converter_init(libvideo_swblitter_generic__conv(ctx),
-			                     &src_buffer->vb_format,
-			                     &dst_buffer->vb_format);
+			                     video_gfx_getsurface(src_gfx),
+			                     video_gfx_getsurface(dst_gfx));
 			drv->bsw_blit         = &libvideo_swblitter_noblend_difffmt__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_difffmt__blit_imatrix;
-			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
-				if (src_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+			if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
+				if (src_buffer->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
 					drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt_interp8888__stretch_l;
 					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt_interp8888__stretch_imatrix_l;
 				} else {
@@ -193,7 +193,7 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 set_generic_operators:
 		drv->bsw_blit         = &libvideo_swblitter_generic__blit;
 		drv->bsw_blit_imatrix = &libvideo_swblitter_generic__blit_imatrix;
-		if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+		if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
 			drv->bsw_stretch         = &libvideo_swblitter_generic__stretch_l;
 			drv->bsw_stretch_imatrix = &libvideo_swblitter_generic__stretch_imatrix_l;
 		} else {
@@ -237,9 +237,9 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 		/* TODO: Special handling when buffers overlap */
 
 		/* Filter out contexts that prevent use of special optimizations */
-		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey))
+		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_surf.vs_colorkey))
 			goto set_generic_operators;
-		if (!VIDEO_COLOR_ISTRANSPARENT(rddst_gfx->vx_colorkey))
+		if (!VIDEO_COLOR_ISTRANSPARENT(rddst_gfx->vx_surf.vs_colorkey))
 			goto set_generic_operators;
 
 		/* Check for cases where we provide special optimizations */
@@ -247,7 +247,7 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 			/* Special optimization for likely case where "wrdst_gfx" doesn't do any blending */
 			drv->bsw3_blit         = &libvideo_swblitter3__blit__blend1;
 			drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__blend1;
-			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+			if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
 				drv->bsw3_stretch         = &libvideo_swblitter3__stretch__blend1_l;
 				drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__blend1_l;
 			} else {
@@ -256,17 +256,17 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 			}
 		} else if (GFX_BLENDMODE_GET_MODE(wrdst_gfx->vx_blend) == GFX_BLENDMODE_ALPHA &&
 		           GFX_BLENDMODE_GET_MODE(rddst_gfx->vx_blend) == GFX_BLENDMODE_ALPHAMASK &&
-		           rddst_gfx->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_A1_MSB) {
+		           rddst_gfx->vx_surf.vs_buffer->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_A1_MSB) {
 			/* Special optimization for bitmasked alpha-blending.
 			 * In this mode, only pixels masked by the given bitmask get blended
 			 * into the `wrdst_gfx' GFX, with all other pixels being left as-is. */
-			if (video_format_hasalpha(&src_gfx->vx_buffer->vb_format)) {
+			if (video_surface_hasalpha(video_gfx_getsurface(src_gfx))) {
 				/* With the source GFX featuring an alpha-channel, regular
 				 * alpha-blending  still  needs to  happen  in `wrdst_gfx'
 				 * (though only for pixels specified by the mask). */
 				drv->bsw3_blit         = &libvideo_swblitter3__blit__mask1msb;
 				drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__mask1msb;
-				if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+				if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
 					drv->bsw3_stretch         = &libvideo_swblitter3__stretch__mask1msb_l;
 					drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__mask1msb_l;
 				} else {
@@ -277,12 +277,12 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 				/* Since the source has no alpha, it always produces colors with A=255.
 				 * As such, the alpha-blending that happens in `wrdst_gfx' would  never
 				 * consider data from existing pixels, meaning blending can be skipped. */
-				if (src_gfx->vx_buffer->vb_format.vf_codec == wrdst_gfx->vx_buffer->vb_format.vf_codec &&
-				    src_gfx->vx_buffer->vb_format.vf_pal == wrdst_gfx->vx_buffer->vb_format.vf_pal) {
+				if (src_gfx->vx_surf.vs_buffer->vb_format.vbf_codec == wrdst_gfx->vx_surf.vs_buffer->vb_format.vbf_codec &&
+				    src_gfx->vx_surf.vs_buffer->vb_format.vbf_pal == wrdst_gfx->vx_surf.vs_buffer->vb_format.vbf_pal) {
 					/* Same-codec+pal -> don't have to convert between pixel formats */
 					drv->bsw3_blit         = &libvideo_swblitter3__blit__mask1msb_blend1_samefmt;
 					drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__mask1msb_blend1_samefmt;
-					if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+					if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
 						drv->bsw3_stretch         = &libvideo_swblitter3__stretch__mask1msb_blend1_samefmt_l;
 						drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__mask1msb_blend1_samefmt_l;
 					} else {
@@ -292,11 +292,11 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 				} else {
 					/* Different formats -> pixel format conversion still has to happen */
 					video_converter_init(libvideo_swblitter3_generic__conv(ctx),
-					                     &src_gfx->vx_buffer->vb_format,
-					                     &wrdst_gfx->vx_buffer->vb_format);
+					                     video_gfx_getsurface(src_gfx),
+					                     video_gfx_getsurface(wrdst_gfx));
 					drv->bsw3_blit         = &libvideo_swblitter3__blit__mask1msb_blend1_difffmt;
 					drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__mask1msb_blend1_difffmt;
-					if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+					if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
 						drv->bsw3_stretch         = &libvideo_swblitter3__stretch__mask1msb_blend1_difffmt_l;
 						drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__mask1msb_blend1_difffmt_l;
 					} else {
@@ -309,7 +309,7 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 set_generic_operators:
 			drv->bsw3_blit         = &libvideo_swblitter3__blit__generic;
 			drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__generic;
-			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+			if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
 				drv->bsw3_stretch         = &libvideo_swblitter3__stretch__generic_l;
 				drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__generic_l;
 			} else {

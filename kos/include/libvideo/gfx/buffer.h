@@ -35,12 +35,14 @@
 #include "../color.h"
 #include "../crect.h"
 #include "blend.h"
-#include "codec/format.h"
-#include "gfx.h"
+#include "gfx-flags.h"
 
-#ifdef __cplusplus
-#include <__stdcxx.h>
-#endif /* __cplusplus */
+#ifdef LIBVIDEO_GFX_EXPOSE_INTERNALS
+#ifndef __INTELLISENSE__
+#include "codec/codec.h"
+#include "codec/palette.h"
+#endif /* !__INTELLISENSE__ */
+#endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 
 /* Possible values for `video_domain_newbuffer()::__flags' */
 #define VIDEO_DOMAIN_NEWBUFFER_F_NORMAL 0x0000 /* Normal flags */
@@ -53,12 +55,30 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-struct video_format;
 struct video_gfx;
 struct video_domain;
 struct video_codec;
 struct video_palette;
+struct video_surface;
 struct video_rect;
+
+/* Descriptor for the format of a video buffer */
+struct video_buffer_format {
+	struct video_palette *vbf_pal;      /* [0..1][valid_if(vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)]
+	                                     * - Color palette (if needed by `vbf_codec')
+	                                     * - Set to "NULL" inside `struct video_buffer::vb_format' when unused */
+	struct video_codec   *vbf_codec;    /* [1..1] Video codec. */
+	video_gfx_flag_t      vbf_flags;    /* Default GFX flags */
+	video_pixel_t         vbf_colorkey; /* [valid_if(vbf_flags & VIDEO_GFX_F_COLORKEY)] Pixel value to skip during blits */
+};
+
+#define video_buffer_format_equals(a, b)                               \
+	((a)->vbf_codec == (b)->vbf_codec &&                               \
+	 (a)->vbf_flags == (b)->vbf_flags &&                               \
+	 ((a)->vbf_pal == (b)->vbf_pal ||                                  \
+	  !((a)->vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) && \
+	 ((a)->vbf_colorkey == (b)->vbf_colorkey ||                        \
+	  !((a)->vbf_flags & VIDEO_GFX_F_COLORKEY)))
 
 
 /* Video-domain: Low-level driver interface for creation of video buffers */
@@ -71,21 +91,16 @@ struct video_domain {
 	 * @param: __ydim:   Y Dimension
 	 * @param: __format: The used video format.
 	 * @param: __flags:  Set of `VIDEO_DOMAIN_NEWBUFFER_F_*'
-	 * @return: * :   The newly created video buffer
+	 * @return: * :      The newly created video buffer
 	 * @return: NULL: [errno=ENOMEM]  Insufficient memory (either regular RAM, or V-RAM)
-	 * @return: NULL: [errno=ENOTSUP] Given `__format->vf_codec'  is not  supported by  this
+	 * @return: NULL: [errno=ENOTSUP] Given `__format->vbf_codec' is  not supported by  this
 	 *                                domain (only `video_ramdomain()' supports all formats)
 	 * @return: NULL: [errno=*] Failed to construct video buffer for some other reason */
-	__ATTR_WUNUSED_T __ATTR_IN_T(4) __ATTR_NONNULL_T((1)) __REF struct video_buffer *
+	__ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ATTR_IN_T(2) __REF struct video_buffer *
 	(LIBVIDEO_GFX_CC *vd_newbuffer)(struct video_domain const *__restrict __self,
+	                                struct video_buffer_format const *__restrict __format,
 	                                video_dim_t __xdim, video_dim_t __ydim,
-	                                struct video_format const *__restrict __format,
 	                                unsigned int __flags);
-	__ATTR_WUNUSED_T __ATTR_IN_T(4) __ATTR_NONNULL_T((1)) __REF struct video_buffer *
-	(LIBVIDEO_GFX_CC *vd_newbuffer_ex)(struct video_domain const *__restrict __self,
-	                                   video_dim_t __xdim, video_dim_t __ydim,
-	                                   struct video_codec_specs const *__restrict __codec_specs,
-	                                   struct video_palette *__palette, unsigned int __flags);
 
 	/* Create  a video buffer  that interfaces with  a pre-existing buffer whose
 	 * base address is located at `mem' (which consists of `__stride * __size_y'
@@ -119,32 +134,27 @@ struct video_domain {
 	 * @return: * :   The newly created video buffer
 	 * @return: NULL: [errno=EINVAL] Given `stride' is too small for `codec' and `size_y'
 	 * @return: NULL: [errno=ENOMEM] Insufficient memory
-	 * @return: NULL: [errno=ENOTSUP] Given `__format->vf_codec'  is not  supported by  this
+	 * @return: NULL: [errno=ENOTSUP] Given `__format->vbf_codec' is  not supported by  this
 	 *                                domain (only `video_ramdomain()' supports all formats)
 	 * @return: NULL: [errno=EFAULT] `VIDEO_DOMAIN_FORMEM_F_SHARED' was given, but not supported by `__mem'
 	 * @return: NULL: [errno=*] Failed to construct video buffer for some other reason */
-	__ATTR_WUNUSED_T __ATTR_IN_T(4) __ATTR_NONNULL_T((1, 5)) __REF struct video_buffer *
-	(LIBVIDEO_GFX_CC *vd_formem)(struct video_domain const *__restrict __self, video_dim_t __xdim, video_dim_t __ydim,
-	                             struct video_format const *__format, void *__mem, __size_t __stride,
+	__ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 5)) __ATTR_IN_T(2) __REF struct video_buffer *
+	(LIBVIDEO_GFX_CC *vd_formem)(struct video_domain const *__restrict __self,
+	                             struct video_buffer_format const *__format,
+	                             video_dim_t __xdim, video_dim_t __ydim, void *__mem, __size_t __stride,
 	                             void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
 	                             void *__release_mem_cookie, unsigned int __flags);
-	__ATTR_WUNUSED_T __ATTR_IN_T(4) __ATTR_NONNULL_T((1, 6)) __REF struct video_buffer *
-	(LIBVIDEO_GFX_CC *vd_formem_ex)(struct video_domain const *__restrict __self, video_dim_t __xdim, video_dim_t __ydim,
-	                                struct video_codec_specs const *__restrict __codec_specs,
-	                                struct video_palette *__palette, void *__mem, __size_t __stride,
-	                                void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
-	                                void *__release_mem_cookie, unsigned int __flags);
 
 	/* Return the closest (by criteria of features and appearance) supported codec to "__codec"
 	 * This  function never returns `NULL', even if the domain only supports a single codec, in
 	 * which case this function simply always returns that codec.
 	 *
 	 * HINT: `video_ramdomain()' implements this function by always re-returning `__codec' */
-	__ATTR_RETNONNULL_T __ATTR_WUNUSED_T __ATTR_IN_T(2) __ATTR_NONNULL_T((1)) struct video_codec const *
+	__ATTR_RETNONNULL_T __ATTR_WUNUSED_T __ATTR_IN_T(2) __ATTR_NONNULL_T((1)) struct video_codec *
 	(LIBVIDEO_GFX_CC *vd_supported_codec)(struct video_domain const *__restrict __self,
 	                                      struct video_codec const *__restrict __codec);
 
-	void (*_vd_pad[11])(void); /* Reserved for future expansion */
+	void (*_vd_pad[13])(void); /* Reserved for future expansion */
 
 	/* TODO: Function for getting memory usage (for the ram-domain,
 	 *       just return regular ram usage info as per `sysinfo(2)) */
@@ -182,19 +192,14 @@ struct video_domain const *LIBVIDEO_GFX_CC video_ramdomain(void);
  * @param: __flags:  Set of `VIDEO_DOMAIN_NEWBUFFER_F_*'
  * @return: * :   The newly created video buffer
  * @return: NULL: [errno=ENOMEM]  Insufficient memory (either regular RAM, or V-RAM)
- * @return: NULL: [errno=ENOTSUP] Given `__format->vf_codec'  is not  supported by  this
+ * @return: NULL: [errno=ENOTSUP] Given `__format->vbf_codec' is  not supported by  this
  *                                domain (only `video_ramdomain()' supports all formats)
  * @return: NULL: [errno=*] Failed to construct video buffer for some other reason */
-extern __ATTR_WUNUSED __ATTR_IN(4) __ATTR_NONNULL((1)) __REF struct video_buffer *LIBVIDEO_GFX_CC
+extern __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_domain_newbuffer(struct video_domain const *__restrict __self,
+                       struct video_buffer_format const *__restrict __format,
                        video_dim_t __xdim, video_dim_t __ydim,
-                       struct video_format const *__restrict __format,
                        unsigned int __flags);
-extern __ATTR_WUNUSED __ATTR_IN(4) __ATTR_NONNULL((1)) __REF struct video_buffer *LIBVIDEO_GFX_CC
-video_domain_newbuffer_ex(struct video_domain const *__restrict __self,
-                          video_dim_t __xdim, video_dim_t __ydim,
-                          struct video_codec_specs const *__restrict __codec_specs,
-                          struct video_palette *__palette, unsigned int __flags);
 
 /* Create  a video buffer  that interfaces with  a pre-existing buffer whose
  * base address is located at `mem' (which consists of `__stride * __size_y'
@@ -228,39 +233,30 @@ video_domain_newbuffer_ex(struct video_domain const *__restrict __self,
  * @return: * :   The newly created video buffer
  * @return: NULL: [errno=EINVAL] Given `stride' is too small for `codec' and `size_y'
  * @return: NULL: [errno=ENOMEM] Insufficient memory
- * @return: NULL: [errno=ENOTSUP] Given `__format->vf_codec'  is not  supported by  this
+ * @return: NULL: [errno=ENOTSUP] Given `__format->vbf_codec' is  not supported by  this
  *                                domain (only `video_ramdomain()' supports all formats)
  * @return: NULL: [errno=EFAULT] `VIDEO_DOMAIN_FORMEM_F_SHARED' was given, but not supported by `__mem'
  * @return: NULL: [errno=*] Failed to construct video buffer for some other reason */
-extern __ATTR_WUNUSED __ATTR_IN(4) __ATTR_NONNULL((1, 5)) __REF struct video_buffer *LIBVIDEO_GFX_CC
-video_domain_formem(struct video_domain const *__restrict __self, video_dim_t __xdim, video_dim_t __ydim,
-                    struct video_format const *__format, void *__mem, __size_t __stride,
+extern __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_domain_formem(struct video_domain const *__restrict __self,
+                    struct video_buffer_format const *__format,
+                    video_dim_t __xdim, video_dim_t __ydim, void *__mem, __size_t __stride,
                     void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
                     void *__release_mem_cookie, unsigned int __flags);
-extern __ATTR_WUNUSED __ATTR_IN(4) __ATTR_NONNULL((1, 6)) __REF struct video_buffer *LIBVIDEO_GFX_CC
-video_domain_formem_ex(struct video_domain const *__restrict __self, video_dim_t __xdim, video_dim_t __ydim,
-                       struct video_codec_specs const *__restrict __codec_specs,
-                       struct video_palette *__palette, void *__mem, __size_t __stride,
-                       void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
-                       void *__release_mem_cookie, unsigned int __flags);
 
 /* Return the closest (by criteria of features and appearance) supported codec to "__codec"
  * This  function never returns `NULL', even if the domain only supports a single codec, in
  * which case this function simply always returns that codec.
  *
  * HINT: `video_ramdomain()' implements this function by always re-returning `__codec' */
-extern __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_NONNULL((1)) struct video_codec const *LIBVIDEO_GFX_CC
+extern __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_NONNULL((1)) struct video_codec *LIBVIDEO_GFX_CC
 video_domain_supported_codec(struct video_domain const *__restrict __self,
                              struct video_codec const *__restrict __codec);
 #else /* __INTELLISENSE__ */
 #define video_domain_newbuffer(self, xdim, ydim, format, flags) \
 	(*(self)->vd_newbuffer)(self, xdim, ydim, format, flags)
-#define video_domain_newbuffer_ex(self, xdim, ydim, codec_specs, palette, flags) \
-	(*(self)->vd_newbuffer_ex)(self, xdim, ydim, codec_specs, palette, flags)
 #define video_domain_formem(self, xdim, ydim, format, mem, stride, release_mem, release_mem_cookie, flags) \
 	(*(self)->vd_formem)(self, xdim, ydim, format, mem, stride, release_mem, release_mem_cookie, flags)
-#define video_domain_formem_ex(self, xdim, ydim, codec_specs, palette, mem, stride, release_mem, release_mem_cookie, flags) \
-	(*(self)->vd_formem_ex)(self, xdim, ydim, codec_specs, palette, mem, stride, release_mem, release_mem_cookie, flags)
 #define video_domain_supported_codec(self, codec) \
 	(*(self)->vd_supported_codec)(self, codec)
 #endif /* !__INTELLISENSE__ */
@@ -292,12 +288,12 @@ struct video_buffer_ops {
 
 	/* Initialize a graphics context for use with the linked buffer.
 	 * The caller  of this  operator must  have already  filled  in:
-	 * - __self->vx_buffer  (with the buffer on which this operator is then called)
+	 * - __self->vx_surf.vs_buffer  (with the buffer on which this operator is then called)
 	 * - __self->vx_blend
-	 * - __self->vx_flags
-	 * - __self->vx_colorkey
-	 * NOTE: This operator is allowed to modify any/all of the  above!
-	 *       e.g. `video_buffer_lockable()' will change `vx_buffer' to
+	 * - __self->vx_surf.vs_flags
+	 * - __self->vx_surf.vs_colorkey
+	 * NOTE: This  operator  is  allowed  to  modify  any/all  of  the  above!
+	 *       e.g. `video_buffer_lockable()' will change `vx_surf.vs_buffer' to
 	 *       the wrapped video buffer.
 	 * @return: * : Always re-returns `__self' */
 	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_gfx *
@@ -305,8 +301,8 @@ struct video_buffer_ops {
 
 	/* Update operators of `__self' after certain behavioral flags were changed:
 	 * - VIDEO_GFX_UPDATE_BLEND:    `__self->vx_blend' may have changed
-	 * - VIDEO_GFX_UPDATE_FLAGS:    `__self->vx_flags' may have changed
-	 * - VIDEO_GFX_UPDATE_COLORKEY: `__self->vx_colorkey' may have changed
+	 * - VIDEO_GFX_UPDATE_FLAGS:    `__self->vx_surf.vs_flags' may have changed
+	 * - VIDEO_GFX_UPDATE_COLORKEY: `__self->vx_surf.vs_colorkey' may have changed
 	 * @param: __what: Set of `VIDEO_GFX_UPDATE_*'
 	 *
 	 * CAUTION: Do not use this operator when `__self' may be used by other threads! */
@@ -393,10 +389,10 @@ struct video_buffer_ops {
 	__NOTHROW_T(LIBVIDEO_GFX_FCC *vi_revoke)(struct video_buffer *__restrict __self);
 
 
-	/* Create a new hard subregion-proxy of `__self'. The caller is responsible to  ensure
-	 * that the given `__rect' does not exceed `__self->vb_xdim' / `__self->vb_ydim'. Note
-	 * that this function behaves slightly different from `video_buffer_region()', in that
-	 * the  later accepts a signed rect, while also  allowing said rect to be greater than
+	/* Create  a new hard subregion-proxy of `__self'.  The caller is responsible to ensure
+	 * that  the given `__rect' does not exceed `__self->vb_xdim' / `__self->vb_ydim'. Note
+	 * that this function behaves slightly different from `video_surface_region()', in that
+	 * the later accepts a signed  rect, while also allowing said  rect to be greater  than
 	 * the dimensions of the original buffer.
 	 *
 	 * On the other hand, this function only works for creating **true** sub-rects, but
@@ -408,8 +404,9 @@ struct video_buffer_ops {
 	 * access to pixel-data in `return' check if `__self' has been revoked).
 	 *
 	 * NOTE: This function will never re-return `__self', even if `__rect' is the  full
-	 *       rect of `__self', and `__gfx_flags == 0'. This is because doing also cause
-	 *       `vi_revoke' invoked on the returned buffer to revoke `__self'.
+	 *       rect of `__self', and `__self' describes the buffer's default format. This
+	 *       is because doing also cause `vi_revoke' invoked on the returned buffer  to
+	 *       revoke `__self'.
 	 *
 	 * @assume(__rect->vcr_xdim > 0);
 	 * @assume(__rect->vcr_ydim > 0);
@@ -417,25 +414,32 @@ struct video_buffer_ops {
 	 * @assume((__rect->vcr_ymin + __rect->vcr_ydim) > __rect->vcr_ymin);
 	 * @assume((__rect->vcr_xmin + __rect->vcr_xdim) <= __self->vb_xdim);
 	 * @assume((__rect->vcr_ymin + __rect->vcr_ydim) <= __self->vb_ydim);
-	 * @param: __self: Video buffer to create a sub-region of
+	 * @param: __self: Video surface to create a sub-region of (returned
+	 *                 buffer's format  is derived  from this  surface).
 	 * @param: __rect: Sub-region rect of `__self' to-be returned
-	 * @param: __gfx_flags: Flags to apply in GFX contexts created using  `return'.
-	 *                      These flags are NOT applied to `__rect', but they still
-	 *                      allow you to create sub-region buffers that will appear
-	 *                      to be natively rotated in `struct video_gfx' contexts.
 	 * @return: * : The newly created sub-region buffer
 	 * @return: NULL: [errno=ENOMEM] Insufficient memory
 	 * @return: NULL: [errno=*] Failed to create sub-region for some other reason */
-	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
-	(LIBVIDEO_GFX_FCC *vi_subregion)(struct video_buffer *__restrict __self,
-	                                 struct video_crect const *__restrict __rect,
-	                                 video_gfx_flag_t __gfx_flags);
+	__ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
+	(LIBVIDEO_GFX_FCC *vi_subregion)(struct video_surface const *__restrict __self,
+	                                 struct video_crect const *__restrict __rect);
 };
 
 
 
 
 #ifdef __INTELLISENSE__
+
+/* Convenience getters for video buffer attributes */
+extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_domain const *video_buffer_getdomain(struct video_buffer const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) struct video_palette *video_buffer_getpalette(struct video_buffer const *__restrict __self);
+extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_codec *video_buffer_getcodec(struct video_buffer const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_gfx_flag_t video_buffer_getflags(struct video_buffer const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_gfx_flag_t video_buffer_getcolorkey(struct video_buffer const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_buffer_hascolorkey(struct video_buffer const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_buffer_getxdim(struct video_buffer const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_buffer_getydim(struct video_buffer const *__restrict __self);
+
 /* Get graphics functions for use with the given buffer
  * @param: blendmode: Pixel blending mode  for graphics operations  targeting this  buffer.
  *                    This  argument   should  be   constructed  using   `GFX_BLENDMODE()'.
@@ -444,15 +448,15 @@ struct video_buffer_ops {
  *                    certain  that alpha-blending isn't required, graphics performance can
  *                    be improved by passing  `GFX_BLENDMODE_OVERRIDE' in order to  prevent
  *                    any overhead  that would  normally  incur from  blending  operations.
- * @param: flags:     Set of `VIDEO_GFX_F*'
- * @param: colorkey:  A specific color that should always return fully opaque when read
- *                    To disable colorkey-ing, simply pass some color with ALPHA=0  (or
- *                    alternatively, just pass `0' (which would be one such color))
  * @return: * : Always re-returns `__result' */
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_OUT(2) struct video_gfx *
-video_buffer_getgfx(struct video_buffer *__self, struct video_gfx *__result,
-                    gfx_blendmode_t __blendmode, video_gfx_flag_t __flags,
-                    video_color_t __colorkey);
+video_buffer_getgfx(struct video_buffer *__self,
+                    struct video_gfx *__result,
+                    gfx_blendmode_t __blendmode);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_OUT(2) struct video_gfx *
+video_buffer_getgfx_ex(struct video_buffer *__self, struct video_gfx *__result,
+                       gfx_blendmode_t __blendmode, struct video_palette *__used_palette,
+                       video_gfx_flag_t __used_flags, video_pixel_t __used_colorkey);
 
 
 
@@ -533,49 +537,31 @@ video_buffer_unlockregion(struct video_buffer *__self, struct video_regionlock *
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_buffer *
 __NOTHROW(video_buffer_revoke)(struct video_buffer *__restrict __self);
 
-/* Create a new hard subregion-proxy of `__self'. The caller is responsible to  ensure
- * that the given `__rect' does not exceed `__self->vb_xdim' / `__self->vb_ydim'. Note
- * that this function behaves slightly different from `video_buffer_region()', in that
- * the  later accepts a signed rect, while also  allowing said rect to be greater than
- * the dimensions of the original buffer.
- *
- * On the other hand, this function only works for creating **true** sub-rects, but
- * since this one is implemented by individual buffers, it is probably faster, too.
- *
- * Buffers  returned by this function are guarantied  to share pixel access with `__self',
- * and `video_buffer_revoke' is to `__self' will  also revoke access for `return'  (either
- * directly, by keeping a list of sub-region buffers in `__self', or indirectly, by having
- * every access to pixel-data in `return' check if `__self' has been revoked).
- *
- * NOTE: This function will never re-return `__self', even if `__rect' is the  full
- *       rect of `__self', and `__gfx_flags == 0'. This is because doing also cause
- *       `video_buffer_revoke' invoked on the returned buffer to revoke `__self'.
- *
- * @assume(__rect->vcr_xdim > 0);
- * @assume(__rect->vcr_ydim > 0);
- * @assume((__rect->vcr_xmin + __rect->vcr_xdim) > __rect->vcr_xmin);
- * @assume((__rect->vcr_ymin + __rect->vcr_ydim) > __rect->vcr_ymin);
- * @assume((__rect->vcr_xmin + __rect->vcr_xdim) <= __self->vb_xdim);
- * @assume((__rect->vcr_ymin + __rect->vcr_ydim) <= __self->vb_ydim);
- * @param: __self: Video buffer to create a sub-region of
- * @param: __rect: Sub-region rect of `__self' to-be returned
- * @param: __gfx_flags: Flags to apply in GFX contexts created using  `return'.
- *                      These flags are NOT applied to `__rect', but they still
- *                      allow you to create sub-region buffers that will appear
- *                      to be natively rotated in `struct video_gfx' contexts.
- * @return: * : The newly created sub-region buffer
- * @return: NULL: [errno=ENOMEM] Insufficient memory
- * @return: NULL: [errno=*] Failed to create sub-region for some other reason */
-extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *
-video_buffer_subregion(struct video_buffer *__restrict __self,
-                       struct video_crect const *__restrict __rect,
-                       video_gfx_flag_t __gfx_flags);
-
 #else /* __INTELLISENSE__ */
-#define video_buffer_getgfx(self, result, blendmode, flags, colorkey)  \
-	((result)->vx_colorkey = (colorkey), (result)->vx_flags = (flags), \
-	 (result)->vx_blend = (blendmode),                                 \
-	 (*((result)->vx_buffer = (self))->vb_ops->vi_initgfx)(result))
+/* Convenience getters for video buffer attributes */
+#define video_buffer_getdomain(self)   (self)->vb_domain
+#define video_buffer_getpalette(self)  (self)->vb_format.vbf_pal
+#define video_buffer_getcodec(self)    (self)->vb_format.vbf_codec
+#define video_buffer_getflags(self)    (self)->vb_format.vbf_flags
+#define video_buffer_getcolorkey(self) (self)->vb_format.vbf_colorkey
+#define video_buffer_hascolorkey(self) ((video_buffer_getflags(self) & VIDEO_GFX_F_COLORKEY) != 0)
+#define video_buffer_getxdim(self)     (self)->vb_xdim
+#define video_buffer_getydim(self)     (self)->vb_ydim
+
+#define video_buffer_getgfx(self, result, blendmode)                 \
+	((result)->vx_surf.vs_pal      = video_buffer_getpalette(self),  \
+	 (result)->vx_surf.vs_buffer   = (self),                         \
+	 (result)->vx_surf.vs_flags    = video_buffer_getflags(self),    \
+	 (result)->vx_surf.vs_colorkey = video_buffer_getcolorkey(self), \
+	 (result)->vx_blend            = (blendmode),                    \
+	 (*((result)->vx_surf.vs_buffer = (self))->vb_ops->vi_initgfx)(result))
+#define video_buffer_getgfx_ex(self, result, blendmode, used_palette, used_flags, used_colorkey) \
+	((result)->vx_surf.vs_pal      = (used_palette),                                             \
+	 (result)->vx_surf.vs_buffer   = (self),                                                     \
+	 (result)->vx_surf.vs_flags    = (used_flags),                                               \
+	 (result)->vx_surf.vs_colorkey = (used_colorkey),                                            \
+	 (result)->vx_blend            = (blendmode),                                                \
+	 (*((result)->vx_surf.vs_buffer = (self))->vb_ops->vi_initgfx)(result))
 #define video_buffer_rlock(self, lock) \
 	(*(self)->vb_ops->vi_rlock)(self, lock)
 #define video_buffer_wlock(self, lock) \
@@ -593,83 +579,36 @@ video_buffer_subregion(struct video_buffer *__restrict __self,
 #define video_buffer_unlockregion(self, lock) \
 	(*(self)->vb_ops->vi_unlockregion)(self, lock)
 #define video_buffer_revoke(self) (*(self)->vb_ops->vi_revoke)(self)
-#define video_buffer_subregion(self, rect, gfx_flags) \
-	(*(self)->vb_ops->vi_subregion)(self, rect, gfx_flags)
 #endif /* !__INTELLISENSE__ */
 
-
-#ifdef __cplusplus
-__CXXDECL_BEGIN
-#endif /* __cplusplus */
+#ifndef __VIDEO_BUFFER_const
+#define __VIDEO_BUFFER_const const
+#endif /* !__VIDEO_BUFFER_const */
 
 struct video_buffer {
-	struct video_buffer_ops const *vb_ops;    /* [1..1][const] Buffer operations. */
-	struct video_domain const     *vb_domain; /* [1..1][const] Buffer domain (generic wrappers use `video_ramdomain()',
-	                                           * meaning a different value here implies that the buffer was created  by
-	                                           * that domain's `video_domain_newbuffer()' or `video_domain_formem()') */
-	struct video_format            vb_format; /* [const] Buffer format. */
-	video_dim_t                    vb_xdim;   /* Buffer dimension in X (in pixels) */
-	video_dim_t                    vb_ydim;   /* Buffer dimension in Y (in pixels) */
-	__uintptr_t                    vb_refcnt; /* Reference counter. */
+	struct video_buffer_ops const *__VIDEO_BUFFER_const vb_ops;    /* [1..1][const] Buffer operations. */
+	struct video_domain const     *__VIDEO_BUFFER_const vb_domain; /* [1..1][const] Buffer domain (generic wrappers use `video_ramdomain()',
+	                                                                * meaning a different value here implies that the buffer was created  by
+	                                                                * that domain's `video_domain_newbuffer()' or `video_domain_formem()') */
+	struct video_buffer_format     __VIDEO_BUFFER_const vb_format; /* [OVERRIDE(.vbf_pal, [REF]), OVERRIDE(.vbf_codec, [REF])]
+	                                                                * [const] Buffer format (including default palette/color-key).
+	                                                                * NOTE: This field holds references to `vbf_pal' and `vbf_codec' */
+	video_dim_t                    __VIDEO_BUFFER_const vb_xdim;   /* Buffer dimension in X (in pixels) */
+	video_dim_t                    __VIDEO_BUFFER_const vb_ydim;   /* Buffer dimension in Y (in pixels) */
+	__uintptr_t                                         vb_refcnt; /* Reference counter. */
 	/* Buffer-specific fields go here */
-
-#ifdef __cplusplus
-#ifndef GUARD_LIBVIDEO_GFX_API_H
-	__CXX_DELETE_CTOR(video_buffer);
-	__CXX_DELETE_DTOR(video_buffer);
-	__CXX_DELETE_COPY(video_buffer);
-	__CXX_DELETE_COPY_ASSIGN(video_buffer);
-#endif /* !GUARD_LIBVIDEO_GFX_API_H */
-public:
-
-	/* Lock the video buffer into memory for reading.
-	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding
-	 *          a  lock to video  memory may block and/or  be much slower until
-	 *          said lock is released! The reason for this is that it is unsafe
-	 *          to use hardware accelerated 2D operations while a video lock is
-	 *          being held!
-	 * @return: 0:  Success
-	 * @return: -1: Error (s.a. `errno') */
-	__CXX_CLASSMEMBER __ATTR_WUNUSED int rlock(struct video_lock &__lock) {
-		return video_buffer_rlock(this, &__lock);
-	}
-
-	/* Same as `vi_rlock', but also lock for reading+writing */
-	__CXX_CLASSMEMBER __ATTR_WUNUSED int wlock(struct video_lock &__lock) {
-		return video_buffer_wlock(this, &__lock);
-	}
-
-	/* Unlock a video buffer that has previously been mapped into memory. */
-	__CXX_CLASSMEMBER void unlock(struct video_lock &__lock) {
-		video_buffer_unlock(this, &__lock);
-	}
-
-
-	/* Get graphics functions for use with the given buffer
-	 * @param: flags: Set of `VIDEO_GFX_F*' */
-	__CXX_CLASSMEMBER struct video_gfx &getgfx(struct video_gfx &__result,
-	                                           gfx_blendmode_t __blendmode = GFX_BLENDMODE_OVERRIDE,
-	                                           __uintptr_t __flags         = VIDEO_GFX_F_NORMAL,
-	                                           video_color_t __colorkey    = 0) {
-		return *video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);
-	}
-
-	/* Get graphics functions for use with the given buffer
-	 * @param: flags: Set of `VIDEO_GFX_F*' */
-	__CXX_CLASSMEMBER struct video_gfx getgfx(gfx_blendmode_t __blendmode = GFX_BLENDMODE_OVERRIDE,
-	                                          __uintptr_t __flags         = VIDEO_GFX_F_NORMAL,
-	                                          video_color_t __colorkey    = 0) {
-		struct video_gfx __result;
-		video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);
-		return __result;
-	}
-#endif /* __cplusplus */
 };
 
-#ifdef __cplusplus
-__CXXDECL_END
-#endif /* __cplusplus */
-
+/* Acquire/release references to sub-objects that any (initialized) buffer must hold */
+#ifdef LIBVIDEO_GFX_EXPOSE_INTERNALS
+#ifdef __INTELLISENSE__
+#define __video_buffer_init_common(self) (void)(&(self)->vb_format.vbf_pal, &(self)->vb_format.vbf_codec, ++(self)->vb_refcnt)
+#define __video_buffer_fini_common(self) (void)(&(self)->vb_format.vbf_pal, &(self)->vb_format.vbf_codec, --(self)->vb_refcnt)
+#else /* __INTELLISENSE__ */
+#define __video_buffer_init_common(self) (void)(!(self)->vb_format.vbf_pal || (video_palette_incref((self)->vb_format.vbf_pal), 0), video_codec_incref((self)->vb_format.vbf_codec))
+#define __video_buffer_fini_common(self) (void)(video_codec_decref((self)->vb_format.vbf_codec), !(self)->vb_format.vbf_pal || (video_palette_decref((self)->vb_format.vbf_pal), 0))
+#endif /* !__INTELLISENSE__ */
+#endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 
 #define video_buffer_destroy(self) (*(self)->vb_ops->vi_destroy)(self)
 #define video_buffer_incref(self) \
@@ -683,25 +622,25 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
 /* Convert `__self' into the specified domain and format.
  * @return: * : The converted video buffer.
  * @return: NULL: [errno=ENOMEM]  Insufficient memory (either regular RAM, or V-RAM)
- * @return: NULL: [errno=ENOTSUP] Given `__format->vf_codec' is not supported by `__domain ?: __self->vb_domain'
+ * @return: NULL: [errno=ENOTSUP] Given `__format->vbf_codec' is not supported by `__domain ?: __self->vb_domain'
  * @return: NULL: [errno=*] Failed to convert buffer for some reason (s.a. `errno') */
 typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_NONNULL_T((2)) __ATTR_IN_T(3) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CONVERT)(struct video_buffer *__restrict __self,
                                          struct video_domain const *__domain,
-                                         struct video_format const *__format);
+                                         struct video_buffer_format const *__format);
 typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_NONNULL_T((2)) __ATTR_IN_T(3) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CONVERT_OR_COPY)(struct video_buffer *__restrict __self,
                                                  struct video_domain const *__domain,
-                                                 struct video_format const *__format);
+                                                 struct video_buffer_format const *__format);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_NONNULL((2)) __ATTR_IN(3) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_convert(struct video_buffer *__restrict __self,
                      struct video_domain const *__domain,
-                     struct video_format const *__format);
+                     struct video_buffer_format const *__format);
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_NONNULL((2)) __ATTR_IN(3) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_convert_or_copy(struct video_buffer *__restrict __self,
                              struct video_domain const *__domain,
-                             struct video_format const *__format);
+                             struct video_buffer_format const *__format);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
@@ -742,7 +681,7 @@ typedef void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_revoke_t)(void *__
  * @param: __cookie:       [?..?] Cookie argument passed to all user-supplied operators */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3, 4, 5)) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FORCUSTOM)(video_dim_t __size_x, video_dim_t __size_y,
-                                           struct video_format const *__restrict __format,
+                                           struct video_buffer_format const *__restrict __format,
                                            /* TODO: Instead of passing each operator individually,
                                             *       define  a helper struct that packages them all
                                             *       together, and document  that said struct  gets
@@ -762,7 +701,7 @@ typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3, 4, 5)) __REF struct video_buffer *
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((3, 4, 5)) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_forcustom(video_dim_t __size_x, video_dim_t __size_y,
-                       struct video_format const *__restrict __format,
+                       struct video_buffer_format const *__restrict __format,
                        video_buffer_custom_getpixel_t __getpixel,
                        video_buffer_custom_setpixel_t __setpixel,
                        video_buffer_custom_destroy_t __destroy,
@@ -803,55 +742,6 @@ LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __REF struct video_buffer *LIBV
 video_buffer_lockable(struct video_buffer *__restrict __self);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
-
-
-/* Create a new region-relative-proxy of `__self', that interacts with the same
- * pixel data, both during GFX operations,  as well when creating video  locks.
- *
- * You can also use  this function to create  regions at negative offsets,  or
- * ones that are larger than `__self'. In this case, the returned buffer  will
- * not be lockable, except when using `video_buffer_r/wlockregion' for regions
- * that  contain actual pixel  data. Similarly, GFX  operations for pixel data
- * outside  the true pixel area (which is enforced  by the I/O Rect of any GFX
- * created using the returned  buffer), will yield "0"  during read, and be  a
- * no-op during write.
- *
- * Then returned buffer always behaves properly when it comes to being able to
- * be  revoked, after which point it will never again make any access to pixel
- * data of `__self'.
- *
- * When the given `__rect' is actually a sub-region of `__self', then  this
- * function will simply make use of `video_buffer_subregion()' and call the
- * dedicated video buffer operator for creating sub-regions.
- *
- * When the returned buffer isn't created as a true sub-region of `__self',
- * its  `vb_domain' will be set to the return value of `video_ramdomain()'.
- *
- * @param: __self: Video buffer to create a region of
- * @param: __rect: region rect of `__self' to-be returned
- * @param: __gfx_flags: Flags to xor- toggle in GFX contexts created on  `return'.
- *                      These flags are  NOT applied to  `__rect', but they  still
- *                      allow  you to create region buffers that will appear to be
- *                      natively  rotated in `struct video_gfx' contexts. Only the
- *                      following flags *should* be used here. All other flags can
- *                      still be used, but  many not necessarily produce  expected
- *                      results:
- *                      - VIDEO_GFX_F_XMIRROR
- *                      - VIDEO_GFX_F_YMIRROR
- *                      - VIDEO_GFX_F_XYSWAP
- * @return: * : The newly created region buffer
- * @return: NULL: [errno=ENOMEM] Insufficient memory
- * @return: NULL: [errno=*] Failed to create region for some other reason */
-typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
-(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_REGION)(struct video_buffer *__restrict __self,
-                                        struct video_rect const *__restrict __rect,
-                                        video_gfx_flag_t __gfx_flags);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
-video_buffer_region(struct video_buffer *__restrict __self,
-                    struct video_rect const *__restrict __rect,
-                    video_gfx_flag_t __gfx_flags);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
 /* Return a video buffer  that simulates the clipping/rotation  behavior
@@ -968,34 +858,6 @@ video_buffer_fdsave(struct video_buffer *__self, char const *__format,
 LIBVIDEO_GFX_DECL /*__ATTR_WUNUSED*/ __ATTR_NONNULL((1, 2)) int LIBVIDEO_GFX_CC
 video_buffer_save(struct video_buffer *__self, char const *__filename,
                   char const *__options);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-
-
-/* Same as `video_buffer_*save', but  save pixel data from  the
- * Clip Rect of `__self'. Values written for pixels outside the
- * I/O Rect of `__self'  are format-specific, but those  pixels
- * are probably going to be either black, or transparent.
- * @return: 0 : Success
- * @return: -1: Error (s.a. `errno') */
-typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
-(LIBVIDEO_GFX_CC *PVIDEO_GFX_FSAVE)(struct video_gfx const *__self, char const *__format,
-                                    __FILE *__restrict __fp, char const *__options);
-typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
-(LIBVIDEO_GFX_CC *PVIDEO_GFX_FDSAVE)(struct video_gfx const *__self, char const *__format,
-                                     __fd_t __fd, char const *__options);
-typedef /*__ATTR_WUNUSED_T*/ __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
-(LIBVIDEO_GFX_CC *PVIDEO_GFX_SAVE)(struct video_gfx const *__self, char const *__filename,
-                                   char const *__options);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
-video_gfx_fsave(struct video_gfx const *__self, char const *__format,
-                __FILE *__restrict __fp, char const *__options);
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
-video_gfx_fdsave(struct video_gfx const *__self, char const *__format,
-                 __fd_t __fd, char const *__options);
-LIBVIDEO_GFX_DECL /*__ATTR_WUNUSED*/ __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
-video_gfx_save(struct video_gfx const *__self, char const *__filename,
-               char const *__options);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 

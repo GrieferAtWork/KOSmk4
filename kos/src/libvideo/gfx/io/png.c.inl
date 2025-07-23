@@ -46,7 +46,6 @@
 #include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
 #include <libvideo/gfx/codec/palette.h>
 
 #include "../codec/codec.h"
@@ -223,7 +222,7 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 	video_codec_t result_codec_id;
 
 	/* Shared with setjmp() target */
-	struct video_format result_format;
+	struct video_buffer_format result_format;
 	REF struct video_buffer *result;
 	struct video_lock result_lock;
 	byte_t *temp_line;
@@ -236,10 +235,10 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 	info_ptr = (*pdyn_png_create_info_struct)(png_ptr);
 	if unlikely(!info_ptr)
 		goto err_nomem_png_ptr;
-	result               = NULL;
-	result_format.vf_pal = NULL;
-	result_lock.vl_data  = NULL;
-	temp_line            = NULL;
+	result                = NULL;
+	result_format.vbf_pal = NULL;
+	result_lock.vl_data   = NULL;
+	temp_line             = NULL;
 	if (setjmp(*(*pdyn_png_set_longjmp_fn)(png_ptr, &longjmp, sizeof(jmp_buf)))) {
 		if (temp_line)
 			free(temp_line);
@@ -247,8 +246,8 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 			video_buffer_unlock(result, &result_lock);
 		if (result)
 			video_buffer_decref(result);
-		if (result_format.vf_pal)
-			video_palette_decref(result_format.vf_pal);
+		if (result_format.vbf_pal)
+			video_palette_decref(result_format.vbf_pal);
 		(*pdyn_png_destroy_read_struct)(&png_ptr, &info_ptr, NULL);
 		return VIDEO_BUFFER_WRONG_FMT;
 	}
@@ -310,16 +309,16 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 		}
 
 		/* Construct palette */
-		result_format.vf_pal = libvideo_palette_create((unsigned int)png_num_palette);
-		if unlikely(!result_format.vf_pal)
+		result_format.vbf_pal = libvideo_palette_create((unsigned int)png_num_palette);
+		if unlikely(!result_format.vbf_pal)
 			goto err_png_ptr_info_ptr;
 		for (pal_i = 0; pal_i < (unsigned int)png_num_palette; ++pal_i) {
 			video_color_t color = VIDEO_COLOR_RGB(png_palette[pal_i].red,
 			                                      png_palette[pal_i].green,
 			                                      png_palette[pal_i].blue);
-			result_format.vf_pal->vp_pal[pal_i] = color;
+			result_format.vbf_pal->vp_pal[pal_i] = color;
 		}
-		result_format.vf_pal = libvideo_palette_optimize(result_format.vf_pal);
+		result_format.vbf_pal = libvideo_palette_optimize(result_format.vbf_pal);
 	} else if (!(color_type & LIBPNG_COLOR_MASK_COLOR)) {
 		/* Grayscale (aka. luminance) */
 		/*png_set_packswap(png_ptr);*/ /* If we called this, below would become *_LSB */
@@ -363,18 +362,18 @@ do_rgb_format:
 	}
 
 	/* Lookup needed codec. */
-	result_format.vf_codec = libvideo_codec_lookup(result_codec_id);
-	assertf(result_format.vf_codec, "Built-in codec should have been recognized");
+	result_format.vbf_codec = libvideo_codec_lookup(result_codec_id);
+	assertf(result_format.vbf_codec, "Built-in codec should have been recognized");
 
 	/* Allocate result video buffer. */
-	result = video_domain_newbuffer(domain_hint, width, height, &result_format,
-	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+	result_format.vbf_flags = VIDEO_GFX_F_NORMAL;
+	result = video_domain_newbuffer(domain_hint, &result_format,
+	                                width, height, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result) {
 		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain)
 			goto err_png_ptr_info_ptr_pal;
-		result = video_domain_newbuffer(_libvideo_ramdomain(),
-		                                width, height, &result_format,
-		                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+		result = video_domain_newbuffer(_libvideo_ramdomain(), &result_format,
+		                                width, height, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!result)
 			goto err_png_ptr_info_ptr_pal;
 	}
@@ -420,8 +419,8 @@ do_rgb_format:
 //	(*pdyn_png_read_end)(png_ptr, info_ptr);
 	(*pdyn_png_destroy_read_struct)(&png_ptr, &info_ptr, NULL);
 
-	if (result_format.vf_pal)
-		video_palette_decref(result_format.vf_pal);
+	if (result_format.vbf_pal)
+		video_palette_decref(result_format.vbf_pal);
 	return result;
 /*
 err_png_ptr_info_ptr_pal_r_lock_temp_line:
@@ -432,8 +431,8 @@ err_png_ptr_info_ptr_pal_r_lock:
 err_png_ptr_info_ptr_pal_r:
 	video_buffer_decref(result);
 err_png_ptr_info_ptr_pal:
-	if (result_format.vf_pal)
-		video_palette_decref(result_format.vf_pal);
+	if (result_format.vbf_pal)
+		video_palette_decref(result_format.vbf_pal);
 err_png_ptr_info_ptr:
 	(*pdyn_png_destroy_read_struct)(&png_ptr, &info_ptr, NULL);
 	return NULL;

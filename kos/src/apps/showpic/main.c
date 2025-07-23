@@ -71,7 +71,7 @@ do_dump_buffer_specs(struct video_buffer *buf,
 	struct video_palette const *palette;
 #define gfx_printf(...) format_printf(&video_fontprinter, io, __VA_ARGS__)
 	gfx_printf("res:   %ux%u\n", (unsigned int)buf->vb_xdim, (unsigned int)buf->vb_ydim);
-	codec = buf->vb_format.vf_codec;
+	codec = buf->vb_format.vbf_codec;
 	gfx_printf("codec: %#x [%ubpp,%c%c%c]\n",
 	           (unsigned int)codec->vc_codec,
 	           (unsigned int)codec->vc_specs.vcs_bpp,
@@ -85,7 +85,7 @@ do_dump_buffer_specs(struct video_buffer *buf,
 		if (codec->vc_specs.vcs_amask)
 			gfx_printf("amask: %#.8I32x\n", (uint32_t)codec->vc_specs.vcs_amask);
 	}
-	palette = buf->vb_format.vf_pal;
+	palette = buf->vb_format.vbf_pal;
 	if (palette) {
 		unsigned int cells_padding     = 2;
 		unsigned int cell_w            = 8;
@@ -151,23 +151,21 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 	struct video_gfx gfx;
 	struct video_gfx result_gfx;
 	REF struct video_buffer *result;
-	struct video_format result_format;
+	struct video_buffer_format result_format = self->vb_format;
 	video_codec_t result_codec_id;
 
 	/* Create palette with the requested # of colors */
-	result_format.vf_pal = video_palette_create(num_colors);
-	if unlikely(!result_format.vf_pal)
+	result_format.vbf_pal = video_palette_create(num_colors);
+	if unlikely(!result_format.vbf_pal)
 		goto err;
 
 	/* Acquire GFX context for source video buffer */
-	video_buffer_getgfx(self, &gfx,
-	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_F_NORMAL, 0);
+	video_buffer_getgfx(self, &gfx, GFX_BLENDMODE_OVERRIDE);
 
 	/* Palettize source video buffer and store results in "pal" */
-	if unlikely(video_gfx_palettize(&gfx, num_colors, result_format.vf_pal->vp_pal, method))
+	if unlikely(video_gfx_palettize(&gfx, num_colors, result_format.vbf_pal->vp_pal, method))
 		goto err_pal;
-	result_format.vf_pal = video_palette_optimize(result_format.vf_pal);
+	result_format.vbf_pal = video_palette_optimize(result_format.vbf_pal);
 
 	/* Figure out appropriate codec for result buffer */
 	if (num_colors <= 2) {
@@ -179,24 +177,23 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 	} else {
 		result_codec_id = VIDEO_CODEC_P8;
 	}
-	result_format.vf_codec = video_codec_lookup(result_codec_id);
-	if unlikely(!result_format.vf_codec)
+	result_format.vbf_codec = video_codec_lookup(result_codec_id);
+	if unlikely(!result_format.vbf_codec)
 		goto err_pal;
 
 	/* Allocate result buffer */
 	result = video_domain_newbuffer(self->vb_domain,
+	                                &result_format,
 	                                video_gfx_getclipw(&gfx),
 	                                video_gfx_getcliph(&gfx),
-	                                &result_format,
 	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
-	video_palette_decref(result_format.vf_pal);
+	video_palette_decref(result_format.vbf_pal);
 	if unlikely(!result)
 		goto err;
 
 	/* Blit source GFX context onto result video_buffer. */
 	video_buffer_getgfx(result, &result_gfx,
-	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_F_NORMAL, 0);
+	                    GFX_BLENDMODE_OVERRIDE);
 	video_gfx_bitblit(&result_gfx, 0, 0, &gfx, 0, 0,
 	                  video_gfx_getclipw(&gfx),
 	                  video_gfx_getcliph(&gfx));
@@ -205,7 +202,7 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 err_pal_r:
 	video_buffer_decref(result);*/
 err_pal:
-	video_palette_decref(result_format.vf_pal);
+	video_palette_decref(result_format.vbf_pal);
 err:
 	return NULL;
 }
@@ -223,7 +220,7 @@ do_showpic(struct video_buffer *screen,
 	video_coord_t blit_x, blit_y;
 #if 0
 	/* Palettize "image" */
-	if (!(image->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
+	if (!(image->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
 		struct video_buffer *new_image;
 		new_image = palettize(image, 128, VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM);
 //		new_image = palettize(image, 32, VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT);
@@ -236,12 +233,8 @@ do_showpic(struct video_buffer *screen,
 #endif
 
 	/* Load GFX contexts for the image and the screen */
-	video_buffer_getgfx(screen, &screen_gfx,
-	                    GFX_BLENDMODE_ALPHA,
-	                    VIDEO_GFX_F_NORMAL, 0);
-	video_buffer_getgfx(image, &image_gfx,
-	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_F_NEAREST /*VIDEO_GFX_F_LINEAR*/, 0);
+	video_buffer_getgfx(screen, &screen_gfx, GFX_BLENDMODE_ALPHA);
+	video_buffer_getgfx(image, &image_gfx, GFX_BLENDMODE_OVERRIDE);
 
 	/*video_gfx_clip(&image_gfx, 200, 200,
 	               video_gfx_getclipw(&image_gfx) / 2,
@@ -446,8 +439,8 @@ do_showpic(struct video_buffer *screen,
 		sized_buffer = video_buffer_create(VIDEO_BUFFER_AUTO,
 		                                   blit_w / tiles_x,
 		                                   blit_h / tiles_y,
-		                                   format_buf->vb_format.vf_codec,
-		                                   format_buf->vb_format.vf_pal);
+		                                   format_buf->vb_format.vbf_codec,
+		                                   format_buf->vb_format.vbf_pal);
 		video_buffer_getgfx(sized_buffer, &sized_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 		video_gfx_stretch(&sized_gfx, 0, 0, video_gfx_getclipw(&sized_gfx), video_gfx_getcliph(&sized_gfx),
 		                  &image_gfx, 0, 0, video_gfx_getclipw(&image_gfx), video_gfx_getcliph(&image_gfx));
@@ -618,9 +611,7 @@ int main(int argc, char *argv[]) {
 		{
 			struct video_gfx window2_gfx;
 			video_color_t colors[2][2];
-			video_buffer_getgfx(buffer, &window2_gfx,
-			                    GFX_BLENDMODE_OVERRIDE,
-			                    VIDEO_GFX_F_NORMAL, 0);
+			video_buffer_getgfx(buffer, &window2_gfx, GFX_BLENDMODE_OVERRIDE);
 			colors[0][0] = VIDEO_COLOR_RGBA(0xff, 0, 0, 0xff);
 			colors[0][1] = VIDEO_COLOR_RGBA(0, 0xff, 0, 0xff);
 			colors[1][0] = VIDEO_COLOR_RGBA(0, 0, 0xff, 0xff);
@@ -667,9 +658,7 @@ int main(int argc, char *argv[]) {
 	/* Clear screen */
 	{
 		struct video_gfx screen_gfx;
-		video_buffer_getgfx(bscreen, &screen_gfx,
-		                    GFX_BLENDMODE_OVERRIDE,
-		                    VIDEO_GFX_F_NORMAL, 0);
+		video_buffer_getgfx(bscreen, &screen_gfx, GFX_BLENDMODE_OVERRIDE);
 		video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
 	}
 

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_RAMDOMAIN_C
 #define GUARD_LIBVIDEO_GFX_RAMDOMAIN_C 1
+#define __VIDEO_BUFFER_const /* nothing */
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -45,10 +46,9 @@
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/buffer/dummy.h>
-#include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/format.h>
-#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface-defs.h>
+#include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
 #include "buffer.h"
@@ -77,17 +77,9 @@ INTERN NONNULL((1)) void FCC
 rambuffer__destroy(struct video_buffer *__restrict self) {
 	struct video_rambuffer *me = (struct video_rambuffer *)self;
 	assertf(LIST_EMPTY(&me->rb_subregions_list), "Sub-regions should have been holding references");
-	if (me->vb_format.vf_pal)
-		video_palette_decref(me->vb_format.vf_pal);
 	free(me->rb_data);
+	__video_buffer_fini_common(me);
 	free(me);
-}
-
-INTERN NONNULL((1)) void FCC
-rambuffer_xcodec__destroy(struct video_buffer *__restrict self) {
-	struct video_rambuffer_xcodec *me = (struct video_rambuffer_xcodec *)self;
-	video_codec_handle_decref(me->rbxc_codec);
-	rambuffer__destroy(me);
 }
 
 INTERN NONNULL((1)) void FCC
@@ -104,6 +96,7 @@ rambuffer_subregion__destroy(struct video_buffer *__restrict self) {
 		video_buffer_decref(base);
 	}
 	video_buffer_dummy_decref(me->rbrv_dummy);
+	__video_buffer_fini_common(me);
 	free(me);
 }
 
@@ -121,6 +114,7 @@ rambuffer_subsubregion__destroy(struct video_buffer *__restrict self) {
 		video_buffer_decref(base);
 	}
 	video_buffer_dummy_decref(me->rbrv_dummy);
+	__video_buffer_fini_common(me);
 	free(me);
 }
 
@@ -132,14 +126,8 @@ rambuffer_formem__destroy(struct video_buffer *__restrict self) {
 	if (me->rbrv_gfx.rbrvg_data != me->rbrv_dummy->vbd_data)
 		(*me->rbfm_release_mem)(me->rbfm_release_mem_cookie, me->rbrv_gfx.rbrvg_data);
 	video_buffer_dummy_decref(me->rbrv_dummy);
+	__video_buffer_fini_common(me);
 	free(me);
-}
-
-INTERN NONNULL((1)) void FCC
-rambuffer_formem_xcodec__destroy(struct video_buffer *__restrict self) {
-	struct video_rambuffer_formem_xcodec *me = (struct video_rambuffer_formem_xcodec *)self;
-	video_codec_handle_decref(me->rbfmxc_codec);
-	rambuffer_formem__destroy(me);
 }
 
 INTERN NONNULL((1)) void FCC
@@ -156,6 +144,7 @@ rambuffer_formem_subregion__destroy(struct video_buffer *__restrict self) {
 		video_buffer_decref(base);
 	}
 	video_buffer_dummy_decref(me->rbrv_dummy);
+	__video_buffer_fini_common(me);
 	free(me);
 }
 
@@ -258,8 +247,9 @@ NOTHROW(FCC rambuffer_formem__revoke)(struct video_buffer *__restrict self) {
  * - Fill in `return->rbrvsr_xflags'
  * - Adjust `return->rbrv_gfx.rbrvg_data'
  */
-PRIVATE WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_rambuffer_revokable_subregion *FCC
-rambuffer__subregion__common(struct video_buffer *__restrict self,
+PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) ATTR_IN(3) REF struct video_rambuffer_revokable_subregion *FCC
+rambuffer__subregion__common(struct video_surface const *__restrict surface,
+                             struct video_buffer *__restrict self,
                              struct video_crect const *__restrict rect, size_t self_stride) {
 	static_assert(sizeof(struct video_rambuffer_subregion) == sizeof(struct video_rambuffer_subsubregion));
 	static_assert(sizeof(struct video_rambuffer_subregion) == sizeof(struct video_rambuffer_formem_subregion));
@@ -271,11 +261,14 @@ rambuffer__subregion__common(struct video_buffer *__restrict self,
 	if unlikely(!result)
 		goto err;
 	result->vb_domain = self->vb_domain;
-	result->vb_format = self->vb_format;
+	result->vb_format.vbf_pal      = video_surface_getpalette(surface);
+	result->vb_format.vbf_codec    = video_buffer_getcodec(self);
+	result->vb_format.vbf_flags    = video_surface_getflags(surface);
+	result->vb_format.vbf_colorkey = video_surface_getcolorkey(surface);
 	result->vb_xdim   = rect->vcr_xdim;
 	result->vb_ydim   = rect->vcr_ydim;
 	result->vb_refcnt = 1;
-	video_codec_xcoord_to_offset(result->vb_format.vf_codec, rect->vcr_xmin,
+	video_codec_xcoord_to_offset(result->vb_format.vbf_codec, rect->vcr_xmin,
 	                             &x_byte_offset, &result->rbrvsr_xoff);
 	result->rbrv_gfx.rbrvg_data  = (byte_t *)(x_byte_offset + rect->vcr_ymin * self_stride);
 	result->rbrv_gfx.rbrvg_inuse = 0;
@@ -288,10 +281,8 @@ rambuffer__subregion__common(struct video_buffer *__restrict self,
 	LIST_INIT(&result->rbrvsr_subsubregions_list);
 	atomic_lock_init(&result->rbrvsr_subsubregions_lock);
 	result->rbsr_base = (REF struct video_rambuffer *)self;
-
 	video_buffer_incref(self); /* for "result->rbsr_base" */
-	if (result->vb_format.vf_pal)
-		video_palette_incref(result->vb_format.vf_pal);
+	__video_buffer_init_common(result);
 	return result;
 err_r:
 	free(result);
@@ -299,16 +290,14 @@ err:
 	return NULL;
 }
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-rambuffer__subregion(struct video_buffer *__restrict self,
-                     struct video_crect const *__restrict rect,
-                     video_gfx_flag_t gfx_flags) {
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+rambuffer__subregion(struct video_surface const *__restrict self,
+                     struct video_crect const *__restrict rect) {
 	REF struct video_rambuffer_subregion *result;
-	struct video_rambuffer *me = (struct video_rambuffer *)self;
-	result = (REF struct video_rambuffer_subregion *)rambuffer__subregion__common(me, rect, me->rb_stride);
+	struct video_rambuffer *me = (struct video_rambuffer *)video_surface_getbuffer(self);
+	result = (REF struct video_rambuffer_subregion *)rambuffer__subregion__common(self, me, rect, me->rb_stride);
 	if likely(result) {
 		result->rbrv_gfx.rbrvg_data += (uintptr_t)me->rb_data;
-		result->rbrvsr_xflags = gfx_flags;
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_subregion_xoff_ops()
 		                                     : _rambuffer_subregion_ops();
 		atomic_lock_acquire(&me->rb_subregions_lock);
@@ -319,16 +308,14 @@ rambuffer__subregion(struct video_buffer *__restrict self,
 	return result;
 }
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-rambuffer_subregion__subregion(struct video_buffer *__restrict self,
-                               struct video_crect const *__restrict rect,
-                               video_gfx_flag_t gfx_flags) {
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+rambuffer_subregion__subregion(struct video_surface const *__restrict self,
+                               struct video_crect const *__restrict rect) {
 	REF struct video_rambuffer_subsubregion *result;
-	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)self;
+	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)video_surface_getbuffer(self);
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
-	result = (REF struct video_rambuffer_subsubregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
+	result = (REF struct video_rambuffer_subsubregion *)rambuffer__subregion__common(self, me, rect, me->rbrv_stride);
 	if likely(result) {
-		result->rbrvsr_xflags = video_gfx_flag_combine(me->rbrvsr_xflags, gfx_flags);
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_subsubregion_xoff_ops()
 		                                     : _rambuffer_subsubregion_ops();
 		atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);
@@ -342,16 +329,14 @@ rambuffer_subregion__subregion(struct video_buffer *__restrict self,
 	return result;
 }
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-rambuffer_formem__subregion(struct video_buffer *__restrict self,
-                            struct video_crect const *__restrict rect,
-                            video_gfx_flag_t gfx_flags) {
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+rambuffer_formem__subregion(struct video_surface const *__restrict self,
+                            struct video_crect const *__restrict rect) {
 	REF struct video_rambuffer_formem_subregion *result;
-	struct video_rambuffer_formem *me = (struct video_rambuffer_formem *)self;
+	struct video_rambuffer_formem *me = (struct video_rambuffer_formem *)video_surface_getbuffer(self);
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
-	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
+	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(self, me, rect, me->rbrv_stride);
 	if likely(result) {
-		result->rbrvsr_xflags = gfx_flags;
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_formem_subregion_xoff_ops()
 		                                     : _rambuffer_formem_subregion_ops();
 		atomic_lock_acquire(&me->rbfm_subregions_lock);
@@ -365,16 +350,14 @@ rambuffer_formem__subregion(struct video_buffer *__restrict self,
 	return result;
 }
 
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
-rambuffer_formem_subregion__subregion(struct video_buffer *__restrict self,
-                                      struct video_crect const *__restrict rect,
-                                      video_gfx_flag_t gfx_flags) {
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
+rambuffer_formem_subregion__subregion(struct video_surface const *__restrict self,
+                                      struct video_crect const *__restrict rect) {
 	REF struct video_rambuffer_formem_subregion *result;
-	struct video_rambuffer_formem_subregion *me = (struct video_rambuffer_formem_subregion *)self;
+	struct video_rambuffer_formem_subregion *me = (struct video_rambuffer_formem_subregion *)video_surface_getbuffer(self);
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
-	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
+	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(self, me, rect, me->rbrv_stride);
 	if likely(result) {
-		result->rbrvsr_xflags = video_gfx_flag_combine(me->rbrvsr_xflags, gfx_flags);
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_formem_subregion_xoff_ops()
 		                                     : _rambuffer_formem_subregion_ops();
 		atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);
@@ -458,13 +441,8 @@ DEFINE_VIDEO_BUFFER_TYPE(rambuffer_ops, rambuffer__destroy,
                          rambuffer__lock, rambuffer__lock, libvideo_buffer_noop_unlock,
                          rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop_unlockregion,
                          rambuffer__revoke, rambuffer__subregion);
-DEFINE_VIDEO_BUFFER_TYPE(rambuffer_xcodec_ops, rambuffer_xcodec__destroy,
-                         rambuffer__initgfx, rambuffer__updategfx,
-                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop_unlock,
-                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop_unlockregion,
-                         rambuffer__revoke, rambuffer__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_ops, rambuffer_subregion__destroy,
-                         rambuffer_subregion__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
                          rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
                          rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
                          rambuffer_subregion__revoke, rambuffer_subregion__subregion);
@@ -474,7 +452,7 @@ DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_xoff_ops, rambuffer_subregion__dest
                          rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__unlockregion,
                          rambuffer_subregion__revoke, rambuffer_subregion__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subsubregion_ops, rambuffer_subsubregion__destroy,
-                         rambuffer_subregion__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
                          rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
                          rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
                          rambuffer_subsubregion__revoke, rambuffer_subsubregion__subregion);
@@ -489,13 +467,8 @@ DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_ops, rambuffer_formem__destroy,
                          rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
                          rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
                          rambuffer_formem__revoke, rambuffer_formem__subregion);
-DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_xcodec_ops, rambuffer_formem_xcodec__destroy,
-                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
-                         rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
-                         rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
-                         rambuffer_formem__revoke, rambuffer_formem__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_subregion_ops, rambuffer_formem_subregion__destroy,
-                         rambuffer_subregion__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
                          rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
                          rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
                          rambuffer_formem_subregion__revoke, rambuffer_formem_subregion__subregion);
@@ -514,11 +487,10 @@ DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_subregion_xoff_ops, rambuffer_formem_s
 		return _empty_res;                                       \
 	}	__WHILE0
 
-INTERN WUNUSED ATTR_IN(4) NONNULL((1)) REF struct video_buffer *CC
+INTERN WUNUSED NONNULL((1)) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
-                             video_dim_t xdim, video_dim_t ydim,
-                             struct video_format const *__restrict format,
-                             unsigned int flags) {
+                             struct video_buffer_format const *__restrict format,
+                             video_dim_t xdim, video_dim_t ydim, unsigned int flags) {
 	REF struct video_rambuffer *result;
 	struct video_rambuffer_requirements req;
 	assert(format);
@@ -526,7 +498,7 @@ libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
 		return_empty_buffer;
 
 	/* Figure out buffer requirements. */
-	(*format->vf_codec->vc_rambuffer_requirements)(xdim, ydim, &req);
+	(*format->vbf_codec->vc_rambuffer_requirements)(xdim, ydim, &req);
 
 	/* Allocate heap memory for the buffer */
 	result = (REF struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
@@ -546,82 +518,27 @@ libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
 	result->vb_format = *format;
 	result->vb_xdim   = xdim;
 	result->vb_ydim   = ydim;
-	if (result->vb_format.vf_pal) {
-		if unlikely(!(result->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
-			result->vb_format.vf_pal = NULL;
-		} else {
-			video_palette_incref(result->vb_format.vf_pal);
-		}
+	if (result->vb_format.vbf_pal) {
+		if unlikely(!(result->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
+			result->vb_format.vbf_pal = NULL;
+	} else if unlikely(result->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		errno = EINVAL;
+		goto err_result_data;
 	}
+	__video_buffer_init_common(result);
 	return result;
+err_result_data:
+	free(result->rb_data);
 err_result:
 	free(result);
 err:
 	return NULL;
 }
 
-INTERN WUNUSED ATTR_IN(4) NONNULL((1)) REF struct video_buffer *CC
-libvideo_ramdomain_newbuffer_ex(struct video_domain const *__restrict self,
-                                video_dim_t xdim, video_dim_t ydim,
-                                struct video_codec_specs const *__restrict codec_specs,
-                                struct video_palette *palette, unsigned int flags) {
-	struct video_codec const *codec;
-	REF struct video_codec_handle *codec_handle;
-	REF struct video_rambuffer_xcodec *result;
-	struct video_rambuffer_requirements req;
-	assert(codec_specs);
-	if unlikely(!xdim || !ydim)
-		return_empty_buffer;
-
-	codec = libvideo_codec_fromspecs(codec_specs, &codec_handle);
-	if unlikely(!codec)
-		goto err;
-	if (!(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
-		palette = NULL;
-
-	/* Figure out buffer requirements. */
-	(*codec->vc_rambuffer_requirements)(xdim, ydim, &req);
-
-	/* Allocate heap memory for the buffer */
-	result = (REF struct video_rambuffer_xcodec *)malloc(sizeof(struct video_rambuffer_xcodec));
-	if unlikely(!result)
-		goto err_codec;
-	result->rb_data = (flags & VIDEO_DOMAIN_NEWBUFFER_F_CALLOC)
-	                  ? (byte_t *)calloc(req.vbs_bufsize)
-	                  : (byte_t *)malloc(req.vbs_bufsize);
-	if unlikely(!result->rb_data)
-		goto err_codec_result;
-	result->rb_stride = req.vbs_stride;
-	LIST_INIT(&result->rb_subregions_list);
-	atomic_lock_init(&result->rb_subregions_lock);
-	result->rbxc_codec = codec_handle;
-	result->vb_ops    = _rambuffer_xcodec_ops();
-	result->vb_domain = self;
-	result->vb_refcnt = 1;
-	result->vb_format.vf_codec = codec;
-	result->vb_format.vf_pal   = palette;
-	result->vb_xdim   = xdim;
-	result->vb_ydim   = ydim;
-	if (palette) {
-		if unlikely(!(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
-			result->vb_format.vf_pal = NULL;
-		} else {
-			video_palette_incref(result->vb_format.vf_pal);
-		}
-	}
-	return result;
-err_codec_result:
-	free(result);
-err_codec:
-	video_codec_handle_decref(codec_handle);
-err:
-	return NULL;
-}
-
-
-INTERN WUNUSED ATTR_IN(4) NONNULL((1, 5)) REF struct video_buffer *CC
-libvideo_ramdomain_formem(struct video_domain const *__restrict self, video_dim_t xdim, video_dim_t ydim,
-                          struct video_format const *format, void *mem, size_t stride,
+INTERN WUNUSED NONNULL((1, 5)) ATTR_IN(2) REF struct video_buffer *CC
+libvideo_ramdomain_formem(struct video_domain const *__restrict self,
+                          struct video_buffer_format const *__restrict format,
+                          video_dim_t xdim, video_dim_t ydim, void *mem, size_t stride,
                           void (CC *release_mem)(void *cookie, void *mem),
                           void *release_mem_cookie, unsigned int flags) {
 	REF struct video_rambuffer_formem *result;
@@ -632,7 +549,7 @@ libvideo_ramdomain_formem(struct video_domain const *__restrict self, video_dim_
 		return_empty_buffer;
 
 	/* Ensure that the specified stride is great enough */
-	(*format->vf_codec->vc_rambuffer_requirements)(xdim, ydim, &req);
+	(*format->vbf_codec->vc_rambuffer_requirements)(xdim, ydim, &req);
 	if (stride < req.vbs_stride) {
 		errno = EINVAL;
 		return NULL;
@@ -648,28 +565,29 @@ libvideo_ramdomain_formem(struct video_domain const *__restrict self, video_dim_
 	result->rbrv_stride          = stride;
 	result->rbrv_gfx.rbrvg_data  = (byte_t *)mem;
 	result->rbrv_gfx.rbrvg_inuse = 0;
-	result->vb_ops      = _rambuffer_formem_ops();
-	result->vb_domain   = self;
-	result->vb_refcnt   = 1;
-	result->vb_format   = *format;
-	result->vb_xdim     = xdim;
-	result->vb_ydim     = ydim;
+	result->vb_ops    = _rambuffer_formem_ops();
+	result->vb_domain = self;
+	result->vb_refcnt = 1;
+	result->vb_format = *format;
+	result->vb_xdim   = xdim;
+	result->vb_ydim   = ydim;
 	result->rbfm_release_mem        = release_mem;
 	result->rbfm_release_mem_cookie = release_mem_cookie;
 	LIST_INIT(&result->rbfm_subregions_list);
 	atomic_lock_init(&result->rbfm_subregions_lock);
 
 	/* Must use a different, fallback "codec" that can deal with bad alignment */
-	if (!IS_ALIGNED(stride, result->vb_format.vf_codec->vc_align) ||
-	    !IS_ALIGNED((uintptr_t)mem, result->vb_format.vf_codec->vc_align))
-		result->vb_format.vf_codec = result->vb_format.vf_codec->vc_nalgn;
-	if (result->vb_format.vf_pal) {
-		if unlikely(!(result->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
-			result->vb_format.vf_pal = NULL;
-		} else {
-			video_palette_incref(result->vb_format.vf_pal);
-		}
+	if (!IS_ALIGNED(stride, result->vb_format.vbf_codec->vc_align) ||
+	    !IS_ALIGNED((uintptr_t)mem, result->vb_format.vbf_codec->vc_align))
+		result->vb_format.vbf_codec = result->vb_format.vbf_codec->vc_nalgn;
+	if (result->vb_format.vbf_pal) {
+		if unlikely(!(result->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
+			result->vb_format.vbf_pal = NULL;
+	} else if unlikely(result->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		errno = EINVAL;
+		goto err_r;
 	}
+	__video_buffer_init_common(result);
 	return result;
 err_r:
 	free(result);
@@ -677,81 +595,13 @@ err:
 	return NULL;
 }
 
-INTERN WUNUSED ATTR_IN(4) NONNULL((1, 6)) REF struct video_buffer *CC
-libvideo_ramdomain_formem_ex(struct video_domain const *__restrict self, video_dim_t xdim, video_dim_t ydim,
-                             struct video_codec_specs const *__restrict codec_specs,
-                             struct video_palette *palette, void *mem, size_t stride,
-                             void (CC *release_mem)(void *cookie, void *mem),
-                             void *release_mem_cookie, unsigned int flags) {
-	struct video_codec const *codec;
-	REF struct video_codec_handle *codec_handle;
-	REF struct video_rambuffer_formem_xcodec *result;
-	struct video_rambuffer_requirements req;
-	(void)flags;
-	if unlikely(!xdim || !ydim)
-		return_empty_buffer;
-
-	codec = libvideo_codec_fromspecs(codec_specs, &codec_handle);
-	if unlikely(!codec)
-		goto err;
-
-	/* Ensure that the specified stride is great enough */
-	(*codec->vc_rambuffer_requirements)(xdim, ydim, &req);
-	if (stride < req.vbs_stride) {
-		errno = EINVAL;
-		goto err_codec;
-	}
-
-	/* Allocate heap memory for the buffer */
-	result = (REF struct video_rambuffer_formem_xcodec *)malloc(sizeof(struct video_rambuffer_formem_xcodec));
-	if unlikely(!result)
-		goto err_codec;
-	result->rbrv_dummy = libvideo_buffer_getdummy(req.vbs_bufsize);
-	if unlikely(!result->rbrv_dummy)
-		goto err_codec_r;
-	result->rbrv_stride          = stride;
-	result->rbrv_gfx.rbrvg_data  = (byte_t *)mem;
-	result->rbrv_gfx.rbrvg_inuse = 0;
-	result->rbfmxc_codec = codec_handle;
-	result->vb_ops    = _rambuffer_formem_xcodec_ops();
-	result->vb_domain = self;
-	result->vb_refcnt = 1;
-	result->vb_format.vf_codec    = codec;
-	result->vb_format.vf_pal      = palette;
-	result->vb_xdim = xdim;
-	result->vb_ydim = ydim;
-	result->rbfm_release_mem        = release_mem;
-	result->rbfm_release_mem_cookie = release_mem_cookie;
-	LIST_INIT(&result->rbfm_subregions_list);
-	atomic_lock_init(&result->rbfm_subregions_lock);
-	if (palette) {
-		if unlikely(!(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
-			result->vb_format.vf_pal = NULL;
-		} else {
-			video_palette_incref(result->vb_format.vf_pal);
-		}
-	}
-
-	/* Must use a different, fallback "codec" that can deal with bad alignment */
-	if (!IS_ALIGNED(stride, result->vb_format.vf_codec->vc_align) ||
-	    !IS_ALIGNED((uintptr_t)mem, result->vb_format.vf_codec->vc_align))
-		result->vb_format.vf_codec = result->vb_format.vf_codec->vc_nalgn;
-	return result;
-err_codec_r:
-	free(result);
-err_codec:
-	video_codec_handle_decref(codec_handle);
-err:
-	return NULL;
-}
-
-INTERN ATTR_RETNONNULL WUNUSED ATTR_IN(2) NONNULL((1)) struct video_codec const *CC
+INTERN ATTR_RETNONNULL WUNUSED ATTR_IN(2) NONNULL((1)) struct video_codec *CC
 libvideo_ramdomain_supported_codec(struct video_domain const *__restrict self,
                                    struct video_codec const *__restrict codec) {
 	/* Ram buffers support *all* codecs */
 	COMPILER_IMPURE();
 	(void)self;
-	return codec;
+	return (struct video_codec *)codec;
 }
 
 /************************************************************************/
@@ -773,9 +623,7 @@ INTERN /*ATTR_CONST*/ ATTR_RETNONNULL WUNUSED
 struct video_domain const *CC _libvideo_ramdomain(void) {
 	if unlikely(!libvideo_ramdomain.vd_newbuffer) {
 		libvideo_ramdomain.vd_supported_codec = &libvideo_ramdomain_supported_codec;
-		libvideo_ramdomain.vd_formem_ex       = &libvideo_ramdomain_formem_ex;
 		libvideo_ramdomain.vd_formem          = &libvideo_ramdomain_formem;
-		libvideo_ramdomain.vd_newbuffer_ex    = &libvideo_ramdomain_newbuffer_ex;
 		COMPILER_WRITE_BARRIER();
 		libvideo_ramdomain.vd_newbuffer = &libvideo_ramdomain_newbuffer;
 		COMPILER_WRITE_BARRIER();

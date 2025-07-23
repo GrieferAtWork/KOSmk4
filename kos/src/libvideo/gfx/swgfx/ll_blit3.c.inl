@@ -30,6 +30,7 @@
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/blendcolors.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
 #include "../gfx-utils.h"
@@ -392,47 +393,47 @@ libvideo_swblitter3__blit__blend1(struct video_blitter3 const *__restrict self,
 	            out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y);
 
 	/* Try to acquire video locks to perform blit directly on video memory. */
-	if (LL_rlockregion(src->vx_buffer, &srclock, src_x, src_y, size_x, size_y)) {
+	if (LL_rlockregion(video_gfx_getbuffer(src), &srclock, src_x, src_y, size_x, size_y)) {
 		struct video_regionlock dstlock;
-		if (LL_rlockregion(dst->vx_buffer, &dstlock, dst_x, dst_y, size_x, size_y)) {
+		if (LL_rlockregion(video_gfx_getbuffer(dst), &dstlock, dst_x, dst_y, size_x, size_y)) {
 			struct video_regionlock outlock;
-			if (LL_wlockregion(out->vx_buffer, &outlock, out_x, out_y, size_x, size_y)) {
+			if (LL_wlockregion(video_gfx_getbuffer(out), &outlock, out_x, out_y, size_x, size_y)) {
 				byte_t const *srcline = srclock.vrl_lock.vl_data;
 				byte_t const *dstline = dstlock.vrl_lock.vl_data;
 				byte_t *outline = outlock.vrl_lock.vl_data;
-				struct video_format const *src_format = &src->vx_buffer->vb_format;
-				struct video_format const *dst_format = &dst->vx_buffer->vb_format;
-				struct video_format const *out_format = &out->vx_buffer->vb_format;
-				video_codec_getpixel_t src_getpixel       = src_format->vf_codec->vc_getpixel;
-				video_codec_pixel2color_t src_pixel2color = src_format->vf_codec->vc_pixel2color;
-				video_codec_getpixel_t dst_getpixel       = dst_format->vf_codec->vc_getpixel;
-				video_codec_pixel2color_t dst_pixel2color = dst_format->vf_codec->vc_pixel2color;
-				video_codec_setpixel_t out_setpixel       = out_format->vf_codec->vc_setpixel;
-				video_codec_color2pixel_t out_color2pixel = out_format->vf_codec->vc_color2pixel;
+				struct video_surface const *src_surface   = video_gfx_getsurface(src);
+				struct video_surface const *dst_surface   = video_gfx_getsurface(dst);
+				struct video_surface const *out_surface   = video_gfx_getsurface(out);
+				video_codec_getpixel_t src_getpixel       = video_surface_getcodec(src_surface)->vc_getpixel;
+				video_codec_pixel2color_t src_pixel2color = video_surface_getcodec(src_surface)->vc_pixel2color;
+				video_codec_getpixel_t dst_getpixel       = video_surface_getcodec(dst_surface)->vc_getpixel;
+				video_codec_pixel2color_t dst_pixel2color = video_surface_getcodec(dst_surface)->vc_pixel2color;
+				video_codec_setpixel_t out_setpixel       = video_surface_getcodec(out_surface)->vc_setpixel;
+				video_codec_color2pixel_t out_color2pixel = video_surface_getcodec(out_surface)->vc_color2pixel;
 				do {
 					video_coord_t x;
 					x = 0;
 					do {
 						video_pixel_t src_pixel = (*src_getpixel)(srcline, srclock.vrl_xbas + x);
-						video_color_t src_color = (*src_pixel2color)(src_format, src_pixel);
+						video_color_t src_color = (*src_pixel2color)(src_surface, src_pixel);
 						video_pixel_t dst_pixel = (*dst_getpixel)(dstline, dstlock.vrl_xbas + x);
-						video_color_t dst_color = (*dst_pixel2color)(dst_format, dst_pixel);
+						video_color_t dst_color = (*dst_pixel2color)(dst_surface, dst_pixel);
 						video_color_t out_color = (*blend)(self, dst_color, src_color);
-						video_pixel_t out_pixel = (*out_color2pixel)(out_format, out_color);
+						video_pixel_t out_pixel = (*out_color2pixel)(out_surface, out_color);
 						(*out_setpixel)(outline, outlock.vrl_xbas + x, out_pixel);
 					} while (++x < size_x);
 					srcline += srclock.vrl_lock.vl_stride;
 					dstline += dstlock.vrl_lock.vl_stride;
 					outline += outlock.vrl_lock.vl_stride;
 				} while (--size_y);
-				LL_unlockregion(out->vx_buffer, &outlock);
-				LL_unlockregion(dst->vx_buffer, &dstlock);
-				LL_unlockregion(src->vx_buffer, &srclock);
+				LL_unlockregion(video_gfx_getbuffer(out), &outlock);
+				LL_unlockregion(video_gfx_getbuffer(dst), &dstlock);
+				LL_unlockregion(video_gfx_getbuffer(src), &srclock);
 				goto done;
 			}
-			LL_unlockregion(dst->vx_buffer, &dstlock);
+			LL_unlockregion(video_gfx_getbuffer(dst), &dstlock);
 		}
-		LL_unlockregion(src->vx_buffer, &srclock);
+		LL_unlockregion(video_gfx_getbuffer(src), &srclock);
 	}
 
 	/* Fallback: perform operate pixel-by-pixel */
