@@ -100,7 +100,7 @@ libvideo_swgfx_noblend__fillstretchmask_n(struct video_gfx const *__restrict sel
                                           video_dim_t src_size_x_, video_dim_t src_size_y_,
                                           struct video_bitmask const *__restrict bm) {
 	struct video_regionlock lock;
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	struct video_buffer *buffer = video_surface_getbuffer(surface);
 	video_color_t bg_fg_pixels[2];
 	bg_fg_pixels[0] = video_surface_color2pixel(surface, bg_fg_colors[0]);
@@ -173,7 +173,7 @@ libvideo_swgfx_noblend__fillstretchmask1_n(struct video_gfx const *__restrict se
                                            struct video_bitmask const *__restrict bm,
                                            __REGISTER_TYPE__ bm_xor) {
 	struct video_regionlock lock;
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	struct video_buffer *buffer = video_surface_getbuffer(surface);
 	video_pixel_t pixel = video_surface_color2pixel(surface, color);
 	TRACE_START("swgfx_noblend__fillstretchmask1_n("
@@ -304,7 +304,7 @@ libvideo_swblitter_noblend_samefmt__blit(struct video_blitter const *__restrict 
 		struct video_regionlock src_lock;
 		struct video_buffer *src_buffer = self->vbt_src->vx_surf.vs_buffer;
 		if likely(LL_rlockregion(src_buffer, &src_lock, src_x, src_y, size_x, size_y)) {
-			video_codec_rectcopy_t vc_rectcopy = dst_buffer->vb_format.vbf_codec->vc_rectcopy;
+			video_codec_rectcopy_t vc_rectcopy = dst_buffer->vb_codec->vc_rectcopy;
 			(*vc_rectcopy)(dst_lock.vrl_lock.vl_data, dst_lock.vrl_xbas, dst_lock.vrl_lock.vl_stride,
 			               src_lock.vrl_lock.vl_data, src_lock.vrl_xbas, src_lock.vrl_lock.vl_stride,
 			               size_x, size_y);
@@ -392,8 +392,8 @@ libvideo_swblitter_noblend_samefmt__stretch_n(struct video_blitter const *__rest
 		struct video_buffer *src_buffer = self->vbt_src->vx_surf.vs_buffer;
 		if likely(LL_rlockregion(src_buffer, &src_lock, src_x_, src_y_, src_size_x_, src_size_y_)) {
 			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
-			video_codec_getpixel_t vc_getpixel = src_buffer->vb_format.vbf_codec->vc_getpixel;
-			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_format.vbf_codec->vc_setpixel;
+			video_codec_getpixel_t vc_getpixel = src_buffer->vb_codec->vc_getpixel;
+			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_codec->vc_setpixel;
 #define LOCAL_dst_startrow(dst_y, src_y) \
 			byte_t const *src_line = src_lock.vrl_lock.vl_data + src_y * src_lock.vrl_lock.vl_stride
 #define LOCAL_copy_pixel(dst_x, dst_y, src_x, src_y)               \
@@ -442,8 +442,8 @@ libvideo_swblitter_noblend_samefmt__stretch_imatrix_n(struct video_blitter const
 		// FIXME: THIS IS BROKEN
 		if likely(LL_rlockregion(src_buffer, &src_lock, src_x_, src_y_, src_size_x_, src_size_y_)) {
 			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
-			video_codec_getpixel_t vc_getpixel = src_buffer->vb_format.vbf_codec->vc_getpixel;
-			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_format.vbf_codec->vc_setpixel;
+			video_codec_getpixel_t vc_getpixel = src_buffer->vb_codec->vc_getpixel;
+			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_codec->vc_setpixel;
 #define LOCAL_copy_pixel(dst_x, dst_y, src_x, src_y)                          \
 			{                                                                 \
 				byte_t const *src_line = src_lock.vrl_lock.vl_data +          \
@@ -567,7 +567,7 @@ libvideo_swblitter_noblend_samebuf__blit(struct video_blitter const *__restrict 
 	if likely(LL_wlockregion(dst_buffer, &lock, lox, loy, lox_size, loy_size)) {
 		byte_t *dst_line = lock.vrl_lock.vl_data + (dst_y - loy) * lock.vrl_lock.vl_stride;
 		byte_t const *src_line = lock.vrl_lock.vl_data + (src_y - loy) * lock.vrl_lock.vl_stride;
-		video_codec_rectmove_t vc_rectmove = dst_buffer->vb_format.vbf_codec->vc_rectmove;
+		video_codec_rectmove_t vc_rectmove = dst_buffer->vb_codec->vc_rectmove;
 		(*vc_rectmove)(dst_line, lock.vrl_xbas + (dst_x - lox),
 		               src_line, lock.vrl_xbas + (src_x - lox),
 		               lock.vrl_lock.vl_stride, size_x, size_y);
@@ -727,8 +727,8 @@ libvideo_swblitter_noblend_difffmt__blit(struct video_blitter const *__restrict 
 				} while (--size_y);                                    \
 				goto done_unlock_buffers;                              \
 			}
-			GFX_BLIT_SELECT_BPP_COMBINATION(dst_buffer->vb_format.vbf_codec->vc_specs.vcs_bpp,
-			                                src_buffer->vb_format.vbf_codec->vc_specs.vcs_bpp,
+			GFX_BLIT_SELECT_BPP_COMBINATION(dst_buffer->vb_codec->vc_specs.vcs_bpp,
+			                                src_buffer->vb_codec->vc_specs.vcs_bpp,
 			                                BLIT_DIFFFMT_FAST);
 #undef BLIT_DIFFFMT_FAST
 #undef getpixel8
@@ -743,8 +743,8 @@ libvideo_swblitter_noblend_difffmt__blit(struct video_blitter const *__restrict 
 
 			/* Fallback: use general-purpose operators to convert pixels */
 			{
-				video_codec_getpixel_t vc_getpixel = src_buffer->vb_format.vbf_codec->vc_getpixel;
-				video_codec_setpixel_t vc_setpixel = dst_buffer->vb_format.vbf_codec->vc_setpixel;
+				video_codec_getpixel_t vc_getpixel = src_buffer->vb_codec->vc_getpixel;
+				video_codec_setpixel_t vc_setpixel = dst_buffer->vb_codec->vc_setpixel;
 				do {
 					video_coord_t used_dst_x = dst_lock.vrl_xbas;
 					video_coord_t used_src_x = src_lock.vrl_xbas;
@@ -814,8 +814,8 @@ libvideo_swblitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__r
 		if likely(LL_rlockregion(src_buffer, &src_lock, base_src_x, base_src_y, base_src_x_size, base_src_y_size)) {
 			struct video_converter const *conv = libvideo_swblitter_generic__cconv(self);
 			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
-			video_codec_getpixel_t vc_getpixel = src_buffer->vb_format.vbf_codec->vc_getpixel;
-			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_format.vbf_codec->vc_setpixel;
+			video_codec_getpixel_t vc_getpixel = src_buffer->vb_codec->vc_getpixel;
+			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_codec->vc_setpixel;
 			video_coord_t iter_dst_x = dst_lock.vrl_xbas;
 			video_coord_t iter_dst_y = 0;
 			video_coord_t iter_src_x = (src_x_ - base_src_x) + src_lock.vrl_xbas;
@@ -868,8 +868,8 @@ libvideo_swblitter_noblend_difffmt__stretch_n(struct video_blitter const *__rest
 		if likely(LL_rlockregion(src_buffer, &src_lock, src_x_, src_y_, src_size_x_, src_size_y_)) {
 			struct video_converter const *conv = libvideo_swblitter_generic__cconv(self);
 			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
-			video_codec_getpixel_t vc_getpixel = src_buffer->vb_format.vbf_codec->vc_getpixel;
-			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_format.vbf_codec->vc_setpixel;
+			video_codec_getpixel_t vc_getpixel = src_buffer->vb_codec->vc_getpixel;
+			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_codec->vc_setpixel;
 #define LOCAL_dst_startrow(dst_y, src_y) \
 			byte_t const *src_line = src_lock.vrl_lock.vl_data + src_y * src_lock.vrl_lock.vl_stride
 #define LOCAL_copy_pixel(dst_x, dst_y, src_x, src_y)                 \
@@ -923,8 +923,8 @@ libvideo_swblitter_noblend_difffmt__stretch_imatrix_n(struct video_blitter const
 		if likely(LL_rlockregion(src_buffer, &src_lock, base_src_x, base_src_y, base_src_x_size, base_src_y_size)) {
 			struct video_converter const *conv = libvideo_swblitter_generic__cconv(self);
 			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
-			video_codec_getpixel_t vc_getpixel = src_buffer->vb_format.vbf_codec->vc_getpixel;
-			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_format.vbf_codec->vc_setpixel;
+			video_codec_getpixel_t vc_getpixel = src_buffer->vb_codec->vc_getpixel;
+			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_codec->vc_setpixel;
 			video_coord_t iter_src_x = (src_x_ - base_src_x) + src_lock.vrl_xbas;
 			video_coord_t iter_src_y = (src_y_ - base_src_y);
 #define LOCAL_copy_pixel(dst_x, dst_y, src_x, src_y)                          \

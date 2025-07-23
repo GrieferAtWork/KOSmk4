@@ -428,29 +428,29 @@ find_hinted_mode:
 
 	/* Convert the SVGA video mode into libvideo codec specs. */
 	if (mode->smi_bits_per_pixel == 4) {
-		result->vb_format.vbf_codec = libvideo_codec_lookup(VIDEO_CODEC_X_VBE16);
+		result->vb_codec = libvideo_codec_lookup(VIDEO_CODEC_X_VBE16);
 	} else {
 		svga_modeinfo_to_codec_specs(mode, &codec_specs);
 
 		/* Build a codec from the newly constructed specs. */
-		result->vb_format.vbf_codec = libvideo_codec_fromspecs(&codec_specs);
+		result->vb_codec = libvideo_codec_fromspecs(&codec_specs);
 	}
-	if (!result->vb_format.vbf_codec) {
+	if (!result->vb_codec) {
 		LOGERR("No codec for SVGA video mode\n");
 		errno = ENODEV;
 		goto err_svga_vdlck_libsvgadrv_r_cs_mode;
 	}
-	video_codec_incref(result->vb_format.vbf_codec);
+	video_codec_incref(result->vb_codec);
 
 	/* If necessary, construct a palette controller for the codec, and populate
 	 * it with whatever is currently configured  by the chipset. In theory,  we
 	 * could also just come up with a  new palette here, but again: use  what's
 	 * already there, so another program can pre-configure it for us. */
-	result->vb_format.vbf_pal = NULL;
-	if (result->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-		shift_t cbits = result->vb_format.vbf_codec->vc_specs.vcs_cbits;
-		result->vb_format.vbf_pal = svga_palette_new(&result->ss_cs, cbits);
-		if unlikely(!result->vb_format.vbf_pal) {
+	result->vb_surf.vs_pal = NULL;
+	if (result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		shift_t cbits = result->vb_codec->vc_specs.vcs_cbits;
+		result->vb_surf.vs_pal = svga_palette_new(&result->ss_cs, cbits);
+		if unlikely(!result->vb_surf.vs_pal) {
 			LOGERR("Failed to allocate palette controller: %m\n");
 			goto err_svga_vdlck_libsvgadrv_r_cs_mode_codec;
 		}
@@ -489,6 +489,9 @@ find_hinted_mode:
 
 	/* Fill in remaining fields of "result" */
 	_video_rambuffer_init(result);
+	result->vb_surf.vs_flags    = VIDEO_GFX_F_NORMAL;
+	result->vb_surf.vs_colorkey = 0;
+	result->vb_surf.vs_buffer   = result;
 	result->vb_refcnt     = 1;
 	result->vb_domain     = _libvideo_ramdomain();
 	result->vb_ops        = &result->ss_ops.sbo_video;
@@ -528,11 +531,11 @@ find_hinted_mode:
 err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys:
 	(void)dlclose(result->ss_libphys);
 err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal:
-	if (result->vb_format.vbf_pal)
-		video_palette_decref(result->vb_format.vbf_pal);
+	if (result->vb_surf.vs_pal)
+		video_palette_decref(result->vb_surf.vs_pal);
 err_svga_vdlck_libsvgadrv_r_cs_mode_codec:
-	if (result->vb_format.vbf_codec)
-		video_codec_decref(result->vb_format.vbf_codec);
+	if (result->vb_codec)
+		video_codec_decref(result->vb_codec);
 err_svga_vdlck_libsvgadrv_r_cs_mode:
 	freea(mode);
 err_svga_vdlck_libsvgadrv_r_cs:

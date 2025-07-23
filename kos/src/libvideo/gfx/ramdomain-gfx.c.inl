@@ -101,21 +101,21 @@ LOCAL_rambuffer__initgfx(struct video_gfx *__restrict self) {
 	static_assert(sizeof(struct gfx_ramdrv) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)));
 	struct video_rambuffer *me = (struct video_rambuffer *)video_gfx_getbuffer(self);
 	struct gfx_ramdrv *drv = video_ramgfx_getdrv(self);
-	drv->grdc_codec  = me->vb_format.vbf_codec;
+	drv->grdc_codec  = me->vb_codec;
 	drv->grdc_stride = me->rb_stride;
 	drv->grd_data    = me->rb_data;
 #elif defined(DEFINE_rambuffer_revokable__initgfx)
 	static_assert(sizeof(struct gfx_ramdrv_revokable) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)));
 	struct video_rambuffer_revokable *me = (struct video_rambuffer_revokable *)video_gfx_getbuffer(self);
 	struct gfx_ramdrv_revokable *drv = video_ramgfx_getdrv_revokable(self);
-	drv->grdc_codec  = me->vb_format.vbf_codec;
+	drv->grdc_codec  = me->vb_codec;
 	drv->grdc_stride = me->rbrv_stride;
 	drv->grdrv_gfx   = &me->rbrv_gfx;
 #elif defined(DEFINE_rambuffer_revokable_xoff__initgfx)
 	static_assert(sizeof(struct gfx_ramdrv_revokable_xoff) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)));
 	struct video_rambuffer_revokable_subregion *me = (struct video_rambuffer_revokable_subregion *)video_gfx_getbuffer(self);
 	struct gfx_ramdrv_revokable_xoff *drv = video_ramgfx_getdrv_revokable_xoff(self);
-	drv->grdc_codec  = me->vb_format.vbf_codec;
+	drv->grdc_codec  = me->vb_codec;
 	drv->grdc_stride = me->rbrv_stride;
 	drv->grdrv_gfx   = &me->rbrv_gfx;
 	drv->grdrvx_xoff = me->rbrvsr_xoff;
@@ -130,7 +130,7 @@ LOCAL_rambuffer__initgfx(struct video_gfx *__restrict self) {
 
 	/* Load optimized pixel accessors if applicable to the loaded format. */
 #ifdef CONFIG_HAVE_OLD_RAMBUFFER_PIXELn_FASTPASS
-	switch (me->vb_format.vbf_codec->vc_specs.vcs_bpp) {
+	switch (me->vb_codec->vc_specs.vcs_bpp) {
 	case 8:
 		drv->xsw_setpixel = &LOCAL_ramgfx__setpixel8;
 		drv->xsw_getpixel = &LOCAL_ramgfx__getpixel8;
@@ -174,7 +174,7 @@ LOCAL_rambuffer__initgfx(struct video_gfx *__restrict self) {
 	}
 
 	/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
-	if (me->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+	if (me->vb_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
 		if (drv->xsw_getcolor == &LOCAL_ramgfx__getcolor)
 			drv->xsw_getcolor = drv->xsw_getpixel;
 		if (drv->xsw_putcolor == &LOCAL_ramgfx__putcolor_noblend) {
@@ -257,7 +257,7 @@ LOCAL_ramgfx__getcolor(struct video_gfx const *__restrict self,
 	line  = LOCAL_GFX_DATA + y * LOCAL_GFX_STRIDE;
 	pixel = (*LOCAL_GFX_CODEC->vc_getpixel)(line, x);
 	LOCAL_GFX_UNLOCK();
-	color = (*LOCAL_GFX_CODEC->vc_pixel2color)(video_gfx_getsurface(self), pixel);
+	color = (*LOCAL_GFX_CODEC->vc_pixel2color)(video_gfx_assurface(self), pixel);
 	return color;
 }
 
@@ -273,9 +273,9 @@ LOCAL_ramgfx__putcolor(struct video_gfx const *__restrict self,
 	LOCAL_GFX_LOCK();
 	line = LOCAL_GFX_DATA + y * LOCAL_GFX_STRIDE;
 	op   = (*LOCAL_GFX_CODEC->vc_getpixel)(line, x);
-	oc   = (*LOCAL_GFX_CODEC->vc_pixel2color)(video_gfx_getsurface(self), op);
+	oc   = (*LOCAL_GFX_CODEC->vc_pixel2color)(video_gfx_assurface(self), op);
 	nc   = gfx_blendcolors(oc, color, self->vx_blend);
-	np   = (*LOCAL_GFX_CODEC->vc_color2pixel)(video_gfx_getsurface(self), nc);
+	np   = (*LOCAL_GFX_CODEC->vc_color2pixel)(video_gfx_assurface(self), nc);
 	(*LOCAL_GFX_CODEC->vc_setpixel)(line, x, np);
 	LOCAL_GFX_UNLOCK();
 }
@@ -287,7 +287,7 @@ LOCAL_ramgfx__putcolor_noblend(struct video_gfx const *__restrict self,
 	byte_t *line;
 	video_pixel_t pixel;
 	x += LOCAL_GFX_XOFF;
-	pixel = (*LOCAL_GFX_CODEC->vc_color2pixel)(video_gfx_getsurface(self), color);
+	pixel = (*LOCAL_GFX_CODEC->vc_color2pixel)(video_gfx_assurface(self), color);
 	LOCAL_GFX_LOCK();
 	line = LOCAL_GFX_DATA + y * LOCAL_GFX_STRIDE;
 	(*LOCAL_GFX_CODEC->vc_setpixel)(line, x, pixel);
@@ -307,9 +307,9 @@ LOCAL_ramgfx__putcolor_noblend(struct video_gfx const *__restrict self,
 		LOCAL_GFX_LOCK();                                                          \
 		line = LOCAL_GFX_DATA + y * LOCAL_GFX_STRIDE;                              \
 		op   = (*LOCAL_GFX_CODEC->vc_getpixel)(line, x);                           \
-		oc   = (*LOCAL_GFX_CODEC->vc_pixel2color)(video_gfx_getsurface(self), op); \
+		oc   = (*LOCAL_GFX_CODEC->vc_pixel2color)(video_gfx_assurface(self), op); \
 		nc   = gfx_blendcolors(oc, color, mode);                                   \
-		np   = (*LOCAL_GFX_CODEC->vc_color2pixel)(video_gfx_getsurface(self), nc); \
+		np   = (*LOCAL_GFX_CODEC->vc_color2pixel)(video_gfx_assurface(self), nc); \
 		(*LOCAL_GFX_CODEC->vc_setpixel)(line, x, np);                              \
 		LOCAL_GFX_UNLOCK();                                                        \
 	}
@@ -328,10 +328,10 @@ GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_LOCAL_ramgfx__putcolor_FOO)
 		LOCAL_GFX_LOCK();                                                          \
 		line = LOCAL_GFX_DATA + y * LOCAL_GFX_STRIDE;                              \
 		op   = (*LOCAL_GFX_CODEC->vc_getpixel)(line, x);                           \
-		oc   = (*LOCAL_GFX_CODEC->vc_pixel2color)(video_gfx_getsurface(self), op); \
+		oc   = (*LOCAL_GFX_CODEC->vc_pixel2color)(video_gfx_assurface(self), op); \
 		cc   = GFX_BLENDMODE_GET_COLOR(self->vx_blend);                            \
 		nc   = gfx_blendcolors_constant(oc, color, mode, cc);                      \
-		np   = (*LOCAL_GFX_CODEC->vc_color2pixel)(video_gfx_getsurface(self), nc); \
+		np   = (*LOCAL_GFX_CODEC->vc_color2pixel)(video_gfx_assurface(self), nc); \
 		(*LOCAL_GFX_CODEC->vc_setpixel)(line, x, np);                              \
 		LOCAL_GFX_UNLOCK();                                                        \
 	}

@@ -223,20 +223,11 @@ INTDEF ATTR_IN_T(1) void CC region_blitter3_subops__stretch(struct video_blitter
 
 
 
-
-
-
-
 /* Create a new region-relative-proxy of `self', that interacts with the same
  * pixel data, both during GFX operations, as well when creating video locks.
  *
- * You can also use  this function to create  regions at negative offsets,  or
- * ones that are larger  than `self'. In this  case, the returned buffer  will
- * not be lockable, except when using `video_buffer_r/wlockregion' for regions
- * that  contain actual pixel  data. Similarly, GFX  operations for pixel data
- * outside  the true pixel area (which is enforced  by the I/O Rect of any GFX
- * created using the returned  buffer), will yield "0"  during read, and be  a
- * no-op during write.
+ * You can also use this function to create regions at negative offsets, or
+ * ones that are larger than `self'.
  *
  * Then returned buffer always behaves properly when it comes to being able to
  * be  revoked, after which point it will never again make any access to pixel
@@ -257,6 +248,9 @@ INTDEF ATTR_IN_T(1) void CC region_blitter3_subops__stretch(struct video_blitter
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_surface_region(struct video_surface const *__restrict self,
                         struct video_rect const *__restrict rect);
+INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *CC
+libvideo_surface_region_distinct(struct video_surface const *__restrict self,
+                                 struct video_rect const *__restrict rect);
 
 DECL_END
 

@@ -242,7 +242,7 @@ libvideo_gfx_allow_noblend_blit(struct video_gfx const *dst,
 			break;
 		ATTR_FALLTHROUGH
 	case GFX_BLENDMODE_ALPHA:
-		return !video_surface_hasalpha(video_gfx_getsurface(src));
+		return !video_surface_hasalpha(video_gfx_assurface(src));
 	case GFX_BLENDMODE_ALPHA_OVERRIDE(0):
 		return VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode));
 	default: break;
@@ -272,12 +272,12 @@ libvideo_gfx_allow_noblend_blit3(struct video_gfx const *wrdst,
 			ATTR_FALLTHROUGH
 		case GFX_BLENDMODE_ALPHA:
 			/* Result of ALPHA-blend always has alpha=1 when at least 1 source has alpha=1 */
-			return !video_surface_hasalpha(video_gfx_getsurface(src)) ||
-			       !video_surface_hasalpha(video_gfx_getsurface(rddst));
+			return !video_surface_hasalpha(video_gfx_assurface(src)) ||
+			       !video_surface_hasalpha(video_gfx_assurface(rddst));
 		case GFX_BLENDMODE_ALPHA_OVERRIDE(0):
 			if (VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode)))
 				return true;
-			if (!video_surface_hasalpha(video_gfx_getsurface(rddst)))
+			if (!video_surface_hasalpha(video_gfx_assurface(rddst)))
 				return true;
 			break;
 		default: break;

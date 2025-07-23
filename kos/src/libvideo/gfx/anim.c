@@ -172,7 +172,7 @@ PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(2) int CC
 cached_anim_firstframe(struct video_anim const *__restrict self,
                        struct video_anim_frame *__restrict frame) {
 	struct cached_frame *cframe;
-	struct video_buffer_format const *frame_format;
+	struct video_buffer_format frame_format;
 	struct cached_anim *me = (struct cached_anim *)self;
 
 	/* Check for special case: animation was already fully loaded */
@@ -212,10 +212,11 @@ cached_anim_firstframe(struct video_anim const *__restrict self,
 	/* Copy data into "cframe" */
 	cframe->cf_showfor  = me->ca_bbuf->vaf_showfor;
 	cframe->cf_colorkey = me->ca_bbuf->vaf_colorkey;
-	frame_format = &me->ca_bbuf->vaf_frame->vb_format;
+	video_buffer_getformat(me->ca_bbuf->vaf_frame, &frame_format);
 	if (me->ca_fmt.vbf_codec)
-		frame_format = &me->ca_fmt;
-	cframe->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf->vaf_frame, me->va_domain, frame_format);
+		frame_format = me->ca_fmt;
+	cframe->cf_frame = libvideo_surface_convert(video_buffer_assurface(me->ca_bbuf->vaf_frame),
+	                                            me->va_domain, &frame_format);
 	if unlikely(!cframe->cf_frame)
 		goto err_lock_cframe_bbuf_fini;
 
@@ -248,7 +249,7 @@ err_lock:
 PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) int CC
 cached_anim_nextframe(struct video_anim const *__restrict self,
                       struct video_anim_frame *__restrict frame) {
-	struct video_buffer_format const *frame_format;
+	struct video_buffer_format frame_format;
 	struct cached_frame *cframe;
 	struct cached_anim *me = (struct cached_anim *)self;
 	video_anim_frame_id next_id = frame->vaf_frameid + 1;
@@ -347,10 +348,11 @@ return_next_cached_frame:
 	}
 
 	/* Convert output buffer formats. */
-	frame_format = &me->ca_bbuf->vaf_frame->vb_format;
+	video_buffer_getformat(me->ca_bbuf->vaf_frame, &frame_format);
 	if (me->ca_fmt.vbf_codec)
-		frame_format = &me->ca_fmt;
-	cframe->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf->vaf_frame, me->va_domain, frame_format);
+		frame_format = me->ca_fmt;
+	cframe->cf_frame = libvideo_surface_convert(video_buffer_assurface(me->ca_bbuf->vaf_frame),
+	                                            me->va_domain, &frame_format);
 	if unlikely(!cframe->cf_frame) {
 		/* Failed to convert frame -> must reset output
 		 * buffer since it's now 1 frame too far  ahead */
@@ -435,14 +437,13 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 		REF struct video_buffer *converted;
 		struct oneframe_anim *me = (struct oneframe_anim *)self;
 		struct video_buffer *frame = me->ofa_frame;
-		if (format == NULL)
-			format = &frame->vb_format;
 		if (frame->vb_domain == domain &&
-		    video_buffer_format_equals(&frame->vb_format, format)) {
+		    (!format || video_buffer_hasformat(frame, format))) {
 			video_anim_incref(me);
 			return me;
 		}
-		converted = libvideo_buffer_convert(frame, domain, format);
+		converted = libvideo_surface_convert(video_buffer_assurface(frame),
+		                                     domain, format);
 		if unlikely(!converted)
 			goto err;
 		oneframe_result = libvideo_anim_fromframe(converted);

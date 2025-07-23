@@ -155,9 +155,9 @@ INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC
 LOCAL_libvideo_swgfx_getcolor_wrap(struct video_gfx const *__restrict self,
                                    video_offset_t x, video_offset_t y) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
+		x = wrap(x, self->vx_hdr.vxh_cxdim);
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP)
-		y = wrap(y, self->vx_hdr.vxh_cysiz);
+		y = wrap(y, self->vx_hdr.vxh_cydim);
 	return LOCAL_libvideo_swgfx_getcolor(self, x, y);
 }
 
@@ -165,9 +165,9 @@ INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC
 LOCAL_libvideo_swgfx_getcolor_mirror(struct video_gfx const *__restrict self,
                                      video_offset_t x, video_offset_t y) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
+		x = (self->vx_hdr.vxh_cxdim - 1) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
+		y = (self->vx_hdr.vxh_cydim - 1) - y;
 	return LOCAL_libvideo_swgfx_getcolor_wrap(self, x, y);
 }
 
@@ -192,9 +192,9 @@ LOCAL_libvideo_swgfx_putcolor_wrap(struct video_gfx const *__restrict self,
                                    video_offset_t x, video_offset_t y,
                                    video_color_t color) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
+		x = wrap(x, self->vx_hdr.vxh_cxdim);
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP)
-		y = wrap(y, self->vx_hdr.vxh_cysiz);
+		y = wrap(y, self->vx_hdr.vxh_cydim);
 	LOCAL_libvideo_swgfx_putcolor(self, x, y, color);
 }
 
@@ -203,9 +203,9 @@ LOCAL_libvideo_swgfx_putcolor_mirror(struct video_gfx const *__restrict self,
                                      video_offset_t x, video_offset_t y,
                                      video_color_t color) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
+		x = (self->vx_hdr.vxh_cxdim - 1) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
+		y = (self->vx_hdr.vxh_cydim - 1) - y;
 	LOCAL_libvideo_swgfx_putcolor_wrap(self, x, y, color);
 }
 
@@ -334,12 +334,12 @@ LOCAL_libvideo_swgfx_line_mirror(struct video_gfx const *__restrict self,
                                  video_offset_t x2, video_offset_t y2,
                                  video_color_t color) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR) {
-		x1 = (self->vx_hdr.vxh_cxsiz - 1) - x1;
-		x2 = (self->vx_hdr.vxh_cxsiz - 1) - x2;
+		x1 = (self->vx_hdr.vxh_cxdim - 1) - x1;
+		x2 = (self->vx_hdr.vxh_cxdim - 1) - x2;
 	}
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR) {
-		y1 = (self->vx_hdr.vxh_cysiz - 1) - y1;
-		y2 = (self->vx_hdr.vxh_cysiz - 1) - y2;
+		y1 = (self->vx_hdr.vxh_cydim - 1) - y1;
+		y2 = (self->vx_hdr.vxh_cydim - 1) - y2;
 	}
 	LOCAL_libvideo_swgfx_line_wrap(self, x1, y1, x2, y2, color);
 }
@@ -384,15 +384,15 @@ LOCAL_libvideo_swgfx_hline_wrap(struct video_gfx const *__restrict self,
                                 video_offset_t x, video_offset_t y,
                                 video_dim_t length, video_color_t color) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP)
-		y = wrap(y, self->vx_hdr.vxh_cysiz);
+		y = wrap(y, self->vx_hdr.vxh_cydim);
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
-		if (OVERFLOW_UADD((video_coord_t)x, length, &cxend) || length >= self->vx_hdr.vxh_cxsiz) {
+		x = wrap(x, self->vx_hdr.vxh_cxdim);
+		if (OVERFLOW_UADD((video_coord_t)x, length, &cxend) || length >= self->vx_hdr.vxh_cxdim) {
 			x = 0;
-			length = self->vx_hdr.vxh_cxsiz;
-		} else if (cxend > self->vx_hdr.vxh_cxsiz) {
-			LOCAL_libvideo_swgfx_hline(self, 0, y, cxend - self->vx_hdr.vxh_cxsiz, color);
+			length = self->vx_hdr.vxh_cxdim;
+		} else if (cxend > self->vx_hdr.vxh_cxdim) {
+			LOCAL_libvideo_swgfx_hline(self, 0, y, cxend - self->vx_hdr.vxh_cxdim, color);
 		}
 	}
 	LOCAL_libvideo_swgfx_hline(self, x, y, length, color);
@@ -403,9 +403,9 @@ LOCAL_libvideo_swgfx_hline_mirror(struct video_gfx const *__restrict self,
                                   video_offset_t x, video_offset_t y,
                                   video_dim_t length, video_color_t color) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxsiz - length) - x;
+		x = (self->vx_hdr.vxh_cxdim - length) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
+		y = (self->vx_hdr.vxh_cydim - 1) - y;
 	LOCAL_libvideo_swgfx_hline_wrap(self, x, y, length, color);
 }
 
@@ -445,15 +445,15 @@ LOCAL_libvideo_swgfx_vline_wrap(struct video_gfx const *__restrict self,
                                 video_offset_t x, video_offset_t y,
                                 video_dim_t length, video_color_t color) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
+		x = wrap(x, self->vx_hdr.vxh_cxdim);
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
-		y = wrap(y, self->vx_hdr.vxh_cysiz);
-		if (OVERFLOW_UADD((video_coord_t)y, length, &cyend) || length >= self->vx_hdr.vxh_cysiz) {
+		y = wrap(y, self->vx_hdr.vxh_cydim);
+		if (OVERFLOW_UADD((video_coord_t)y, length, &cyend) || length >= self->vx_hdr.vxh_cydim) {
 			y = 0;
-			length = self->vx_hdr.vxh_cysiz;
-		} else if (cyend > self->vx_hdr.vxh_cysiz) {
-			LOCAL_libvideo_swgfx_vline(self, x, 0, cyend - self->vx_hdr.vxh_cysiz, color);
+			length = self->vx_hdr.vxh_cydim;
+		} else if (cyend > self->vx_hdr.vxh_cydim) {
+			LOCAL_libvideo_swgfx_vline(self, x, 0, cyend - self->vx_hdr.vxh_cydim, color);
 		}
 	}
 	LOCAL_libvideo_swgfx_vline(self, x, y, length, color);
@@ -464,9 +464,9 @@ LOCAL_libvideo_swgfx_vline_mirror(struct video_gfx const *__restrict self,
                                   video_offset_t x, video_offset_t y,
                                   video_dim_t length, video_color_t color) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
+		x = (self->vx_hdr.vxh_cxdim - 1) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cysiz - length) - y;
+		y = (self->vx_hdr.vxh_cydim - length) - y;
 	LOCAL_libvideo_swgfx_vline_wrap(self, x, y, length, color);
 }
 
@@ -522,25 +522,25 @@ LOCAL_libvideo_swgfx_fill_wrap(struct video_gfx const *__restrict self,
 	video_dim_t ywrap = 0;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
-		if (OVERFLOW_UADD((video_coord_t)x, size_x, &cxend) || size_x >= self->vx_hdr.vxh_cxsiz) {
+		x = wrap(x, self->vx_hdr.vxh_cxdim);
+		if (OVERFLOW_UADD((video_coord_t)x, size_x, &cxend) || size_x >= self->vx_hdr.vxh_cxdim) {
 			x = 0;
-			size_x = self->vx_hdr.vxh_cxsiz;
+			size_x = self->vx_hdr.vxh_cxdim;
 		} else {
 			/* # of pixels that go beyond the right clip-edge */
-			if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxsiz, &xwrap))
+			if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxdim, &xwrap))
 				xwrap = 0;
 		}
 	}
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
-		y = wrap(y, self->vx_hdr.vxh_cysiz);
-		if (OVERFLOW_UADD((video_coord_t)y, size_y, &cyend) || size_y >= self->vx_hdr.vxh_cysiz) {
+		y = wrap(y, self->vx_hdr.vxh_cydim);
+		if (OVERFLOW_UADD((video_coord_t)y, size_y, &cyend) || size_y >= self->vx_hdr.vxh_cydim) {
 			y = 0;
-			size_y = self->vx_hdr.vxh_cysiz;
+			size_y = self->vx_hdr.vxh_cydim;
 		} else {
 			/* # of pixels that go beyond the bottom clip-edge */
-			if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cysiz, &ywrap))
+			if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cydim, &ywrap))
 				ywrap = 0;
 		}
 	}
@@ -559,9 +559,9 @@ LOCAL_libvideo_swgfx_fill_mirror(struct video_gfx const *__restrict self,
                                  video_dim_t size_x, video_dim_t size_y,
                                  video_color_t color) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
+		x = (self->vx_hdr.vxh_cxdim - size_x) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
+		y = (self->vx_hdr.vxh_cydim - size_y) - y;
 	LOCAL_libvideo_swgfx_fill_wrap(self, x, y, size_x, size_y, color);
 }
 
@@ -763,9 +763,9 @@ LOCAL_libvideo_swgfx_rect_mirror(struct video_gfx const *__restrict self,
                                  video_dim_t size_x, video_dim_t size_y,
                                  video_color_t color) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
+		x = (self->vx_hdr.vxh_cxdim - size_x) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
+		y = (self->vx_hdr.vxh_cydim - size_y) - y;
 	LOCAL_libvideo_swgfx_rect_wrap(self, x, y, size_x, size_y, color);
 }
 
@@ -851,25 +851,25 @@ LOCAL_libvideo_swgfx_gradient_wrap(struct video_gfx const *__restrict self,
 	video_dim_t ywrap = 0;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
-		if (OVERFLOW_UADD((video_coord_t)x, size_x, &cxend) || size_x >= self->vx_hdr.vxh_cxsiz) {
+		x = wrap(x, self->vx_hdr.vxh_cxdim);
+		if (OVERFLOW_UADD((video_coord_t)x, size_x, &cxend) || size_x >= self->vx_hdr.vxh_cxdim) {
 			x = 0;
-			size_x = self->vx_hdr.vxh_cxsiz;
+			size_x = self->vx_hdr.vxh_cxdim;
 		} else {
 			/* # of pixels that go beyond the right clip-edge */
-			if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxsiz, &xwrap))
+			if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxdim, &xwrap))
 				xwrap = 0;
 		}
 	}
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
-		y = wrap(y, self->vx_hdr.vxh_cysiz);
-		if (OVERFLOW_UADD((video_coord_t)y, size_y, &cyend) || size_y >= self->vx_hdr.vxh_cysiz) {
+		y = wrap(y, self->vx_hdr.vxh_cydim);
+		if (OVERFLOW_UADD((video_coord_t)y, size_y, &cyend) || size_y >= self->vx_hdr.vxh_cydim) {
 			y = 0;
-			size_y = self->vx_hdr.vxh_cysiz;
+			size_y = self->vx_hdr.vxh_cydim;
 		} else {
 			/* # of pixels that go beyond the bottom clip-edge */
-			if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cysiz, &ywrap))
+			if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cydim, &ywrap))
 				ywrap = 0;
 		}
 	}
@@ -924,20 +924,20 @@ LOCAL_libvideo_swgfx_gradient_mirror(struct video_gfx const *__restrict self,
 	case 0:
 		break;
 	case VIDEO_GFX_F_XMIRROR:
-		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
+		x = (self->vx_hdr.vxh_cxdim - size_x) - x;
 		colors = (video_color_t const (*)[2])memcpy(fixed_colors, colors, 4, sizeof(video_color_t));
 		Tswap(video_color_t, fixed_colors[0][0], fixed_colors[0][1]);
 		Tswap(video_color_t, fixed_colors[1][0], fixed_colors[1][1]);
 		break;
 	case VIDEO_GFX_F_YMIRROR:
-		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
+		y = (self->vx_hdr.vxh_cydim - size_y) - y;
 		colors = (video_color_t const (*)[2])memcpy(fixed_colors, colors, 4, sizeof(video_color_t));
 		Tswap(video_color_t, fixed_colors[0][0], fixed_colors[1][0]);
 		Tswap(video_color_t, fixed_colors[0][1], fixed_colors[1][1]);
 		break;
 	case VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR:
-		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
-		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
+		x = (self->vx_hdr.vxh_cxdim - size_x) - x;
+		y = (self->vx_hdr.vxh_cydim - size_y) - y;
 		colors = (video_color_t const (*)[2])memcpy(fixed_colors, colors, 4, sizeof(video_color_t));
 		Tswap(video_color_t, fixed_colors[0][0], fixed_colors[1][1]);
 		Tswap(video_color_t, fixed_colors[0][1], fixed_colors[1][0]);
@@ -1011,25 +1011,25 @@ LOCAL_libvideo_swgfx_hgradient_wrap(struct video_gfx const *__restrict self,
 	video_dim_t ywrap = 0;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
-		if (OVERFLOW_UADD((video_coord_t)x, size_x, &cxend) || size_x >= self->vx_hdr.vxh_cxsiz) {
+		x = wrap(x, self->vx_hdr.vxh_cxdim);
+		if (OVERFLOW_UADD((video_coord_t)x, size_x, &cxend) || size_x >= self->vx_hdr.vxh_cxdim) {
 			x = 0;
-			size_x = self->vx_hdr.vxh_cxsiz;
+			size_x = self->vx_hdr.vxh_cxdim;
 		} else {
 			/* # of pixels that go beyond the right clip-edge */
-			if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxsiz, &xwrap))
+			if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxdim, &xwrap))
 				xwrap = 0;
 		}
 	}
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
-		y = wrap(y, self->vx_hdr.vxh_cysiz);
-		if (OVERFLOW_UADD((video_coord_t)y, size_y, &cyend) || size_y >= self->vx_hdr.vxh_cysiz) {
+		y = wrap(y, self->vx_hdr.vxh_cydim);
+		if (OVERFLOW_UADD((video_coord_t)y, size_y, &cyend) || size_y >= self->vx_hdr.vxh_cydim) {
 			y = 0;
-			size_y = self->vx_hdr.vxh_cysiz;
+			size_y = self->vx_hdr.vxh_cydim;
 		} else {
 			/* # of pixels that go beyond the bottom clip-edge */
-			if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cysiz, &ywrap))
+			if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cydim, &ywrap))
 				ywrap = 0;
 		}
 	}
@@ -1061,13 +1061,13 @@ LOCAL_libvideo_swgfx_hgradient_mirror(struct video_gfx const *__restrict self,
                                       video_color_t locolor, video_color_t hicolor) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR) {
 		video_color_t temp;
-		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
+		x = (self->vx_hdr.vxh_cxdim - size_x) - x;
 		temp = locolor;
 		locolor = hicolor;
 		hicolor = temp;
 	}
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
+		y = (self->vx_hdr.vxh_cydim - size_y) - y;
 	LOCAL_libvideo_swgfx_hgradient_wrap(self, x, y, size_x, size_y, locolor, hicolor);
 }
 
@@ -1134,25 +1134,25 @@ LOCAL_libvideo_swgfx_vgradient_wrap(struct video_gfx const *__restrict self,
 	video_dim_t ywrap = 0;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
-		if (OVERFLOW_UADD((video_coord_t)x, size_x, &cxend) || size_x >= self->vx_hdr.vxh_cxsiz) {
+		x = wrap(x, self->vx_hdr.vxh_cxdim);
+		if (OVERFLOW_UADD((video_coord_t)x, size_x, &cxend) || size_x >= self->vx_hdr.vxh_cxdim) {
 			x = 0;
-			size_x = self->vx_hdr.vxh_cxsiz;
+			size_x = self->vx_hdr.vxh_cxdim;
 		} else {
 			/* # of pixels that go beyond the right clip-edge */
-			if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxsiz, &xwrap))
+			if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxdim, &xwrap))
 				xwrap = 0;
 		}
 	}
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
-		y = wrap(y, self->vx_hdr.vxh_cysiz);
-		if (OVERFLOW_UADD((video_coord_t)y, size_y, &cyend) || size_y >= self->vx_hdr.vxh_cysiz) {
+		y = wrap(y, self->vx_hdr.vxh_cydim);
+		if (OVERFLOW_UADD((video_coord_t)y, size_y, &cyend) || size_y >= self->vx_hdr.vxh_cydim) {
 			y = 0;
-			size_y = self->vx_hdr.vxh_cysiz;
+			size_y = self->vx_hdr.vxh_cydim;
 		} else {
 			/* # of pixels that go beyond the bottom clip-edge */
-			if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cysiz, &ywrap))
+			if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cydim, &ywrap))
 				ywrap = 0;
 		}
 	}
@@ -1183,10 +1183,10 @@ LOCAL_libvideo_swgfx_vgradient_mirror(struct video_gfx const *__restrict self,
                                       video_dim_t size_x, video_dim_t size_y,
                                       video_color_t locolor, video_color_t hicolor) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
+		x = (self->vx_hdr.vxh_cxdim - size_x) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR) {
 		video_color_t temp;
-		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
+		y = (self->vx_hdr.vxh_cydim - size_y) - y;
 		temp = locolor;
 		locolor = hicolor;
 		hicolor = temp;

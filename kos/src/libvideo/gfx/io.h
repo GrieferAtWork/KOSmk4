@@ -56,9 +56,9 @@ filefmt_detect(char const *__restrict format);
 
 /* Write a video buffer */
 INTDEF WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options,
-                         enum filefmt fmt);
+libvideo_surface_save_fmt(struct video_surface const *__restrict self,
+                          FILE *stream, char const *options,
+                          enum filefmt fmt);
 
 
 
@@ -79,31 +79,19 @@ libvideo_buffer_open(struct video_domain const *__restrict domain,
                      char const *filename);
 
 
-/* Do the inverse of `video_buffer_*open' and save the contents of a video buffer
- * into  a file/memory/stream. The same set of  file formats is supported as also
- * supported by `video_buffer_*open', and the intended file format is  determined
- * by the given `format' argument, which should be the case-insensitive extension
- * (without a leading ".") of the format (e.g. "png" for PNG files).
- * @param: self:     The video buffer to save to a file.
- * @param: format:   The format to use for the output file written.
- * @param: fp/fd:    Output file descriptor / stdio-stream
- * @param: filename: Output filename ("format" is detected from file extension)
- * @param: options:  ","-separated string of format-specific encoding  options.
- *                   Available options are not explicitly document here, so you
- *                   need  to look at  the source to see  what's there. You may
- *                   simply pass `NULL' to use defaults for everything.
+/* Same  as  `video_buffer_*save', but  save pixel
+ * data using the palette and GFX flags of `self'.
  * @return: 0 : Success
- * @return: -1: [errno=ENOTSUP] Unsupported `format'
  * @return: -1: Error (s.a. `errno') */
-INTDEF WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_fsave(struct video_buffer *self, char const *format,
-                      FILE *__restrict fp, char const *options);
-INTDEF WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_fdsave(struct video_buffer *self, char const *format,
-                       fd_t fd, char const *options);
-INTDEF /*WUNUSED*/ NONNULL((1, 2)) int CC
-libvideo_buffer_save(struct video_buffer *self, char const *filename,
-                     char const *options);
+INTDEF WUNUSED ATTR_IN(1) NONNULL((2)) int CC
+libvideo_surface_fsave(struct video_surface const *self, char const *format,
+                       FILE *__restrict fp, char const *options);
+INTDEF WUNUSED ATTR_IN(1) NONNULL((2)) int CC
+libvideo_surface_fdsave(struct video_surface const *self, char const *format,
+                        fd_t fd, char const *options);
+INTDEF /*WUNUSED*/ ATTR_IN(1) NONNULL((2)) int CC
+libvideo_surface_save(struct video_surface const *self, char const *filename,
+                      char const *options);
 
 
 /* Same as `video_buffer_*save', but save pixel data from the

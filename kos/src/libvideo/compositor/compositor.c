@@ -234,7 +234,7 @@ try_convert_window_to_passthru(struct local_window *__restrict self) {
 	 *      become viewable, even if the window  is moved to be fully  on-screen) */
 
 	/* Allocate passthru buffer */
-	new_content = video_buffer_region(comp->lc_buffer, &self->lw_attr.vwa_rect);
+	new_content = video_buffer_region_distinct(comp->lc_buffer, &self->lw_attr.vwa_rect);
 	if unlikely(!new_content)
 		return; /* Failed to allocate passthru buffer */
 
@@ -432,8 +432,8 @@ local_window_hide_update_background_above_cb(void *cookie, struct local_window *
 			inner_data.lwhuba_src_gfx = video_gfx_clip(&display_gfx,
 			                                           -video_rect_getxmin(&window->lw_attr.vwa_rect),
 			                                           -video_rect_getymin(&window->lw_attr.vwa_rect),
-			                                           video_rect_getxmin(&window->lw_attr.vwa_rect) + video_gfx_getclipw(&display_gfx),
-			                                           video_rect_getymin(&window->lw_attr.vwa_rect) + video_gfx_getcliph(&display_gfx));
+			                                           video_rect_getxmin(&window->lw_attr.vwa_rect) + video_gfx_getxdim(&display_gfx),
+			                                           video_rect_getymin(&window->lw_attr.vwa_rect) + video_gfx_getydim(&display_gfx));
 			local_compositor_foreach_above(comp, above, intersect,
 			                               &local_window_hide_update_background_above_cb,
 			                               NULL, &inner_data);
@@ -496,8 +496,8 @@ local_window_hide_impl(struct local_window *__restrict me) {
 			data.lwhuba_src_gfx = video_gfx_clip(data.lwhuba_src_gfx,
 			                                     -video_rect_getxmin(&me->lw_attr.vwa_rect),
 			                                     -video_rect_getymin(&me->lw_attr.vwa_rect),
-			                                     video_rect_getxmin(&me->lw_attr.vwa_rect) + video_gfx_getclipw(data.lwhuba_src_gfx),
-			                                     video_rect_getymin(&me->lw_attr.vwa_rect) + video_gfx_getcliph(data.lwhuba_src_gfx));
+			                                     video_rect_getxmin(&me->lw_attr.vwa_rect) + video_gfx_getxdim(data.lwhuba_src_gfx),
+			                                     video_rect_getymin(&me->lw_attr.vwa_rect) + video_gfx_getydim(data.lwhuba_src_gfx));
 		}
 		local_compositor_foreach_above(comp, above, &me->lw_attr.vwa_rect,
 		                               &local_window_hide_update_background_above_cb,
@@ -607,8 +607,8 @@ local_window_update_background_propagate(struct local_window *window,
 		video_gfx_clip(&display_gfx,
 		               -video_rect_getxmin(&window->lw_attr.vwa_rect),
 		               -video_rect_getymin(&window->lw_attr.vwa_rect),
-		               video_rect_getxmin(&window->lw_attr.vwa_rect) + video_gfx_getclipw(&display_gfx),
-		               video_rect_getymin(&window->lw_attr.vwa_rect) + video_gfx_getcliph(&display_gfx));
+		               video_rect_getxmin(&window->lw_attr.vwa_rect) + video_gfx_getxdim(&display_gfx),
+		               video_rect_getymin(&window->lw_attr.vwa_rect) + video_gfx_getydim(&display_gfx));
 		local_compositor_foreach_above(comp, above, intersect,
 		                               &local_window_update_background_cb,
 		                               NULL, &display_gfx);
@@ -679,13 +679,13 @@ local_window_update_overlay_cb(void *cookie, struct local_window *window,
 			video_gfx_clip(&dst_gfx,
 			               -video_rect_getxmin(&window->lw_attr.vwa_rect),
 			               -video_rect_getymin(&window->lw_attr.vwa_rect),
-			               video_rect_getxmin(&window->lw_attr.vwa_rect) + video_gfx_getclipw(&dst_gfx),
-			               video_rect_getymin(&window->lw_attr.vwa_rect) + video_gfx_getcliph(&dst_gfx));
+			               video_rect_getxmin(&window->lw_attr.vwa_rect) + video_gfx_getxdim(&dst_gfx),
+			               video_rect_getymin(&window->lw_attr.vwa_rect) + video_gfx_getydim(&dst_gfx));
 			video_gfx_clip(&inner_data.lwuod_above_content,
 			               -video_rect_getxmin(&window->lw_attr.vwa_rect),
 			               -video_rect_getymin(&window->lw_attr.vwa_rect),
-			               video_rect_getxmin(&window->lw_attr.vwa_rect) + video_gfx_getclipw(&inner_data.lwuod_above_content),
-			               video_rect_getymin(&window->lw_attr.vwa_rect) + video_gfx_getcliph(&inner_data.lwuod_above_content));
+			               video_rect_getxmin(&window->lw_attr.vwa_rect) + video_gfx_getxdim(&inner_data.lwuod_above_content),
+			               video_rect_getymin(&window->lw_attr.vwa_rect) + video_gfx_getydim(&inner_data.lwuod_above_content));
 			local_compositor_foreach_below(comp, below, intersect,
 			                               &local_window_update_overlay_cb,
 			                               NULL, &inner_data);
@@ -778,8 +778,8 @@ local_window_updaterect_locked(struct local_window *__restrict me,
 			video_gfx_clip(&content_gfx,
 			               -video_rect_getxmin(&me->lw_attr.vwa_rect),
 			               -video_rect_getymin(&me->lw_attr.vwa_rect),
-			               video_rect_getxmin(&me->lw_attr.vwa_rect) + video_gfx_getclipw(&content_gfx),
-			               video_rect_getymin(&me->lw_attr.vwa_rect) + video_gfx_getcliph(&content_gfx));
+			               video_rect_getxmin(&me->lw_attr.vwa_rect) + video_gfx_getxdim(&content_gfx),
+			               video_rect_getymin(&me->lw_attr.vwa_rect) + video_gfx_getydim(&content_gfx));
 			local_compositor_foreach_above(comp, above, screen_rect,
 			                               &local_window_update_background_cb,
 			                               NULL, &content_gfx);
@@ -819,8 +819,8 @@ local_window_updaterect_locked(struct local_window *__restrict me,
 				video_gfx_clip(&overlay_gfx,
 				               -video_rect_getxmin(&me->lw_attr.vwa_rect),
 				               -video_rect_getymin(&me->lw_attr.vwa_rect),
-				               video_rect_getxmin(&me->lw_attr.vwa_rect) + video_gfx_getclipw(&overlay_gfx),
-				               video_rect_getymin(&me->lw_attr.vwa_rect) + video_gfx_getcliph(&overlay_gfx));
+				               video_rect_getxmin(&me->lw_attr.vwa_rect) + video_gfx_getxdim(&overlay_gfx),
+				               video_rect_getymin(&me->lw_attr.vwa_rect) + video_gfx_getydim(&overlay_gfx));
 				data.lwuod_above_overlay = &overlay_gfx;
 			}
 			video_buffer_getgfx(me->lw_content, &data.lwuod_above_content,
@@ -828,8 +828,8 @@ local_window_updaterect_locked(struct local_window *__restrict me,
 			video_gfx_clip(&data.lwuod_above_content,
 			               -video_rect_getxmin(&me->lw_attr.vwa_rect),
 			               -video_rect_getymin(&me->lw_attr.vwa_rect),
-			               video_rect_getxmin(&me->lw_attr.vwa_rect) + video_gfx_getclipw(&data.lwuod_above_content),
-			               video_rect_getymin(&me->lw_attr.vwa_rect) + video_gfx_getcliph(&data.lwuod_above_content));
+			               video_rect_getxmin(&me->lw_attr.vwa_rect) + video_gfx_getxdim(&data.lwuod_above_content),
+			               video_rect_getymin(&me->lw_attr.vwa_rect) + video_gfx_getydim(&data.lwuod_above_content));
 			local_compositor_foreach_below(comp, below, screen_rect,
 			                               &local_window_update_overlay_cb,
 			                               NULL, &data);
@@ -1706,8 +1706,8 @@ _local_window_ensure_not_passthru_impl(struct local_window *__restrict self) {
 	video_buffer_getgfx(oldbuf, &passthru_gfx, GFX_BLENDMODE_OVERRIDE);
 	video_gfx_bitblit(&distinct_gfx, 0, 0,
 	                  &passthru_gfx, 0, 0,
-	                  video_gfx_getclipw(&passthru_gfx),
-	                  video_gfx_getcliph(&passthru_gfx));
+	                  video_gfx_getxdim(&passthru_gfx),
+	                  video_gfx_getydim(&passthru_gfx));
 
 	/* Store the new buffer within the window. */
 	self->lw_content = newbuf; /* Inherit reference (x2) */
@@ -1845,8 +1845,8 @@ local_compositor_inc_overlay_mask_rollback_cb(void *cookie, struct local_window 
 		                    GFX_BLENDMODE_OVERRIDE);
 		video_gfx_clip(&overlay_mask_gfx,
 		               -video_rect_getxmin(intersect), -video_rect_getymin(intersect),
-		               video_rect_getxmin(intersect) + video_gfx_getclipw(&overlay_mask_gfx),
-		               video_rect_getymin(intersect) + video_gfx_getcliph(&overlay_mask_gfx));
+		               video_rect_getxmin(intersect) + video_gfx_getxdim(&overlay_mask_gfx),
+		               video_rect_getymin(intersect) + video_gfx_getydim(&overlay_mask_gfx));
 		assertf(above, "If this were the case, then 'lw_overlay_mask_allcount' should be 0 at this point!");
 		assert(TAILQ_ISBOUND(origin_window, lw_zorder_visi));
 		TAILQ_REMOVE(&comp->lc_zorder_visi, origin_window, lw_zorder_visi); /* Render without this one! */
@@ -1946,8 +1946,8 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 			video_gfx_clip(&overlay_rgba_gfx,
 			               -video_rect_getxmin(&result->lw_attr.vwa_rect),
 			               -video_rect_getymin(&result->lw_attr.vwa_rect),
-			               video_rect_getxmin(&result->lw_attr.vwa_rect) + video_gfx_getclipw(&overlay_rgba_gfx),
-			               video_rect_getymin(&result->lw_attr.vwa_rect) + video_gfx_getcliph(&overlay_rgba_gfx));
+			               video_rect_getxmin(&result->lw_attr.vwa_rect) + video_gfx_getxdim(&overlay_rgba_gfx),
+			               video_rect_getymin(&result->lw_attr.vwa_rect) + video_gfx_getydim(&overlay_rgba_gfx));
 			local_compositor_render_rgba_overlay_above(comp, above_visible,
 			                                           &result->lw_attr.vwa_rect,
 			                                           &overlay_rgba_gfx, false);
@@ -1967,8 +1967,8 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 			video_gfx_clip(&overlay_mask_gfx,
 			               -video_rect_getxmin(&result->lw_attr.vwa_rect),
 			               -video_rect_getymin(&result->lw_attr.vwa_rect),
-			               video_rect_getxmin(&result->lw_attr.vwa_rect) + video_gfx_getclipw(&overlay_mask_gfx),
-			               video_rect_getymin(&result->lw_attr.vwa_rect) + video_gfx_getcliph(&overlay_mask_gfx));
+			               video_rect_getxmin(&result->lw_attr.vwa_rect) + video_gfx_getxdim(&overlay_mask_gfx),
+			               video_rect_getymin(&result->lw_attr.vwa_rect) + video_gfx_getydim(&overlay_mask_gfx));
 			local_compositor_render_mask_overlay_above(comp, above_visible,
 			                                           &result->lw_attr.vwa_rect,
 			                                           &overlay_mask_gfx, true);
@@ -2020,7 +2020,7 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 		    (result->lw_overlay_mask_allcount == 0)) {
 			/* Use a passthru buffer */
 			REF struct video_buffer *content;
-			content = video_buffer_region(comp->lc_buffer, &result->lw_attr.vwa_rect);
+			content = video_buffer_region_distinct(comp->lc_buffer, &result->lw_attr.vwa_rect);
 			if unlikely(!content)
 				goto err_unlock_r_overlay;
 			result->lw_content = content;
@@ -2069,8 +2069,8 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 	if (initial_content) {
 		struct video_gfx window_gfx;
 		video_buffer_getgfx(result->lw_content, &window_gfx, GFX_BLENDMODE_OVERRIDE);
-		video_gfx_stretch(&window_gfx, 0, 0, video_gfx_getclipw(&window_gfx), video_gfx_getcliph(&window_gfx),
-		                  initial_content, 0, 0, video_gfx_getclipw(initial_content), video_gfx_getcliph(initial_content));
+		video_gfx_stretch(&window_gfx, 0, 0, video_gfx_getxdim(&window_gfx), video_gfx_getydim(&window_gfx),
+		                  initial_content, 0, 0, video_gfx_getxdim(initial_content), video_gfx_getydim(initial_content));
 	}
 
 	/* Update "lw_overlay_rgba_allcount" / "lw_overlay_mask_allcount" of all
@@ -2233,10 +2233,10 @@ local_compositor_updatebuffercaches(struct local_compositor *__restrict me) {
 
 	me->lc_domain                  = buffer->vb_domain;
 	me->lc_nalpha_format.vbf_codec = video_buffer_getcodec(buffer);
-	me->lc_nalpha_format.vbf_pal   = buffer->vb_format.vbf_pal;
+	me->lc_nalpha_format.vbf_pal   = buffer->vb_surf.vs_pal;
 	me->lc_nalpha_format.vbf_flags = video_buffer_getflags(buffer) & ~VIDEO_GFX_F_COLORKEY;
 	me->lc_yalpha_format.vbf_codec = add_alpha(video_buffer_getcodec(buffer));
-	me->lc_yalpha_format.vbf_pal   = buffer->vb_format.vbf_pal;
+	me->lc_yalpha_format.vbf_pal   = buffer->vb_surf.vs_pal;
 	me->lc_yalpha_format.vbf_flags = me->lc_nalpha_format.vbf_flags;
 
 	/* Generate new (pre-cached) GFX contexts */
@@ -2269,7 +2269,7 @@ local_compositor_setbuffer_locked(struct local_compositor *__restrict me,
 			REF struct video_buffer *new_passthru;
 			assert(LIST_ISBOUND(pt_window, lw_passthru));
 			local_window_assert(pt_window);
-			new_passthru = video_buffer_region(new_buffer, &pt_window->lw_attr.vwa_rect);
+			new_passthru = video_buffer_region_distinct(new_buffer, &pt_window->lw_attr.vwa_rect);
 			if unlikely(!new_passthru) {
 				struct local_window *rollback;
 				/* Rollback already-allocated (new) passthru buffers */
@@ -2309,8 +2309,8 @@ local_compositor_setbuffer_locked(struct local_compositor *__restrict me,
 			video_buffer_getgfx(obuffer, &ogfx, GFX_BLENDMODE_OVERRIDE);
 			video_buffer_getgfx(nbuffer, &ngfx, GFX_BLENDMODE_OVERRIDE);
 			video_gfx_bitblit(&ngfx, 0, 0, &ogfx, 0, 0,
-			                  video_gfx_getclipw(&ngfx),
-			                  video_gfx_getcliph(&ngfx));
+			                  video_gfx_getxdim(&ngfx),
+			                  video_gfx_getydim(&ngfx));
 			video_buffer_decref(obuffer);
 		}
 	}
@@ -2499,8 +2499,8 @@ local_compositor_setfeatures(struct video_compositor *__restrict self,
 			video_buffer_getgfx(obuffer, &ogfx, GFX_BLENDMODE_OVERRIDE);
 			video_buffer_getgfx(nbuffer, &ngfx, GFX_BLENDMODE_OVERRIDE);
 			video_gfx_bitblit(&ngfx, 0, 0, &ogfx, 0, 0,
-			                  video_gfx_getclipw(&ngfx),
-			                  video_gfx_getcliph(&ngfx));
+			                  video_gfx_getxdim(&ngfx),
+			                  video_gfx_getydim(&ngfx));
 			obuffer = video_buffer_revoke(obuffer);
 			video_buffer_decref(obuffer);
 			LIST_UNBIND(pt_window, lw_passthru);
@@ -2587,8 +2587,8 @@ local_compositor_setbackground(struct video_compositor *__restrict self,
 			struct video_rect whole_screen;
 			video_rect_setxmin(&whole_screen, 0);
 			video_rect_setymin(&whole_screen, 0);
-			video_rect_setxdim(&whole_screen, video_gfx_getclipw(&screen_gfx));
-			video_rect_setydim(&whole_screen, video_gfx_getcliph(&screen_gfx));
+			video_rect_setxdim(&whole_screen, video_gfx_getxdim(&screen_gfx));
+			video_rect_setydim(&whole_screen, video_gfx_getydim(&screen_gfx));
 			local_compositor_foreach_above(me, start, &whole_screen,
 			                               &local_compositor_update_background_foreach_cb,
 			                               &local_compositor_update_background_foreach_nohit_cb,

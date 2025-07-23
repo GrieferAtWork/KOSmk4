@@ -494,8 +494,8 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer_base *result,
 	               (video_offset_t)gfx.vx_hdr.vxh_bymin - gfx.vx_hdr.vxh_cyoff,
 	               _video_gfxhdr_bxsiz(&gfx.vx_hdr),
 	               _video_gfxhdr_bysiz(&gfx.vx_hdr));
-	stride = video_gfx_getclipw(&gfx) * 4;
-	total  = video_gfx_getcliph(&gfx) * stride;
+	stride = video_gfx_getxdim(&gfx) * 4;
+	total  = video_gfx_getydim(&gfx) * stride;
 	result->rb_data = (byte_t *)malloc(total);
 	if unlikely(!result->rb_data)
 		goto err;
@@ -503,16 +503,16 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer_base *result,
 /*	result->vb_refcnt          = 1;*/ /* Unused */
 /*	result->vb_domain          = _libvideo_ramdomain();*/ /* Unused */
 	result->vb_ops             = _rambuffer_ops();
-	result->vb_format.vbf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
-	result->vb_format.vbf_pal   = NULL;
-	result->vb_xdim            = video_gfx_getclipw(&gfx);
-	result->vb_ydim            = video_gfx_getcliph(&gfx);
-	assertf(result->vb_format.vbf_codec, "Built-in codec should have been recognized");
+	result->vb_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
+	result->vb_surf.vs_pal   = NULL;
+	result->vb_xdim            = video_gfx_getxdim(&gfx);
+	result->vb_ydim            = video_gfx_getydim(&gfx);
+	assertf(result->vb_codec, "Built-in codec should have been recognized");
 	video_buffer_getgfx(result, &result_gfx,
 	                    GFX_BLENDMODE_OVERRIDE);
 	video_gfx_bitblit(&result_gfx, 0, 0, &gfx, 0, 0,
-	                  video_gfx_getclipw(&gfx),
-	                  video_gfx_getcliph(&gfx));
+	                  video_gfx_getxdim(&gfx),
+	                  video_gfx_getydim(&gfx));
 	return 0;
 err:
 	return -1;
@@ -525,10 +525,10 @@ median_cut_start(struct video_gfx const *__restrict self,
                  video_color_t constant_alpha) {
 	struct median_io io;
 	struct video_rambuffer_base rgba_buf;
-	if (video_gfx_getbuffer(self)->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_RGBA8888 &&
-	    /* TODO: This  actually  works   for  any  XXXX8888   codec.  Just  need   to
-	     *       "video_gfx_getbuffer(self)->vb_format.vbf_codec->vc_color2pixel" the
-	     *       produced   palette   entries   afterwards,  and   always   pass  the
+	if (video_gfx_getbuffer(self)->vb_codec->vc_codec == VIDEO_CODEC_RGBA8888 &&
+	    /* TODO: This actually works for any XXXX8888 codec. Just need  to
+	     *       "video_gfx_getbuffer(self)->vb_codec->vc_color2pixel" the
+	     *       produced  palette entries afterwards, and always pass the
 	     *       codec's alpha-mask instead of "constant_alpha". */
 	    self->vx_hdr.vxh_bxmin == 0 &&
 	    self->vx_hdr.vxh_bymin == 0 &&

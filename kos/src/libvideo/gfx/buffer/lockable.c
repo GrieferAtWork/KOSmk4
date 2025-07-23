@@ -88,7 +88,7 @@ lockable_getdata(struct lockable_buffer_base *__restrict self) {
 	byte_t *result = atomic_read(&self->lbb_data);
 	if (!result) {
 		struct video_rambuffer_requirements req;
-		(*self->vb_format.vbf_codec->vc_rambuffer_requirements)(self->vb_xdim, self->vb_ydim, &req);
+		(*self->vb_codec->vc_rambuffer_requirements)(self->vb_xdim, self->vb_ydim, &req);
 		result = (byte_t *)calloc(req.vbs_bufsize);
 		if unlikely(!result)
 			goto err;
@@ -179,17 +179,15 @@ lockable_buffer__subregion_impl(struct video_surface const *__restrict surface,
 		goto err;
 	result->lbb_data   = NULL;
 	result->vb_domain  = _libvideo_ramdomain();
-	result->vb_format.vbf_pal      = video_surface_getpalette(surface);
-	result->vb_format.vbf_codec    = video_buffer_getcodec(self);
-	result->vb_format.vbf_flags    = video_surface_getflags(surface);
-	result->vb_format.vbf_colorkey = video_surface_getcolorkey(surface);
+	video_surface_copyattrib(&result->vb_surf, surface);
+	result->vb_codec   = video_buffer_getcodec(self);
 	result->vb_xdim    = rect->vcr_xdim;
 	result->vb_ydim    = rect->vcr_ydim;
 	result->vb_refcnt  = 1;
 	result->lbb_stride = self->lbb_stride;
 	result->lbb_data += base_yoff * result->lbb_stride;
 	result->lbb_data += base_yoff * result->lbb_stride;
-	video_codec_xcoord_to_offset(result->vb_format.vbf_codec, base_xoff,
+	video_codec_xcoord_to_offset(result->vb_codec, base_xoff,
 	                             &result->lbsb_bxoff, &result->lbsb_bxrem);
 	result->lbsb_xoff   = base_xoff;
 	result->lbsb_yoff   = base_yoff;
@@ -233,10 +231,12 @@ PRIVATE ATTR_OUT(1) ATTR_IN(2) void FCC
 lockable_asram(struct video_rambuffer_base *__restrict rb,
                struct lockable_buffer_base const *__restrict self) {
 	DBG_memset(&rb->vb_domain, 0xcc, sizeof(rb->vb_domain));
-	rb->vb_ops    = _rambuffer_ops();
-	rb->vb_format = self->vb_format;
-	rb->vb_xdim   = self->vb_xdim;
-	rb->vb_ydim   = self->vb_ydim;
+	video_surface_copyattrib(&rb->vb_surf, &self->vb_surf);
+	rb->vb_surf.vs_buffer = rb;
+	rb->vb_codec = video_buffer_getcodec(self);
+	rb->vb_ops   = _rambuffer_ops();
+	rb->vb_xdim  = self->vb_xdim;
+	rb->vb_ydim  = self->vb_ydim;
 #ifndef NDEBUG
 	rb->vb_refcnt = 0; /* So someone incref'ing will fault */
 #endif /* !NDEBUG */
@@ -261,8 +261,8 @@ lockable_readpixels(struct lockable_buffer_base const *__restrict self) {
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, 0, 0,
 	                  p_srcgfx, 0, 0,
-	                  video_gfx_getclipw(p_dstgfx),
-	                  video_gfx_getcliph(p_dstgfx));
+	                  video_gfx_getxdim(p_dstgfx),
+	                  video_gfx_getydim(p_dstgfx));
 }
 
 /* Write video lock to GFX */
@@ -281,8 +281,8 @@ lockable_writepixels(struct lockable_buffer_base const *__restrict self) {
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, 0, 0, p_srcgfx, 0, 0,
-	                  video_gfx_getclipw(p_dstgfx),
-	                  video_gfx_getcliph(p_dstgfx));
+	                  video_gfx_getxdim(p_dstgfx),
+	                  video_gfx_getydim(p_dstgfx));
 }
 
 
@@ -453,10 +453,12 @@ PRIVATE ATTR_OUT(1) ATTR_IN(2) void FCC
 lockable_subregion_asram(struct video_rambuffer_base *__restrict rb,
                          struct lockable_buffer_subregion const *__restrict self) {
 	DBG_memset(&rb->vb_domain, 0xcc, sizeof(rb->vb_domain));
-	rb->vb_ops    = _rambuffer_ops();
-	rb->vb_format = self->vb_format;
-	rb->vb_xdim   = self->vb_xdim + self->lbsb_bxrem;
-	rb->vb_ydim   = self->vb_ydim;
+	video_surface_copyattrib(&rb->vb_surf, &self->vb_surf);
+	rb->vb_surf.vs_buffer = rb;
+	rb->vb_codec = video_buffer_getcodec(self);
+	rb->vb_ops   = _rambuffer_ops();
+	rb->vb_xdim  = self->vb_xdim + self->lbsb_bxrem;
+	rb->vb_ydim  = self->vb_ydim;
 #ifndef NDEBUG
 	rb->vb_refcnt = 0; /* So someone incref'ing will fault */
 #endif /* !NDEBUG */
@@ -481,8 +483,8 @@ lockable_subregion_readpixels(struct lockable_buffer_subregion const *__restrict
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, self->lbsb_bxrem, 0,
 	                  p_srcgfx, self->lbsb_xoff, self->lbsb_yoff,
-	                  video_gfx_getclipw(p_dstgfx),
-	                  video_gfx_getcliph(p_dstgfx));
+	                  video_gfx_getxdim(p_dstgfx),
+	                  video_gfx_getydim(p_dstgfx));
 }
 
 /* Write video lock to GFX */
@@ -502,8 +504,8 @@ lockable_subregion_writepixels(struct lockable_buffer_subregion const *__restric
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, self->lbsb_xoff, self->lbsb_yoff,
 	                  p_srcgfx, self->lbsb_bxrem, 0,
-	                  video_gfx_getclipw(p_dstgfx),
-	                  video_gfx_getcliph(p_dstgfx));
+	                  video_gfx_getxdim(p_dstgfx),
+	                  video_gfx_getydim(p_dstgfx));
 }
 
 
@@ -742,8 +744,8 @@ lockable_buffer__updategfx(struct video_gfx *__restrict self, unsigned int what)
 
 
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) bool CC
-video_buffer_islockable(struct video_buffer const *__restrict self) {
+INTERN ATTR_PURE WUNUSED ATTR_IN(1) bool CC
+libvideo_buffer_islockable(struct video_buffer const *__restrict self) {
 	/* List of RAM-domain buffers that are known to always be lockable */
 	if (self->vb_domain == &libvideo_ramdomain) {
 		if (self->vb_ops == &lockable_buffer_ops)
@@ -767,7 +769,7 @@ video_buffer_islockable(struct video_buffer const *__restrict self) {
 			 * base buffer (meaning not **all** pixels are lockable) */
 			struct region_buffer_subregion_alias const *me;
 			me = (struct region_buffer_subregion_alias const *)self;
-			return video_buffer_islockable(me->rbf_base);
+			return libvideo_buffer_islockable(me->rbf_base);
 		}
 	}
 	return false;
@@ -776,27 +778,25 @@ yes:
 }
 
 
-/* Check if `buffer'  is lockable. If  so re-return  "buffer"
- * and initialize `self' such that `lockable_buffer_finibase'
- * does nothing. Else, wrap it using `buffer' and return *it*
- * instead. */
-INTERN WUNUSED ATTR_OUT(1) NONNULL((2)) struct video_buffer *CC
+/* Wrap `surface' as the surface of a lockable buffer. */
+INTERN ATTR_RETNONNULL WUNUSED ATTR_OUT(1) ATTR_IN(2) struct video_surface const *CC
 lockable_buffer_initbase(struct lockable_buffer_base *self,
-                         struct video_buffer *__restrict buffer) {
-	if (video_buffer_islockable(buffer))
-		return buffer;
-	self->vb_ops    = _lockable_buffer_ops();
-	self->vb_format = buffer->vb_format;
-	self->vb_xdim   = buffer->vb_xdim;
-	self->vb_ydim   = buffer->vb_ydim;
+                         struct video_surface const *__restrict surface) {
+	struct video_buffer *base = video_surface_getbuffer(surface);
+	video_surface_copyattrib(&self->vb_surf, surface);
+	self->vb_surf.vs_buffer = self;
+	self->vb_codec = video_buffer_getcodec(base);
+	self->vb_ops   = _lockable_buffer_ops();
+	self->vb_xdim  = video_buffer_getxdim(base);
+	self->vb_ydim  = video_buffer_getydim(base);
 #ifndef NDEBUG
 	self->vb_refcnt = 0;
 #endif /* !NDEBUG */
-	self->lbb_base  = buffer;
+	self->lbb_base  = base;
 	self->lbb_data  = NULL;
 	self->lbb_edata = NULL;
 	DBG_memset(&self->lbb_stride, 0xcc, sizeof(self->lbb_stride));
-	return self;
+	return video_buffer_assurface(self);
 }
 
 
@@ -812,23 +812,29 @@ lockable_buffer_initbase(struct lockable_buffer_base *self,
  * - In case `vi_wlock' was called, the matching `vi_unlock' will  then
  *   once again use a GFX context to at least all modified (or possibly
  *   just all) pixels back to the underlying buffer.
- * @param: self:  The video buffer to wrap
+ * @param: self:  The video surface to wrap
  * @return: * :   The video buffer wrapper (having the same codec/dimensions as `self')
  * @return: self: The given `self' is already  known to have vi_rlock/vi_wlock  operators
  *                that either never fail, or can only fail with errno=ENOMEM for the same
  *                reason that the  "lockable" wrapper could  also fail. (generally,  this
  *                means that this is a no-op when  `self' is a ram-buffer, or is  already
  *                a "lockable" video buffer). */
-DEFINE_PUBLIC_ALIAS(video_buffer_lockable, libvideo_buffer_lockable);
-INTERN WUNUSED ATTR_INOUT(1) REF struct video_buffer *CC
-libvideo_buffer_lockable(struct video_buffer *__restrict self) {
-	REF struct lockable_buffer *result;
-
+DEFINE_PUBLIC_ALIAS(video_surface_lockable, libvideo_surface_lockable);
+INTERN WUNUSED ATTR_IN(1) REF struct video_buffer *CC
+libvideo_surface_lockable(struct video_surface const *__restrict self) {
 	/* Check for special cases where we can re-return "self" */
-	if (video_buffer_islockable(self)) {
-		video_buffer_incref(self);
-		return self;
+	struct video_buffer *buffer = video_surface_getbuffer(self);
+	if (libvideo_buffer_islockable(buffer) && video_surface_isdefault(self)) {
+		video_buffer_incref(buffer);
+		return buffer;
 	}
+	return libvideo_surface_lockable_distinct(self);
+}
+
+INTERN WUNUSED ATTR_IN(1) REF struct video_buffer *CC
+libvideo_surface_lockable_distinct(struct video_surface const *__restrict self) {
+	REF struct lockable_buffer *result;
+	struct video_buffer *buffer = video_surface_getbuffer(self);
 
 	/* Allocate the wrapper */
 	result = (REF struct lockable_buffer *)malloc(sizeof(struct lockable_buffer));
@@ -836,12 +842,13 @@ libvideo_buffer_lockable(struct video_buffer *__restrict self) {
 		goto err;
 	result->vb_ops    = _lockable_buffer_ops();
 	result->vb_domain = _libvideo_ramdomain();
-	result->vb_format = self->vb_format;
-	result->vb_xdim   = self->vb_xdim;
-	result->vb_ydim   = self->vb_ydim;
+	video_surface_copyattrib(&result->vb_surf, self);
+	result->vb_codec  = video_buffer_getcodec(buffer);
+	result->vb_xdim   = video_buffer_getxdim(buffer);
+	result->vb_ydim   = video_buffer_getydim(buffer);
 	result->vb_refcnt = 1;
-	video_buffer_incref(self);
-	result->lbb_base  = self;
+	video_buffer_incref(buffer);
+	result->lbb_base  = buffer;
 	result->lbb_data  = NULL;
 	result->lbb_edata = NULL;
 	DBG_memset(&result->lbb_stride, 0xcc, sizeof(result->lbb_stride));

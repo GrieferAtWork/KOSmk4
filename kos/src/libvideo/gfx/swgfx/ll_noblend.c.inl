@@ -106,7 +106,7 @@ libvideo_swgfx_noblend__absline_llhh(struct video_gfx const *__restrict self,
                                      video_dim_t size_x, video_dim_t size_y,
                                      video_color_t color) {
 	struct video_regionlock lock;
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	struct video_buffer *buffer = video_surface_getbuffer(surface);
 	video_pixel_t pixel = video_surface_color2pixel(surface, color);
 	gfx_assert(size_x > 0);
@@ -197,7 +197,7 @@ libvideo_swgfx_noblend__absline_lhhl(struct video_gfx const *__restrict self,
                                      video_dim_t size_x, video_dim_t size_y,
                                      video_color_t color) {
 	struct video_regionlock lock;
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	struct video_buffer *buffer = video_surface_getbuffer(surface);
 	video_pixel_t pixel = video_surface_color2pixel(surface, color);
 	gfx_assert(size_x > 0);
@@ -257,7 +257,7 @@ libvideo_swgfx_noblend__absline_h(struct video_gfx const *__restrict self,
                                   video_coord_t dst_x, video_coord_t dst_y,
                                   video_dim_t length, video_color_t color) {
 	struct video_regionlock lock;
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	struct video_buffer *buffer = video_surface_getbuffer(surface);
 	video_pixel_t pixel = video_surface_color2pixel(surface, color);
 	gfx_assert(length > 0);
@@ -286,7 +286,7 @@ libvideo_swgfx_noblend__absline_v(struct video_gfx const *__restrict self,
                                   video_coord_t dst_x, video_coord_t dst_y,
                                   video_dim_t length, video_color_t color) {
 	struct video_regionlock lock;
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	struct video_buffer *buffer = video_surface_getbuffer(surface);
 	video_pixel_t pixel = video_surface_color2pixel(surface, color);
 	if likely(LL_wlockregion(buffer, &lock, dst_x, dst_y, 1, length)) {
@@ -319,7 +319,7 @@ libvideo_swgfx_noblend__absfill(struct video_gfx const *__restrict self,
                                 video_dim_t size_x, video_dim_t size_y,
                                 video_color_t color) {
 	struct video_regionlock lock;
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	struct video_buffer *buffer = video_surface_getbuffer(surface);
 	video_pixel_t pixel = video_surface_color2pixel(surface, color);
 	gfx_assert(size_x > 0);
@@ -424,7 +424,7 @@ libvideo_swgfx_noblend_interp8888__absgradient(struct video_gfx const *__restric
 	}
 
 	/* Convert colors to pixels */
-	surface = video_gfx_getsurface(self);
+	surface = video_gfx_assurface(self);
 	buffer = video_surface_getbuffer(surface);
 	pixels[0][0] = video_surface_color2pixel(surface, colors[0][0]);
 	pixels[0][1] = video_surface_color2pixel(surface, colors[0][1]);
@@ -562,7 +562,7 @@ libvideo_swgfx_noblend_interp8888__absgradient_h(struct video_gfx const *__restr
 	            dst_x, dst_y, size_x, size_y,
 	            locolor, hicolor);
 	calc_linear_stretch_dim(2, size_x, &fp_src_x, &fp_step_x, &pad_xmin, &pad_xmax);
-	surface = video_gfx_getsurface(self);
+	surface = video_gfx_assurface(self);
 	buffer  = video_surface_getbuffer(surface);
 	lopixel = video_surface_color2pixel(surface, locolor);
 	hipixel = video_surface_color2pixel(surface, hicolor);
@@ -648,7 +648,7 @@ libvideo_swgfx_noblend_interp8888__absgradient_v(struct video_gfx const *__restr
 	            dst_x, dst_y, size_x, size_y,
 	            locolor, hicolor);
 	calc_linear_stretch_dim(2, size_y, &fp_src_y, &fp_step_y, &pad_ymin, &pad_ymax);
-	surface = video_gfx_getsurface(self);
+	surface = video_gfx_assurface(self);
 	buffer  = video_surface_getbuffer(surface);
 	lopixel = video_surface_color2pixel(surface, locolor);
 	hipixel = video_surface_color2pixel(surface, hicolor);
@@ -734,7 +734,7 @@ libvideo_swgfx_noblend__fillmask1(struct video_gfx const *__restrict self,
                                   struct video_bitmask const *__restrict bm,
                                   __REGISTER_TYPE__ bm_xor) {
 	struct video_regionlock lock;
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	struct video_buffer *buffer = video_surface_getbuffer(surface);
 	video_pixel_t pixel = video_surface_color2pixel(surface, color);
 	TRACE_START("noblend__fillmask1("
@@ -903,7 +903,7 @@ libvideo_swgfx_noblend__fillmask(struct video_gfx const *__restrict self,
                                  video_color_t const bg_fg_colors[2],
                                  struct video_bitmask const *__restrict bm) {
 	struct video_regionlock lock;
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	struct video_buffer *buffer = video_surface_getbuffer(surface);
 	video_pixel_t bg_fg_pixel[2];
 	bg_fg_pixel[0] = video_surface_color2pixel(surface, bg_fg_colors[0]);

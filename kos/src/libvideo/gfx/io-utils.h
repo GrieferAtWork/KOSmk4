@@ -49,14 +49,14 @@ INTDEF WUNUSED NONNULL((1)) REF struct video_buffer *CC
 libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
                          void const *blob, size_t blob_size);
 INTDEF WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_png(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options);
+libvideo_surface_save_png(struct video_surface const *__restrict self,
+                          FILE *stream, char const *options);
 INTDEF WUNUSED NONNULL((1)) REF struct video_buffer *CC
 libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
                              void const *blob, size_t blob_size);
 INTDEF WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
-                             FILE *stream, char const *options);
+libvideo_surface_save_lodepng(struct video_surface const *__restrict self,
+                              FILE *stream, char const *options);
 
 
 
@@ -65,8 +65,8 @@ INTDEF WUNUSED NONNULL((1)) REF struct video_buffer *CC
 libvideo_buffer_open_jpg(struct video_domain const *__restrict domain_hint,
                          void const *blob, size_t blob_size);
 INTDEF WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options);
+libvideo_surface_save_jpg(struct video_surface const *__restrict self,
+                          FILE *stream, char const *options);
 
 
 
@@ -80,8 +80,8 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
                          void const *blob, size_t blob_size,
                          struct mapfile *p_mapfile);
 INTDEF WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options);
+libvideo_surface_save_bmp(struct video_surface const *__restrict self,
+                          FILE *stream, char const *options);
 
 
 

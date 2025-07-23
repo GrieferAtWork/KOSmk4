@@ -260,15 +260,13 @@ rambuffer__subregion__common(struct video_surface const *__restrict surface,
 	result = (REF struct video_rambuffer_subregion *)malloc(sizeof(struct video_rambuffer_subregion));
 	if unlikely(!result)
 		goto err;
+	video_surface_copyattrib(&result->vb_surf, surface);
+	result->vb_codec  = video_buffer_getcodec(self);
 	result->vb_domain = self->vb_domain;
-	result->vb_format.vbf_pal      = video_surface_getpalette(surface);
-	result->vb_format.vbf_codec    = video_buffer_getcodec(self);
-	result->vb_format.vbf_flags    = video_surface_getflags(surface);
-	result->vb_format.vbf_colorkey = video_surface_getcolorkey(surface);
 	result->vb_xdim   = rect->vcr_xdim;
 	result->vb_ydim   = rect->vcr_ydim;
 	result->vb_refcnt = 1;
-	video_codec_xcoord_to_offset(result->vb_format.vbf_codec, rect->vcr_xmin,
+	video_codec_xcoord_to_offset(result->vb_codec, rect->vcr_xmin,
 	                             &x_byte_offset, &result->rbrvsr_xoff);
 	result->rbrv_gfx.rbrvg_data  = (byte_t *)(x_byte_offset + rect->vcr_ymin * self_stride);
 	result->rbrv_gfx.rbrvg_inuse = 0;
@@ -504,6 +502,23 @@ libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
 	result = (REF struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
 	if unlikely(!result)
 		goto err;
+
+	/* Initialize meta-data */
+	__video_buffer_setformat(result, format);
+	result->vb_ops    = _rambuffer_ops();
+	result->vb_domain = self;
+	result->vb_refcnt = 1;
+	result->vb_xdim   = xdim;
+	result->vb_ydim   = ydim;
+	if (result->vb_surf.vs_pal) {
+		if unlikely(!(result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
+			result->vb_surf.vs_pal = NULL;
+	} else if unlikely(result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		errno = EINVAL;
+		goto err_result_data;
+	}
+
+	/* Allocate buffer data */
 	result->rb_data = (flags & VIDEO_DOMAIN_NEWBUFFER_F_CALLOC)
 	                  ? (byte_t *)calloc(req.vbs_bufsize)
 	                  : (byte_t *)malloc(req.vbs_bufsize);
@@ -512,19 +527,6 @@ libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
 	result->rb_stride = req.vbs_stride;
 	LIST_INIT(&result->rb_subregions_list);
 	atomic_lock_init(&result->rb_subregions_lock);
-	result->vb_ops    = _rambuffer_ops();
-	result->vb_domain = self;
-	result->vb_refcnt = 1;
-	result->vb_format = *format;
-	result->vb_xdim   = xdim;
-	result->vb_ydim   = ydim;
-	if (result->vb_format.vbf_pal) {
-		if unlikely(!(result->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
-			result->vb_format.vbf_pal = NULL;
-	} else if unlikely(result->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-		errno = EINVAL;
-		goto err_result_data;
-	}
 	__video_buffer_init_common(result);
 	return result;
 err_result_data:
@@ -559,34 +561,36 @@ libvideo_ramdomain_formem(struct video_domain const *__restrict self,
 	result = (REF struct video_rambuffer_formem *)malloc(sizeof(struct video_rambuffer_formem));
 	if unlikely(!result)
 		goto err;
+	__video_buffer_setformat(result, format);
+
+	/* Must use a different, fallback "codec" that can deal with bad alignment */
+	if (!IS_ALIGNED(stride, result->vb_codec->vc_align) ||
+	    !IS_ALIGNED((uintptr_t)mem, result->vb_codec->vc_align))
+		result->vb_codec = result->vb_codec->vc_nalgn;
+
+	/* Validate palette configuration */
+	if (result->vb_surf.vs_pal) {
+		if unlikely(!(result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
+			result->vb_surf.vs_pal = NULL;
+	} else if unlikely(result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		errno = EINVAL;
+		goto err_r;
+	}
 	result->rbrv_dummy = libvideo_buffer_getdummy(req.vbs_bufsize);
 	if unlikely(!result->rbrv_dummy)
 		goto err_r;
-	result->rbrv_stride          = stride;
-	result->rbrv_gfx.rbrvg_data  = (byte_t *)mem;
-	result->rbrv_gfx.rbrvg_inuse = 0;
 	result->vb_ops    = _rambuffer_formem_ops();
 	result->vb_domain = self;
 	result->vb_refcnt = 1;
-	result->vb_format = *format;
 	result->vb_xdim   = xdim;
 	result->vb_ydim   = ydim;
+	result->rbrv_stride             = stride;
+	result->rbrv_gfx.rbrvg_data     = (byte_t *)mem;
+	result->rbrv_gfx.rbrvg_inuse    = 0;
 	result->rbfm_release_mem        = release_mem;
 	result->rbfm_release_mem_cookie = release_mem_cookie;
 	LIST_INIT(&result->rbfm_subregions_list);
 	atomic_lock_init(&result->rbfm_subregions_lock);
-
-	/* Must use a different, fallback "codec" that can deal with bad alignment */
-	if (!IS_ALIGNED(stride, result->vb_format.vbf_codec->vc_align) ||
-	    !IS_ALIGNED((uintptr_t)mem, result->vb_format.vbf_codec->vc_align))
-		result->vb_format.vbf_codec = result->vb_format.vbf_codec->vc_nalgn;
-	if (result->vb_format.vbf_pal) {
-		if unlikely(!(result->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
-			result->vb_format.vbf_pal = NULL;
-	} else if unlikely(result->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-		errno = EINVAL;
-		goto err_r;
-	}
 	__video_buffer_init_common(result);
 	return result;
 err_r:

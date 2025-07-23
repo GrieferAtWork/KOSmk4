@@ -195,14 +195,14 @@ LOCAL_libvideo_swblitter_blit(LOCAL_struct_video_blitter const *__restrict self
 	/* Apply mirror rules to destination coords */
 #ifdef LOCAL_USE_IMATRIX
 	if (dst->vx_surf.vs_flags & VIDEO_GFX_F_XMIRROR)
-		dst_x = (dst->vx_hdr.vxh_cxsiz - LOCAL_dst_size_x) - dst_x;
+		dst_x = (dst->vx_hdr.vxh_cxdim - LOCAL_dst_size_x) - dst_x;
 	if (dst->vx_surf.vs_flags & VIDEO_GFX_F_YMIRROR)
-		dst_y = (dst->vx_hdr.vxh_cysiz - LOCAL_dst_size_y) - dst_y;
+		dst_y = (dst->vx_hdr.vxh_cydim - LOCAL_dst_size_y) - dst_y;
 #ifdef LOCAL_USE_SWBLITTER3
 	if (out->vx_surf.vs_flags & VIDEO_GFX_F_XMIRROR)
-		out_x = (out->vx_hdr.vxh_cxsiz - LOCAL_dst_size_x) - out_x;
+		out_x = (out->vx_hdr.vxh_cxdim - LOCAL_dst_size_x) - out_x;
 	if (out->vx_surf.vs_flags & VIDEO_GFX_F_YMIRROR)
-		out_y = (out->vx_hdr.vxh_cysiz - LOCAL_dst_size_y) - out_y;
+		out_y = (out->vx_hdr.vxh_cydim - LOCAL_dst_size_y) - out_y;
 #endif /* LOCAL_USE_SWBLITTER3 */
 #endif /* LOCAL_USE_IMATRIX */
 

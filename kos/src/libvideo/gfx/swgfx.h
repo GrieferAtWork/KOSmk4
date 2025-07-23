@@ -1018,7 +1018,7 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 	 * - drv->xsw_getcolor */
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_COLORKEY)) {
 		/* Select how colors should be read. */
-		if (video_gfx_getbuffer(self)->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+		if (video_gfx_getbuffer(self)->vb_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
 			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
 			drv->xsw_getcolor = drv->xsw_getpixel;
 		} else {
@@ -1059,7 +1059,7 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 			/* No blending is being done -> link operators that try to make use of direct memory access. */
 
 			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
-			if (video_gfx_getbuffer(self)->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+			if (video_gfx_getbuffer(self)->vb_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
 				drv->xsw_putcolor = drv->xsw_setpixel;
 			} else {
 				drv->xsw_putcolor = &libvideo_swgfx_generic__putcolor_noblend;
@@ -1069,7 +1069,7 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 			drv->xsw_absline_v   = &libvideo_swgfx_noblend__absline_v;
 			drv->xsw_absfill     = &libvideo_swgfx_noblend__absfill;
 			drv->xsw_absfillmask = &libvideo_swgfx_noblend__fillmask;
-			if (video_gfx_getbuffer(self)->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+			if (video_gfx_getbuffer(self)->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
 				drv->xsw_absgradient   = &libvideo_swgfx_noblend_interp8888__absgradient;
 				drv->xsw_absgradient_h = &libvideo_swgfx_noblend_interp8888__absgradient_h;
 				drv->xsw_absgradient_v = &libvideo_swgfx_noblend_interp8888__absgradient_v;

@@ -122,7 +122,7 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	video_swblitter_setops(ctx);
 
 	/* Check for special case: source and target buffers are the same */
-	if (video_gfx_getclipw(src_gfx) == 0 || video_gfx_getcliph(src_gfx) == 0) {
+	if (video_gfx_getxdim(src_gfx) == 0 || video_gfx_getydim(src_gfx) == 0) {
 		ctx->vbt_ops = &libvideo_emptyblitter_ops;
 	} else if (src_buffer == dst_buffer) {
 		if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
@@ -147,16 +147,16 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	} else if (libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
 		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_surf.vs_colorkey))
 			goto set_generic_operators;
-		if (noblend_blit_compatible(dst_buffer->vb_format.vbf_codec,
-		                            src_buffer->vb_format.vbf_codec) &&
-		    src_buffer->vb_format.vbf_pal == dst_buffer->vb_format.vbf_pal) {
+		if (noblend_blit_compatible(dst_buffer->vb_codec,
+		                            src_buffer->vb_codec) &&
+		    src_buffer->vb_surf.vs_pal == dst_buffer->vb_surf.vs_pal) {
 			/* Special optimization when not doing any blending, and both GFX contexts
 			 * share the same codec: in this case,  we can try to directly copy  pixel
 			 * data, either through video locks, or by directly reading/writing pixels */
 			drv->bsw_blit         = &libvideo_swblitter_noblend_samefmt__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samefmt__blit_imatrix;
 			if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
-				if (src_buffer->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+				if (src_buffer->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
 					drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt_interp8888__stretch_l;
 					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt_interp8888__stretch_imatrix_l;
 				} else {
@@ -172,12 +172,12 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			 * share the same codec: in this case,  we can try to directly copy  pixel
 			 * data, either through video locks, or by directly reading/writing pixels */
 			video_converter_init(libvideo_swblitter_generic__conv(ctx),
-			                     video_gfx_getsurface(src_gfx),
-			                     video_gfx_getsurface(dst_gfx));
+			                     video_gfx_assurface(src_gfx),
+			                     video_gfx_assurface(dst_gfx));
 			drv->bsw_blit         = &libvideo_swblitter_noblend_difffmt__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_difffmt__blit_imatrix;
 			if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
-				if (src_buffer->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+				if (src_buffer->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
 					drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt_interp8888__stretch_l;
 					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt_interp8888__stretch_imatrix_l;
 				} else {
@@ -213,10 +213,10 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 	struct blt3_swdrv *drv = video_swblitter3_getdrv(ctx);
 	video_swblitter3_setops(ctx);
 	(void)wrdst_gfx;
-	assert(video_gfx_getclipw(wrdst_gfx) != 0);
-	assert(video_gfx_getcliph(wrdst_gfx) != 0);
-	if (video_gfx_getclipw(src_gfx) == 0 || video_gfx_getcliph(src_gfx) == 0 ||
-	    video_gfx_getclipw(rddst_gfx) == 0 || video_gfx_getcliph(rddst_gfx) == 0) {
+	assert(video_gfx_getxdim(wrdst_gfx) != 0);
+	assert(video_gfx_getydim(wrdst_gfx) != 0);
+	if (video_gfx_getxdim(src_gfx) == 0 || video_gfx_getydim(src_gfx) == 0 ||
+	    video_gfx_getxdim(rddst_gfx) == 0 || video_gfx_getydim(rddst_gfx) == 0) {
 		ctx->vbt3_ops = &libvideo_emptyblitter3_ops;
 	} else {
 		drv->bsw3_blendmode = rddst_gfx->vx_blend;
@@ -256,11 +256,11 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 			}
 		} else if (GFX_BLENDMODE_GET_MODE(wrdst_gfx->vx_blend) == GFX_BLENDMODE_ALPHA &&
 		           GFX_BLENDMODE_GET_MODE(rddst_gfx->vx_blend) == GFX_BLENDMODE_ALPHAMASK &&
-		           rddst_gfx->vx_surf.vs_buffer->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_A1_MSB) {
+		           rddst_gfx->vx_surf.vs_buffer->vb_codec->vc_codec == VIDEO_CODEC_A1_MSB) {
 			/* Special optimization for bitmasked alpha-blending.
 			 * In this mode, only pixels masked by the given bitmask get blended
 			 * into the `wrdst_gfx' GFX, with all other pixels being left as-is. */
-			if (video_surface_hasalpha(video_gfx_getsurface(src_gfx))) {
+			if (video_surface_hasalpha(video_gfx_assurface(src_gfx))) {
 				/* With the source GFX featuring an alpha-channel, regular
 				 * alpha-blending  still  needs to  happen  in `wrdst_gfx'
 				 * (though only for pixels specified by the mask). */
@@ -277,8 +277,8 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 				/* Since the source has no alpha, it always produces colors with A=255.
 				 * As such, the alpha-blending that happens in `wrdst_gfx' would  never
 				 * consider data from existing pixels, meaning blending can be skipped. */
-				if (src_gfx->vx_surf.vs_buffer->vb_format.vbf_codec == wrdst_gfx->vx_surf.vs_buffer->vb_format.vbf_codec &&
-				    src_gfx->vx_surf.vs_buffer->vb_format.vbf_pal == wrdst_gfx->vx_surf.vs_buffer->vb_format.vbf_pal) {
+				if (src_gfx->vx_surf.vs_buffer->vb_codec == wrdst_gfx->vx_surf.vs_buffer->vb_codec &&
+				    src_gfx->vx_surf.vs_buffer->vb_surf.vs_pal == wrdst_gfx->vx_surf.vs_buffer->vb_surf.vs_pal) {
 					/* Same-codec+pal -> don't have to convert between pixel formats */
 					drv->bsw3_blit         = &libvideo_swblitter3__blit__mask1msb_blend1_samefmt;
 					drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__mask1msb_blend1_samefmt;
@@ -292,8 +292,8 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 				} else {
 					/* Different formats -> pixel format conversion still has to happen */
 					video_converter_init(libvideo_swblitter3_generic__conv(ctx),
-					                     video_gfx_getsurface(src_gfx),
-					                     video_gfx_getsurface(wrdst_gfx));
+					                     video_gfx_assurface(src_gfx),
+					                     video_gfx_assurface(wrdst_gfx));
 					drv->bsw3_blit         = &libvideo_swblitter3__blit__mask1msb_blend1_difffmt;
 					drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__mask1msb_blend1_difffmt;
 					if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {

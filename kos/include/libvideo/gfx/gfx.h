@@ -29,6 +29,7 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
+#include <kos/anno.h>
 
 #include "../color.h"
 #include "../types.h"
@@ -42,6 +43,7 @@
 
 #ifndef __INTELLISENSE__
 #include "../rect.h"
+#include "../crect.h"
 #include "buffer.h"
 #endif /* !__INTELLISENSE__ */
 
@@ -63,6 +65,8 @@ __DECL_BEGIN
 struct video_buffer;
 struct video_gfxhdr;
 struct video_gfx;
+struct video_rect;
+struct video_crect;
 struct video_blitter;
 struct video_blitter3;
 
@@ -379,6 +383,66 @@ LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_r
 
 
 
+/* Wrapper  around `video_buffer_region()' that produces a buffer which,
+ * when used to instantiate a GFX context, replicates an effective Clip-
+ * and I/O-Rect that matches `__self', as well as has its buffer  format
+ * initialized to reflect the current  palette, flags and color key,  as
+ * set in `__self' at the time of this function being called.
+ *
+ * CAUTION: Just like with `video_buffer_region()', pixel  data
+ *          of the returned buffer will be rotated in GFX-only!
+ *
+ * NOTE: `video_gfx_asbuffer_distinct()' never returns `video_gfx_getbuffer()',
+ *       even  if the GFX  context isn't doing anything  that would require the
+ *       creation of a separate sub-buffer.
+ *
+ * @return: * : The video buffer representing a wrapped and const-i-fied copy of `__self'
+ * @return: NULL: [errno=ENOMEM] Insufficient memory
+ * @return: NULL: [errno=*] Failed to create wrapper for some other reason */
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_ASBUFFER)(struct video_gfx const *__restrict __self);
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_ASBUFFER_DISTINCT)(struct video_gfx const *__restrict __self);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_gfx_asbuffer(struct video_gfx const *__restrict __self);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_gfx_asbuffer_distinct(struct video_gfx const *__restrict __self);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+
+
+/* Same as `video_surface_*save', but save pixel data from  the
+ * Clip Rect of `__self'. Values written for pixels outside the
+ * I/O Rect of `__self'  are format-specific, but those  pixels
+ * are probably going to be either black, or transparent.
+ *
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_FSAVE)(struct video_gfx const *__self, char const *__format,
+                                    __FILE *__restrict __fp, char const *__options);
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_FDSAVE)(struct video_gfx const *__self, char const *__format,
+                                     __fd_t __fd, char const *__options);
+typedef /*__ATTR_WUNUSED_T*/ __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_SAVE)(struct video_gfx const *__self, char const *__filename,
+                                   char const *__options);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
+video_gfx_fsave(struct video_gfx const *__self, char const *__format,
+                __FILE *__restrict __fp, char const *__options);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
+video_gfx_fdsave(struct video_gfx const *__self, char const *__format,
+                 __fd_t __fd, char const *__options);
+LIBVIDEO_GFX_DECL /*__ATTR_WUNUSED*/ __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
+video_gfx_save(struct video_gfx const *__self, char const *__filename,
+               char const *__options);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+
 /* Possible values for `video_gfx_palettize()'s `__method' argument.
  * - "n": # of pixels in clip region
  * - "k": The given `__palsize' */
@@ -470,21 +534,6 @@ video_blitter3_stretch(struct video_blitter3 const *__restrict __self,
 /* VIDEO_GFX                                                            */
 /************************************************************************/
 
-/* Return the API-visible Clip Rect size in X or Y */
-extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t
-video_gfx_getclipw(struct video_gfx const *__restrict __self);
-extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t
-video_gfx_getcliph(struct video_gfx const *__restrict __self);
-
-/* Backup/restore the current Clip Rect of `self' */
-extern __ATTR_IN(1) __ATTR_OUT(2) void
-video_gfx_saveclip(struct video_gfx const *__restrict self,
-                   video_gfx_clipinfo_t *__restrict backup);
-extern __ATTR_IN(2) __ATTR_OUT(1) void
-video_gfx_loadclip(struct video_gfx *__restrict self,
-                   video_gfx_clipinfo_t const *__restrict backup);
-
-
 /* Update operators of `__self' after certain behavioral flags were changed:
  * - VIDEO_GFX_UPDATE_BLEND:    `__self->vx_blend' may have changed
  * - VIDEO_GFX_UPDATE_FLAGS:    `__self->vx_surf.vs_flags' may have changed
@@ -511,11 +560,11 @@ extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setcolorkey
 
 #ifdef __cplusplus
 extern "C++" {
-extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct video_surface *video_gfx_getsurface(struct video_gfx *__restrict __self);
-extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct video_surface const *video_gfx_getsurface(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct video_surface *video_gfx_assurface(struct video_gfx *__restrict __self);
+extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct video_surface const *video_gfx_assurface(struct video_gfx const *__restrict __self);
 } /* extern "C++" */
 #else /* __cplusplus */
-#define video_gfx_getsurface(self) (&(self)->vx_surf)
+#define video_gfx_assurface(self) (&(self)->vx_surf)
 #endif /* !__cplusplus */
 extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_domain const *video_gfx_getdomain(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_codec *video_gfx_getcodec(struct video_gfx const *__restrict __self);
@@ -529,6 +578,119 @@ extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) struct video_palette *video_gfx_g
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_gfx_flag_t video_gfx_getdefaultflags(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_pixel_t video_gfx_getdefaultcolorkey(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_hasdefaultcolorkey(struct video_gfx const *__restrict __self);
+
+/* Helpers for reading the coords of the GFX's Clip- / I/O-Rect, relative to the
+ * GFX context's buffer/surface,  AFTER being  swapped by  `VIDEO_GFX_F_XYSWAP'.
+ *
+ * CAUTION: Please note that  the GFX's effective  `video_buffer' may NOT  actually
+ *          be  the one that  was used to create  the GFX in  the first place. Some
+ *          types of video buffers wrap others, and automatically unwrap themselves
+ *          when  creating a GFX  context. In these cases,  the Clip- and I/O-Rects
+ *          of the  produced GFX  have been  adjusted to  reference the  sub-region
+ *          described by the wrapping buffer.
+ *
+ * We intentionally don't provide you  with setters for these; you  should
+ * always use `video_gfx_clip()' to adjust your GFX's Clip- and I/O-Rects. */
+
+/* CLIP: Clip-Rect coords, relative to surface */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getclipxmin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getclipymin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getclipxend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getclipyend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getclipxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getclipydim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getcliprect(struct video_gfx const *__restrict __self, struct video_rect *__restrict __result);
+
+/* IO: I/O-Rect coords, relative to surface */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getioxmin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getioymin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getioxend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getioyend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getioxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getioydim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getiorect(struct video_gfx const *__restrict __self, struct video_crect *__restrict __result);
+
+/* CLIPIO: I/O Rect coords, relative to Clip-Rect (may be useful, since I/O-Rect is always contains within Clip-Rect) */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getclipioxmin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getclipioymin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getclipioxend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getclipioyend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getclipioxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getclipioydim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getclipiorect(struct video_gfx const *__restrict __self, struct video_crect *__restrict __result);
+
+/* IOCLIP: Clip Rect coords, relative to I/O-Rect (note that XMIN/YMIN here is
+ * always `<= 0', since the I/O-Rect is always contained within the Clip-Rect) */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getioclipxmin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getioclipymin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getioclipxend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getioclipyend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getioclipxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getioclipydim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getiocliprect(struct video_gfx const *__restrict __self, struct video_rect *__restrict __result);
+
+/* SURF: Surface coords, relative to itself (as such there is no XMIN/YMIN getter, since
+ *       those are always be 0, and as a matter of fact: `video_gfx_getsurfrect()'  will
+ *       just write `0' for x/y-min into the given rect) */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getsurfxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getsurfydim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getsurfrect(struct video_gfx const *__restrict __self, struct video_crect *__restrict __result);
+
+/* RAWxxx: Same as xxx, but the `VIDEO_GFX_F_XYSWAP' flag is NOT applied */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawclipxmin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawclipymin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawclipxend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawclipyend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawclipxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawclipydim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getrawcliprect(struct video_gfx const *__restrict __self, struct video_rect *__restrict __result);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getrawioxmin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getrawioymin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getrawioxend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getrawioyend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawioxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawioydim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getrawiorect(struct video_gfx const *__restrict __self, struct video_crect *__restrict __result);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getrawclipioxmin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getrawclipioymin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getrawclipioxend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_gfx_getrawclipioyend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawclipioxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawclipioydim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getrawclipiorect(struct video_gfx const *__restrict __self, struct video_crect *__restrict __result);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawioclipxmin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawioclipymin(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawioclipxend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawioclipyend(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawioclipxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawioclipydim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getrawiocliprect(struct video_gfx const *__restrict __self, struct video_rect *__restrict __result);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawsurfxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawsurfydim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getrawsurfrect(struct video_gfx const *__restrict __self, struct video_crect *__restrict __result);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawydim(struct video_gfx const *__restrict __self);
+
+/* Check if the GFX's Clip- / I/O-Rect / Surface Rect are equal one-another:
+ * - video_gfx_isioclip:   video_gfx_getcliprect() == video_gfx_getiorect()
+ * - video_gfx_issurfclip: video_gfx_getcliprect() == video_gfx_getsurfrect()
+ * - video_gfx_issurfio:   video_gfx_getiorect() == video_gfx_getsurfrect() (implies video_gfx_isioclip() && video_gfx_issurfclip()) */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_isioclip(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_issurfio(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_issurfclip(struct video_gfx const *__restrict __self);
+
+/* Return the API-visible Clip Rect size in X or Y.
+ * These are simply aliases for `video_gfx_getclipxdim()' and `video_gfx_getclipydim()' */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getxdim(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getydim(struct video_gfx const *__restrict __self);
+
+/* Backup/restore the current Clip Rect of `self' */
+extern __ATTR_IN(1) __ATTR_OUT(2) void
+video_gfx_saveclip(struct video_gfx const *__restrict self,
+                   video_gfx_clipinfo_t *__restrict backup);
+extern __ATTR_IN(2) __ATTR_OUT(1) void
+video_gfx_loadclip(struct video_gfx *__restrict self,
+                   video_gfx_clipinfo_t const *__restrict backup);
 
 
 /* Apply a clipping  rect to "self",  shrinking the  pixel
@@ -717,14 +879,139 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 #define video_blitter3_stretch(self, wrdst_x, wrdst_y, rddst_x, rddst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
 	(*(self)->vbt3_ops->vbt3o_stretch)(self, wrdst_x, wrdst_y, rddst_x, rddst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
 
-#define video_gfx_getclipw(self) (self)->vx_hdr.vxh_cxsiz /* TODO: Rename to "video_gfx_getxdim" */
-#define video_gfx_getcliph(self) (self)->vx_hdr.vxh_cysiz /* TODO: Rename to "video_gfx_getydim" */
+#define __video_gfx_xyswap(self, regular, swapped) \
+	(__likely(!(video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP)) ? (regular) : (swapped))
+
 #define video_gfx_saveclip(self, backup) (void)(*(backup) = (self)->vx_hdr)
 #define video_gfx_loadclip(self, backup) (void)((self)->vx_hdr = *(backup))
+#define video_gfx_getblend(self)      ((self)->vx_blend)
+#define video_gfx_getflags(self)      ((self)->vx_surf.vs_flags)
+#define video_gfx_getxdim(self)       (video_dim_t)(self)->vx_hdr.vxh_cxdim
+#define video_gfx_getydim(self)       (video_dim_t)(self)->vx_hdr.vxh_cydim
+#define video_gfx_getclipxmin(self)   (video_offset_t)(self)->vx_hdr.vxh_cxoff
+#define video_gfx_getclipymin(self)   (video_offset_t)(self)->vx_hdr.vxh_cyoff
+#define video_gfx_getclipxend(self)   (video_offset_t)((self)->vx_hdr.vxh_cxoff + (self)->vx_hdr.vxh_cxdim)
+#define video_gfx_getclipyend(self)   (video_offset_t)((self)->vx_hdr.vxh_cyoff + (self)->vx_hdr.vxh_cydim)
+#define video_gfx_getclipxdim(self)   (video_dim_t)(self)->vx_hdr.vxh_cxdim
+#define video_gfx_getclipydim(self)   (video_dim_t)(self)->vx_hdr.vxh_cydim
+#define video_gfx_getioxmin(self)     (video_coord_t)(self)->vx_hdr.vxh_bxmin
+#define video_gfx_getioymin(self)     (video_coord_t)(self)->vx_hdr.vxh_bymin
+#define video_gfx_getioxend(self)     (video_coord_t)(self)->vx_hdr.vxh_bxend
+#define video_gfx_getioyend(self)     (video_coord_t)(self)->vx_hdr.vxh_byend
+#define video_gfx_getioxdim(self)     (video_dim_t)((self)->vx_hdr.vxh_bxend - (self)->vx_hdr.vxh_bxmin)
+#define video_gfx_getioydim(self)     (video_dim_t)((self)->vx_hdr.vxh_byend - (self)->vx_hdr.vxh_bymin)
+#define video_gfx_getclipioxmin(self) (video_coord_t)((self)->vx_hdr.vxh_bxmin - (self)->vx_hdr.vxh_cxoff)
+#define video_gfx_getclipioymin(self) (video_coord_t)((self)->vx_hdr.vxh_bymin - (self)->vx_hdr.vxh_cyoff)
+#define video_gfx_getclipioxend(self) (video_coord_t)((self)->vx_hdr.vxh_bxend - (self)->vx_hdr.vxh_cxoff)
+#define video_gfx_getclipioyend(self) (video_coord_t)((self)->vx_hdr.vxh_byend - (self)->vx_hdr.vxh_cyoff)
+#define video_gfx_getclipioxdim(self) video_gfx_getioxdim(self)
+#define video_gfx_getclipioydim(self) video_gfx_getioydim(self)
+#define video_gfx_getioclipxmin(self) ((self)->vx_hdr.vxh_cxoff - (video_offset_t)(self)->vx_hdr.vxh_bxmin)
+#define video_gfx_getioclipymin(self) ((self)->vx_hdr.vxh_cyoff - (video_offset_t)(self)->vx_hdr.vxh_bymin)
+#define video_gfx_getioclipxend(self) ((self)->vx_hdr.vxh_cxoff - (video_offset_t)(self)->vx_hdr.vxh_bxend)
+#define video_gfx_getioclipyend(self) ((self)->vx_hdr.vxh_cxoff - (video_offset_t)(self)->vx_hdr.vxh_byend)
+#define video_gfx_getioclipxdim(self) (video_dim_t)(self)->vx_hdr.vxh_cxdim
+#define video_gfx_getioclipydim(self) (video_dim_t)(self)->vx_hdr.vxh_cydim
+#define video_gfx_getcliprect(self, result)                 \
+	(void)((result)->vr_xmin = video_gfx_getclipxmin(self), \
+	       (result)->vr_ymin = video_gfx_getclipymin(self), \
+	       (result)->vr_xdim = video_gfx_getclipxdim(self), \
+	       (result)->vr_ydim = video_gfx_getclipydim(self))
+#define video_gfx_getiorect(self, result)                  \
+	(void)((result)->vcr_xmin = video_gfx_getioxmin(self), \
+	       (result)->vcr_ymin = video_gfx_getioymin(self), \
+	       (result)->vcr_xdim = video_gfx_getioxdim(self), \
+	       (result)->vcr_ydim = video_gfx_getioydim(self))
+#define video_gfx_getclipiorect(self, result)                  \
+	(void)((result)->vcr_xmin = video_gfx_getclipioxmin(self), \
+	       (result)->vcr_ymin = video_gfx_getclipioymin(self), \
+	       (result)->vcr_xdim = video_gfx_getclipioxdim(self), \
+	       (result)->vcr_ydim = video_gfx_getclipioydim(self))
+#define video_gfx_getiocliprect(self, result)                 \
+	(void)((result)->vr_xmin = video_gfx_getioclipxmin(self), \
+	       (result)->vr_ymin = video_gfx_getioclipymin(self), \
+	       (result)->vr_xdim = video_gfx_getioclipxdim(self), \
+	       (result)->vr_ydim = video_gfx_getioclipydim(self))
+#define video_gfx_getrawsurfxdim(self) video_buffer_getxdim(video_gfx_getbuffer(self))
+#define video_gfx_getrawsurfydim(self) video_buffer_getydim(video_gfx_getbuffer(self))
+#define video_gfx_getrawsurfrect(self, result)                  \
+	(void)((result)->vcr_xmin = (result)->vcr_ymin = 0,         \
+	       (result)->vcr_xdim = video_gfx_getrawsurfxdim(self), \
+	       (result)->vcr_ydim = video_gfx_getrawsurfydim(self))
+#define video_gfx_getsurfxdim(self) __video_gfx_xyswap(self, video_gfx_getrawsurfxdim(self), video_gfx_getrawsurfydim(self))
+#define video_gfx_getsurfydim(self) __video_gfx_xyswap(self, video_gfx_getrawsurfydim(self), video_gfx_getrawsurfxdim(self))
+#define video_gfx_getsurfrect(self, result)                  \
+	(void)((result)->vcr_xmin = (result)->vcr_ymin = 0,      \
+	       (result)->vcr_xdim = video_gfx_getsurfxdim(self), \
+	       (result)->vcr_ydim = video_gfx_getsurfydim(self))
+#define video_gfx_isioclip(self)                                                        \
+	((self)->vx_hdr.vxh_bxmin == (video_coord_t)(self)->vx_hdr.vxh_cxoff &&             \
+	 (self)->vx_hdr.vxh_bymin == (video_coord_t)(self)->vx_hdr.vxh_cyoff &&             \
+	 (self)->vx_hdr.vxh_bxend == (self)->vx_hdr.vxh_bxmin + (self)->vx_hdr.vxh_cxdim && \
+	 (self)->vx_hdr.vxh_byend == (self)->vx_hdr.vxh_bymin + (self)->vx_hdr.vxh_cydim)
+#define video_gfx_issurfclip(self)                                     \
+	((self)->vx_hdr.vxh_cxoff == 0 && (self)->vx_hdr.vxh_cyoff == 0 && \
+	 (self)->vx_hdr.vxh_cxdim == video_gfx_getsurfxdim(self) &&        \
+	 (self)->vx_hdr.vxh_cydim == video_gfx_getsurfydim(self))
+#define video_gfx_issurfio(self)                                       \
+	((self)->vx_hdr.vxh_bxmin == 0 && (self)->vx_hdr.vxh_bymin == 0 && \
+	 (self)->vx_hdr.vxh_bxend == video_gfx_getsurfxdim(self) &&        \
+	 (self)->vx_hdr.vxh_byend == video_gfx_getsurfydim(self))
+
+#define __video_gfx_getcliprect_xyswap(self, result)        \
+	(void)((result)->vr_xmin = video_gfx_getclipymin(self), \
+	       (result)->vr_ymin = video_gfx_getclipxmin(self), \
+	       (result)->vr_xdim = video_gfx_getclipydim(self), \
+	       (result)->vr_ydim = video_gfx_getclipxdim(self))
+#define __video_gfx_getiorect_xyswap(self, result)         \
+	(void)((result)->vcr_xmin = video_gfx_getioymin(self), \
+	       (result)->vcr_ymin = video_gfx_getioxmin(self), \
+	       (result)->vcr_xdim = video_gfx_getioydim(self), \
+	       (result)->vcr_ydim = video_gfx_getioxdim(self))
+#define __video_gfx_getclipiorect_xyswap(self, result)         \
+	(void)((result)->vcr_xmin = video_gfx_getclipioymin(self), \
+	       (result)->vcr_ymin = video_gfx_getclipioxmin(self), \
+	       (result)->vcr_xdim = video_gfx_getclipioydim(self), \
+	       (result)->vcr_ydim = video_gfx_getclipioxdim(self))
+#define __video_gfx_getiocliprect_xyswap(self, result)        \
+	(void)((result)->vr_xmin = video_gfx_getioclipymin(self), \
+	       (result)->vr_ymin = video_gfx_getioclipxmin(self), \
+	       (result)->vr_xdim = video_gfx_getioclipydim(self), \
+	       (result)->vr_ydim = video_gfx_getioclipxdim(self))
+#define video_gfx_getrawclipxmin(self)   __video_gfx_xyswap(self, video_gfx_getclipxmin(self), video_gfx_getclipymin(self))
+#define video_gfx_getrawclipymin(self)   __video_gfx_xyswap(self, video_gfx_getclipymin(self), video_gfx_getclipxmin(self))
+#define video_gfx_getrawclipxend(self)   __video_gfx_xyswap(self, video_gfx_getclipxend(self), video_gfx_getclipyend(self))
+#define video_gfx_getrawclipyend(self)   __video_gfx_xyswap(self, video_gfx_getclipyend(self), video_gfx_getclipxend(self))
+#define video_gfx_getrawclipxdim(self)   __video_gfx_xyswap(self, video_gfx_getclipxdim(self), video_gfx_getclipydim(self))
+#define video_gfx_getrawclipydim(self)   __video_gfx_xyswap(self, video_gfx_getclipydim(self), video_gfx_getclipxdim(self))
+#define video_gfx_getrawioxmin(self)     __video_gfx_xyswap(self, video_gfx_getioxmin(self), video_gfx_getioymin(self))
+#define video_gfx_getrawioymin(self)     __video_gfx_xyswap(self, video_gfx_getioymin(self), video_gfx_getioxmin(self))
+#define video_gfx_getrawioxend(self)     __video_gfx_xyswap(self, video_gfx_getioxend(self), video_gfx_getioyend(self))
+#define video_gfx_getrawioyend(self)     __video_gfx_xyswap(self, video_gfx_getioyend(self), video_gfx_getioxend(self))
+#define video_gfx_getrawioxdim(self)     __video_gfx_xyswap(self, video_gfx_getioxdim(self), video_gfx_getioydim(self))
+#define video_gfx_getrawioydim(self)     __video_gfx_xyswap(self, video_gfx_getioydim(self), video_gfx_getioxdim(self))
+#define video_gfx_getrawclipioxmin(self) __video_gfx_xyswap(self, video_gfx_getclipioxmin(self), video_gfx_getclipioymin(self))
+#define video_gfx_getrawclipioymin(self) __video_gfx_xyswap(self, video_gfx_getclipioymin(self), video_gfx_getclipioxmin(self))
+#define video_gfx_getrawclipioxend(self) __video_gfx_xyswap(self, video_gfx_getclipioxend(self), video_gfx_getclipioyend(self))
+#define video_gfx_getrawclipioyend(self) __video_gfx_xyswap(self, video_gfx_getclipioyend(self), video_gfx_getclipioxend(self))
+#define video_gfx_getrawclipioxdim(self) __video_gfx_xyswap(self, video_gfx_getclipioxdim(self), video_gfx_getclipioydim(self))
+#define video_gfx_getrawclipioydim(self) __video_gfx_xyswap(self, video_gfx_getclipioydim(self), video_gfx_getclipioxdim(self))
+#define video_gfx_getrawioclipxmin(self) __video_gfx_xyswap(self, video_gfx_getioclipxmin(self), video_gfx_getioclipymin(self))
+#define video_gfx_getrawioclipymin(self) __video_gfx_xyswap(self, video_gfx_getioclipymin(self), video_gfx_getioclipxmin(self))
+#define video_gfx_getrawioclipxend(self) __video_gfx_xyswap(self, video_gfx_getioclipxend(self), video_gfx_getioclipyend(self))
+#define video_gfx_getrawioclipyend(self) __video_gfx_xyswap(self, video_gfx_getioclipyend(self), video_gfx_getioclipxend(self))
+#define video_gfx_getrawioclipxdim(self) __video_gfx_xyswap(self, video_gfx_getioclipxdim(self), video_gfx_getioclipydim(self))
+#define video_gfx_getrawioclipydim(self) __video_gfx_xyswap(self, video_gfx_getioclipydim(self), video_gfx_getioclipxdim(self))
+#define video_gfx_getrawxdim(self)       __video_gfx_xyswap(self, video_gfx_getxdim(self), video_gfx_getydim(self))
+#define video_gfx_getrawydim(self)       __video_gfx_xyswap(self, video_gfx_getydim(self), video_gfx_getxdim(self))
+
+#define video_gfx_getrawcliprect(self, result)   __video_gfx_xyswap(self, video_gfx_getcliprect(self, result), __video_gfx_getcliprect_xyswap(self, result))
+#define video_gfx_getrawiorect(self, result)     __video_gfx_xyswap(self, video_gfx_getiorect(self, result), __video_gfx_getiorect_xyswap(self, result))
+#define video_gfx_getrawclipiorect(self, result) __video_gfx_xyswap(self, video_gfx_getclipiorect(self, result), __video_gfx_getclipiorect_xyswap(self, result))
+#define video_gfx_getrawiocliprect(self, result) __video_gfx_xyswap(self, video_gfx_getiocliprect(self, result), __video_gfx_getiocliprect_xyswap(self, result))
+
 #define video_gfx_update(self, what) \
 	(*(self)->vx_surf.vs_buffer->vb_ops->vi_updategfx)(self, what)
-#define video_gfx_getblend(self)              ((self)->vx_blend)
-#define video_gfx_getflags(self)              ((self)->vx_surf.vs_flags)
 #define video_gfx_clip(self, clip_x, clip_y, size_x, size_y) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_clip)(self, clip_x, clip_y, size_x, size_y)
 #define video_gfx_cliprect(self, rect) \
@@ -740,7 +1027,7 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 #define video_gfx_enableflags(self, flags)    ((self)->vx_surf.vs_flags |= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
 #define video_gfx_disableflags(self, flags)   ((self)->vx_surf.vs_flags &= ~(flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
 #define video_gfx_setcolorkey(self, colorkey) ((self)->vx_surf.vs_colorkey = (colorkey), video_gfx_update(self, VIDEO_GFX_UPDATE_COLORKEY))
-#define video_gfx_getsurface(self)            (&(self)->vx_surf)
+#define video_gfx_assurface(self)            (&(self)->vx_surf)
 #define video_gfx_getdomain(self)             video_buffer_getdomain(video_gfx_getbuffer(self))
 #define video_gfx_getcodec(self)              video_buffer_getcodec(video_gfx_getbuffer(self))
 #define video_gfx_getbuffer(self)             (self)->vx_surf.vs_buffer
@@ -795,35 +1082,6 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 #define video_gfx_stretch3(wrdst, wrdst_x, wrdst_y, rddst, rddst_x, rddst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y) \
 	(*(wrdst)->vx_hdr.vxh_ops->vgfo_stretch3)(wrdst, wrdst_x, wrdst_y, rddst, rddst_x, rddst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y)
 #endif /* !__INTELLISENSE__ */
-
-
-/* Same as `video_buffer_*save', but  save pixel data from  the
- * Clip Rect of `__self'. Values written for pixels outside the
- * I/O Rect of `__self'  are format-specific, but those  pixels
- * are probably going to be either black, or transparent.
- * @return: 0 : Success
- * @return: -1: Error (s.a. `errno') */
-typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
-(LIBVIDEO_GFX_CC *PVIDEO_GFX_FSAVE)(struct video_gfx const *__self, char const *__format,
-                                    __FILE *__restrict __fp, char const *__options);
-typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
-(LIBVIDEO_GFX_CC *PVIDEO_GFX_FDSAVE)(struct video_gfx const *__self, char const *__format,
-                                     __fd_t __fd, char const *__options);
-typedef /*__ATTR_WUNUSED_T*/ __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
-(LIBVIDEO_GFX_CC *PVIDEO_GFX_SAVE)(struct video_gfx const *__self, char const *__filename,
-                                   char const *__options);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
-video_gfx_fsave(struct video_gfx const *__self, char const *__format,
-                __FILE *__restrict __fp, char const *__options);
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
-video_gfx_fdsave(struct video_gfx const *__self, char const *__format,
-                 __fd_t __fd, char const *__options);
-LIBVIDEO_GFX_DECL /*__ATTR_WUNUSED*/ __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
-video_gfx_save(struct video_gfx const *__self, char const *__filename,
-               char const *__options);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-
 
 
 #ifdef __cplusplus
@@ -892,7 +1150,7 @@ public:
  * >>     video_buffer_getgfx(src, &src_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0); // Blend mode doesn't matter
  * >>     video_buffer_getgfx(mask, &mask_gfx, GFX_BLENDMODE_ALPHAMASK, VIDEO_GFX_F_NORMAL, 0);
  * >>     video_gfx_bitblit3(&dst_gfx, 0, 0, &mask_gfx, 0, 0, &src_gfx, 0, 0,
- * >>                        video_gfx_getclipw(&src_gfx), video_gfx_getclipw(&dst_gfx));
+ * >>                        video_gfx_getxdim(&src_gfx), video_gfx_getxdim(&dst_gfx));
  * >> }
  *
  * An optimizing video blitter implementation will detect this config
@@ -980,7 +1238,7 @@ struct video_gfxhdr {
 	 *
 	 * Coords of these rects are (in absolute "video_coord_t" coords):
 	 * - Buffer:    {xy: {0,0}, wh: {vx_surf.vs_buffer->vb_xdim,vx_surf.vs_buffer->vb_ydim}}
-	 * - Clip Rect: {xy: {vxh_cxoff,vxh_cyoff}, wh: {vxh_cxsiz,vxh_cysiz}}
+	 * - Clip Rect: {xy: {vxh_cxoff,vxh_cyoff}, wh: {vxh_cxdim,vxh_cydim}}
 	 * - I/O Rect:  {xy: {vxh_bxmin,vxh_bymin}, wh: {vxh_bxsiz,vxh_bysiz}}
 	 *
 	 * When using any of the  publicly exposed functions, you always  operate
@@ -1002,13 +1260,13 @@ struct video_gfxhdr {
 	 * Do no rely on this translation behavior; always use APIs to modify or
 	 * otherwise interact with Clip Rect infos.
 	 * >> if (vx_surf.vs_flags & VIDEO_GFX_F_XMIRROR)
-	 * >>     x = (vxh_cxsiz - 1) - x;
+	 * >>     x = (vxh_cxdim - 1) - x;
 	 * >> if (vx_surf.vs_flags & VIDEO_GFX_F_YMIRROR)
-	 * >>     y = (vxh_cysiz - 1) - y;
+	 * >>     y = (vxh_cydim - 1) - y;
 	 * >> if (vx_surf.vs_flags & VIDEO_GFX_F_XWRAP)
-	 * >>     x = wrap(x, vxh_cxsiz); // wrap(x, dim) = ((x % dim) + dim) % dim
+	 * >>     x = wrap(x, vxh_cxdim); // wrap(x, dim) = ((x % dim) + dim) % dim
 	 * >> if (vx_surf.vs_flags & VIDEO_GFX_F_YWRAP)
-	 * >>     x = wrap(x, vxh_cxsiz); // ...
+	 * >>     x = wrap(x, vxh_cxdim); // ...
 	 * >> x += vxh_cxoff;
 	 * >> y += vxh_cyoff;
 	 * >> if (x < vxh_bxmin)
@@ -1028,16 +1286,16 @@ struct video_gfxhdr {
 	 */
 	video_offset_t              vxh_cxoff;    /* Delta added to all X coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
 	video_offset_t              vxh_cyoff;    /* Delta added to all Y coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
-	video_dim_t                 vxh_cxsiz;    /* Absolute width of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
-	video_dim_t                 vxh_cysiz;    /* Absolute height of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
+	video_dim_t                 vxh_cxdim;    /* Absolute width of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
+	video_dim_t                 vxh_cydim;    /* Absolute height of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
 	/* I/O Rect: these values control the (absolute) pixel area where read/writes do something
 	 * NOTE: The I/O Rect is already pre-adjusted for VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR */
 	video_coord_t               vxh_bxmin;    /* [<= vxh_bxend][>= vxh_cxoff] Absolute buffer start coord in X (start of acc) */
 	video_coord_t               vxh_bymin;    /* [<= vxh_byend][>= vxh_cyoff] Absolute buffer start coord in Y */
 	video_coord_t               vxh_bxend;    /* [<= vx_surf.vs_buffer->vb_xdim] Absolute buffer end coord in X (<= `vx_surf.vs_buffer->vb_xdim') */
 	video_coord_t               vxh_byend;    /* [<= vx_surf.vs_buffer->vb_ydim] Absolute buffer end coord in Y (<= `vx_surf.vs_buffer->vb_ydim') */
-//	video_dim_t                 vxh_bxsiz;    /* [== vxh_bxend - vxh_bxmin][<= vxh_cxsiz] I/O Rect width */
-//	video_dim_t                 vxh_bysiz;    /* [== vxh_byend - vxh_bymin][<= vxh_cysiz] I/O Rect height */
+//	video_dim_t                 vxh_bxdim;    /* [== vxh_bxend - vxh_bxmin][<= vxh_cxdim] I/O Rect width */
+//	video_dim_t                 vxh_bydim;    /* [== vxh_byend - vxh_bymin][<= vxh_cydim] I/O Rect height */
 };
 
 #define _video_gfxhdr_bxsiz(self) ((self)->vxh_bxend - (self)->vxh_bxmin)

@@ -194,17 +194,15 @@ custom_buffer__subregion_impl(struct video_surface const *__restrict surface,
 	result = (REF struct custom_buffer_subregion *)malloc(sizeof(struct custom_buffer_subregion));
 	if unlikely(!result)
 		goto err;
+	video_surface_copyattrib(&result->vb_surf, surface);
+	result->vb_codec   = video_buffer_getcodec(parent);
 	result->vb_domain  = video_buffer_getdomain(parent);
-	result->vb_format.vbf_pal      = video_surface_getpalette(surface);
-	result->vb_format.vbf_codec    = video_buffer_getcodec(parent);
-	result->vb_format.vbf_flags    = video_surface_getflags(surface);
-	result->vb_format.vbf_colorkey = video_surface_getcolorkey(surface);
 	result->vb_xdim    = rect->vcr_xdim;
 	result->vb_ydim    = rect->vcr_ydim;
 	result->vb_refcnt  = 1;
 	result->cbsr_xoff  = parent_xoff + rect->vcr_xmin;
 	result->cbsr_yoff  = parent_yoff + rect->vcr_ymin;
-	video_codec_xcoord_to_offset(result->vb_format.vbf_codec, result->cbsr_xoff,
+	video_codec_xcoord_to_offset(result->vb_codec, result->cbsr_xoff,
 	                             &result->cbsr_bxoff, &result->cbsr_bxrem);
 	result->vb_ops = !result->cbsr_xoff && !result->cbsr_yoff
 	                 ? _custom_buffer_subregion_nooff_ops()
@@ -370,7 +368,7 @@ custom_buffer__rlockregion(struct video_buffer *__restrict self,
 	if (rlock) {
 		int result;
 		size_t xoff;
-		video_codec_xcoord_to_offset(me->vb_format.vbf_codec,
+		video_codec_xcoord_to_offset(me->vb_codec,
 		                             lock->_vrl_rect.vcr_xmin,
 		                             &xoff, &lock->vrl_xbas);
 		result = (*rlock)(me->cbc_cookie, &lock->vrl_lock);
@@ -405,7 +403,7 @@ custom_buffer__wlockregion(struct video_buffer *__restrict self,
 	if (wlock) {
 		int result;
 		size_t xoff;
-		video_codec_xcoord_to_offset(me->vb_format.vbf_codec,
+		video_codec_xcoord_to_offset(me->vb_codec,
 		                             lock->_vrl_rect.vcr_xmin,
 		                             &xoff, &lock->vrl_xbas);
 		result = (*wlock)(me->cbc_cookie, &lock->vrl_lock);
@@ -430,7 +428,7 @@ NOTHROW(FCC custom_buffer__unlockregion)(struct video_buffer *__restrict self,
 	} else if (me->cbc_unlock) {
 		size_t xoff;
 		video_coord_t xrem;
-		video_codec_xcoord_to_offset(self->vb_format.vbf_codec,
+		video_codec_xcoord_to_offset(self->vb_codec,
 		                             lock->_vrl_rect.vcr_xmin,
 		                             &xoff, &xrem);
 		assert(xrem == lock->vrl_xbas);
@@ -619,17 +617,17 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
                           void *cookie) {
 	REF struct custom_buffer *result;
 	result = (REF struct custom_buffer *)malloc(sizeof(struct custom_buffer));
-	if unlikely (!result)
+	if unlikely(!result)
 		goto err;
-	result->vb_ops    = _custom_buffer_ops();
-	result->vb_domain = _libvideo_ramdomain();
-	result->vb_format = *format;
-	if (format->vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-		result->vb_format.vbf_pal = NULL;
-	} else if (!result->vb_format.vbf_pal) {
+	__video_buffer_setformat(result, format);
+	if (result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		result->vb_surf.vs_pal = NULL;
+	} else if (!result->vb_surf.vs_pal) {
 		errno = EINVAL;
 		goto err_r;
 	}
+	result->vb_ops    = _custom_buffer_ops();
+	result->vb_domain = _libvideo_ramdomain();
 	result->vb_xdim          = size_x;
 	result->vb_ydim          = size_y;
 	result->vb_refcnt        = 1;

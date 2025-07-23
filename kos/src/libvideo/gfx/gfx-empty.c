@@ -73,8 +73,8 @@ libvideo_emptygfx_clip(struct video_gfx *__restrict self,
 		self->vx_hdr.vxh_cxoff -= 2 * clip_x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
 		self->vx_hdr.vxh_cyoff -= 2 * clip_y;
-	self->vx_hdr.vxh_cxsiz = size_x;
-	self->vx_hdr.vxh_cysiz = size_y;
+	self->vx_hdr.vxh_cxdim = size_x;
+	self->vx_hdr.vxh_cydim = size_y;
 	return self;
 }
 
@@ -350,12 +350,15 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_emptybuffer
 
 #undef libvideo_emptybuffer
 PRIVATE struct video_buffer libvideo_emptybuffer = {
+	.vb_surf = {
+		.vs_pal      = NULL,
+		.vs_buffer   = NULL, /* Initialized lazily */
+		.vs_flags    = VIDEO_GFX_F_NORMAL,
+		.vs_colorkey = 0,
+	},
+	.vb_codec  = NULL, /* Initialized lazily */
 	.vb_ops    = NULL, /* Initialized lazily */
 	.vb_domain = NULL, /* Initialized lazily */
-	.vb_format = {
-		.vbf_pal   = NULL,
-		.vbf_codec = NULL, /* Initialized lazily */
-	},
 	.vb_xdim = 0,
 	.vb_ydim = 0,
 	.vb_refcnt = 0x7fff,
@@ -364,8 +367,9 @@ PRIVATE struct video_buffer libvideo_emptybuffer = {
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_emptybuffer(void) {
 	if (!libvideo_emptybuffer.vb_ops) {
 		libvideo_emptybuffer.vb_domain = _libvideo_ramdomain();
-		libvideo_emptybuffer.vb_format.vbf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
-		assertf(libvideo_emptybuffer.vb_format.vbf_codec, "Built-in codec should have been recognized");
+		libvideo_emptybuffer.vb_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
+		assertf(libvideo_emptybuffer.vb_codec, "Built-in codec should have been recognized");
+		libvideo_emptybuffer.vb_surf.vs_buffer = &libvideo_emptybuffer;
 		COMPILER_WRITE_BARRIER();
 		libvideo_emptybuffer.vb_ops = _libvideo_emptybuffer_ops();
 		COMPILER_WRITE_BARRIER();

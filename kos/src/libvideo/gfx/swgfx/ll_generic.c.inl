@@ -63,7 +63,7 @@ INTERN ATTR_IN(1) video_color_t CC
 libvideo_swgfx_generic__getcolor(struct video_gfx const *__restrict self,
                                  video_coord_t x, video_coord_t y) {
 	video_pixel_t pixel = LL_getpixel(self, x, y);
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	return video_surface_pixel2color(surface, pixel);
 }
 
@@ -71,7 +71,7 @@ INTERN ATTR_IN(1) void CC
 libvideo_swgfx_generic__putcolor(struct video_gfx const *__restrict self,
                                  video_coord_t x, video_coord_t y,
                                  video_color_t color) {
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	video_pixel_t op = LL_getpixel(self, x, y);
 	video_color_t oc = video_surface_pixel2color(surface, op);
 	video_color_t nc = gfx_blendcolors(oc, color, self->vx_blend);
@@ -83,7 +83,7 @@ INTERN ATTR_IN(1) void CC
 libvideo_swgfx_generic__putcolor_noblend(struct video_gfx const *__restrict self,
                                          video_coord_t x, video_coord_t y,
                                          video_color_t color) {
-	struct video_surface const *surface = video_gfx_getsurface(self);
+	struct video_surface const *surface = video_gfx_assurface(self);
 	video_pixel_t np = video_surface_color2pixel(surface, color);
 	LL_setpixel(self, x, y, np);
 }
@@ -93,7 +93,7 @@ libvideo_swgfx_generic__putcolor_noblend(struct video_gfx const *__restrict self
 	libvideo_swgfx_generic__putcolor_##name(struct video_gfx const *__restrict self, \
 	                                        video_coord_t x, video_coord_t y,        \
 	                                        video_color_t color) {                   \
-		struct video_surface const *surface = video_gfx_getsurface(self);            \
+		struct video_surface const *surface = video_gfx_assurface(self);            \
 		video_pixel_t op = LL_getpixel(self, x, y);                                  \
 		video_color_t oc = video_surface_pixel2color(surface, op);                   \
 		video_color_t nc = gfx_blendcolors(oc, color, mode);                         \
@@ -109,7 +109,7 @@ GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_swgfx_generic__putcolor_FOO)
 	libvideo_swgfx_generic__putcolor_##name(struct video_gfx const *__restrict self, \
 	                                        video_coord_t x, video_coord_t y,        \
 	                                        video_color_t color) {                   \
-		struct video_surface const *surface = video_gfx_getsurface(self);            \
+		struct video_surface const *surface = video_gfx_assurface(self);            \
 		video_pixel_t op = LL_getpixel(self, x, y);                                  \
 		video_color_t oc = video_surface_pixel2color(surface, op);                   \
 		video_color_t cc = GFX_BLENDMODE_GET_COLOR(self->vx_blend);                  \

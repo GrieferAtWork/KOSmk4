@@ -219,9 +219,7 @@ region_buffer__subregion(struct video_surface const *__restrict self,
 	    result_rect.vr_ydim == base_iorect.vr_ydim) {
 		REF struct video_buffer *result_base;
 		REF struct region_buffer_subregion_alias *alias_result;
-		struct video_surface base_surface;
-		video_surface_frombuffer(&base_surface, base);
-		result_base = video_surface_subregion(&base_surface, (struct video_crect const *)&base_iorect);
+		result_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect);
 		if unlikely(!result_base)
 			goto err_base;
 		video_buffer_decref(base);
@@ -229,12 +227,10 @@ region_buffer__subregion(struct video_surface const *__restrict self,
 		alias_result = (REF struct region_buffer_subregion_alias *)malloc(sizeof(struct region_buffer_subregion_alias));
 		if unlikely(!alias_result)
 			goto err_base;
+		video_surface_copyattrib(&alias_result->vb_surf, self);
+		alias_result->vb_codec  = video_buffer_getcodec(base);
 		alias_result->vb_ops    = _region_buffer_subregion_alias_ops();
 		alias_result->vb_domain = me->vb_domain;
-		alias_result->vb_format.vbf_codec    = video_buffer_getcodec(base);
-		alias_result->vb_format.vbf_pal      = video_surface_getpalette(self);
-		alias_result->vb_format.vbf_flags    = video_surface_getflags(self);
-		alias_result->vb_format.vbf_colorkey = video_surface_getcolorkey(self);
 		alias_result->vb_xdim   = video_buffer_getxdim(base);
 		alias_result->vb_ydim   = video_buffer_getydim(base);
 		alias_result->vb_refcnt = 1;
@@ -260,9 +256,7 @@ region_buffer__subregion(struct video_surface const *__restrict self,
 	    base_iorect.vr_xdim < base->vb_xdim ||
 	    base_iorect.vr_ydim < base->vb_ydim) {
 		REF struct video_buffer *result_base;
-		struct video_surface base_surface;
-		video_surface_frombuffer(&base_surface, base);
-		result_base = video_surface_subregion(&base_surface, (struct video_crect const *)&base_iorect);
+		result_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect);
 		if unlikely(!result_base)
 			goto err_base;
 		video_buffer_decref(base);
@@ -275,12 +269,10 @@ region_buffer__subregion(struct video_surface const *__restrict self,
 	result = (REF struct region_buffer_subregion *)malloc(sizeof(struct region_buffer_subregion));
 	if unlikely(!result)
 		goto err_base;
+	video_surface_copyattrib(&result->vb_surf, self);
+	result->vb_codec  = video_buffer_getcodec(base);
 	result->vb_ops    = _region_buffer_subregion_ops();
 	result->vb_domain = me->vb_domain;
-	result->vb_format.vbf_codec    = video_buffer_getcodec(base);
-	result->vb_format.vbf_pal      = video_surface_getpalette(self);
-	result->vb_format.vbf_flags    = video_surface_getflags(self);
-	result->vb_format.vbf_colorkey = video_surface_getcolorkey(self);
 	result->vb_xdim   = result_rect.vr_xdim;
 	result->vb_ydim   = result_rect.vr_ydim;
 	result->vb_refcnt = 1;
@@ -315,21 +307,17 @@ region_buffer_subregion_alias__subregion(struct video_surface const *__restrict 
                                          struct video_crect const *__restrict rect) {
 	REF struct video_buffer *result_base;
 	REF struct region_buffer_subregion_alias *result;
-	struct video_surface base_surface;
 	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)video_surface_getbuffer(self);
 	result = (REF struct region_buffer_subregion_alias *)malloc(sizeof(struct region_buffer_subregion_alias));
 	if unlikely(!result)
 		goto err;
-	video_surface_frombuffer(&base_surface, me->rbf_base);
-	result_base = video_surface_subregion(&base_surface, rect);
+	result_base = video_buffer_subregion(me->rbf_base, rect);
 	if unlikely(!result_base)
 		goto err_r;
+	video_surface_copyattrib(&result->vb_surf, self);
+	result->vb_codec  = video_buffer_getcodec(result_base);
 	result->vb_ops    = me->vb_ops;
 	result->vb_domain = me->vb_domain;
-	result->vb_format.vbf_codec    = video_buffer_getcodec(result_base);
-	result->vb_format.vbf_pal      = video_surface_getpalette(self);
-	result->vb_format.vbf_flags    = video_surface_getflags(self);
-	result->vb_format.vbf_colorkey = video_surface_getcolorkey(self);
 	result->vb_xdim   = result_base->vb_xdim;
 	result->vb_ydim   = result_base->vb_ydim;
 	result->vb_refcnt = 1;
@@ -471,7 +459,7 @@ NOTHROW(FCC region_buffer_subregion_alias__unlockregion)(struct video_buffer *__
 /* GFX */
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 region_buffer__initgfx(struct video_gfx *__restrict self) {
-	struct region_buffer *me = (struct region_buffer *)self;
+	struct region_buffer *me = (struct region_buffer *)video_gfx_getbuffer(self);
 	struct video_buffer *base;
 	atomic_inc(&me->rbf_inuse);
 	self->vx_surf.vs_buffer = base = atomic_read(&me->rbf_base);
@@ -495,7 +483,7 @@ region_buffer__initgfx(struct video_gfx *__restrict self) {
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 region_buffer__updategfx(struct video_gfx *__restrict self, unsigned int what) {
 	if (self->vx_hdr.vxh_ops == &region_gfx_subops_ops) {
-		struct region_buffer *me = (struct region_buffer *)self;
+		struct region_buffer *me = (struct region_buffer *)video_gfx_getbuffer(self);
 		struct video_buffer *base;
 		atomic_inc(&me->rbf_inuse);
 		base = atomic_read(&me->rbf_base);
@@ -696,8 +684,8 @@ _region_blitter3_subops_ops(void) {
 	video_gfx_clip(&subgfx_name,                                                      \
 	               (self)->vx_hdr.vxh_cxoff - (self)->vx_hdr.vxh_bxmin,               \
 	               (self)->vx_hdr.vxh_cyoff - (self)->vx_hdr.vxh_bymin,               \
-	               (self)->vx_hdr.vxh_cxsiz,                                          \
-	               (self)->vx_hdr.vxh_cysiz)
+	               (self)->vx_hdr.vxh_cxdim,                                          \
+	               (self)->vx_hdr.vxh_cydim)
 #define SUBGFX_END() \
 	atomic_dec(&_sg_me->rbf_inuse)
 #define SUBOPS_BEGIN(self)                                                                            \
@@ -1296,13 +1284,8 @@ region_blitter3_subops__stretch(struct video_blitter3 const *__restrict self,
 /* Create a new region-relative-proxy of `self', that interacts with the same
  * pixel data, both during GFX operations, as well when creating video locks.
  *
- * You can also use  this function to create  regions at negative offsets,  or
- * ones that are larger  than `self'. In this  case, the returned buffer  will
- * not be lockable, except when using `video_buffer_r/wlockregion' for regions
- * that  contain actual pixel  data. Similarly, GFX  operations for pixel data
- * outside  the true pixel area (which is enforced  by the I/O Rect of any GFX
- * created using the returned  buffer), will yield "0"  during read, and be  a
- * no-op during write.
+ * You can also use this function to create regions at negative offsets, or
+ * ones that are larger than `self'.
  *
  * Then returned buffer always behaves properly when it comes to being able to
  * be  revoked, after which point it will never again make any access to pixel
@@ -1321,26 +1304,48 @@ region_blitter3_subops__stretch(struct video_blitter3 const *__restrict self,
  * @return: NULL: [errno=ENOMEM] Insufficient memory
  * @return: NULL: [errno=*] Failed to create region for some other reason */
 DEFINE_PUBLIC_ALIAS(video_surface_region, libvideo_surface_region);
+DEFINE_PUBLIC_ALIAS(video_surface_region_distinct, libvideo_surface_region_distinct);
 INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_surface_region(struct video_surface const *__restrict self,
                         struct video_rect const *__restrict rect) {
+	struct video_buffer *buffer = video_surface_getbuffer(self);
+	if (rect->vr_xmin == 0 && rect->vr_ymin == 0 &&
+	    rect->vr_xdim == video_buffer_getxdim(buffer) &&
+	    rect->vr_ydim == video_buffer_getydim(buffer) &&
+	    video_surface_isdefault(self)) {
+		video_buffer_incref(buffer);
+		return buffer;
+	}
+	return libvideo_surface_region_distinct(self, rect);
+}
+
+INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *CC
+libvideo_surface_region_distinct(struct video_surface const *__restrict self,
+                                 struct video_rect const *__restrict rect) {
 	struct video_buffer *buffer;
 	REF struct region_buffer *result;
 	bool self_is_region;
+	struct video_rect buffer_rect = *rect;
+	if (video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) {
+		buffer_rect.vr_xmin = rect->vr_ymin;
+		buffer_rect.vr_ymin = rect->vr_xmin;
+		buffer_rect.vr_xdim = rect->vr_ydim;
+		buffer_rect.vr_ydim = rect->vr_xdim;
+	}
 
 	/* Check for simple case: can we do this as a sub-region? */
-	if (rect->vr_xmin >= 0 && rect->vr_ymin >= 0) {
+	if (buffer_rect.vr_xmin >= 0 && buffer_rect.vr_ymin >= 0) {
 		video_coord_t rect_xend, rect_yend;
-		if (!OVERFLOW_UADD((video_coord_t)rect->vr_xmin, rect->vr_xdim, &rect_xend) &&
-		    !OVERFLOW_UADD((video_coord_t)rect->vr_ymin, rect->vr_ydim, &rect_yend) &&
-		    rect_xend < video_surface_getxdim(self) &&
-		    rect_yend < video_surface_getydim(self)) {
+		if (!OVERFLOW_UADD((video_coord_t)buffer_rect.vr_xmin, buffer_rect.vr_xdim, &rect_xend) &&
+		    !OVERFLOW_UADD((video_coord_t)buffer_rect.vr_ymin, buffer_rect.vr_ydim, &rect_yend) &&
+		    rect_xend < video_surface_getbufferxdim(self) &&
+		    rect_yend < video_surface_getbufferydim(self)) {
 			/* Yes! Yes, we can! */
 			static_assert(offsetof(struct video_rect, vr_xmin) == offsetof(struct video_crect, vcr_xmin));
 			static_assert(offsetof(struct video_rect, vr_ymin) == offsetof(struct video_crect, vcr_ymin));
 			static_assert(offsetof(struct video_rect, vr_xdim) == offsetof(struct video_crect, vcr_xdim));
 			static_assert(offsetof(struct video_rect, vr_ydim) == offsetof(struct video_crect, vcr_ydim));
-			return video_surface_subregion(self, (struct video_crect const *)rect);
+			return video_surface_subregion(self, (struct video_crect const *)&buffer_rect);
 		}
 	}
 
@@ -1358,16 +1363,14 @@ libvideo_surface_region(struct video_surface const *__restrict self,
 		goto err;
 
 	/* Start filling in basic data for `result' */
+	video_surface_copyattrib(&result->vb_surf, self);
+	result->vb_codec  = video_buffer_getcodec(buffer);
 	result->vb_domain = _libvideo_ramdomain();
-	result->vb_format.vbf_codec    = video_buffer_getcodec(buffer);
-	result->vb_format.vbf_pal      = video_surface_getpalette(self);
-	result->vb_format.vbf_flags    = video_surface_getflags(self);
-	result->vb_format.vbf_colorkey = video_surface_getcolorkey(self);
-	result->vb_xdim   = rect->vr_xdim;
-	result->vb_ydim   = rect->vr_ydim;
+	result->vb_xdim   = buffer_rect.vr_xdim;
+	result->vb_ydim   = buffer_rect.vr_ydim;
 	result->vb_refcnt = 1;
-	result->rbf_cxoff = rect->vr_xmin;
-	result->rbf_cyoff = rect->vr_ymin;
+	result->rbf_cxoff = buffer_rect.vr_xmin;
+	result->rbf_cyoff = buffer_rect.vr_ymin;
 	result->rbf_inuse = 0;
 	LIST_INIT(&result->rbf_child_list);
 	atomic_lock_init(&result->rbf_child_lock);
@@ -1429,13 +1432,11 @@ libvideo_surface_region(struct video_surface const *__restrict self,
 		    base_iorect.vr_xdim < base->vb_xdim ||
 		    base_iorect.vr_xdim < base->vb_ydim) {
 			REF struct video_buffer *used_base;
-			struct video_surface base_surface;
 			static_assert(offsetof(struct video_rect, vr_xmin) == offsetof(struct video_crect, vcr_xmin));
 			static_assert(offsetof(struct video_rect, vr_ymin) == offsetof(struct video_crect, vcr_ymin));
 			static_assert(offsetof(struct video_rect, vr_xdim) == offsetof(struct video_crect, vcr_xdim));
 			static_assert(offsetof(struct video_rect, vr_ydim) == offsetof(struct video_crect, vcr_ydim));
-			video_surface_frombuffer(&base_surface, base);
-			used_base = video_surface_subregion(&base_surface, (struct video_crect const *)&base_iorect);
+			used_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect);
 			video_buffer_decref(base);
 			if unlikely(!used_base)
 				goto err_r;
@@ -1446,7 +1447,7 @@ libvideo_surface_region(struct video_surface const *__restrict self,
 			base = used_base;
 		}
 
-		ret->vb_ops   = &region_buffer_subregion_ops;
+		ret->vb_ops   = _region_buffer_subregion_ops();
 		ret->rbf_base = base; /* Inherit reference */
 		ret->rbf_orig = ret->rbf_base;
 		ret->brbsr_parent = me;
@@ -1455,7 +1456,7 @@ libvideo_surface_region(struct video_surface const *__restrict self,
 		LIST_INSERT_HEAD(&me->rbf_child_list, ret, brbsr_chain);
 		atomic_lock_release(&me->rbf_child_lock);
 	} else {
-		result->vb_ops   = &region_buffer_ops;
+		result->vb_ops   = _region_buffer_ops();
 		result->rbf_base = buffer;
 		result->rbf_orig = result->rbf_base;
 		video_buffer_incref(buffer);

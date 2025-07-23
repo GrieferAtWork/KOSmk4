@@ -57,6 +57,7 @@
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/screen.h>
+#include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
 DECL_BEGIN
@@ -65,13 +66,15 @@ static struct video_crect const CRECT_FULL = VIDEO_CRECT_INIT_FULL;
 static struct video_rect const RECT_FULL = VIDEO_RECT_INIT_FULL;
 
 static void
-do_dump_buffer_specs(struct video_buffer *buf,
+do_dump_buffer_specs(struct video_surface const *surface,
                      struct video_fontprinter_data *io) {
 	struct video_codec const *codec;
 	struct video_palette const *palette;
 #define gfx_printf(...) format_printf(&video_fontprinter, io, __VA_ARGS__)
-	gfx_printf("res:   %ux%u\n", (unsigned int)buf->vb_xdim, (unsigned int)buf->vb_ydim);
-	codec = buf->vb_format.vbf_codec;
+	gfx_printf("res:   %ux%u\n",
+	           (unsigned int)video_surface_getxdim(surface),
+	           (unsigned int)video_surface_getydim(surface));
+	codec = video_surface_getcodec(surface);
 	gfx_printf("codec: %#x [%ubpp,%c%c%c]\n",
 	           (unsigned int)codec->vc_codec,
 	           (unsigned int)codec->vc_specs.vcs_bpp,
@@ -85,7 +88,7 @@ do_dump_buffer_specs(struct video_buffer *buf,
 		if (codec->vc_specs.vcs_amask)
 			gfx_printf("amask: %#.8I32x\n", (uint32_t)codec->vc_specs.vcs_amask);
 	}
-	palette = buf->vb_format.vbf_pal;
+	palette = video_surface_getpalette(surface);
 	if (palette) {
 		unsigned int cells_padding     = 2;
 		unsigned int cell_w            = 8;
@@ -123,7 +126,7 @@ do_dump_buffer_specs(struct video_buffer *buf,
 }
 
 static void
-dump_buffer_specs(struct video_buffer *buf,
+dump_buffer_specs(struct video_surface const *surface,
                   struct video_fontprinter_data *io) {
 	unsigned int padding = 2;
 	video_offset_t start_x, start_y;
@@ -134,7 +137,7 @@ dump_buffer_specs(struct video_buffer *buf,
 	start_y = io->vfp_cury;
 	io->vfp_curx += padding;
 	io->vfp_cury += padding;
-	do_dump_buffer_specs(buf, io);
+	do_dump_buffer_specs(surface, io);
 	io->vfp_curx -= padding;
 	io->vfp_cury += padding;
 	io->vfp_lnstart -= padding;
@@ -147,11 +150,10 @@ dump_buffer_specs(struct video_buffer *buf,
 }
 
 static ATTR_UNUSED REF struct video_buffer *
-palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int method) {
-	struct video_gfx gfx;
+palettize(struct video_gfx const *self, video_pixel_t num_colors, unsigned int method) {
 	struct video_gfx result_gfx;
 	REF struct video_buffer *result;
-	struct video_buffer_format result_format = self->vb_format;
+	struct video_buffer_format result_format;
 	video_codec_t result_codec_id;
 
 	/* Create palette with the requested # of colors */
@@ -159,11 +161,10 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 	if unlikely(!result_format.vbf_pal)
 		goto err;
 
-	/* Acquire GFX context for source video buffer */
-	video_buffer_getgfx(self, &gfx, GFX_BLENDMODE_OVERRIDE);
-
 	/* Palettize source video buffer and store results in "pal" */
-	if unlikely(video_gfx_palettize(&gfx, num_colors, result_format.vbf_pal->vp_pal, method))
+	if unlikely(video_gfx_palettize(self, num_colors,
+	                                result_format.vbf_pal->vp_pal,
+	                                method))
 		goto err_pal;
 	result_format.vbf_pal = video_palette_optimize(result_format.vbf_pal);
 
@@ -180,12 +181,17 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 	result_format.vbf_codec = video_codec_lookup(result_codec_id);
 	if unlikely(!result_format.vbf_codec)
 		goto err_pal;
+	result_format.vbf_flags = video_gfx_getflags(self);
+	if (result_format.vbf_flags & VIDEO_GFX_F_COLORKEY) {
+		video_color_t c = video_gfx_pixel2color(self, video_gfx_getcolorkey(self));
+		result_format.vbf_colorkey = video_palette_getpixel(result_format.vbf_pal, c);
+	}
 
 	/* Allocate result buffer */
-	result = video_domain_newbuffer(self->vb_domain,
+	result = video_domain_newbuffer(video_gfx_getdomain(self),
 	                                &result_format,
-	                                video_gfx_getclipw(&gfx),
-	                                video_gfx_getcliph(&gfx),
+	                                video_gfx_getrawxdim(self),
+	                                video_gfx_getrawydim(self),
 	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	video_palette_decref(result_format.vbf_pal);
 	if unlikely(!result)
@@ -194,9 +200,9 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 	/* Blit source GFX context onto result video_buffer. */
 	video_buffer_getgfx(result, &result_gfx,
 	                    GFX_BLENDMODE_OVERRIDE);
-	video_gfx_bitblit(&result_gfx, 0, 0, &gfx, 0, 0,
-	                  video_gfx_getclipw(&gfx),
-	                  video_gfx_getcliph(&gfx));
+	video_gfx_bitblit(&result_gfx, 0, 0, self, 0, 0,
+	                  video_gfx_getxdim(self),
+	                  video_gfx_getydim(self));
 	return result;
 /*
 err_pal_r:
@@ -210,7 +216,7 @@ err:
 
 static void
 do_showpic(struct video_buffer *screen,
-           struct video_buffer *image,
+           struct video_surface const *image,
            struct video_font *font,
            char const *filename,
            struct video_anim_frame *frameinfo) {
@@ -218,33 +224,36 @@ do_showpic(struct video_buffer *screen,
 	struct video_gfx image_gfx;
 	video_dim_t blit_w, blit_h;
 	video_coord_t blit_x, blit_y;
+
+	/* Load GFX contexts for the image and the screen */
+	video_buffer_getgfx(screen, &screen_gfx, GFX_BLENDMODE_ALPHA);
+	video_surface_getgfx(image, &image_gfx, GFX_BLENDMODE_OVERRIDE);
+
 #if 0
 	/* Palettize "image" */
-	if (!(image->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
-		struct video_buffer *new_image;
-		new_image = palettize(image, 128, VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM);
-//		new_image = palettize(image, 32, VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT);
+	if (!video_surface_getpalette(image)) {
+		REF struct video_buffer *new_image;
+		new_image = palettize(&image_gfx, 128, VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM);
+//		new_image = palettize(&image_gfx, 32, VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT);
 		if likely(new_image) {
-			do_showpic(new_image);
+			do_showpic(screen, video_buffer_assurface(new_image), font, filename, frameinfo);
 			video_buffer_decref(new_image);
 			return;
 		}
 	}
 #endif
 
-	/* Load GFX contexts for the image and the screen */
-	video_buffer_getgfx(screen, &screen_gfx, GFX_BLENDMODE_ALPHA);
-	video_buffer_getgfx(image, &image_gfx, GFX_BLENDMODE_OVERRIDE);
-
 	/*video_gfx_clip(&image_gfx, 200, 200,
-	               video_gfx_getclipw(&image_gfx) / 2,
-	               video_gfx_getcliph(&image_gfx) / 2);*/
+	               video_gfx_getxdim(&image_gfx) / 2,
+	               video_gfx_getydim(&image_gfx) / 2);*/
 	/*video_gfx_clip(&screen_gfx, 20, 20,
-	               video_gfx_getclipw(&screen_gfx) - 40,
-	               video_gfx_getcliph(&screen_gfx) - 40);
+	               video_gfx_getxdim(&screen_gfx) - 40,
+	               video_gfx_getydim(&screen_gfx) - 40);
 	video_gfx_clip(&screen_gfx, -20, -20,
-	               video_gfx_getclipw(&screen_gfx) + 40,
-	               video_gfx_getcliph(&screen_gfx) + 40);*/
+	               video_gfx_getxdim(&screen_gfx) + 40,
+	               video_gfx_getydim(&screen_gfx) + 40);*/
+//	video_gfx_xyswap(&screen_gfx);
+//	video_gfx_xyswap(&image_gfx);
 //	video_gfx_hmirror(&screen_gfx);
 //	video_gfx_vmirror(&screen_gfx);
 //	video_gfx_lrot90(&screen_gfx);
@@ -252,38 +261,38 @@ do_showpic(struct video_buffer *screen,
 //	video_gfx_rrot90(&image_gfx);
 
 	/* Calculate where the image should be displayed */
-	blit_w = video_gfx_getclipw(&image_gfx);
-	blit_h = video_gfx_getcliph(&image_gfx);
-	if (blit_w > video_gfx_getclipw(&screen_gfx)) {
+	blit_w = video_gfx_getxdim(&image_gfx);
+	blit_h = video_gfx_getydim(&image_gfx);
+	if (blit_w > video_gfx_getxdim(&screen_gfx)) {
 		video_dim_t new_blit_w, new_blit_h;
 		/* >> new_blit_w / new_blit_h = blit_w / blit_h;
 		 * >> new_blit_w = (blit_w / blit_h) * new_blit_h;
 		 * >> new_blit_w / (blit_w / blit_h) = new_blit_h;
 		 * >> new_blit_h = new_blit_w / (blit_w / blit_h);
 		 * >> new_blit_h = (new_blit_w * blit_h) / blit_w; */
-		new_blit_w = video_gfx_getclipw(&screen_gfx);
+		new_blit_w = video_gfx_getxdim(&screen_gfx);
 		new_blit_h = ((uint64_t)new_blit_w * blit_h) / blit_w;
 		blit_w = new_blit_w;
 		blit_h = new_blit_h;
 	}
 
-	if (blit_h > video_gfx_getcliph(&screen_gfx)) {
+	if (blit_h > video_gfx_getydim(&screen_gfx)) {
 		video_dim_t new_blit_w, new_blit_h;
 		/* >> new_blit_w / new_blit_h = blit_w / blit_h;
 		 * >> new_blit_w = (blit_w / blit_h) * new_blit_h;
 		 * >> new_blit_w = (blit_w * new_blit_h) / blit_h; */
-		new_blit_h = video_gfx_getcliph(&screen_gfx);
+		new_blit_h = video_gfx_getydim(&screen_gfx);
 		new_blit_w = ((uint64_t)blit_w * new_blit_h) / blit_h;
 		blit_w = new_blit_w;
 		blit_h = new_blit_h;
 	}
 
-	blit_x = (video_gfx_getclipw(&screen_gfx) - blit_w) / 2;
-	blit_y = (video_gfx_getcliph(&screen_gfx) - blit_h) / 2;
+	blit_x = (video_gfx_getxdim(&screen_gfx) - blit_w) / 2;
+	blit_y = (video_gfx_getydim(&screen_gfx) - blit_h) / 2;
 
 #if 0
-	blit_w = video_gfx_getclipw(&screen_gfx);
-	blit_h = video_gfx_getcliph(&screen_gfx);
+	blit_w = video_gfx_getxdim(&screen_gfx);
+	blit_h = video_gfx_getydim(&screen_gfx);
 	blit_x = 0;
 	blit_y = 0;
 #endif
@@ -292,8 +301,8 @@ do_showpic(struct video_buffer *screen,
 #if 1
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
-	                  video_gfx_getclipw(&image_gfx),
-	                  video_gfx_getcliph(&image_gfx));
+	                  video_gfx_getxdim(&image_gfx),
+	                  video_gfx_getydim(&image_gfx));
 #elif 0
 	{
 		static REF struct video_buffer *mask_buffer = NULL;
@@ -328,13 +337,13 @@ do_showpic(struct video_buffer *screen,
 			                   &mask_gfx, 32, 32,
 			                   blit_w, blit_h,
 			                   &image_gfx, 0, 0,
-			                   video_gfx_getclipw(&image_gfx),
-			                   video_gfx_getcliph(&image_gfx));*/
+			                   video_gfx_getxdim(&image_gfx),
+			                   video_gfx_getydim(&image_gfx));*/
 			video_gfx_bitblit3(&screen_gfx, blit_x, blit_y,
 			                   &mask_gfx, 29, 29,
 			                   &image_gfx, 0, 0,
-			                   video_gfx_getclipw(&image_gfx),
-			                   video_gfx_getcliph(&image_gfx));
+			                   video_gfx_getxdim(&image_gfx),
+			                   video_gfx_getydim(&image_gfx));
 		}
 	}
 #elif 0
@@ -346,12 +355,12 @@ do_showpic(struct video_buffer *screen,
 		video_gfx_enableflags(&flipgfx, VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
 		video_gfx_stretch3(&screen_gfx, blit_x, blit_y,
 		                   &flipgfx,
-		                   (video_gfx_getcliph(&image_gfx) * 2) + offset,
-		                   video_gfx_getclipw(&image_gfx) * 2,
+		                   (video_gfx_getydim(&image_gfx) * 2) + offset,
+		                   video_gfx_getxdim(&image_gfx) * 2,
 		                   blit_w, blit_h,
 		                   &image_gfx, 0, 0,
-		                   video_gfx_getclipw(&image_gfx),
-		                   video_gfx_getcliph(&image_gfx));
+		                   video_gfx_getxdim(&image_gfx),
+		                   video_gfx_getydim(&image_gfx));
 		offset += 3;
 //		syslog(LOG_DEBUG, "offset = %d\n", offset);
 	}
@@ -366,8 +375,8 @@ do_showpic(struct video_buffer *screen,
 		                                0xff, 0, 0, 0xff));
 		video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 		                  &image_gfx, 0, 0,
-		                  video_gfx_getclipw(&image_gfx),
-		                  video_gfx_getcliph(&image_gfx));
+		                  video_gfx_getxdim(&image_gfx),
+		                  video_gfx_getydim(&image_gfx));
 		/* Alpha-blend on-top: green */
 		video_gfx_setblend(&screen_gfx, GFX_BLENDMODE_EX(
 		                                /*RGB=*/SRC_ALPHA_MUL_CONSTANT_COLOR, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_COLOR,
@@ -375,8 +384,8 @@ do_showpic(struct video_buffer *screen,
 		                                0, 0xff, 0, 0xff));
 		video_gfx_stretch(&screen_gfx, blit_x + offset, blit_y + offset, blit_w, blit_h,
 		                  &image_gfx, 0, 0,
-		                  video_gfx_getclipw(&image_gfx),
-		                  video_gfx_getcliph(&image_gfx));
+		                  video_gfx_getxdim(&image_gfx),
+		                  video_gfx_getydim(&image_gfx));
 		/* Alpha-blend on-top: blue */
 		video_gfx_setblend(&screen_gfx, GFX_BLENDMODE_EX(
 		                                /*RGB=*/SRC_ALPHA_MUL_CONSTANT_COLOR, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_COLOR,
@@ -384,15 +393,15 @@ do_showpic(struct video_buffer *screen,
 		                                0, 0, 0xff, 0xff));
 		video_gfx_stretch(&screen_gfx, blit_x + 2 * offset, blit_y + 2 * offset, blit_w, blit_h,
 		                  &image_gfx, 0, 0,
-		                  video_gfx_getclipw(&image_gfx),
-		                  video_gfx_getcliph(&image_gfx));
+		                  video_gfx_getxdim(&image_gfx),
+		                  video_gfx_getydim(&image_gfx));
 		video_gfx_setblend(&screen_gfx, omode);
 	}
 #elif 0
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
-	                  video_gfx_getclipw(&image_gfx),
-	                  video_gfx_getcliph(&image_gfx));
+	                  video_gfx_getxdim(&image_gfx),
+	                  video_gfx_getydim(&image_gfx));
 
 	/* With MIN, this is like that pencil-sketching filter from VLC :D
 	 * With MAX, it looks like a  blur that also brightens the  image. */
@@ -408,8 +417,8 @@ do_showpic(struct video_buffer *screen,
 //		video_gfx_hmirror(&image_gfx);
 		video_gfx_stretch(&screen_gfx, blit_x + x, blit_y + y, blit_w, blit_h,
 		                  &image_gfx, 0, 0,
-		                  video_gfx_getclipw(&image_gfx),
-		                  video_gfx_getcliph(&image_gfx));
+		                  video_gfx_getxdim(&image_gfx),
+		                  video_gfx_getydim(&image_gfx));
 //		video_gfx_hmirror(&image_gfx);
 		video_gfx_setblend(&screen_gfx, omode);
 	}
@@ -439,27 +448,27 @@ do_showpic(struct video_buffer *screen,
 		sized_buffer = video_buffer_create(VIDEO_BUFFER_AUTO,
 		                                   blit_w / tiles_x,
 		                                   blit_h / tiles_y,
-		                                   format_buf->vb_format.vbf_codec,
-		                                   format_buf->vb_format.vbf_pal);
+		                                   format_buf->vb_codec,
+		                                   format_buf->vb_surf.vs_pal);
 		video_buffer_getgfx(sized_buffer, &sized_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-		video_gfx_stretch(&sized_gfx, 0, 0, video_gfx_getclipw(&sized_gfx), video_gfx_getcliph(&sized_gfx),
-		                  &image_gfx, 0, 0, video_gfx_getclipw(&image_gfx), video_gfx_getcliph(&image_gfx));
+		video_gfx_stretch(&sized_gfx, 0, 0, video_gfx_getxdim(&sized_gfx), video_gfx_getydim(&sized_gfx),
+		                  &image_gfx, 0, 0, video_gfx_getxdim(&image_gfx), video_gfx_getydim(&image_gfx));
 		video_buffer_getgfx(sized_buffer, &sized_gfx,
 		                    video_gfx_getblend(&image_gfx),
 		                    video_gfx_getflags(&image_gfx),
 		                    video_gfx_getcolorkey(&image_gfx));
 		video_gfx_bitblit(&screen_gfx, blit_x, blit_y, &sized_gfx,
-		                  dst_offset + (video_gfx_getclipw(&sized_gfx) / 2),
-		                  dst_offset + (video_gfx_getcliph(&sized_gfx) / 2),
+		                  dst_offset + (video_gfx_getxdim(&sized_gfx) / 2),
+		                  dst_offset + (video_gfx_getydim(&sized_gfx) / 2),
 		                  blit_w, blit_h);
 		video_buffer_decref(sized_buffer);
 	} else {
 		video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 		                  &image_gfx,
-		                  (video_gfx_getclipw(&image_gfx) / 2) + dst_offset * tiles_x,
-		                  (video_gfx_getcliph(&image_gfx) / 2) + dst_offset * tiles_y,
-		                  video_gfx_getclipw(&image_gfx) * tiles_x,
-		                  video_gfx_getcliph(&image_gfx) * tiles_y);
+		                  (video_gfx_getxdim(&image_gfx) / 2) + dst_offset * tiles_x,
+		                  (video_gfx_getydim(&image_gfx) / 2) + dst_offset * tiles_y,
+		                  video_gfx_getxdim(&image_gfx) * tiles_x,
+		                  video_gfx_getydim(&image_gfx) * tiles_y);
 	}
 
 #if 0
@@ -469,8 +478,8 @@ do_showpic(struct video_buffer *screen,
 			video_dim_t r_h = blit_h / tiles_y;
 			video_offset_t r_x = blit_x + (tile_x - 2) * r_w;
 			video_offset_t r_y = blit_y + (tile_y - 2) * r_h;
-			r_x += (((video_gfx_getclipw(&image_gfx) / 2) + dst_offset * tiles_x) * blit_w) / video_gfx_getclipw(&image_gfx);
-			r_y += (((video_gfx_getcliph(&image_gfx) / 2) + dst_offset * tiles_y) * blit_h) / video_gfx_getcliph(&image_gfx);
+			r_x += (((video_gfx_getxdim(&image_gfx) / 2) + dst_offset * tiles_x) * blit_w) / video_gfx_getxdim(&image_gfx);
+			r_y += (((video_gfx_getydim(&image_gfx) / 2) + dst_offset * tiles_y) * blit_h) / video_gfx_getydim(&image_gfx);
 			video_gfx_rect(&screen_gfx, r_x, r_y, r_w, r_h, VIDEO_COLOR_WHITE);
 		}
 	}
@@ -488,7 +497,7 @@ do_showpic(struct video_buffer *screen,
 		fd.vfp_curx    = 0;
 		fd.vfp_cury    = 0;
 		fd.vfp_lnstart = 0;
-		fd.vfp_lnend   = video_gfx_getclipw(&screen_gfx) / 5;
+		fd.vfp_lnend   = video_gfx_getxdim(&screen_gfx) / 5;
 		if (fd.vfp_lnend < 150)
 			fd.vfp_lnend = 150;
 		fd.vfp_bg_fg_colors[0] = VIDEO_COLOR_BLACK;
@@ -510,7 +519,7 @@ do_showpic(struct video_buffer *screen,
 		dump_buffer_specs(image, &fd);
 
 		gfx_printf("Screen:\n");
-		dump_buffer_specs(screen, &fd);
+		dump_buffer_specs(video_buffer_assurface(screen), &fd);
 #undef gfx_printf
 	}
 
@@ -617,8 +626,8 @@ int main(int argc, char *argv[]) {
 			colors[1][0] = VIDEO_COLOR_RGBA(0, 0, 0xff, 0xff);
 			colors[1][1] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0);
 			video_gfx_gradient(&window2_gfx, 0, 0,
-			                   video_gfx_getclipw(&window2_gfx),
-			                   video_gfx_getcliph(&window2_gfx),
+			                   video_gfx_getxdim(&window2_gfx),
+			                   video_gfx_getydim(&window2_gfx),
 			                   colors);
 			video_window_updaterect(window2, &RECT_FULL);
 		}
@@ -643,7 +652,11 @@ int main(int argc, char *argv[]) {
 #if 0
 	anim = video_anim_cached(anim, NULL, NULL);
 #elif 1
-	anim = video_anim_cached(anim, bscreen->vb_domain, &bscreen->vb_format);
+	{
+		struct video_buffer_format format;
+		video_buffer_getformat(bscreen, &format);
+		anim = video_anim_cached(anim, bscreen->vb_domain, &format);
+	}
 #endif
 	if unlikely(!anim)
 		err(EXIT_FAILURE, "Failed to cache animation");
@@ -669,7 +682,8 @@ int main(int argc, char *argv[]) {
 		struct timespec ts_delay;
 
 		/* Render frame */
-		do_showpic(bscreen, frame->vaf_frame, font, argv[1], frame);
+		do_showpic(bscreen, video_buffer_assurface(frame->vaf_frame),
+		           font, argv[1], frame);
 		if (display) {
 			syslog(LOG_DEBUG, "BEGIN: video_display_updaterect()\n");
 			video_display_updaterect(display, &RECT_FULL);

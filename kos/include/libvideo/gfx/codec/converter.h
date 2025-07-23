@@ -83,7 +83,7 @@ video_converter_mappixel(struct video_converter const *__restrict __self,
                          video_pixel_t __from_pixel);
 #else /* __INTELLISENSE__ */
 #define video_converter_init(self, from_surface, to_surface) \
-	((self)->vcv_to = (to_surface), (*((self)->vcv_from = (from_surface))->vs_buffer->vb_format.vbf_codec->vc_initconverter)(self))
+	((self)->vcv_to = (to_surface), (*((self)->vcv_from = (from_surface))->vs_buffer->vb_codec->vc_initconverter)(self))
 #define video_converter_mappixel(self, from_pixel) \
 	(*(self)->vcv_mappixel)(self, from_pixel)
 #endif /* !__INTELLISENSE__ */

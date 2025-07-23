@@ -605,7 +605,7 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 	}
 
 	/* Check if we need to convert from a palette-based output buffer to a direct-color one */
-	codec = frame->vb_format.vbf_codec;
+	codec = frame->vb_codec;
 	if ((self->gb_lct != lct) &&
 	    (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) &&
 	    /* When the old frame gets disposed, then we also don't need DCOL mode */
@@ -617,7 +617,7 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		struct video_lock pal_lock;
 		REF struct video_buffer *dcol_buffer;
 		struct video_buffer_format format;
-		struct video_palette *pal = frame->vb_format.vbf_pal;
+		struct video_palette *pal = frame->vb_surf.vs_pal;
 		assert(pal);
 
 		/* Only the transparency-config of the first frame (i.e. the "gobal transparency")
@@ -696,11 +696,11 @@ err_dcol_buffer:
 		free(self->gb_restore);
 		self->gb_restore = NULL;
 		self->vaf_colorkey = 0;
-		assert(pal == frame->vb_format.vbf_pal);
+		assert(pal == frame->vb_surf.vs_pal);
 		assert(self->vaf_frame == frame);
 		video_buffer_decref(frame);            /* Decref old (palette) frame */
 		self->vaf_frame = frame = dcol_buffer; /* Inherit reference */
-		codec = frame->vb_format.vbf_codec;
+		codec = frame->vb_codec;
 	} else {
 		if unlikely(video_buffer_wlock(frame, &frame_lock))
 			goto err;
@@ -720,7 +720,7 @@ err_dcol_buffer:
 			if (!self->gb_restore) {
 				byte_t *backup;
 				struct video_rambuffer_requirements req;
-				(*frame->vb_format.vbf_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
+				(*frame->vb_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
 				backup = (byte_t *)malloc(req.vbs_bufsize);
 				if unlikely(!backup)
 					goto err_frame_lock;
@@ -753,7 +753,7 @@ err_dcol_buffer:
 		if (!self->gb_restore) {
 			byte_t *backup;
 			struct video_rambuffer_requirements req;
-			(*frame->vb_format.vbf_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
+			(*frame->vb_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
 			backup = (byte_t *)malloc(req.vbs_bufsize);
 			if unlikely(!backup)
 				goto err_frame_lock;
@@ -790,7 +790,7 @@ check_for_global_transparency:
 			 * canvas. */
 			if (frame_x > 0 || frame_y > 0 || frame_w < frame->vb_xdim || frame_h < frame->vb_ydim) {
 set_has_global_transparency:
-				self->vaf_colorkey = frame->vb_format.vbf_pal->vp_pal[anim->ga_cfg.gc_trans];
+				self->vaf_colorkey = frame->vb_surf.vs_pal->vp_pal[anim->ga_cfg.gc_trans];
 				break;
 			}
 			ATTR_FALLTHROUGH
@@ -1068,7 +1068,7 @@ set_have_global_trans:
 	case GIF_ANIM_FRAME1_GLOBAL_TRANS__YES:
 have_global_trans:
 		/* Use special operators to force a color key into a GFX context */
-		frame->vaf_colorkey = result->vb_format.vbf_pal->vp_pal[me->ga_cfg.gc_trans];
+		frame->vaf_colorkey = result->vb_surf.vs_pal->vp_pal[me->ga_cfg.gc_trans];
 		break;
 
 	case GIF_ANIM_FRAME1_GLOBAL_TRANS__NO:

@@ -28,16 +28,16 @@
 
 /* Video graphic flags. */
 #define VIDEO_GFX_F_NORMAL   0x0000 /* Normal render flags. */
-#define VIDEO_GFX_F_XWRAP    0x0001 /* OOB X coords wrap to the other side of the Clip Rect (else: coords are clamped) */
-#define VIDEO_GFX_F_YWRAP    0x0002 /* OOB Y coords wrap to the other side of the Clip Rect (else: coords are clamped) */
-#define VIDEO_GFX_F_XMIRROR  0x0004 /* X coords are horizontally mirrored relative to the Clip Rect */
-#define VIDEO_GFX_F_YMIRROR  0x0008 /* Y coords are vertically mirrored relative to the Clip Rect */
-#define VIDEO_GFX_F_XYSWAP   0x0010 /* Swap X/Y coords (width becoming height, and height becoming width)
+#define VIDEO_GFX_F_XYSWAP   0x0001 /* Swap X/Y coords (width becoming height, and height becoming width)
                                      * WARNING: Do not alter this flag directly; use `video_gfx_xyswap()'
                                      * NOTE: Happens **after** VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR! */
+#define VIDEO_GFX_F_COLORKEY 0x0002 /* GFX uses a color-key; GFX blit operations will skip pixels matching the key */
+#define VIDEO_GFX_F_XMIRROR  0x0004 /* X coords are horizontally mirrored relative to the Clip Rect */
+#define VIDEO_GFX_F_YMIRROR  0x0008 /* Y coords are vertically mirrored relative to the Clip Rect */
+#define VIDEO_GFX_F_XWRAP    0x0010 /* OOB X coords wrap to the other side of the Clip Rect (else: coords are clamped) */
+#define VIDEO_GFX_F_YWRAP    0x0020 /* OOB Y coords wrap to the other side of the Clip Rect (else: coords are clamped) */
 #define VIDEO_GFX_F_NEAREST  0x0000 /* Use nearest interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
-#define VIDEO_GFX_F_LINEAR   0x0020 /* Use linear interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
-#define VIDEO_GFX_F_COLORKEY 0x0040 /* GFX uses a color-key; GFX blit operations will skip pixels matching the key */
+#define VIDEO_GFX_F_LINEAR   0x0040 /* Use linear interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
 
 #ifdef __CC__
 __DECL_BEGIN

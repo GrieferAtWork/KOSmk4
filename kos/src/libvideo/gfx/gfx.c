@@ -28,10 +28,13 @@
 
 #include <hybrid/overflow.h>
 
+#include <libvideo/crect.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/rect.h>
 #include <libvideo/types.h>
 
+#include "buffer/region.h"
 #include "gfx-empty.h"
 #include "gfx-utils.h"
 #include "gfx.h"
@@ -165,8 +168,8 @@ libvideo_gfx_clip__generic(struct video_gfx *__restrict self,
 		self->vx_hdr.vxh_cxoff -= 2 * clip_x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
 		self->vx_hdr.vxh_cyoff -= 2 * clip_y;
-	self->vx_hdr.vxh_cxsiz = size_x;
-	self->vx_hdr.vxh_cysiz = size_y;
+	self->vx_hdr.vxh_cxdim = size_x;
+	self->vx_hdr.vxh_cydim = size_y;
 
 	/* Clamp I/O Rect according to new Clip Rect */
 	if ((video_offset_t)self->vx_hdr.vxh_bxmin < self->vx_hdr.vxh_cxoff) {
@@ -211,13 +214,13 @@ libvideo_gfx_offset2coord__generic(struct video_gfx const *__restrict self,
                                    video_offset_t x, video_offset_t y,
                                    video_coord_t coords[2]) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
+		x = (self->vx_hdr.vxh_cxdim - 1) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
+		y = (self->vx_hdr.vxh_cydim - 1) - y;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
+		x = wrap(x, self->vx_hdr.vxh_cxdim);
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
+		x = wrap(x, self->vx_hdr.vxh_cxdim);
 	x += self->vx_hdr.vxh_cxoff;
 	y += self->vx_hdr.vxh_cyoff;
 	if unlikely((video_coord_t)x < self->vx_hdr.vxh_bxmin)
@@ -268,9 +271,9 @@ libvideo_gfx_coord2offset__generic(struct video_gfx const *__restrict self,
 	x -= self->vx_hdr.vxh_cxoff;
 	y -= self->vx_hdr.vxh_cyoff;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
+		x = (self->vx_hdr.vxh_cxdim - 1) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
+		y = (self->vx_hdr.vxh_cydim - 1) - y;
 	offsets[0] = (video_offset_t)x;
 	offsets[1] = (video_offset_t)y;
 	return true;
@@ -307,15 +310,15 @@ _libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
 	static_assert((GFX_YFLAGS >> GFX_FLAGS_Y_TO_X_RSHIFT) == GFX_XFLAGS);
 #define Tswap(T, a, b) { T _temp = (a); (a) = (b); (b) = _temp; }
 	Tswap(video_offset_t, self->vx_hdr.vxh_cxoff, self->vx_hdr.vxh_cyoff);
-	Tswap(video_dim_t, self->vx_hdr.vxh_cxsiz, self->vx_hdr.vxh_cysiz);
+	Tswap(video_dim_t, self->vx_hdr.vxh_cxdim, self->vx_hdr.vxh_cydim);
 	Tswap(video_coord_t, self->vx_hdr.vxh_bxmin, self->vx_hdr.vxh_bymin);
 	Tswap(video_coord_t, self->vx_hdr.vxh_bxend, self->vx_hdr.vxh_byend);
 #undef Tswap
 
 	/* Swap axis-specific flags */
-	video_gfx_getflags(self) = (video_gfx_getflags(self) & ~(GFX_XFLAGS | GFX_YFLAGS)) |
-	                 ((video_gfx_getflags(self) & GFX_XFLAGS) << GFX_FLAGS_X_TO_Y_LSHIFT) |
-	                 ((video_gfx_getflags(self) & GFX_YFLAGS) >> GFX_FLAGS_Y_TO_X_RSHIFT);
+	self->vx_surf.vs_flags = (video_gfx_getflags(self) & ~(GFX_XFLAGS | GFX_YFLAGS)) |
+	                         ((video_gfx_getflags(self) & GFX_XFLAGS) << GFX_FLAGS_X_TO_Y_LSHIFT) |
+	                         ((video_gfx_getflags(self) & GFX_YFLAGS) >> GFX_FLAGS_Y_TO_X_RSHIFT);
 #undef GFX_YFLAGS
 #undef GFX_XFLAGS
 #undef GFX_FLAGS_Y_TO_X_RSHIFT
@@ -326,21 +329,21 @@ DEFINE_PUBLIC_ALIAS(video_gfx_xyswap, libvideo_gfx_xyswap);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
 	_libvideo_gfx_xyswap(self);
-	video_gfx_getflags(self) ^= VIDEO_GFX_F_XYSWAP;
+	self->vx_surf.vs_flags ^= VIDEO_GFX_F_XYSWAP;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_hmirror, libvideo_gfx_hmirror);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_hmirror(struct video_gfx *__restrict self) {
-	video_gfx_getflags(self) ^= VIDEO_GFX_F_XMIRROR;
+	self->vx_surf.vs_flags ^= VIDEO_GFX_F_XMIRROR;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_vmirror, libvideo_gfx_vmirror);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_vmirror(struct video_gfx *__restrict self) {
-	video_gfx_getflags(self) ^= VIDEO_GFX_F_YMIRROR;
+	self->vx_surf.vs_flags ^= VIDEO_GFX_F_YMIRROR;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
@@ -348,7 +351,7 @@ DEFINE_PUBLIC_ALIAS(video_gfx_lrot90, libvideo_gfx_lrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_lrot90(struct video_gfx *__restrict self) {
 	_libvideo_gfx_xyswap(self);
-	video_gfx_getflags(self) ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
+	self->vx_surf.vs_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
@@ -365,7 +368,7 @@ libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
 	 *
 	 * Since mirroring  always  happens  before  X/Y-swap,
 	 * and since `_libvideo_gfx_xyswap' already made it so
-	 * `self->vx_hdr.vxh_cxsiz = video_gfx_getbuffer(self)->vb_ydim-1'
+	 * `self->vx_hdr.vxh_cxdim = video_gfx_getbuffer(self)->vb_ydim-1'
 	 * (assuming  no  custom  clip  rect),  we  have  to  toggle   the
 	 * XMIRROR   flag   here   (since   mirror   happens   before  X/Y
 	 * swapping)
@@ -393,14 +396,14 @@ libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
 	 *      the BOTTOM LEFT (even though your old origin is now in
 	 *      the top left). */
 	_libvideo_gfx_xyswap(self);
-	video_gfx_getflags(self) ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
+	self->vx_surf.vs_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_rot180, libvideo_gfx_rot180);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_rot180(struct video_gfx *__restrict self) {
-	video_gfx_getflags(self) ^= (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR);
+	self->vx_surf.vs_flags ^= (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
@@ -433,6 +436,85 @@ libvideo_gfx_rrot90n(struct video_gfx *__restrict self, int n) {
 	default: __builtin_unreachable();
 	}
 }
+
+
+/* Wrapper  around `video_buffer_region()' that produces a buffer which,
+ * when used to instantiate a GFX context, replicates an effective Clip-
+ * and  I/O-Rect that matches  `self', as well as  has its buffer format
+ * initialized to reflect the current  palette, flags and color key,  as
+ * set in `self' at the time of this function being called.
+ *
+ * CAUTION: Just like with `video_buffer_region()', pixel  data
+ *          of the returned buffer will be rotated in GFX-only!
+ *
+ * NOTE: `video_gfx_asbuffer_distinct()' never returns `video_gfx_getbuffer()',
+ *       even  if the GFX  context isn't doing anything  that would require the
+ *       creation of a separate sub-buffer.
+ *
+ * @return: * : The video buffer representing a wrapped and const-i-fied copy of `self'
+ * @return: NULL: [errno=ENOMEM] Insufficient memory
+ * @return: NULL: [errno=*] Failed to create wrapper for some other reason */
+DEFINE_PUBLIC_ALIAS(video_gfx_asbuffer, libvideo_gfx_asbuffer);
+DEFINE_PUBLIC_ALIAS(video_gfx_asbuffer_distinct, libvideo_gfx_asbuffer_distinct);
+INTERN WUNUSED ATTR_IN(1) REF struct video_buffer *CC
+libvideo_gfx_asbuffer_distinct(struct video_gfx const *__restrict self) {
+	struct video_surface surface = *video_gfx_assurface(self);
+	video_buffer_incref(surface.vs_buffer);
+	if (!video_gfx_issurfio(self)) {
+		/* Must create a custom sub-region for the I/O-Rect */
+		struct video_crect iorect;
+		REF struct video_buffer *new_buffer;
+		video_gfx_getiorect(self, &iorect);
+		new_buffer = video_surface_subregion(&surface, &iorect);
+		if unlikely(!new_buffer)
+			goto err_surface_buffer;
+		video_buffer_decref(surface.vs_buffer);
+		surface.vs_buffer = new_buffer;
+	}
+	if (!video_gfx_isioclip(self)) {
+		/* Must create a custom region for the Clip-Rect */
+		struct video_rect clipio;
+		REF struct video_buffer *new_buffer;
+		video_gfx_getiocliprect(self, &clipio);
+		new_buffer = libvideo_surface_region(&surface, &clipio);
+		if unlikely(!new_buffer)
+			goto err_surface_buffer;
+		video_buffer_decref(surface.vs_buffer);
+		surface.vs_buffer = new_buffer;
+	}
+
+	/* If  we're still using the GFX's buffer at this point, force a new one
+	 * since we're required to return a distinct buffer, as well as one that
+	 * features the currently set palette/flags/color-key of `self'. */
+	if unlikely(surface.vs_buffer == video_gfx_getbuffer(self)) {
+		struct video_crect surfrect;
+		REF struct video_buffer *new_buffer;
+		video_gfx_getsurfrect(self, &surfrect);
+		new_buffer = video_surface_subregion(&surface, &surfrect);
+		if unlikely(!new_buffer)
+			goto err_surface_buffer;
+		video_buffer_decref(surface.vs_buffer);
+		surface.vs_buffer = new_buffer;
+	}
+
+	/* Return the new video buffer. */
+	return surface.vs_buffer;
+err_surface_buffer:
+	video_buffer_decref(surface.vs_buffer);
+	return NULL;
+}
+
+INTERN WUNUSED ATTR_IN(1) REF struct video_buffer *CC
+libvideo_gfx_asbuffer(struct video_gfx const *__restrict self) {
+	/* If the Clip Rect matches the associated surface, then no region shenanigans are needed. */
+	if (video_gfx_issurfclip(self))
+		return video_surface_asbuffer(video_gfx_assurface(self));
+
+	/* Will always need to create a separate buffer, so
+	 * just let the *_distinct variant do all the work. */
+	return libvideo_gfx_asbuffer_distinct(self);
+}
+
 
 DECL_END
 

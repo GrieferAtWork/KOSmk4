@@ -61,8 +61,9 @@
 #include <libvideo/types.h>
 
 #include "../buffer.h"
-#include "../codec/codec.h"
+#include "../buffer/lockable.h"
 #include "../codec/codec-specs.h"
+#include "../codec/codec.h"
 #include "../codec/palette.h"
 #include "../gfx-utils.h"
 #include "../io-utils.h"
@@ -220,8 +221,8 @@ fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 	assert(me->vb_domain == &libvideo_ramdomain);
 	assert(me->vb_ops == &rambuffer_ops ||
 	       me->vb_ops == &rambuffer_formem_ops);
-	assert(me->vb_format.vbf_codec->vc_codec == VIDEO_CODEC_RGBA8888);
-	assert(me->vb_format.vbf_pal == NULL);
+	assert(me->vb_codec->vc_codec == VIDEO_CODEC_RGBA8888);
+	assert(me->vb_surf.vs_pal == NULL);
 	for (y = 0; y < me->vb_ydim; ++y) {
 		struct pixel *iter, *end;
 		iter = (struct pixel *)(me->rb_data + y * me->rb_stride);
@@ -234,8 +235,8 @@ fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 
 	/* No alpha values -> use RGBX8888 instead.
 	 * Because we're a ram-buffer, we can simply change the codec like this! */
-	me->vb_format.vbf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBX8888);
-	assertf(me->vb_format.vbf_codec, "Built-in codec should have been recognized");
+	me->vb_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBX8888);
+	assertf(me->vb_codec, "Built-in codec should have been recognized");
 }
 
 struct bmp_masks {
@@ -649,8 +650,8 @@ err:
 
 
 INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options) {
+libvideo_surface_save_bmp(struct video_surface const *__restrict self,
+                          FILE *stream, char const *options) {
 	struct ATTR_PACKED bmp_pal_color {
 		uint8_t b;
 		uint8_t g;
@@ -666,12 +667,10 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		};
 	} hdr;
 	struct video_lock vid_lock;
-	struct video_codec const *codec = self->vb_format.vbf_codec;
-	struct video_palette const *pal = self->vb_format.vbf_pal;
-	DWORD dwPixelScanline = CEILDIV(self->vb_xdim * codec->vc_specs.vcs_bpp, NBBY);
-
-	/* From Wikipedia: """The size of each row is rounded up to a multiple of 4 bytes""" */
-	dwPixelScanline = CEIL_ALIGN(dwPixelScanline, 4);
+	struct video_buffer *buffer = video_surface_getbuffer(self);
+	struct video_codec const *codec = video_buffer_getcodec(buffer);
+	struct video_palette const *pal = video_surface_getpalette(self);
+	DWORD dwPixelScanline;
 
 	/* Check for codec types that cannot be written as-it into a BMP file */
 	if ((codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM))
@@ -705,26 +704,45 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		} else {
 			preferred_codec_id = VIDEO_CODEC_BGRA8888;
 		}
-		preferred_format.vbf_flags = VIDEO_GFX_F_NORMAL;
+		preferred_format.vbf_flags = video_surface_getflags(self) & VIDEO_GFX_F_YMIRROR;
 		preferred_format.vbf_codec = libvideo_codec_lookup(preferred_codec_id);
 		assertf(preferred_format.vbf_codec, "Built-in codec should have been recognized");
 		assert(preferred_format.vbf_codec->vc_specs.vcs_bpp > 8);
-		converted_buffer = libvideo_buffer_convert(self, _libvideo_ramdomain(), &preferred_format);
+		converted_buffer = libvideo_surface_convert(self, _libvideo_ramdomain(), &preferred_format);
 		if unlikely(!converted_buffer)
 			return -1;
-		result = libvideo_buffer_save_bmp(converted_buffer, stream, options);
+		result = libvideo_surface_save_bmp(video_buffer_assurface(converted_buffer), stream, options);
+		video_buffer_decref(converted_buffer);
+		return result;
+	} else if (video_surface_getflags(self) & (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR)) {
+		/* Can't represent these flags natively (only "VIDEO_GFX_F_YMIRROR" can be encoded into a BMP) */
+		int result;
+		REF struct video_buffer *converted_buffer;
+		struct video_buffer_format preferred_format;
+		preferred_format.vbf_flags = video_surface_getflags(self) & VIDEO_GFX_F_YMIRROR;
+		preferred_format.vbf_codec = video_surface_getcodec(self);
+		converted_buffer = libvideo_surface_convert(self, _libvideo_ramdomain(), &preferred_format);
+		if unlikely(!converted_buffer)
+			return -1;
+		result = libvideo_surface_save_bmp(video_buffer_assurface(converted_buffer), stream, options);
 		video_buffer_decref(converted_buffer);
 		return result;
 	}
 
+	/* From Wikipedia: """The size of each row is rounded up to a multiple of 4 bytes""" */
+	dwPixelScanline = CEILDIV(video_buffer_getxdim(buffer) * codec->vc_specs.vcs_bpp, NBBY);
+	dwPixelScanline = CEIL_ALIGN(dwPixelScanline, 4);
+
 	bzero(&hdr, sizeof(hdr));
-	hdr.bmFile.bfType      = ENCODE_INT16('B', 'M');
-	hdr.bmFile.bfSize      = sizeof(hdr.bmFile);
-	hdr.bmInfo.biWidth     = self->vb_xdim;
-	hdr.bmInfo.biHeight    = -(LONG)self->vb_ydim;
+	hdr.bmFile.bfType   = ENCODE_INT16('B', 'M');
+	hdr.bmFile.bfSize   = sizeof(hdr.bmFile);
+	hdr.bmInfo.biWidth  = video_buffer_getxdim(buffer);
+	hdr.bmInfo.biHeight = -(LONG)video_buffer_getydim(buffer);
+	if (video_surface_getflags(self) & VIDEO_GFX_F_YMIRROR)
+		hdr.bmInfo.biHeight = -hdr.bmInfo.biHeight;
 	hdr.bmInfo.biPlanes    = 1;
 	hdr.bmInfo.biBitCount  = codec->vc_specs.vcs_bpp;
-	hdr.bmInfo.biSizeImage = dwPixelScanline * self->vb_ydim;
+	hdr.bmInfo.biSizeImage = dwPixelScanline * video_buffer_getydim(buffer);
 	hdr.bmColorMasks[0]    = codec->vc_specs.vcs_rmask;
 	hdr.bmColorMasks[1]    = codec->vc_specs.vcs_gmask;
 	hdr.bmColorMasks[2]    = codec->vc_specs.vcs_bmask;
@@ -767,9 +785,19 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		}
 	}
 
-	/* Acquire lock to video memory of "self" */
-	if unlikely(video_buffer_rlock(self, &vid_lock))
+	/* Acquire lock to video memory of "buffer" */
+	if unlikely(video_buffer_rlock(buffer, &vid_lock)) {
+		if (errno != ENOMEM) {
+			/* Try with a force-lockable buffer */
+			int result;
+			struct lockable_buffer_base lockable;
+			self   = lockable_buffer_initbase(&lockable, self);
+			result = libvideo_surface_save_bmp(self, stream, options);
+			lockable_buffer_finibase(&lockable);
+			return result;
+		}
 		goto err;
+	}
 
 	/* Write file header and color masks/palette */
 	if (!fwrite(&hdr, hdr.bmFile.bfOffBits, 1, stream))
@@ -778,12 +806,12 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 	/* Write pixel data */
 	if likely(vid_lock.vl_stride == dwPixelScanline) {
 		/* Can write data without any need for padding or-the-like */
-		size_t n_bytes = vid_lock.vl_stride * self->vb_ydim;
+		size_t n_bytes = vid_lock.vl_stride * video_buffer_getydim(buffer);
 		if (!fwrite(vid_lock.vl_data, n_bytes, 1, stream))
 			goto err_unlock;
 	} else if (vid_lock.vl_stride > dwPixelScanline) {
 		video_coord_t y;
-		for (y = 0; y < self->vb_ydim; ++y) {
+		for (y = 0; y < video_buffer_getydim(buffer); ++y) {
 			byte_t const *src = vid_lock.vl_data + y * vid_lock.vl_stride;
 			if (!fwrite(src, dwPixelScanline, 1, stream))
 				goto err_unlock;
@@ -791,7 +819,7 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 	} else {
 		size_t n_skip = dwPixelScanline - vid_lock.vl_stride;
 		video_coord_t y;
-		for (y = 0; y < self->vb_ydim; ++y) {
+		for (y = 0; y < video_buffer_getydim(buffer); ++y) {
 			byte_t const *src = vid_lock.vl_data + y * vid_lock.vl_stride;
 			if (!fwrite(src, dwPixelScanline, 1, stream))
 				goto err_unlock;
@@ -805,10 +833,10 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 			goto err_unlock;
 	}
 
-	video_buffer_unlock(self, &vid_lock);
+	video_buffer_unlock(buffer, &vid_lock);
 	return 0;
 err_unlock:
-	video_buffer_unlock(self, &vid_lock);
+	video_buffer_unlock(buffer, &vid_lock);
 err:
 	return -1;
 }

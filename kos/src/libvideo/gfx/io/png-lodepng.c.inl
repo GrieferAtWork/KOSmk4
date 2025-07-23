@@ -1,8 +1,3 @@
-/*[[[magic
-local gcc_opt = options.setdefault("GCC.options", []);
-gcc_opt.removeif(x -> x.startswith("-O"));
-gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
-]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +19,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  */
 #ifndef GUARD_LIBVIDEO_GFX_IO_PNG_LODEPNG_C_INL
 #define GUARD_LIBVIDEO_GFX_IO_PNG_LODEPNG_C_INL 1
+#define __VIDEO_BUFFER_const /*nothing */
 #define _KOS_SOURCE 1
 
 #include "../api.h"
@@ -44,15 +40,11 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <stdio.h>
 #include <string.h>
 
-#include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
-#include <libvideo/gfx/codec/palette.h>
-#include <libvideo/gfx/gfx.h>
 
 #include "../buffer.h"
 #include "../codec/codec.h"
-#include "../codec/palette.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
 
@@ -222,33 +214,9 @@ video_lock_convert_stride(struct video_lock *__restrict self,
 	return result;
 }
 
-/* Convert "self" into a RGB/RGBA buffer. */
-PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
-libvideo_buffer_convert_to_lodepng_rgb(struct video_buffer *__restrict self) {
-	struct video_buffer_format format;
-	bool has_alpha = self->vb_format.vbf_codec->vc_specs.vcs_amask != 0;
-	format.vbf_codec = libvideo_codec_lookup(has_alpha ? VIDEO_CODEC_RGBA8888 : VIDEO_CODEC_RGB888);
-	assertf(format.vbf_codec, "Built-in codec should have been recognized");
-	format.vbf_flags = VIDEO_GFX_F_NORMAL;
-	return libvideo_buffer_convert(self, _libvideo_ramdomain(), &format);
-}
-
-PRIVATE WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_convert_and_save_lodepng(struct video_buffer *__restrict self,
-                                         FILE *stream, char const *options) {
-	int result;
-	REF struct video_buffer *rgb_buffer;
-	rgb_buffer = libvideo_buffer_convert_to_lodepng_rgb(self);
-	if unlikely(!rgb_buffer)
-		return -1;
-	result = libvideo_buffer_save_lodepng(rgb_buffer, stream, options);
-	video_buffer_decref(rgb_buffer);
-	return result;
-}
-
 INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
-                             FILE *stream, char const *options) {
+libvideo_surface_save_lodepng(struct video_surface const *__restrict self,
+                              FILE *stream, char const *options) {
 	int result;
 	LodePNGColorType colortype;
 	unsigned int bitdepth;
@@ -257,7 +225,9 @@ libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
 	unsigned char *out;
 	size_t out_size;
 	struct video_lock lock;
-	switch (self->vb_format.vbf_codec->vc_codec) {
+	struct video_buffer *buffer = video_surface_getbuffer(self);
+	struct video_codec const *codec = video_buffer_getcodec(buffer);
+	switch (codec->vc_codec) {
 	case VIDEO_CODEC_L1_LSB:
 		colortype = LCT_GREY;
 		bitdepth  = 1;
@@ -283,37 +253,56 @@ libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
 		bitdepth  = 8;
 		break;
 
-	default:
+	default: {
 		/* Convert "self" into a supported codec */
-		return libvideo_buffer_convert_and_save_lodepng(self, stream, options);
+		struct video_buffer_format format;
+		REF struct video_buffer *rgb_buffer;
+		bool has_alpha;
+convert_surface:
+		has_alpha = codec->vc_specs.vcs_amask != 0;
+		format.vbf_codec = libvideo_codec_lookup(has_alpha ? VIDEO_CODEC_RGBA8888 : VIDEO_CODEC_RGB888);
+		assertf(format.vbf_codec, "Built-in codec should have been recognized");
+		format.vbf_flags = VIDEO_GFX_F_NORMAL;
+		rgb_buffer = libvideo_surface_convert(self, _libvideo_ramdomain(), &format);
+		if unlikely(!rgb_buffer)
+			return -1;
+		result = libvideo_surface_save_lodepng(video_buffer_assurface(rgb_buffer), stream, options);
+		video_buffer_decref(rgb_buffer);
+		return result;
+	}	break;
 	}
 
-	result = video_buffer_rlock(self, &lock);
+	/* Also force a conversion if the surface is rotates somehow */
+	if (video_surface_getflags(self) & (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR))
+		goto convert_surface;
+
+	result = video_buffer_rlock(buffer, &lock);
 	if unlikely(result)
 		return result;
-	lodepng_stride = get_lodepng_stride(self->vb_xdim,
+	lodepng_stride = get_lodepng_stride(video_buffer_getxdim(buffer),
 	                                    colortype, bitdepth);
 	if likely(lodepng_stride == lock.vl_stride) {
 		error = my_lodepng_encode_memory(&out, &out_size,
 		                                 (unsigned char const *)lock.vl_data,
-		                                 self->vb_xdim, self->vb_ydim,
+		                                 video_buffer_getxdim(buffer),
+		                                 video_buffer_getydim(buffer),
 		                                 colortype, bitdepth, options);
 	} else {
 		byte_t *fixed_stride;
-		fixed_stride = video_lock_convert_stride(&lock,
-		                                         lodepng_stride,
-		                                         self->vb_ydim);
+		fixed_stride = video_lock_convert_stride(&lock, lodepng_stride,
+		                                         video_buffer_getydim(buffer));
 		if unlikely(!fixed_stride) {
 			error = 83; /* OOM */
 		} else {
 			error = my_lodepng_encode_memory(&out, &out_size,
 			                                 (unsigned char const *)fixed_stride,
-			                                 self->vb_xdim, self->vb_ydim,
+			                                 video_buffer_getxdim(buffer),
+			                                 video_buffer_getydim(buffer),
 			                                 colortype, bitdepth, options);
 			free(fixed_stride);
 		}
 	}
-	video_buffer_unlock(self, &lock);
+	video_buffer_unlock(buffer, &lock);
 	switch (error) {
 	case 0:
 		result = 0;

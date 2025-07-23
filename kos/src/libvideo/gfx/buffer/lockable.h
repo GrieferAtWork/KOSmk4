@@ -48,14 +48,15 @@ struct lockable_buffer_base: video_buffer {
 	byte_t                  *lbb_edata;  /* [valid_if(lbb_data)] End of lock data */
 };
 
-/* Check if `buffer'  is lockable. If  so re-return  "buffer"
- * and initialize `self' such that `lockable_buffer_finibase'
- * does nothing. Else, wrap it using `buffer' and return *it*
- * instead. */
-INTDEF WUNUSED ATTR_OUT(1) NONNULL((2)) struct video_buffer *CC
+/* Wrap `surface' as the surface of a lockable buffer. */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_OUT(1) ATTR_IN(2) struct video_surface const *CC
 lockable_buffer_initbase(struct lockable_buffer_base *self,
-                         struct video_buffer *__restrict buffer);
+                         struct video_surface const *__restrict surface);
 #define lockable_buffer_finibase(self) __libc_free((self)->lbb_data)
+
+/* Check if "self" is *always* lockable */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) bool CC
+libvideo_buffer_islockable(struct video_buffer const *__restrict self);
 
 
 
@@ -120,7 +121,6 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC lockable_buffer__upda
 
 
 
-
 /* When `self' isn't  known to unconditionally  support read/write  locks,
  * wrap it using a proxy video buffer that implements these operations as:
  * - Attempt the lock on the underlying buffer.
@@ -133,15 +133,17 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC lockable_buffer__upda
  * - In case `vi_wlock' was called, the matching `vi_unlock' will  then
  *   once again use a GFX context to at least all modified (or possibly
  *   just all) pixels back to the underlying buffer.
- * @param: self:  The video buffer to wrap
+ * @param: self:  The video surface to wrap
  * @return: * :   The video buffer wrapper (having the same codec/dimensions as `self')
  * @return: self: The given `self' is already  known to have vi_rlock/vi_wlock  operators
  *                that either never fail, or can only fail with errno=ENOMEM for the same
  *                reason that the  "lockable" wrapper could  also fail. (generally,  this
  *                means that this is a no-op when  `self' is a ram-buffer, or is  already
  *                a "lockable" video buffer). */
-INTDEF WUNUSED ATTR_INOUT(1) REF struct video_buffer *CC
-libvideo_buffer_lockable(struct video_buffer *__restrict self);
+INTDEF WUNUSED ATTR_IN(1) REF struct video_buffer *CC
+libvideo_surface_lockable(struct video_surface const *__restrict self);
+INTDEF WUNUSED ATTR_IN(1) REF struct video_buffer *CC
+libvideo_surface_lockable_distinct(struct video_surface const *__restrict self);
 
 DECL_END
 

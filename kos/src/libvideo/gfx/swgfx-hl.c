@@ -122,26 +122,26 @@ libvideo_swgfx_fillmask_wrap(struct video_gfx const *__restrict self,
 	video_dim_t yinb = size_y;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
-		dst_x = wrap(dst_x, self->vx_hdr.vxh_cxsiz);
-		if (size_x > self->vx_hdr.vxh_cxsiz)
-			size_x = self->vx_hdr.vxh_cxsiz;
+		dst_x = wrap(dst_x, self->vx_hdr.vxh_cxdim);
+		if (size_x > self->vx_hdr.vxh_cxdim)
+			size_x = self->vx_hdr.vxh_cxdim;
 		cxend = (video_coord_t)dst_x + size_x;
-		if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxsiz, &xwrap)) {
+		if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxdim, &xwrap)) {
 			xwrap = 0;
 		} else {
-			xinb = self->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
+			xinb = self->vx_hdr.vxh_cxdim - (video_coord_t)dst_x;
 		}
 	}
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
-		dst_y = wrap(dst_y, self->vx_hdr.vxh_cysiz);
-		if (size_y > self->vx_hdr.vxh_cysiz)
-			size_y = self->vx_hdr.vxh_cysiz;
+		dst_y = wrap(dst_y, self->vx_hdr.vxh_cydim);
+		if (size_y > self->vx_hdr.vxh_cydim)
+			size_y = self->vx_hdr.vxh_cydim;
 		cyend = (video_coord_t)dst_y + size_y;
-		if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cysiz, &ywrap)) {
+		if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cydim, &ywrap)) {
 			ywrap = 0;
 		} else {
-			yinb = self->vx_hdr.vxh_cysiz - (video_coord_t)dst_y;
+			yinb = self->vx_hdr.vxh_cydim - (video_coord_t)dst_y;
 		}
 	}
 	if (xwrap && ywrap) { /* Must do a partial fill at the top-left */
@@ -265,30 +265,30 @@ libvideo_swgfx_fillstretchmask_wrap(struct video_gfx const *__restrict self,
 	video_dim_t yinb = dst_size_y;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
-		dst_x = wrap(dst_x, self->vx_hdr.vxh_cxsiz);
-		if (dst_size_x > self->vx_hdr.vxh_cxsiz) {
-			src_size_x = xdst2src(self->vx_hdr.vxh_cxsiz);
-			dst_size_x = self->vx_hdr.vxh_cxsiz;
+		dst_x = wrap(dst_x, self->vx_hdr.vxh_cxdim);
+		if (dst_size_x > self->vx_hdr.vxh_cxdim) {
+			src_size_x = xdst2src(self->vx_hdr.vxh_cxdim);
+			dst_size_x = self->vx_hdr.vxh_cxdim;
 		}
 		cxend = (video_coord_t)dst_x + dst_size_x;
-		if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxsiz, &xwrap)) {
+		if (OVERFLOW_USUB(cxend, self->vx_hdr.vxh_cxdim, &xwrap)) {
 			xwrap = 0;
 		} else {
-			xinb = self->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
+			xinb = self->vx_hdr.vxh_cxdim - (video_coord_t)dst_x;
 		}
 	}
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
-		dst_y = wrap(dst_y, self->vx_hdr.vxh_cysiz);
-		if (dst_size_y > self->vx_hdr.vxh_cysiz) {
-			src_size_y = ydst2src(self->vx_hdr.vxh_cysiz);
-			dst_size_y = self->vx_hdr.vxh_cysiz;
+		dst_y = wrap(dst_y, self->vx_hdr.vxh_cydim);
+		if (dst_size_y > self->vx_hdr.vxh_cydim) {
+			src_size_y = ydst2src(self->vx_hdr.vxh_cydim);
+			dst_size_y = self->vx_hdr.vxh_cydim;
 		}
 		cyend = (video_coord_t)dst_y + dst_size_y;
-		if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cysiz, &ywrap)) {
+		if (OVERFLOW_USUB(cyend, self->vx_hdr.vxh_cydim, &ywrap)) {
 			ywrap = 0;
 		} else {
-			yinb = self->vx_hdr.vxh_cysiz - (video_coord_t)dst_y;
+			yinb = self->vx_hdr.vxh_cydim - (video_coord_t)dst_y;
 		}
 	}
 

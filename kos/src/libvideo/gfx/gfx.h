@@ -67,6 +67,30 @@ INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_lrot90n(struct video_gfx
 INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rrot90n(struct video_gfx *__restrict self, int n);
 
 
+/* Wrapper  around `video_buffer_region()' that produces a buffer which,
+ * when used to instantiate a GFX context, replicates an effective Clip-
+ * and  I/O-Rect that matches  `self', as well as  has its buffer format
+ * initialized to reflect the current  palette, flags and color key,  as
+ * set in `self' at the time of this function being called.
+ *
+ * CAUTION: Just like with `video_buffer_region()', pixel  data
+ *          of the returned buffer will be rotated in GFX-only!
+ *
+ * NOTE: `video_gfx_asbuffer_distinct()' never returns `video_gfx_getbuffer()',
+ *       even  if the GFX  context isn't doing anything  that would require the
+ *       creation of a separate sub-buffer.
+ *
+ * @return: * : The video buffer representing a wrapped and const-i-fied copy of `self'
+ * @return: NULL: [errno=ENOMEM] Insufficient memory
+ * @return: NULL: [errno=*] Failed to create wrapper for some other reason */
+INTDEF WUNUSED ATTR_IN(1) REF struct video_buffer *CC
+libvideo_gfx_asbuffer(struct video_gfx const *__restrict self);
+INTDEF WUNUSED ATTR_IN(1) REF struct video_buffer *CC
+libvideo_gfx_asbuffer_distinct(struct video_gfx const *__restrict self);
+
+
+
+
 
 /* Initialize the clip / I/O rects of `self' to fully represent the underlying buffer fully. */
 LOCAL ATTR_INOUT(1) void CC
@@ -74,11 +98,11 @@ libvideo_gfx_init_fullclip(struct video_gfx *__restrict self) {
 	self->vx_hdr.vxh_bxmin = self->vx_hdr.vxh_cxoff = 0;
 	self->vx_hdr.vxh_bymin = self->vx_hdr.vxh_cyoff = 0;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP) {
-		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = video_gfx_getbuffer(self)->vb_ydim;
-		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = video_gfx_getbuffer(self)->vb_xdim;
+		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxdim = video_gfx_getbuffer(self)->vb_ydim;
+		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cydim = video_gfx_getbuffer(self)->vb_xdim;
 	} else {
-		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = video_gfx_getbuffer(self)->vb_xdim;
-		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = video_gfx_getbuffer(self)->vb_ydim;
+		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxdim = video_gfx_getbuffer(self)->vb_xdim;
+		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cydim = video_gfx_getbuffer(self)->vb_ydim;
 	}
 }
 

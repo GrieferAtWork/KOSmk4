@@ -46,6 +46,7 @@
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/screen.h>
+#include <libvideo/gfx/surface.h>
 
 DECL_BEGIN
 
@@ -135,7 +136,7 @@ again_font:
 		fontprinter_data.vfp_cury = 0;
 	}
 	fontprinter_data.vfp_gfx   = &fontgfx;
-	fontprinter_data.vfp_lnend = video_gfx_getclipw(&fontgfx);
+	fontprinter_data.vfp_lnend = video_gfx_getxdim(&fontgfx);
 	fontprinter_data.vfp_curx  = 0;
 
 	format_printf(&video_fontprinter,
@@ -156,8 +157,8 @@ again_font:
 	              "▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟\n");
 	/* Clear screen beyond text area */
 	fontgfx.fill(fontprinter_data.vfp_curx, fontprinter_data.vfp_cury,
-	             video_gfx_getclipw(&fontgfx) - fontprinter_data.vfp_curx,
-	             video_gfx_getcliph(&fontgfx) - fontprinter_data.vfp_cury,
+	             video_gfx_getxdim(&fontgfx) - fontprinter_data.vfp_curx,
+	             video_gfx_getydim(&fontgfx) - fontprinter_data.vfp_cury,
 	             fontprinter_data.vfp_bg_fg_colors[0]);
 
 	for (;;) {
@@ -189,8 +190,8 @@ again_font:
 
 	gfx.clip(-16,
 	         -16,
-	         video_gfx_getclipw(&gfx) + 32,
-	         video_gfx_getcliph(&gfx) + 32);
+	         video_gfx_getxdim(&gfx) + 32,
+	         video_gfx_getydim(&gfx) + 32);
 
 	for (;;) {
 		unsigned int action;
@@ -218,10 +219,10 @@ again_font:
 				video_color_t color = rand_color();
 				/* TODO: The quadrants of the image this produces aren't all identical
 				 *       (something must be wrong somewhere in the line drawing  also) */
-				for (i = 0; i < video_gfx_getclipw(&gfx); ++i)
-					gfx.line(i, 0, (video_gfx_getclipw(&gfx) - 1) - i, video_gfx_getcliph(&gfx) - 1, color);
-				for (i = 0; i < video_gfx_getcliph(&gfx); ++i)
-					gfx.line(0, i, video_gfx_getclipw(&gfx) - 1, (video_gfx_getcliph(&gfx) - 1) - i, color);
+				for (i = 0; i < video_gfx_getxdim(&gfx); ++i)
+					gfx.line(i, 0, (video_gfx_getxdim(&gfx) - 1) - i, video_gfx_getydim(&gfx) - 1, color);
+				for (i = 0; i < video_gfx_getydim(&gfx); ++i)
+					gfx.line(0, i, video_gfx_getxdim(&gfx) - 1, (video_gfx_getydim(&gfx) - 1) - i, color);
 			}	continue;
 
 			case 'j': {

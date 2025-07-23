@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_IO_JPG_C_INL
 #define GUARD_LIBVIDEO_GFX_IO_JPG_C_INL 1
+#define __VIDEO_BUFFER_const /*nothing */
 #define _KOS_SOURCE 1
 
 #include "../api.h"
@@ -43,6 +44,7 @@
 #include <libvideo/gfx/codec/codec.h>
 
 #include "../buffer.h"
+#include "../buffer/lockable.h"
 #include "../codec/codec.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
@@ -464,21 +466,22 @@ err_errno:
 }
 
 INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options) {
-	video_codec_t in_codec_id;
+libvideo_surface_save_jpg(struct video_surface const *__restrict self,
+                          FILE *stream, char const *options) {
 	struct minimal_jpeg_compress_struct comp;
 	struct used_jpeg_error_mgr err;
 	struct video_lock vid_lock;
-	JPEGLIB_J_COLOR_SPACE comp_in_color_space;
-	int comp_input_components;
+	struct video_codec const *codec;
+	struct video_buffer *buffer;
+	volatile JPEGLIB_J_COLOR_SPACE comp_in_color_space;
+	volatile int comp_input_components;
 	if (!jpeglib_loadapi()) {
 		errno = ENOSYS;
 		return -1;
 	}
 
-	in_codec_id = self->vb_format.vbf_codec->vc_codec;
-	switch (in_codec_id) {
+	codec = video_surface_getcodec(self);
+	switch (codec->vc_codec) {
 
 	case VIDEO_CODEC_L8:
 		comp_in_color_space   = JPEGLIB_JCS_GRAYSCALE;
@@ -493,22 +496,35 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 	default: {
 		/* Fallback: convert to most appropriate fallback codec, and then save it as a buffer */
 		int result;
-		struct video_buffer_format in_format;
+		struct video_buffer_format out_format;
 		struct video_buffer *conv_buffer;
-		in_codec_id = (self->vb_format.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_LUM)
-		              ? VIDEO_CODEC_L8
-		              : VIDEO_CODEC_RGB888;
-		in_format.vbf_codec = libvideo_codec_lookup(in_codec_id);
-		assertf(in_format.vbf_codec, "Built-in codec should have been recognized");
-		in_format.vbf_flags = VIDEO_GFX_F_NORMAL;
-		conv_buffer = libvideo_buffer_convert(self, _libvideo_ramdomain(), &in_format);
+		video_codec_t out_codec_id;
+do_convert:
+		out_codec_id = (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_LUM) ? VIDEO_CODEC_L8 : VIDEO_CODEC_RGB888;
+		out_format.vbf_codec = libvideo_codec_lookup(out_codec_id);
+		assertf(out_format.vbf_codec, "Built-in codec should have been recognized");
+		out_format.vbf_flags = VIDEO_GFX_F_NORMAL;
+		conv_buffer = libvideo_surface_convert(self, _libvideo_ramdomain(), &out_format);
 		if unlikely(!conv_buffer)
 			return -1;
-		result = libvideo_buffer_save_jpg(conv_buffer, stream, options);
+		result = libvideo_surface_save_jpg(video_buffer_assurface(conv_buffer),
+		                                   stream, options);
 		video_buffer_decref(conv_buffer);
 		return result;
 	}	break;
 
+	}
+	if (video_surface_getflags(self) & (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR))
+		goto do_convert;
+	buffer = video_surface_getbuffer(self);
+	if (!libvideo_buffer_islockable(buffer)) {
+		/* Must wrap as a lockable buffer */
+		int result;
+		struct lockable_buffer_base lockable;
+		self   = lockable_buffer_initbase(&lockable, self);
+		result = libvideo_surface_save_jpg(self, stream, options);
+		lockable_buffer_finibase(&lockable);
+		return result;
 	}
 
 	/* Setup jpeglib error handler */
@@ -522,7 +538,7 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 #endif
 		(void)(*pdyn_jpeg_destroy_compress)(&comp);
 		if (vid_lock.vl_data)
-			video_buffer_unlock(self, &vid_lock);
+			video_buffer_unlock(buffer, &vid_lock);
 		errno = EIO; /* ??? */
 		return -1;
 	}
@@ -531,8 +547,8 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 	(void)(*pdyn_jpeg_CreateCompress)(&comp, JPEGLIB_JPEG_LIB_VERSION,
 	                                  JPEGLIB_SIZEOF_jpeg_compress_struct);
 	(void)(*pdyn_jpeg_stdio_dest)(&comp, stream);
-	minimal_jpeg_compress_struct__set_image_width(&comp, self->vb_xdim);
-	minimal_jpeg_compress_struct__set_image_height(&comp, self->vb_ydim);
+	minimal_jpeg_compress_struct__set_image_width(&comp, buffer->vb_xdim);
+	minimal_jpeg_compress_struct__set_image_height(&comp, buffer->vb_ydim);
 	minimal_jpeg_compress_struct__set_input_components(&comp, comp_input_components);
 	minimal_jpeg_compress_struct__set_in_color_space(&comp, comp_in_color_space);
 	(void)(*pdyn_jpeg_set_defaults)(&comp);
@@ -551,7 +567,7 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 	(void)(*pdyn_jpeg_start_compress)(&comp, 1);
 
 	/* Acquire a lock to video memory */
-	if unlikely(video_buffer_rlock(self, &vid_lock) != 0)
+	if unlikely(video_buffer_rlock(buffer, &vid_lock) != 0)
 		goto err_errno;
 
 	for (;;) {
@@ -571,7 +587,7 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 	(void)(*pdyn_jpeg_destroy_compress)(&comp);
 
 	/* Release video lock and indicate success */
-	video_buffer_unlock(self, &vid_lock);
+	video_buffer_unlock(buffer, &vid_lock);
 	return 0;
 	{
 		int saved_errno;

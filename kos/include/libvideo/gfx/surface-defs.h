@@ -33,11 +33,16 @@ struct video_palette;
 struct video_buffer;
 
 /* Wrapper around  `struct video_buffer'  that  allows  users  to
- * directly override the palette and color key of a video buffer. */
+ * directly override the palette and color key of a video buffer.
+ *
+ * This structure is exclusively owned, updated, and maintained
+ * by the user. As such, no locking is mandated implicitly, and
+ * any modifications made by the  user must be synchronized  by
+ * them. */
 struct video_surface {
 	struct video_palette *vs_pal;      /* [0..1] Used color palette */
 	struct video_buffer  *vs_buffer;   /* [1..1] Video buffer. */
-	video_gfx_flag_t      vs_flags;    /* Special buffer flags */
+	video_gfx_flag_t      vs_flags;    /* Special buffer/gfx flags (set of `VIDEO_GFX_F_*') */
 	video_pixel_t         vs_colorkey; /* [valid_if(vs_flags & VIDEO_GFX_F_COLORKEY)] Color key */
 };
 

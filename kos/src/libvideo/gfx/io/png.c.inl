@@ -449,12 +449,12 @@ err_nomem:
 }
 
 INTERN WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_png(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options) {
+libvideo_surface_save_png(struct video_surface const *__restrict self,
+                          FILE *stream, char const *options) {
 	if (libpng_loadapi()) {
 		/* TODO: Use libpng */
 	}
-	return libvideo_buffer_save_lodepng(self, stream, options);
+	return libvideo_surface_save_lodepng(self, stream, options);
 }
 
 

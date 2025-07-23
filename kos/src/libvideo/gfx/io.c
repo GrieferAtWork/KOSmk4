@@ -49,8 +49,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include "anim.h"
 #include "buffer.h"
-#include "buffer/gfx.h"
-#include "buffer/lockable.h"
 #include "io-utils.h"
 #include "io.h"
 
@@ -63,6 +61,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "io/png.c.inl"
 #endif /* !__INTELLISENSE__ */
 
+/* FIXME: <libiberty.h> defines "free()" in a way that is incompatible if <stdlib.h> is included later */
 #include <libiberty.h>
 
 DECL_BEGIN
@@ -129,9 +128,10 @@ convert_to_wanted_domain(struct video_domain const *__restrict domain,
                          /*inherit(always)*/ REF struct video_buffer *__restrict self) {
 	if unlikely(self->vb_domain != domain) {
 		REF struct video_buffer *converted;
-		struct video_buffer_format result_format = self->vb_format;
+		struct video_buffer_format result_format;
+		video_buffer_getformat(self, &result_format);
 		result_format.vbf_codec = video_domain_supported_codec(domain, result_format.vbf_codec);
-		converted = libvideo_buffer_convert(self, domain, &result_format);
+		converted = libvideo_surface_convert(video_buffer_assurface(self), domain, &result_format);
 		video_buffer_decref(self);
 		self = converted;
 	}
@@ -192,41 +192,22 @@ libvideo_anim_open_fmt(struct video_domain const *__restrict domain,
 	return frame2anim(frame);
 }
 
-PRIVATE WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_fmt_lockable(struct video_buffer *__restrict self,
-                                  FILE *stream, char const *options,
-                                  enum filefmt fmt) {
+INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
+libvideo_surface_save_fmt(struct video_surface const *__restrict self,
+                          FILE *stream, char const *options,
+                          enum filefmt fmt) {
 	switch (fmt) {
 	case FMT_PNG:
-		return libvideo_buffer_save_png(self, stream, options);
+		return libvideo_surface_save_png(self, stream, options);
 	case FMT_JPG:
-		return libvideo_buffer_save_jpg(self, stream, options);
+		return libvideo_surface_save_jpg(self, stream, options);
 	case FMT_BMP:
-		return libvideo_buffer_save_bmp(self, stream, options);
+		return libvideo_surface_save_bmp(self, stream, options);
 		/* TODO: GIF */
 	default: break;
 	}
 	errno = ENOTSUP;
 	return -1;
-}
-
-INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options,
-                         enum filefmt fmt) {
-	/* Wrap "self" such that it rlock()  never fails due to the  underlying
-	 * buffer not supporting that  function (where the underlying  buffer's
-	 * rlock() would have failed, allocate a heap buffer, and use GFX pixel
-	 * reads to read pixel data into a temporary buffer) */
-
-	/* TODO: Don't do this here -- if the I/O backend converts the buffer to
-	 *       a different pixel format first, then locking might fail  again. */
-	int result;
-	struct lockable_buffer_base lockable;
-	self   = lockable_buffer_initbase(&lockable, self);
-	result = libvideo_buffer_save_fmt_lockable(self, stream, options, fmt);
-	lockable_buffer_finibase(&lockable);
-	return result;
 }
 
 
@@ -287,14 +268,6 @@ libvideo_anim_open_impl(struct video_domain const *__restrict domain,
 	return NULL;
 }
 
-PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 2, 3)) int CC
-libvideo_buffer_save_impl(struct video_buffer *__restrict self,
-                          char const *format,
-                          FILE *stream, char const *options) {
-	enum filefmt used_format = filefmt_detect(format);
-	return libvideo_buffer_save_fmt(self, stream, options, used_format);
-}
-
 
 
 /* Various functions  for opening  a file/stream/blob  as an  image  file.
@@ -350,49 +323,38 @@ libvideo_buffer_open(struct video_domain const *__restrict domain, char const *f
 
 
 
-/* Do the inverse of `video_buffer_*open' and save the contents of a video buffer
- * into  a file/memory/stream. The same set of  file formats is supported as also
- * supported by `video_buffer_*open', and the intended file format is  determined
- * by the given `format' argument, which should be the case-insensitive extension
- * (without a leading ".") of the format (e.g. "png" for PNG files).
- * @param: self:     The video buffer to save to a file.
- * @param: format:   The format to use for the output file written.
- * @param: fp/fd:    Output file descriptor / stdio-stream
- * @param: filename: Output filename ("format" is detected from file extension)
- * @param: options:  ","-separated string of format-specific encoding  options.
- *                   Available options are not explicitly document here, so you
- *                   need  to look at  the source to see  what's there. You may
- *                   simply pass `NULL' to use defaults for everything.
+
+/* Same  as  `video_buffer_*save', but  save pixel
+ * data using the palette and GFX flags of `self'.
  * @return: 0 : Success
- * @return: -1: [errno=ENOTSUP] Unsupported `format'
  * @return: -1: Error (s.a. `errno') */
-DEFINE_PUBLIC_ALIAS(video_buffer_fsave, libvideo_buffer_fsave);
-INTERN WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_fsave(struct video_buffer *self, char const *format,
-                      FILE *__restrict fp, char const *options) {
-	return libvideo_buffer_save_impl(self, format, fp, options);
+DEFINE_PUBLIC_ALIAS(video_surface_fsave, libvideo_surface_fsave);
+INTERN ATTR_NOINLINE WUNUSED ATTR_IN(1) NONNULL((2)) int CC
+libvideo_surface_fsave(struct video_surface const *self, char const *format,
+                       FILE *__restrict fp, char const *options) {
+	enum filefmt used_format = filefmt_detect(format);
+	return libvideo_surface_save_fmt(self, fp, options, used_format);
 }
 
-DEFINE_PUBLIC_ALIAS(video_buffer_fdsave, libvideo_buffer_fdsave);
-INTERN WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_fdsave(struct video_buffer *self, char const *format,
-                       fd_t fd, char const *options) {
+DEFINE_PUBLIC_ALIAS(video_surface_fdsave, libvideo_surface_fdsave);
+INTERN WUNUSED ATTR_IN(1) NONNULL((2)) int CC
+libvideo_surface_fdsave(struct video_surface const *self, char const *format,
+                        fd_t fd, char const *options) {
 	int result;
 	FILE *stream = fdopen(fd, "wb");
 	if unlikely(!stream)
 		return -1;
 	unlock_stream(stream);
-	result = libvideo_buffer_save_impl(self, format, stream, options);
+	result = libvideo_surface_fsave(self, format, stream, options);
 	(void)frelease(stream);
 	(void)fclose(stream);
 	return result;
 }
 
-DEFINE_PUBLIC_ALIAS(video_buffer_save, libvideo_buffer_save);
-INTERN /*WUNUSED*/ NONNULL((1, 2)) int CC
-libvideo_buffer_save(struct video_buffer *self,
-                     char const *filename,
-                     char const *options) {
+DEFINE_PUBLIC_ALIAS(video_surface_save, libvideo_surface_save);
+INTERN /*WUNUSED*/ ATTR_IN(1) NONNULL((2)) int CC
+libvideo_surface_save(struct video_surface const *self, char const *filename,
+                      char const *options) {
 	int result;
 	char const *format;
 	FILE *stream;
@@ -406,7 +368,7 @@ libvideo_buffer_save(struct video_buffer *self,
 	if unlikely(!stream)
 		return -1;
 	unlock_stream(stream);
-	result = libvideo_buffer_save_impl(self, format, stream, options);
+	result = libvideo_surface_fsave(self, format, stream, options);
 	(void)fclose(stream);
 	if (result != 0) /* Delete broken file on error. */
 		(void)unlink(filename);
@@ -428,10 +390,11 @@ libvideo_gfx_fsave(struct video_gfx const *self, char const *format,
                    FILE *__restrict fp, char const *options) {
 	int result;
 	REF struct video_buffer *buffer;
-	buffer = libvideo_buffer_fromgfx(self);
+	buffer = libvideo_gfx_asbuffer(self);
 	if unlikely(!buffer)
 		goto err;
-	result = libvideo_buffer_fsave(buffer, format, fp, options);
+	result = libvideo_surface_fsave(video_buffer_assurface(buffer),
+	                                format, fp, options);
 	video_buffer_decref(buffer);
 	return result;
 err:
@@ -444,10 +407,11 @@ libvideo_gfx_fdsave(struct video_gfx const *self, char const *format,
                     fd_t fd, char const *options) {
 	int result;
 	REF struct video_buffer *buffer;
-	buffer = libvideo_buffer_fromgfx(self);
+	buffer = libvideo_gfx_asbuffer(self);
 	if unlikely(!buffer)
 		goto err;
-	result = libvideo_buffer_fdsave(buffer, format, fd, options);
+	result = libvideo_surface_fdsave(video_buffer_assurface(buffer),
+	                                 format, fd, options);
 	video_buffer_decref(buffer);
 	return result;
 err:
@@ -460,10 +424,11 @@ libvideo_gfx_save(struct video_gfx const *self, char const *filename,
                   char const *options) {
 	int result;
 	REF struct video_buffer *buffer;
-	buffer = libvideo_buffer_fromgfx(self);
+	buffer = libvideo_gfx_asbuffer(self);
 	if unlikely(!buffer)
 		goto err;
-	result = libvideo_buffer_save(buffer, filename, options);
+	result = libvideo_surface_save(video_buffer_assurface(buffer),
+	                               filename, options);
 	video_buffer_decref(buffer);
 	return result;
 err:
@@ -527,8 +492,6 @@ libvideo_anim_open(struct video_domain const *__restrict domain, char const *fil
 	(void)unmapfile(&mf);
 	return result;
 }
-
-
 
 DECL_END
 

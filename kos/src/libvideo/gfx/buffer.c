@@ -101,37 +101,47 @@ NOTHROW(FCC libvideo_buffer_generic_unlockregion)(struct video_buffer *__restric
 
 
 /* Convert `self' into the specified domain and format.
+ *
+ * If `self' specifies rotation/etc. in its GFX flags, and that rotation  differs
+ * from whatever is specified by `format' (including the case where the state  of
+ * the `VIDEO_GFX_F_XYSWAP' flag  differs, meaning dimensions  of `self' and  the
+ * returned buffer won't match up), that rotation info is materialized, such that
+ * this function can also be  used to rotate the actual  V-mem of a video  buffer
+ * whilst at the same time copying/converting it into a different format.
+ *
  * @return: * : The converted video buffer.
  * @return: NULL: [errno=ENOMEM]  Insufficient memory (either regular RAM, or V-RAM)
- * @return: NULL: [errno=ENOTSUP] Given `format->vbf_codec' is not supported by `domain ?: self->vb_domain'
+ * @return: NULL: [errno=ENOTSUP] Given `format->vbf_codec' is not supported by `domain ?: video_surface_getdomain(self)'
  * @return: NULL: [errno=*] Failed to convert buffer for some reason (s.a. `errno') */
-DEFINE_PUBLIC_ALIAS(video_buffer_convert, libvideo_buffer_convert);
-INTERN WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
-libvideo_buffer_convert(struct video_buffer *__restrict self,
-                        struct video_domain const *domain,
-                        struct video_buffer_format const *format) {
+DEFINE_PUBLIC_ALIAS(video_surface_convert, libvideo_surface_convert);
+DEFINE_PUBLIC_ALIAS(video_surface_convert_distinct, libvideo_surface_convert_distinct);
+INTERN WUNUSED ATTR_IN(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
+libvideo_surface_convert(struct video_surface const *__restrict self,
+                         struct video_domain const *domain,
+                         struct video_buffer_format const *format) {
 	/* Check for simple case: buffer is already in the expected format. */
-	if (self->vb_domain == domain &&
-	    video_buffer_format_equals(&self->vb_format, format)) {
-		video_buffer_incref(self);
-		return self;
+	if (video_surface_getdomain(self) == domain) {
+		struct video_buffer *buffer = video_surface_getbuffer(self);
+		if (video_buffer_hasformat(buffer, format)) {
+			video_buffer_incref(buffer);
+			return buffer;
+		}
 	}
-	return libvideo_buffer_convert_or_copy(self, domain, format);
+	return libvideo_surface_convert_distinct(self, domain, format);
 }
 
-DEFINE_PUBLIC_ALIAS(video_buffer_convert_or_copy, libvideo_buffer_convert_or_copy);
-INTERN WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
-libvideo_buffer_convert_or_copy(struct video_buffer *__restrict self,
-                                struct video_domain const *domain,
-                                struct video_buffer_format const *format) {
+INTERN WUNUSED ATTR_IN(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
+libvideo_surface_convert_distinct(struct video_surface const *__restrict self,
+                                  struct video_domain const *domain,
+                                  struct video_buffer_format const *format) {
 	REF struct video_buffer *result;
 	struct video_gfx src_gfx, dst_gfx;
 	video_dim_t result_xdim, result_ydim;
 
 	/* Figure out fully transformed dimensions of new video buffer. */
-	video_buffer_getgfx(self, &src_gfx, GFX_BLENDMODE_OVERRIDE);
-	result_xdim = video_gfx_getclipw(&src_gfx);
-	result_ydim = video_gfx_getcliph(&src_gfx);
+	video_surface_getgfx(self, &src_gfx, GFX_BLENDMODE_OVERRIDE);
+	result_xdim = video_gfx_getxdim(&src_gfx);
+	result_ydim = video_gfx_getydim(&src_gfx);
 	if (format->vbf_flags & VIDEO_GFX_F_XYSWAP) {
 		video_dim_t temp = result_xdim;
 		result_xdim = result_ydim;
@@ -145,12 +155,16 @@ libvideo_buffer_convert_or_copy(struct video_buffer *__restrict self,
 	if likely(result) {
 		/* Blit the entirety of the source buffer into the target buffer. */
 		video_buffer_getgfx(result, &dst_gfx, GFX_BLENDMODE_OVERRIDE);
-		assert(video_gfx_getclipw(&dst_gfx) == video_gfx_getclipw(&src_gfx));
-		assert(video_gfx_getcliph(&dst_gfx) == video_gfx_getcliph(&src_gfx));
+
+		/* At this point, XYSWAP flags should once again cancel out */
+		assert(video_gfx_getxdim(&dst_gfx) == video_gfx_getxdim(&src_gfx));
+		assert(video_gfx_getydim(&dst_gfx) == video_gfx_getydim(&src_gfx));
+
+		/* Do the blit (which will also do any format conversion for us) */
 		video_gfx_bitblit(&dst_gfx, 0, 0,
 		                  &src_gfx, 0, 0,
-		                  video_gfx_getclipw(&dst_gfx),
-		                  video_gfx_getcliph(&dst_gfx));
+		                  video_gfx_getxdim(&dst_gfx),
+		                  video_gfx_getydim(&dst_gfx));
 	}
 	return result;
 }

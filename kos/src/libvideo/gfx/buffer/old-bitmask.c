@@ -218,12 +218,13 @@ old_bitmask_buffer_init(struct old_bitmask_buffer *__restrict self,
 	self->bmb_pal.vp_cnt = 2;
 	self->bmb_pal.vp_pal[0] = bg_fg_colors[0];
 	self->bmb_pal.vp_pal[1] = bg_fg_colors[1];
-	self->vb_ops = _old_bitmask_ops();
-	self->vb_format.vbf_codec    = libvideo_codec_lookup(VIDEO_CODEC_P1_MSB);
-	self->vb_format.vbf_pal      = libvideo_palette_optimize((struct video_palette *)&self->bmb_pal); /* For "vp_color2pixel" */
-	self->vb_format.vbf_flags    = VIDEO_GFX_F_NORMAL;
-	/*self->vb_format.vbf_colorkey = 0;*/
-	assert(self->vb_format.vbf_codec);
+	self->vb_surf.vs_pal    = libvideo_palette_optimize((struct video_palette *)&self->bmb_pal); /* For "vp_color2pixel" */
+	self->vb_surf.vs_buffer = self;
+	self->vb_surf.vs_flags  = VIDEO_GFX_F_NORMAL;
+	/*self->vb_surf.vs_colorkey = 0;*/
+	self->vb_codec = libvideo_codec_lookup(VIDEO_CODEC_P1_MSB);
+	assert(self->vb_codec);
+	self->vb_ops  = _old_bitmask_ops();
 	self->vb_xdim = size_x;
 	self->vb_ydim = size_y;
 #ifndef NDEBUG

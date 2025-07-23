@@ -401,9 +401,9 @@ libvideo_swblitter3__blit__blend1(struct video_blitter3 const *__restrict self,
 				byte_t const *srcline = srclock.vrl_lock.vl_data;
 				byte_t const *dstline = dstlock.vrl_lock.vl_data;
 				byte_t *outline = outlock.vrl_lock.vl_data;
-				struct video_surface const *src_surface   = video_gfx_getsurface(src);
-				struct video_surface const *dst_surface   = video_gfx_getsurface(dst);
-				struct video_surface const *out_surface   = video_gfx_getsurface(out);
+				struct video_surface const *src_surface   = video_gfx_assurface(src);
+				struct video_surface const *dst_surface   = video_gfx_assurface(dst);
+				struct video_surface const *out_surface   = video_gfx_assurface(out);
 				video_codec_getpixel_t src_getpixel       = video_surface_getcodec(src_surface)->vc_getpixel;
 				video_codec_pixel2color_t src_pixel2color = video_surface_getcodec(src_surface)->vc_pixel2color;
 				video_codec_getpixel_t dst_getpixel       = video_surface_getcodec(dst_surface)->vc_getpixel;

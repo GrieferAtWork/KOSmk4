@@ -115,21 +115,27 @@ NOTHROW(FCC libvideo_buffer_generic_unlockregion)(struct video_buffer *__restric
                                                   struct video_regionlock *__restrict lock);
 
 
-
-
 /* Convert `self' into the specified domain and format.
+ *
+ * If `self' specifies rotation/etc. in its GFX flags, and that rotation  differs
+ * from whatever is specified by `format' (including the case where the state  of
+ * the `VIDEO_GFX_F_XYSWAP' flag  differs, meaning dimensions  of `self' and  the
+ * returned buffer won't match up), that rotation info is materialized, such that
+ * this function can also be  used to rotate the actual  V-mem of a video  buffer
+ * whilst at the same time copying/converting it into a different format.
+ *
  * @return: * : The converted video buffer.
  * @return: NULL: [errno=ENOMEM]  Insufficient memory (either regular RAM, or V-RAM)
- * @return: NULL: [errno=ENOTSUP] Given `format->vbf_codec' is not supported by `domain ?: self->vb_domain'
+ * @return: NULL: [errno=ENOTSUP] Given `format->vbf_codec' is not supported by `domain ?: video_surface_getdomain(self)'
  * @return: NULL: [errno=*] Failed to convert buffer for some reason (s.a. `errno') */
-INTDEF WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
-libvideo_buffer_convert(struct video_buffer *__restrict self,
-                        struct video_domain const *domain,
-                        struct video_buffer_format const *format);
-INTDEF WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
-libvideo_buffer_convert_or_copy(struct video_buffer *__restrict self,
-                                struct video_domain const *domain,
-                                struct video_buffer_format const *format);
+INTDEF WUNUSED ATTR_IN(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
+libvideo_surface_convert(struct video_surface const *__restrict self,
+                         struct video_domain const *domain,
+                         struct video_buffer_format const *format);
+INTDEF WUNUSED ATTR_IN(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
+libvideo_surface_convert_distinct(struct video_surface const *__restrict self,
+                                  struct video_domain const *domain,
+                                  struct video_buffer_format const *format);
 
 DECL_END
 

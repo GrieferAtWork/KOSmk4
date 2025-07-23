@@ -388,11 +388,11 @@ libvideo_swblitter_samebuf__stretch__with_temporary(struct video_blitter const *
 
 	/*rb.vb_refcnt = 1;*/
 	rb.vb_ops    = _rambuffer_ops();
-	rb.vb_format.vbf_codec = srcbuf->vb_format.vbf_codec;
+	rb.vb_codec = srcbuf->vb_codec;
 	rb.vb_xdim   = min(dst_size_x, src_size_x);
 	rb.vb_ydim   = min(dst_size_y, src_size_y);
-	rb.rb_stride = rb.vb_xdim * rb.vb_format.vbf_codec->vc_specs.vcs_pxsz;
-	rb.rb_stride = CEIL_ALIGN(rb.rb_stride, rb.vb_format.vbf_codec->vc_align);
+	rb.rb_stride = rb.vb_xdim * rb.vb_codec->vc_specs.vcs_pxsz;
+	rb.rb_stride = CEIL_ALIGN(rb.rb_stride, rb.vb_codec->vc_align);
 	rb_total     = rb.rb_stride * rb.vb_ydim;
 	rb.rb_data   = (byte_t *)malloca(rb_total);
 	if unlikely(!rb.rb_data) {
