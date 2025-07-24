@@ -490,7 +490,7 @@ find_hinted_mode:
 	/* Fill in remaining fields of "result" */
 	_video_rambuffer_init(result);
 	result->vb_surf.vs_flags    = VIDEO_GFX_F_NORMAL;
-#if 0 /* FIXME: Causes breakage when combined with 'FIXME: This, plus the "VIDEO_GFX_F_XYSWAP" in "screen.c" breaks' */
+#if 1 /* FIXME: Causes breakage when combined with 'FIXME: This, plus the "VIDEO_GFX_F_XYSWAP" in "screen.c" breaks' */
 	result->vb_surf.vs_flags    = VIDEO_GFX_F_XYSWAP;
 #endif
 	result->vb_surf.vs_colorkey = 0;

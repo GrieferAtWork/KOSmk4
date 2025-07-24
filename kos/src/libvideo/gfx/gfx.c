@@ -28,9 +28,14 @@
 
 #include <hybrid/overflow.h>
 
+#include <kos/anno.h>
+#include <sys/param.h>
+
 #include <libvideo/crect.h>
 #include <libvideo/gfx/blend.h>
+#include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface.h>
 #include <libvideo/rect.h>
 #include <libvideo/types.h>
 

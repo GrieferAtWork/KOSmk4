@@ -350,8 +350,14 @@ region_buffer__rlockregion(struct video_buffer *__restrict self,
 	video_coord_t xend, yend;
 	assert((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) > lock->_vrl_rect.vcr_xmin);
 	assert((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) > lock->_vrl_rect.vcr_ymin);
-	assert((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) <= me->vb_xdim);
-	assert((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) <= me->vb_ydim);
+	assertf((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) <= me->vb_xdim,
+	        "X[=%" PRIuCRD "]+SX[=%" PRIuDIM "][=%" PRIuCRD "] exceeds XDIM[=%" PRIuDIM "]",
+	        lock->_vrl_rect.vcr_xmin, lock->_vrl_rect.vcr_xdim,
+	        lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim, me->vb_xdim);
+	assertf((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) <= me->vb_ydim,
+	        "Y[=%" PRIuCRD "]+SY[=%" PRIuDIM "][=%" PRIuCRD "] eyceeds YDIM[=%" PRIuDIM "]",
+	        lock->_vrl_rect.vcr_ymin, lock->_vrl_rect.vcr_ydim,
+	        lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim, me->vb_ydim);
 
 	/* Make the region-rect relative to the base buffer. */
 	lock->_vrl_rect.vcr_xmin += me->rbf_cxoff;
@@ -379,8 +385,14 @@ region_buffer__wlockregion(struct video_buffer *__restrict self,
 	video_coord_t xend, yend;
 	assert((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) > lock->_vrl_rect.vcr_xmin);
 	assert((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) > lock->_vrl_rect.vcr_ymin);
-	assert((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) <= me->vb_xdim);
-	assert((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) <= me->vb_ydim);
+	assertf((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) <= me->vb_xdim,
+	        "X[=%" PRIuCRD "]+SX[=%" PRIuDIM "][=%" PRIuCRD "] exceeds XDIM[=%" PRIuDIM "]",
+	        lock->_vrl_rect.vcr_xmin, lock->_vrl_rect.vcr_xdim,
+	        lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim, me->vb_xdim);
+	assertf((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) <= me->vb_ydim,
+	        "Y[=%" PRIuCRD "]+SY[=%" PRIuDIM "][=%" PRIuCRD "] eyceeds YDIM[=%" PRIuDIM "]",
+	        lock->_vrl_rect.vcr_ymin, lock->_vrl_rect.vcr_ydim,
+	        lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim, me->vb_ydim);
 
 	/* Make the region-rect relative to the base buffer. */
 	lock->_vrl_rect.vcr_xmin += me->rbf_cxoff;
@@ -467,6 +479,36 @@ region_buffer__initgfx(struct video_gfx *__restrict self) {
 	self = (*base->vb_ops->vi_initgfx)(self);
 	self = (*self->vx_hdr.vxh_ops->vgfo_clip)(self, me->rbf_cxoff, me->rbf_cyoff,
 	                                          me->vb_xdim, me->vb_ydim);
+	/* FIXME: THIS DOESN'T WORK!!!
+	 *
+	 * By always re-assigning "me" as buffer of "self", trying to use the GFX as the
+	 * source of a blit operation will invoke the memory-locking functions on  "me",
+	 * but with coords that are actually meant for "base"!!!
+	 *
+	 * The only real solution I see here is to:
+	 * - still re-assign "vxh_ops" (and backup its original value)
+	 * - But use another index in "_vx_driver" when it comes to storing "me",
+	 *   since we can't have the GFX context's buffer not actually be the one
+	 *   we are wrapping.
+	 * - The "rbf_base" field must become  [1..1][const]. Since the real  base-
+	 *   buffer always has to be stored and exposed in the GFX context, we must
+	 *   also  keep a reference to it around, even if we are revoked. Else, the
+	 *   pointer stored in the GFX won't be valid after we were revoked.
+	 *
+	 * (Thinking about it: is this whole buffer revocation system actually still
+	 *  necessary? I mean: there won't be any point to it once multiple processes
+	 *  come into play, at  which point I'll just  need some special kernel  file
+	 *  that  can be  created to represent  a section of  physical memory, whilst
+	 *  having an ioctl(2) to revoke said access by simply replacing all mappings
+	 *  of it with /dev/void)
+	 *
+	 * >> Think about this a little more, but probably get rid of buffer revocation,
+	 *    which  would then allow region buffers to  not have to hook GFX operations
+	 *    at all!
+	 *
+	 * This would also mean I could get rid of the `*_distinct' aliases of various
+	 * API functions (since  `video_buffer' would once  again be *FULLY*  [const],
+	 * meaning there's no point in not having buffer sub-regions be re-used) */
 	if likely(self->vx_surf.vs_buffer == base && self->_vx_driver[REGION_GFX_SUBOPS] == NULL) {
 		/* GFX-reuse optimizations */
 		self->_vx_driver[REGION_GFX_SUBOPS] = (void *)self->vx_hdr.vxh_ops;
