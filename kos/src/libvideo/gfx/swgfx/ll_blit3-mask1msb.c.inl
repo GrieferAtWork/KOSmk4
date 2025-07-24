@@ -165,10 +165,8 @@ LOCAL_libvideo_swblitter3__blit_imatrix__mask1msb__bypixel(struct video_blitter3
 	struct video_gfx const *dst = self->vbt3_rddst;
 	struct video_gfx const *src = self->vbt3_src;
 	LOCAL_load_conv;
-	gfx_assert_imatrix2d(&dst_matrix);
-	gfx_assert_imatrix2d(&src_matrix);
 	GFX_BLIT_FOREACH3_IMATRIX(out_x, out_y, dst_x, dst_y, dst_matrix,
-	                          src_x, src_y, src_matrix, size_x, size_y,
+	                          src_x, src_y, size_x, size_y, src_matrix,
 	                          BLIT_PIXEL, GFX_ROW_NOOP, GFX_ROW_NOOP);
 }
 
