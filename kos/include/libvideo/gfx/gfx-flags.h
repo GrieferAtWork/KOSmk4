@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <libvideo/gfx/gfx.h>*/
 #ifndef _LIBVIDEO_GFX_GFX_FLAGS_H
 #define _LIBVIDEO_GFX_GFX_FLAGS_H 1
 

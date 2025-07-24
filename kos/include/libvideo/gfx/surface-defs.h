@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <libvideo/gfx/surface.h>*/
 #ifndef _LIBVIDEO_GFX_SURFACE_DEFS_H
 #define _LIBVIDEO_GFX_SURFACE_DEFS_H 1
 
@@ -38,7 +39,12 @@ struct video_buffer;
  * This structure is exclusively owned, updated, and maintained
  * by the user. As such, no locking is mandated implicitly, and
  * any modifications made by the  user must be synchronized  by
- * them. */
+ * them.
+ *
+ * NOTE: We keep `vs_pal' at offset=0, so video_codec pixel<=>color
+ *       conversion functions (which take  `struct video_surface *'
+ *       as argument) don't have to add any offset before  derefing
+ *       the surface argument in order to access the palette. */
 struct video_surface {
 	struct video_palette *vs_pal;      /* [0..1] Used color palette */
 	struct video_buffer  *vs_buffer;   /* [1..1] Video buffer. */

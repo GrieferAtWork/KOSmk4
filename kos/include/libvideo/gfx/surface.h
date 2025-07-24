@@ -51,6 +51,7 @@ struct video_codec;
 struct video_domain;
 struct video_surface;
 struct video_palette;
+struct video_gfx;
 struct video_rect;
 struct video_crect;
 struct video_buffer;
