@@ -147,25 +147,6 @@ libvideo_emptygfx_hgradient(struct video_gfx const *__restrict UNUSED(self),
 	COMPILER_IMPURE();
 }
 
-INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC
-libvideo_emptygfx_fillmask(struct video_gfx const *__restrict UNUSED(self),
-                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
-                            video_color_t const UNUSED2(bg_fg_colors, [2]),
-                            struct video_bitmask const *__restrict UNUSED(bm)) {
-	COMPILER_IMPURE();
-}
-
-INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC
-libvideo_emptygfx_fillstretchmask(struct video_gfx const *__restrict UNUSED(self),
-                                   video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                                   video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
-                                   video_color_t const UNUSED2(bg_fg_colors, [2]),
-                                   video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
-                                   struct video_bitmask const *__restrict UNUSED(bm)) {
-	COMPILER_IMPURE();
-}
-
 INTERN ATTR_IN(1) ATTR_IN(4) void CC
 libvideo_emptygfx_bitblit(struct video_gfx const *UNUSED(dst),
                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
@@ -213,26 +194,24 @@ libvideo_emptygfx_stretch3(struct video_gfx const *UNUSED(wrdst),
 PRIVATE struct video_gfx_ops libvideo_emptygfx_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_emptygfx_ops(void) {
 	if unlikely(!libvideo_emptygfx_ops.vgfo_getcolor) {
-		libvideo_emptygfx_ops.vgfo_blitfrom        = &libvideo_emptygfx_blitfrom;
-		libvideo_emptygfx_ops.vgfo_blitfrom3       = &libvideo_emptygfx_blitfrom3;
-		libvideo_emptygfx_ops.vgfo_clip            = &libvideo_emptygfx_clip;
-		libvideo_emptygfx_ops.vgfo_coord2offset    = &libvideo_emptygfx_coord2offset;
-		libvideo_emptygfx_ops.vgfo_offset2coord    = &libvideo_emptygfx_offset2coord;
-		libvideo_emptygfx_ops.vgfo_bitblit         = &libvideo_emptygfx_bitblit;
-		libvideo_emptygfx_ops.vgfo_stretch         = &libvideo_emptygfx_stretch;
-		libvideo_emptygfx_ops.vgfo_bitblit3        = &libvideo_emptygfx_bitblit3;
-		libvideo_emptygfx_ops.vgfo_stretch3        = &libvideo_emptygfx_stretch3;
-		libvideo_emptygfx_ops.vgfo_vgradient       = &libvideo_emptygfx_vgradient;
-		libvideo_emptygfx_ops.vgfo_hgradient       = &libvideo_emptygfx_hgradient;
-		libvideo_emptygfx_ops.vgfo_gradient        = &libvideo_emptygfx_gradient;
-		libvideo_emptygfx_ops.vgfo_fillstretchmask = &libvideo_emptygfx_fillstretchmask;
-		libvideo_emptygfx_ops.vgfo_fillmask        = &libvideo_emptygfx_fillmask;
-		libvideo_emptygfx_ops.vgfo_rect            = &libvideo_emptygfx_rect;
-		libvideo_emptygfx_ops.vgfo_fill            = &libvideo_emptygfx_fill;
-		libvideo_emptygfx_ops.vgfo_vline           = &libvideo_emptygfx_vline;
-		libvideo_emptygfx_ops.vgfo_hline           = &libvideo_emptygfx_hline;
-		libvideo_emptygfx_ops.vgfo_line            = &libvideo_emptygfx_line;
-		libvideo_emptygfx_ops.vgfo_putcolor        = &libvideo_emptygfx_putcolor;
+		libvideo_emptygfx_ops.vgfo_blitfrom     = &libvideo_emptygfx_blitfrom;
+		libvideo_emptygfx_ops.vgfo_blitfrom3    = &libvideo_emptygfx_blitfrom3;
+		libvideo_emptygfx_ops.vgfo_clip         = &libvideo_emptygfx_clip;
+		libvideo_emptygfx_ops.vgfo_coord2offset = &libvideo_emptygfx_coord2offset;
+		libvideo_emptygfx_ops.vgfo_offset2coord = &libvideo_emptygfx_offset2coord;
+		libvideo_emptygfx_ops.vgfo_bitblit      = &libvideo_emptygfx_bitblit;
+		libvideo_emptygfx_ops.vgfo_stretch      = &libvideo_emptygfx_stretch;
+		libvideo_emptygfx_ops.vgfo_bitblit3     = &libvideo_emptygfx_bitblit3;
+		libvideo_emptygfx_ops.vgfo_stretch3     = &libvideo_emptygfx_stretch3;
+		libvideo_emptygfx_ops.vgfo_vgradient    = &libvideo_emptygfx_vgradient;
+		libvideo_emptygfx_ops.vgfo_hgradient    = &libvideo_emptygfx_hgradient;
+		libvideo_emptygfx_ops.vgfo_gradient     = &libvideo_emptygfx_gradient;
+		libvideo_emptygfx_ops.vgfo_rect         = &libvideo_emptygfx_rect;
+		libvideo_emptygfx_ops.vgfo_fill         = &libvideo_emptygfx_fill;
+		libvideo_emptygfx_ops.vgfo_vline        = &libvideo_emptygfx_vline;
+		libvideo_emptygfx_ops.vgfo_hline        = &libvideo_emptygfx_hline;
+		libvideo_emptygfx_ops.vgfo_line         = &libvideo_emptygfx_line;
+		libvideo_emptygfx_ops.vgfo_putcolor     = &libvideo_emptygfx_putcolor;
 		COMPILER_WRITE_BARRIER();
 		libvideo_emptygfx_ops.vgfo_getcolor = &libvideo_emptygfx_getcolor;
 		COMPILER_WRITE_BARRIER();

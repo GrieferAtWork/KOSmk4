@@ -72,34 +72,6 @@ struct video_crect;
 struct video_blitter;
 struct video_blitter3;
 
-/* Video bitmask descriptor.
- *
- * Bitmasks can be used to mask filling of pixels in fill/stretch
- * operations, such that the corresponding bit selects the source
- * color used for that pixel during the fill/stretch.
- *
- * Bitmasks are expected to encode their bits similar to
- * `VIDEO_CODEC_L1_MSB', except  that `vbm_skip'  allows
- * the user to specify a bit-perfect starting offset.
- *
- * USAGE:
- * - Bitmasks are meant for rendering of simple terminal fonts,
- *   as well as emulation of hardware VGA fonts. As a matter of
- *   fact: the default VGA terminal font can be rendered when
- *   treated as a bitmask.
- *
- * The status of a pixel is calculated as:
- * >> uintptr_t bitno = vbm_skip + x + y * vbm_scan;
- * >> byte_t byte = ((byte_t const *)vbm_mask)[bitno / NBBY];
- * >> shift_t bit = bitno % NBBY;
- * >> bool status = (byte >> (NBBY - 1 - bit)) & 1;
- */
-struct video_bitmask {
-	void const *vbm_mask; /* [1..1] Bitmask base pointer */
-	__uintptr_t vbm_skip; /* # of leading bits to skip */
-	__size_t    vbm_scan; /* # of bits that make up a scanline */
-};
-
 struct video_blitter_ops {
 	/* Blit the contents of another video buffer into this one. */
 	__ATTR_IN_T(1) void
@@ -262,30 +234,6 @@ struct video_gfx_ops {
 	                             video_offset_t __x, video_offset_t __y,
 	                             video_dim_t __size_x, video_dim_t __size_y,
 	                             video_color_t __color);
-
-	/* Same as `vgfo_fill()', but only fill in a pixel if masked by `__bm'
-	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
-
-	/* TODO: This  operator needs to  go away; mask-fills need  to happen using blits,
-	 *       and `video_buffer_forbitmask()' needs to go away, also. Instead, bitmasks
-	 *       need to use `video_buffer_formem()', which in turn also needs the ability
-	 *       to be allocated in V-RAM. */
-	__ATTR_IN_T(1) __ATTR_IN_T(6) __ATTR_IN_T(7) void
-	(LIBVIDEO_GFX_CC *vgfo_fillmask)(struct video_gfx const *__restrict __self,
-	                                 video_offset_t __x, video_offset_t __y,
-	                                 video_dim_t __size_x, video_dim_t __size_y,
-	                                 video_color_t const __bg_fg_colors[2],
-	                                 struct video_bitmask const *__restrict __bm);
-
-	/* Same as `vgfo_fillmask()', however perform the blit while up-scaling the given bitmask. */
-	/* TODO: This one needs to go away, too */
-	__ATTR_IN_T(1) __ATTR_IN_T(6) __ATTR_IN_T(9) void
-	(LIBVIDEO_GFX_CC *vgfo_fillstretchmask)(struct video_gfx const *__restrict __self,
-	                                        video_offset_t __dst_x, video_offset_t __dst_y,
-	                                        video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                        video_color_t const __bg_fg_colors[2],
-	                                        video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                        struct video_bitmask const *__restrict __bm);
 
 	/* Same as `vgfo_fill', but do so via gradient with colors[y][x] being used
 	 * to essentially do a  VIDEO_GFX_F_LINEAR stretch-blit into the  specified
@@ -813,24 +761,6 @@ video_gfx_rect(struct video_gfx const *__restrict __self,
                video_dim_t __size_x, video_dim_t __size_y,
                video_color_t __color);
 
-/* Same as `vgfo_fill()', but only fill in a pixel if masked by `__bm'
- * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
-extern __ATTR_IN(1) __ATTR_IN(7) void
-video_gfx_absfillmask(struct video_gfx const *__restrict __self,
-                      video_offset_t __x, video_offset_t __y,
-                      video_dim_t __size_x, video_dim_t __size_y,
-                      video_color_t const __bg_fg_colors[2],
-                      struct video_bitmask const *__restrict __bm);
-
-/* Same as `video_gfx_absfillmask()', however perform the blit while up-scaling the given bitmask. */
-extern __ATTR_IN(1) __ATTR_IN(9) void
-video_gfx_absfillstretchmask(struct video_gfx const *__restrict __self,
-                             video_offset_t __dst_x, video_offset_t __dst_y,
-                             video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-                             video_color_t const __bg_fg_colors[2],
-                             video_dim_t __src_size_x, video_dim_t __src_size_y,
-                             struct video_bitmask const *__restrict __bm);
-
 /* Same as `video_gfx_fill', but do so via gradient with colors[y][x] being
  * used to  essentially  do  a  VIDEO_GFX_F_LINEAR  stretch-blit  into  the
  * specified destination rect. */
@@ -1091,10 +1021,6 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 	video_gfx_fill(self, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX, color)
 #define video_gfx_rect(self, x, y, size_x, size_y, color) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_rect)(self, x, y, size_x, size_y, color)
-#define video_gfx_absfillmask(self, x, y, size_x, size_y, bg_fg_colors, bigtmask) \
-	(*(self)->vx_hdr.vxh_ops->vgfo_fillmask)(self, x, y, size_x, size_y, bg_fg_colors, bigtmask)
-#define video_gfx_absfillstretchmask(self, dst_x, dst_y, dst_sizex, dst_sizey, bg_fg_colors, src_size_x, src_size_y, bigtmask) \
-	(*(self)->vx_hdr.vxh_ops->vgfo_fillstretchmask)(self, dst_x, dst_y, dst_sizex, dst_sizey, bg_fg_colors, src_size_x, src_size_y, bigtmask)
 #define video_gfx_gradient(self, x, y, size_x, size_y, colors) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_gradient)(self, x, y, size_x, size_y, colors)
 #define video_gfx_hgradient(self, x, y, size_x, size_y, locolor, hicolor) \
@@ -1428,24 +1354,6 @@ public:
 	                            video_dim_t __size_x, video_dim_t __size_y,
 	                            video_color_t __color) const {
 		video_gfx_rect(this, __x, __y, __size_x, __size_y, __color);
-	}
-
-	/* Fill an area with a solid color. */
-	__CXX_CLASSMEMBER void fillmask(video_offset_t __x, video_offset_t __y,
-	                                video_dim_t __size_x, video_dim_t __size_y,
-	                                video_color_t const __bg_fg_colors[2],
-	                                struct video_bitmask const *__restrict __bm) const {
-		video_gfx_absfillmask(this, __x, __y, __size_x, __size_y, __bg_fg_colors, __bm);
-	}
-
-	/* Same as `vgfo_fillmask()', however perform the blit while up-scaling the given bitmask. */
-	__CXX_CLASSMEMBER void fillstretchmask(video_offset_t __dst_x, video_offset_t __dst_y,
-	                                       video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                       video_color_t const __bg_fg_colors[2],
-	                                       video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                       struct video_bitmask const *__restrict __bm) const {
-		video_gfx_absfillstretchmask(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
-		                             __bg_fg_colors, __src_size_x, __src_size_y, __bm);
 	}
 
 

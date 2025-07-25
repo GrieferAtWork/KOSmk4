@@ -24,21 +24,19 @@
 
 /* When  low-level  GFX  functions want  to  call other
  * low-level GFX functions, these macros should be used */
-#define _LL_getcolor           _video_swgfx_x_getcolor
-#define _LL_putcolor           _video_swgfx_x_putcolor
-#define _LL_putcolor_p         _video_swgfx_x_putcolor_p
-#define _LL_getpixel           _video_swgfx_x_getpixel
-#define _LL_setpixel           _video_swgfx_x_setpixel
-#define _LL_absline_llhh       _video_swgfx_x_absline_llhh
-#define _LL_absline_lhhl       _video_swgfx_x_absline_lhhl
-#define _LL_absline_h          _video_swgfx_x_absline_h
-#define _LL_absline_v          _video_swgfx_x_absline_v
-#define _LL_absfill            _video_swgfx_x_absfill
-#define _LL_absfillmask        _video_swgfx_x_absfillmask
-#define _LL_absfillstretchmask _video_swgfx_x_absfillstretchmask
-#define _LL_absgradient        _video_swgfx_x_absgradient
-#define _LL_absgradient_h      _video_swgfx_x_absgradient_h
-#define _LL_absgradient_v      _video_swgfx_x_absgradient_v
+#define _LL_getcolor      _video_swgfx_x_getcolor
+#define _LL_putcolor      _video_swgfx_x_putcolor
+#define _LL_putcolor_p    _video_swgfx_x_putcolor_p
+#define _LL_getpixel      _video_swgfx_x_getpixel
+#define _LL_setpixel      _video_swgfx_x_setpixel
+#define _LL_absline_llhh  _video_swgfx_x_absline_llhh
+#define _LL_absline_lhhl  _video_swgfx_x_absline_lhhl
+#define _LL_absline_h     _video_swgfx_x_absline_h
+#define _LL_absline_v     _video_swgfx_x_absline_v
+#define _LL_absfill       _video_swgfx_x_absfill
+#define _LL_absgradient   _video_swgfx_x_absgradient
+#define _LL_absgradient_h _video_swgfx_x_absgradient_h
+#define _LL_absgradient_v _video_swgfx_x_absgradient_v
 
 #define LL_assert_x(self, x) \
 	gfx_assertf((x) < (self)->vx_surf.vs_buffer->vb_xdim, "X coord too large (%" PRIuCRD " >= %" PRIuCRD ")", (x), (self)->vx_surf.vs_buffer->vb_xdim)
@@ -79,10 +77,6 @@
 	(LL_assert_x(self, x), LL_assert_sy(self, y, length), _LL_absline_v(self, x, y, length, color))
 #define LL_absfill(self, x, y, size_x, size_y, color) \
 	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_absfill(self, x, y, size_x, size_y, color))
-#define LL_absfillmask(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm) \
-	(LL_assert_sxy(self, dst_x, dst_y, size_x, size_y), _LL_absfillmask(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm))
-#define LL_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm) \
-	(LL_assert_sxy(self, dst_x, dst_y, dst_size_x, dst_size_y), _LL_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm))
 #define LL_absgradient(self, x, y, size_x, size_y, colors) \
 	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_absgradient(self, x, y, size_x, size_y, colors))
 #define LL_absgradient_h(self, x, y, size_x, size_y, locolor, hicolor) \

@@ -55,78 +55,62 @@ DECL_BEGIN
 #define LOCAL_FUNC(x) x
 #endif /* !DEFINE_libvideo_swgfx_XXX_xyswap */
 
-#define LOCAL_libvideo_swgfx_getcolor               LOCAL_FUNC(libvideo_swgfx_getcolor)
-#define LOCAL_libvideo_swgfx_getcolor_wrap          LOCAL_FUNC(libvideo_swgfx_getcolor_wrap)
-#define LOCAL_libvideo_swgfx_getcolor_mirror        LOCAL_FUNC(libvideo_swgfx_getcolor_mirror)
-#define LOCAL_libvideo_swgfx_putcolor               LOCAL_FUNC(libvideo_swgfx_putcolor)
-#define LOCAL_libvideo_swgfx_putcolor_wrap          LOCAL_FUNC(libvideo_swgfx_putcolor_wrap)
-#define LOCAL_libvideo_swgfx_putcolor_mirror        LOCAL_FUNC(libvideo_swgfx_putcolor_mirror)
-#define LOCAL_libvideo_swgfx_line                   LOCAL_FUNC(libvideo_swgfx_line)
-#define LOCAL_libvideo_swgfx_line_wrap              LOCAL_FUNC(libvideo_swgfx_line_wrap)
-#define LOCAL_libvideo_swgfx_line_mirror            LOCAL_FUNC(libvideo_swgfx_line_mirror)
-#define LOCAL_libvideo_swgfx_hline                  LOCAL_FUNC(libvideo_swgfx_hline)
-#define LOCAL_libvideo_swgfx_hline_wrap             LOCAL_FUNC(libvideo_swgfx_hline_wrap)
-#define LOCAL_libvideo_swgfx_hline_mirror           LOCAL_FUNC(libvideo_swgfx_hline_mirror)
-#define LOCAL_libvideo_swgfx_vline                  LOCAL_FUNC(libvideo_swgfx_vline)
-#define LOCAL_libvideo_swgfx_vline_wrap             LOCAL_FUNC(libvideo_swgfx_vline_wrap)
-#define LOCAL_libvideo_swgfx_vline_mirror           LOCAL_FUNC(libvideo_swgfx_vline_mirror)
-#define LOCAL_libvideo_swgfx_fill                   LOCAL_FUNC(libvideo_swgfx_fill)
-#define LOCAL_libvideo_swgfx_fill_wrap              LOCAL_FUNC(libvideo_swgfx_fill_wrap)
-#define LOCAL_libvideo_swgfx_fill_mirror            LOCAL_FUNC(libvideo_swgfx_fill_mirror)
-#define LOCAL_libvideo_swgfx_rect                   LOCAL_FUNC(libvideo_swgfx_rect)
-#define LOCAL_libvideo_swgfx_rect_wrap              LOCAL_FUNC(libvideo_swgfx_rect_wrap)
-#define LOCAL_libvideo_swgfx_rect_mirror            LOCAL_FUNC(libvideo_swgfx_rect_mirror)
-#define LOCAL_libvideo_swgfx_gradient               LOCAL_FUNC(libvideo_swgfx_gradient)
-#define LOCAL_libvideo_swgfx_gradient_wrap          LOCAL_FUNC(libvideo_swgfx_gradient_wrap)
-#define LOCAL_libvideo_swgfx_gradient_mirror        LOCAL_FUNC(libvideo_swgfx_gradient_mirror)
-#define LOCAL_libvideo_swgfx_hgradient              LOCAL_FUNC(libvideo_swgfx_hgradient)
-#define LOCAL_libvideo_swgfx_hgradient_wrap         LOCAL_FUNC(libvideo_swgfx_hgradient_wrap)
-#define LOCAL_libvideo_swgfx_hgradient_mirror       LOCAL_FUNC(libvideo_swgfx_hgradient_mirror)
-#define LOCAL_libvideo_swgfx_vgradient              LOCAL_FUNC(libvideo_swgfx_vgradient)
-#define LOCAL_libvideo_swgfx_vgradient_wrap         LOCAL_FUNC(libvideo_swgfx_vgradient_wrap)
-#define LOCAL_libvideo_swgfx_vgradient_mirror       LOCAL_FUNC(libvideo_swgfx_vgradient_mirror)
+#define LOCAL_libvideo_swgfx_getcolor         LOCAL_FUNC(libvideo_swgfx_getcolor)
+#define LOCAL_libvideo_swgfx_getcolor_wrap    LOCAL_FUNC(libvideo_swgfx_getcolor_wrap)
+#define LOCAL_libvideo_swgfx_getcolor_mirror  LOCAL_FUNC(libvideo_swgfx_getcolor_mirror)
+#define LOCAL_libvideo_swgfx_putcolor         LOCAL_FUNC(libvideo_swgfx_putcolor)
+#define LOCAL_libvideo_swgfx_putcolor_wrap    LOCAL_FUNC(libvideo_swgfx_putcolor_wrap)
+#define LOCAL_libvideo_swgfx_putcolor_mirror  LOCAL_FUNC(libvideo_swgfx_putcolor_mirror)
+#define LOCAL_libvideo_swgfx_line             LOCAL_FUNC(libvideo_swgfx_line)
+#define LOCAL_libvideo_swgfx_line_wrap        LOCAL_FUNC(libvideo_swgfx_line_wrap)
+#define LOCAL_libvideo_swgfx_line_mirror      LOCAL_FUNC(libvideo_swgfx_line_mirror)
+#define LOCAL_libvideo_swgfx_hline            LOCAL_FUNC(libvideo_swgfx_hline)
+#define LOCAL_libvideo_swgfx_hline_wrap       LOCAL_FUNC(libvideo_swgfx_hline_wrap)
+#define LOCAL_libvideo_swgfx_hline_mirror     LOCAL_FUNC(libvideo_swgfx_hline_mirror)
+#define LOCAL_libvideo_swgfx_vline            LOCAL_FUNC(libvideo_swgfx_vline)
+#define LOCAL_libvideo_swgfx_vline_wrap       LOCAL_FUNC(libvideo_swgfx_vline_wrap)
+#define LOCAL_libvideo_swgfx_vline_mirror     LOCAL_FUNC(libvideo_swgfx_vline_mirror)
+#define LOCAL_libvideo_swgfx_fill             LOCAL_FUNC(libvideo_swgfx_fill)
+#define LOCAL_libvideo_swgfx_fill_wrap        LOCAL_FUNC(libvideo_swgfx_fill_wrap)
+#define LOCAL_libvideo_swgfx_fill_mirror      LOCAL_FUNC(libvideo_swgfx_fill_mirror)
+#define LOCAL_libvideo_swgfx_rect             LOCAL_FUNC(libvideo_swgfx_rect)
+#define LOCAL_libvideo_swgfx_rect_wrap        LOCAL_FUNC(libvideo_swgfx_rect_wrap)
+#define LOCAL_libvideo_swgfx_rect_mirror      LOCAL_FUNC(libvideo_swgfx_rect_mirror)
+#define LOCAL_libvideo_swgfx_gradient         LOCAL_FUNC(libvideo_swgfx_gradient)
+#define LOCAL_libvideo_swgfx_gradient_wrap    LOCAL_FUNC(libvideo_swgfx_gradient_wrap)
+#define LOCAL_libvideo_swgfx_gradient_mirror  LOCAL_FUNC(libvideo_swgfx_gradient_mirror)
+#define LOCAL_libvideo_swgfx_hgradient        LOCAL_FUNC(libvideo_swgfx_hgradient)
+#define LOCAL_libvideo_swgfx_hgradient_wrap   LOCAL_FUNC(libvideo_swgfx_hgradient_wrap)
+#define LOCAL_libvideo_swgfx_hgradient_mirror LOCAL_FUNC(libvideo_swgfx_hgradient_mirror)
+#define LOCAL_libvideo_swgfx_vgradient        LOCAL_FUNC(libvideo_swgfx_vgradient)
+#define LOCAL_libvideo_swgfx_vgradient_wrap   LOCAL_FUNC(libvideo_swgfx_vgradient_wrap)
+#define LOCAL_libvideo_swgfx_vgradient_mirror LOCAL_FUNC(libvideo_swgfx_vgradient_mirror)
 
-#ifdef DEFINE_libvideo_swgfx_XXX_xyswap
-#define LOCAL_libvideo_swgfx_fillmask             libvideo_swgfx_fillmask_byblit
-#define LOCAL_libvideo_swgfx_fillmask_wrap        libvideo_swgfx_fillmask_byblit
-#define LOCAL_libvideo_swgfx_fillstretchmask      libvideo_swgfx_fillstretchmask_byblit
-#define LOCAL_libvideo_swgfx_fillstretchmask_wrap libvideo_swgfx_fillstretchmask_byblit
-#else /* DEFINE_libvideo_swgfx_XXX_xyswap */
-#define LOCAL_libvideo_swgfx_fillmask             libvideo_swgfx_fillmask
-#define LOCAL_libvideo_swgfx_fillmask_wrap        libvideo_swgfx_fillmask_wrap
-#define LOCAL_libvideo_swgfx_fillstretchmask      libvideo_swgfx_fillstretchmask
-#define LOCAL_libvideo_swgfx_fillstretchmask_wrap libvideo_swgfx_fillstretchmask_wrap
-#endif /* !DEFINE_libvideo_swgfx_XXX_xyswap */
+#define LOCAL__video_swgfx_x_getcolor      LOCAL_FUNC(_video_swgfx_x_getcolor)
+#define LOCAL__video_swgfx_x_putcolor      LOCAL_FUNC(_video_swgfx_x_putcolor)
+#define LOCAL__video_swgfx_x_getpixel      LOCAL_FUNC(_video_swgfx_x_getpixel)
+#define LOCAL__video_swgfx_x_setpixel      LOCAL_FUNC(_video_swgfx_x_setpixel)
+#define LOCAL__video_swgfx_x_absline_llhh  LOCAL_FUNC(_video_swgfx_x_absline_llhh)
+#define LOCAL__video_swgfx_x_absline_lhhl  LOCAL_FUNC(_video_swgfx_x_absline_lhhl)
+#define LOCAL__video_swgfx_x_absline_h     LOCAL_FUNC(_video_swgfx_x_absline_h)
+#define LOCAL__video_swgfx_x_absline_v     LOCAL_FUNC(_video_swgfx_x_absline_v)
+#define LOCAL__video_swgfx_x_absfill       LOCAL_FUNC(_video_swgfx_x_absfill)
+#define LOCAL__video_swgfx_x_absgradient   LOCAL_FUNC(_video_swgfx_x_absgradient)
+#define LOCAL__video_swgfx_x_absgradient_h LOCAL_FUNC(_video_swgfx_x_absgradient_h)
+#define LOCAL__video_swgfx_x_absgradient_v LOCAL_FUNC(_video_swgfx_x_absgradient_v)
 
-#define LOCAL__video_swgfx_x_getcolor           LOCAL_FUNC(_video_swgfx_x_getcolor)
-#define LOCAL__video_swgfx_x_putcolor           LOCAL_FUNC(_video_swgfx_x_putcolor)
-#define LOCAL__video_swgfx_x_getpixel           LOCAL_FUNC(_video_swgfx_x_getpixel)
-#define LOCAL__video_swgfx_x_setpixel           LOCAL_FUNC(_video_swgfx_x_setpixel)
-#define LOCAL__video_swgfx_x_absline_llhh       LOCAL_FUNC(_video_swgfx_x_absline_llhh)
-#define LOCAL__video_swgfx_x_absline_lhhl       LOCAL_FUNC(_video_swgfx_x_absline_lhhl)
-#define LOCAL__video_swgfx_x_absline_h          LOCAL_FUNC(_video_swgfx_x_absline_h)
-#define LOCAL__video_swgfx_x_absline_v          LOCAL_FUNC(_video_swgfx_x_absline_v)
-#define LOCAL__video_swgfx_x_absfill            LOCAL_FUNC(_video_swgfx_x_absfill)
-#define LOCAL__video_swgfx_x_absfillmask        LOCAL_FUNC(_video_swgfx_x_absfillmask)
-#define LOCAL__video_swgfx_x_absfillstretchmask LOCAL_FUNC(_video_swgfx_x_absfillstretchmask)
-#define LOCAL__video_swgfx_x_absgradient        LOCAL_FUNC(_video_swgfx_x_absgradient)
-#define LOCAL__video_swgfx_x_absgradient_h      LOCAL_FUNC(_video_swgfx_x_absgradient_h)
-#define LOCAL__video_swgfx_x_absgradient_v      LOCAL_FUNC(_video_swgfx_x_absgradient_v)
-
-#define LOCAL_video_swgfx_x_getcolor           LOCAL_FUNC(video_swgfx_x_getcolor)
-#define LOCAL_video_swgfx_x_putcolor           LOCAL_FUNC(video_swgfx_x_putcolor)
-#define LOCAL_video_swgfx_x_getpixel           LOCAL_FUNC(video_swgfx_x_getpixel)
-#define LOCAL_video_swgfx_x_setpixel           LOCAL_FUNC(video_swgfx_x_setpixel)
-#define LOCAL_video_swgfx_x_absline_llhh       LOCAL_FUNC(video_swgfx_x_absline_llhh)
-#define LOCAL_video_swgfx_x_absline_lhhl       LOCAL_FUNC(video_swgfx_x_absline_lhhl)
-#define LOCAL_video_swgfx_x_absline_h          LOCAL_FUNC(video_swgfx_x_absline_h)
-#define LOCAL_video_swgfx_x_absline_v          LOCAL_FUNC(video_swgfx_x_absline_v)
-#define LOCAL_video_swgfx_x_absfill            LOCAL_FUNC(video_swgfx_x_absfill)
-#define LOCAL_video_swgfx_x_absfillmask        LOCAL_FUNC(video_swgfx_x_absfillmask)
-#define LOCAL_video_swgfx_x_absfillstretchmask LOCAL_FUNC(video_swgfx_x_absfillstretchmask)
-#define LOCAL_video_swgfx_x_absgradient        LOCAL_FUNC(video_swgfx_x_absgradient)
-#define LOCAL_video_swgfx_x_absgradient_h      LOCAL_FUNC(video_swgfx_x_absgradient_h)
-#define LOCAL_video_swgfx_x_absgradient_v      LOCAL_FUNC(video_swgfx_x_absgradient_v)
+#define LOCAL_video_swgfx_x_getcolor      LOCAL_FUNC(video_swgfx_x_getcolor)
+#define LOCAL_video_swgfx_x_putcolor      LOCAL_FUNC(video_swgfx_x_putcolor)
+#define LOCAL_video_swgfx_x_getpixel      LOCAL_FUNC(video_swgfx_x_getpixel)
+#define LOCAL_video_swgfx_x_setpixel      LOCAL_FUNC(video_swgfx_x_setpixel)
+#define LOCAL_video_swgfx_x_absline_llhh  LOCAL_FUNC(video_swgfx_x_absline_llhh)
+#define LOCAL_video_swgfx_x_absline_lhhl  LOCAL_FUNC(video_swgfx_x_absline_lhhl)
+#define LOCAL_video_swgfx_x_absline_h     LOCAL_FUNC(video_swgfx_x_absline_h)
+#define LOCAL_video_swgfx_x_absline_v     LOCAL_FUNC(video_swgfx_x_absline_v)
+#define LOCAL_video_swgfx_x_absfill       LOCAL_FUNC(video_swgfx_x_absfill)
+#define LOCAL_video_swgfx_x_absgradient   LOCAL_FUNC(video_swgfx_x_absgradient)
+#define LOCAL_video_swgfx_x_absgradient_h LOCAL_FUNC(video_swgfx_x_absgradient_h)
+#define LOCAL_video_swgfx_x_absgradient_v LOCAL_FUNC(video_swgfx_x_absgradient_v)
 
 #define LOCAL_libvideo_swgfx_ops         LOCAL_FUNC(libvideo_swgfx_ops)
 #define LOCAL_libvideo_swgfx_ops_wrap    LOCAL_FUNC(libvideo_swgfx_ops_wrap)
@@ -1228,17 +1212,15 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC
 LOCAL__libvideo_swgfx_ops(void) {
 	if unlikely(!LOCAL_libvideo_swgfx_ops.vgfo_getcolor) {
 		libvideo_gfx_ops_setcommon(&LOCAL_libvideo_swgfx_ops);
-		LOCAL_libvideo_swgfx_ops.vgfo_vgradient       = &LOCAL_libvideo_swgfx_vgradient;
-		LOCAL_libvideo_swgfx_ops.vgfo_hgradient       = &LOCAL_libvideo_swgfx_hgradient;
-		LOCAL_libvideo_swgfx_ops.vgfo_gradient        = &LOCAL_libvideo_swgfx_gradient;
-		LOCAL_libvideo_swgfx_ops.vgfo_fillstretchmask = &LOCAL_libvideo_swgfx_fillstretchmask;
-		LOCAL_libvideo_swgfx_ops.vgfo_fillmask        = &LOCAL_libvideo_swgfx_fillmask;
-		LOCAL_libvideo_swgfx_ops.vgfo_rect            = &LOCAL_libvideo_swgfx_rect;
-		LOCAL_libvideo_swgfx_ops.vgfo_fill            = &LOCAL_libvideo_swgfx_fill;
-		LOCAL_libvideo_swgfx_ops.vgfo_vline           = &LOCAL_libvideo_swgfx_vline;
-		LOCAL_libvideo_swgfx_ops.vgfo_hline           = &LOCAL_libvideo_swgfx_hline;
-		LOCAL_libvideo_swgfx_ops.vgfo_line            = &LOCAL_libvideo_swgfx_line;
-		LOCAL_libvideo_swgfx_ops.vgfo_putcolor        = &LOCAL_libvideo_swgfx_putcolor;
+		LOCAL_libvideo_swgfx_ops.vgfo_vgradient = &LOCAL_libvideo_swgfx_vgradient;
+		LOCAL_libvideo_swgfx_ops.vgfo_hgradient = &LOCAL_libvideo_swgfx_hgradient;
+		LOCAL_libvideo_swgfx_ops.vgfo_gradient  = &LOCAL_libvideo_swgfx_gradient;
+		LOCAL_libvideo_swgfx_ops.vgfo_rect      = &LOCAL_libvideo_swgfx_rect;
+		LOCAL_libvideo_swgfx_ops.vgfo_fill      = &LOCAL_libvideo_swgfx_fill;
+		LOCAL_libvideo_swgfx_ops.vgfo_vline     = &LOCAL_libvideo_swgfx_vline;
+		LOCAL_libvideo_swgfx_ops.vgfo_hline     = &LOCAL_libvideo_swgfx_hline;
+		LOCAL_libvideo_swgfx_ops.vgfo_line      = &LOCAL_libvideo_swgfx_line;
+		LOCAL_libvideo_swgfx_ops.vgfo_putcolor  = &LOCAL_libvideo_swgfx_putcolor;
 		COMPILER_WRITE_BARRIER();
 		LOCAL_libvideo_swgfx_ops.vgfo_getcolor = &LOCAL_libvideo_swgfx_getcolor;
 		COMPILER_WRITE_BARRIER();
@@ -1250,17 +1232,15 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC
 LOCAL__libvideo_swgfx_ops_wrap(void) {
 	if unlikely(!LOCAL_libvideo_swgfx_ops_wrap.vgfo_getcolor) {
 		libvideo_gfx_ops_setcommon(&LOCAL_libvideo_swgfx_ops_wrap);
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_vgradient       = &LOCAL_libvideo_swgfx_vgradient_wrap;
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_hgradient       = &LOCAL_libvideo_swgfx_hgradient_wrap;
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_gradient        = &LOCAL_libvideo_swgfx_gradient_wrap;
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_fillstretchmask = &LOCAL_libvideo_swgfx_fillstretchmask_wrap;
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_fillmask        = &LOCAL_libvideo_swgfx_fillmask_wrap;
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_rect            = &LOCAL_libvideo_swgfx_rect_wrap;
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_fill            = &LOCAL_libvideo_swgfx_fill_wrap;
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_vline           = &LOCAL_libvideo_swgfx_vline_wrap;
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_hline           = &LOCAL_libvideo_swgfx_hline_wrap;
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_line            = &LOCAL_libvideo_swgfx_line_wrap;
-		LOCAL_libvideo_swgfx_ops_wrap.vgfo_putcolor        = &LOCAL_libvideo_swgfx_putcolor_wrap;
+		LOCAL_libvideo_swgfx_ops_wrap.vgfo_vgradient = &LOCAL_libvideo_swgfx_vgradient_wrap;
+		LOCAL_libvideo_swgfx_ops_wrap.vgfo_hgradient = &LOCAL_libvideo_swgfx_hgradient_wrap;
+		LOCAL_libvideo_swgfx_ops_wrap.vgfo_gradient  = &LOCAL_libvideo_swgfx_gradient_wrap;
+		LOCAL_libvideo_swgfx_ops_wrap.vgfo_rect      = &LOCAL_libvideo_swgfx_rect_wrap;
+		LOCAL_libvideo_swgfx_ops_wrap.vgfo_fill      = &LOCAL_libvideo_swgfx_fill_wrap;
+		LOCAL_libvideo_swgfx_ops_wrap.vgfo_vline     = &LOCAL_libvideo_swgfx_vline_wrap;
+		LOCAL_libvideo_swgfx_ops_wrap.vgfo_hline     = &LOCAL_libvideo_swgfx_hline_wrap;
+		LOCAL_libvideo_swgfx_ops_wrap.vgfo_line      = &LOCAL_libvideo_swgfx_line_wrap;
+		LOCAL_libvideo_swgfx_ops_wrap.vgfo_putcolor  = &LOCAL_libvideo_swgfx_putcolor_wrap;
 		COMPILER_WRITE_BARRIER();
 		LOCAL_libvideo_swgfx_ops_wrap.vgfo_getcolor = &LOCAL_libvideo_swgfx_getcolor_wrap;
 		COMPILER_WRITE_BARRIER();
@@ -1272,17 +1252,15 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC
 LOCAL__libvideo_swgfx_ops_mirror(void) {
 	if unlikely(!LOCAL_libvideo_swgfx_ops_mirror.vgfo_getcolor) {
 		libvideo_gfx_ops_setcommon(&LOCAL_libvideo_swgfx_ops_mirror);
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_vgradient       = &LOCAL_libvideo_swgfx_vgradient_mirror;
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_hgradient       = &LOCAL_libvideo_swgfx_hgradient_mirror;
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_gradient        = &LOCAL_libvideo_swgfx_gradient_mirror;
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_fillstretchmask = &libvideo_swgfx_fillstretchmask_byblit;
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_fillmask        = &libvideo_swgfx_fillmask_byblit;
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_rect            = &LOCAL_libvideo_swgfx_rect_mirror;
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_fill            = &LOCAL_libvideo_swgfx_fill_mirror;
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_vline           = &LOCAL_libvideo_swgfx_vline_mirror;
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_hline           = &LOCAL_libvideo_swgfx_hline_mirror;
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_line            = &LOCAL_libvideo_swgfx_line_mirror;
-		LOCAL_libvideo_swgfx_ops_mirror.vgfo_putcolor        = &LOCAL_libvideo_swgfx_putcolor_mirror;
+		LOCAL_libvideo_swgfx_ops_mirror.vgfo_vgradient = &LOCAL_libvideo_swgfx_vgradient_mirror;
+		LOCAL_libvideo_swgfx_ops_mirror.vgfo_hgradient = &LOCAL_libvideo_swgfx_hgradient_mirror;
+		LOCAL_libvideo_swgfx_ops_mirror.vgfo_gradient  = &LOCAL_libvideo_swgfx_gradient_mirror;
+		LOCAL_libvideo_swgfx_ops_mirror.vgfo_rect      = &LOCAL_libvideo_swgfx_rect_mirror;
+		LOCAL_libvideo_swgfx_ops_mirror.vgfo_fill      = &LOCAL_libvideo_swgfx_fill_mirror;
+		LOCAL_libvideo_swgfx_ops_mirror.vgfo_vline     = &LOCAL_libvideo_swgfx_vline_mirror;
+		LOCAL_libvideo_swgfx_ops_mirror.vgfo_hline     = &LOCAL_libvideo_swgfx_hline_mirror;
+		LOCAL_libvideo_swgfx_ops_mirror.vgfo_line      = &LOCAL_libvideo_swgfx_line_mirror;
+		LOCAL_libvideo_swgfx_ops_mirror.vgfo_putcolor  = &LOCAL_libvideo_swgfx_putcolor_mirror;
 		COMPILER_WRITE_BARRIER();
 		LOCAL_libvideo_swgfx_ops_mirror.vgfo_getcolor = &LOCAL_libvideo_swgfx_getcolor_mirror;
 		COMPILER_WRITE_BARRIER();
@@ -1326,10 +1304,6 @@ LOCAL__libvideo_swgfx_ops_mirror(void) {
 #undef LOCAL_libvideo_swgfx_vgradient
 #undef LOCAL_libvideo_swgfx_vgradient_wrap
 #undef LOCAL_libvideo_swgfx_vgradient_mirror
-#undef LOCAL_libvideo_swgfx_fillmask
-#undef LOCAL_libvideo_swgfx_fillmask_wrap
-#undef LOCAL_libvideo_swgfx_fillstretchmask
-#undef LOCAL_libvideo_swgfx_fillstretchmask_wrap
 
 #undef LOCAL__video_swgfx_x_getcolor
 #undef LOCAL__video_swgfx_x_putcolor
@@ -1340,8 +1314,6 @@ LOCAL__libvideo_swgfx_ops_mirror(void) {
 #undef LOCAL__video_swgfx_x_absline_h
 #undef LOCAL__video_swgfx_x_absline_v
 #undef LOCAL__video_swgfx_x_absfill
-#undef LOCAL__video_swgfx_x_absfillmask
-#undef LOCAL__video_swgfx_x_absfillstretchmask
 #undef LOCAL__video_swgfx_x_absgradient
 #undef LOCAL__video_swgfx_x_absgradient_h
 #undef LOCAL__video_swgfx_x_absgradient_v
@@ -1355,8 +1327,6 @@ LOCAL__libvideo_swgfx_ops_mirror(void) {
 #undef LOCAL_video_swgfx_x_absline_h
 #undef LOCAL_video_swgfx_x_absline_v
 #undef LOCAL_video_swgfx_x_absfill
-#undef LOCAL_video_swgfx_x_absfillmask
-#undef LOCAL_video_swgfx_x_absfillstretchmask
 #undef LOCAL_video_swgfx_x_absgradient
 #undef LOCAL_video_swgfx_x_absgradient_h
 #undef LOCAL_video_swgfx_x_absgradient_v

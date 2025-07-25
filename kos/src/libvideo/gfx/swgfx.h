@@ -127,31 +127,6 @@ struct gfx_swdrv {
 	                  video_dim_t size_x, video_dim_t size_y,
 	                  video_color_t color);
 
-	/* Paint masked pixels
-	 * @assume(size_x > 0);
-	 * @assume(size_y > 0); */
-	ATTR_IN_T(1) ATTR_IN_T(6) ATTR_IN_T(7) void
-	(CC *xsw_absfillmask)(struct video_gfx const *__restrict self,
-	                      video_coord_t dst_x, video_coord_t dst_y,
-	                      video_dim_t size_x, video_dim_t size_y,
-	                      video_color_t const bg_fg_colors[2],
-	                      struct video_bitmask const *__restrict bm);
-
-	/* Stretch and paint masked pixels
-	 * @assume(dst_size_x > 0);
-	 * @assume(dst_size_y > 0);
-	 * @assume(src_size_x > 0);
-	 * @assume(src_size_y > 0);
-	 * @assume(dst_size_x != src_size_x);
-	 * @assume(dst_size_y != src_size_y); */
-	ATTR_IN_T(1) ATTR_IN_T(6) ATTR_IN_T(9) void
-	(CC *xsw_absfillstretchmask)(struct video_gfx const *__restrict self,
-	                             video_coord_t dst_x, video_coord_t dst_y,
-	                             video_dim_t dst_size_x, video_dim_t dst_size_y,
-	                             video_color_t const bg_fg_colors[2],
-	                             video_dim_t src_size_x, video_dim_t src_size_y,
-	                             struct video_bitmask const *__restrict bm);
-
 	/* Same as `xsw_absfill', but do so via gradient with colors[y][x] being used
 	 * to essentially  do a  VIDEO_GFX_F_LINEAR stretch-blit  into the  specified
 	 * destination rect.
@@ -200,10 +175,6 @@ struct gfx_swdrv {
 	(*video_swgfx_getcdrv(self)->xsw_absline_v)(self, x, y, length, color)
 #define _video_swgfx_x_absfill(self, x, y, size_x, size_y, color) \
 	(*video_swgfx_getcdrv(self)->xsw_absfill)(self, x, y, size_x, size_y, color)
-#define _video_swgfx_x_absfillmask(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm) \
-	(*video_swgfx_getcdrv(self)->xsw_absfillmask)(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm)
-#define _video_swgfx_x_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm) \
-	(*video_swgfx_getcdrv(self)->xsw_absfillstretchmask)(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm)
 #define _video_swgfx_x_absgradient(self, x, y, size_x, size_y, colors) \
 	(*video_swgfx_getcdrv(self)->xsw_absgradient)(self, x, y, size_x, size_y, colors)
 #define _video_swgfx_x_absgradient_h(self, x, y, size_x, size_y, locolor, hicolor) \
@@ -271,15 +242,6 @@ struct gfx_swdrv {
 #define video_swgfx_x_absfill(self, x, y, size_x, size_y, color) \
 	(gfx_assert_absbounds_sxy(self, x, y, size_x, size_y),       \
 	 _video_swgfx_x_absfill(self, x, y, size_x, size_y, color))
-#define video_swgfx_x_absfillmask(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm) \
-	(gfx_assert_absbounds_sxy(self, dst_x, dst_y, size_x, size_y),                      \
-	 _video_swgfx_x_absfillmask(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm))
-#define video_swgfx_x_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm) \
-	(gfx_assert_absbounds_sxy(self, dst_x, dst_y, dst_size_x, dst_size_y),                                                     \
-	 gfx_assert(src_size_x), gfx_assert(src_size_y),                                                                           \
-	 gfx_assertf((dst_size_x) != (src_size_x) || (dst_size_y) != (src_size_y),                                                 \
-	             "dst/src size identical: {%" PRIuDIM "x%" PRIuDIM "}", dst_size_x, dst_size_y),                               \
-	 _video_swgfx_x_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm))
 #define video_swgfx_x_absgradient(self, x, y, size_x, size_y, colors) \
 	(gfx_assert_absbounds_sxy(self, x, y, size_x, size_y),            \
 	 _video_swgfx_x_absgradient(self, x, y, size_x, size_y, colors))
@@ -678,25 +640,19 @@ INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__absfill(struct video_gfx const
 INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_swgfx_generic__absgradient(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__absgradient_h(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_swgfx_generic__fillmask(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_generic__fillstretchmask_l(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_generic__fillstretchmask_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 
 /* Custom pre-blending GFX functions */
-#define DECLARE_libvideo_swgfx_generic__render_preblend_FOO(name, mode, preblend_name, preblend)                                                                                                                                                                                                                                                                           \
-	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_llhh__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                                                                                                                                               \
-	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_lhhl__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                                                                                                                                               \
-	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_llhh_l__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                                                                                                                                             \
-	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_lhhl_l__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                                                                                                                                             \
-	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_h__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);                                                                                                                                                                      \
-	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_v__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);                                                                                                                                                                      \
-	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absfill__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                                                                                                                                                    \
-	INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_swgfx_preblend__absgradient__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);                                                                                                                        \
-	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absgradient_h__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);                                                                                                                     \
-	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absgradient_v__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);                                                                                                                     \
-	INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_swgfx_preblend__fillmask__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);                                                                  \
-	INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_preblend__fillstretchmask_l__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm); \
-	INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_preblend__fillstretchmask_n__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+#define DECLARE_libvideo_swgfx_generic__render_preblend_FOO(name, mode, preblend_name, preblend)                                                                                                                                                       \
+	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_llhh__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                           \
+	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_lhhl__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                           \
+	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_llhh_l__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                         \
+	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_lhhl_l__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                         \
+	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_h__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);                                                  \
+	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absline_v__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);                                                  \
+	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absfill__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                                \
+	INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_swgfx_preblend__absgradient__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);    \
+	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absgradient_h__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor); \
+	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__absgradient_v__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 GFX_FOREACH_DEDICATED_PREBLENDMODE(DECLARE_libvideo_swgfx_generic__render_preblend_FOO)
 #undef DECLARE_libvideo_swgfx_generic__render_preblend_FOO
 
@@ -740,10 +696,6 @@ INTDEF ATTR_IN(1) void CC libvideo_swgfx_noblend__absfill(struct video_gfx const
 INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_swgfx_noblend_interp8888__absgradient(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_noblend_interp8888__absgradient_h(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_noblend_interp8888__absgradient_v(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_swgfx_noblend__fillmask1(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, struct video_bitmask const *__restrict bm, __REGISTER_TYPE__ bm_xor);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_swgfx_noblend__fillmask(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_noblend__fillstretchmask_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_swgfx_noblend__fillstretchmask1_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm, __REGISTER_TYPE__ bm_xor);
 
 INTDEF ATTR_IN(1) void CC libvideo_swblitter_noblend_samefmt__blit(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter_noblend_samefmt__blit_imatrix(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, video_imatrix2d_t src_matrix);
@@ -844,12 +796,6 @@ INTDEF ATTR_IN(1) void CC libvideo_swgfx_vgradient_wrap(struct video_gfx const *
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_vgradient_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_vgradient_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_vgradient_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_swgfx_fillmask(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_swgfx_fillmask_wrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_swgfx_fillmask_byblit(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_fillstretchmask(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_fillstretchmask_wrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_fillstretchmask_byblit(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_swgfx_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_swgfx_ops_xyswap(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_swgfx_ops_wrap(void);
@@ -1032,7 +978,6 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 	 * - drv->xsw_absline_h
 	 * - drv->xsw_absline_v
 	 * - drv->xsw_absfill
-	 * - drv->xsw_absfillmask
 	 * - drv->xsw_absgradient
 	 * - drv->xsw_absgradient_h
 	 * - drv->xsw_absgradient_v */
@@ -1068,7 +1013,6 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 			drv->xsw_absline_h   = &libvideo_swgfx_noblend__absline_h;
 			drv->xsw_absline_v   = &libvideo_swgfx_noblend__absline_v;
 			drv->xsw_absfill     = &libvideo_swgfx_noblend__absfill;
-			drv->xsw_absfillmask = &libvideo_swgfx_noblend__fillmask;
 			if (video_gfx_getbuffer(self)->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
 				drv->xsw_absgradient   = &libvideo_swgfx_noblend_interp8888__absgradient;
 				drv->xsw_absgradient_h = &libvideo_swgfx_noblend_interp8888__absgradient_h;
@@ -1097,7 +1041,6 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 			drv->xsw_absline_h     = &libvideo_swgfx_preblend__absline_h__##name;             \
 			drv->xsw_absline_v     = &libvideo_swgfx_preblend__absline_v__##name;             \
 			drv->xsw_absfill       = &libvideo_swgfx_preblend__absfill__##name;               \
-			drv->xsw_absfillmask   = &libvideo_swgfx_preblend__fillmask__##name;              \
 			drv->xsw_absgradient   = &libvideo_swgfx_preblend__absgradient__##name;           \
 			drv->xsw_absgradient_h = &libvideo_swgfx_preblend__absgradient_h__##name;         \
 			drv->xsw_absgradient_v = &libvideo_swgfx_preblend__absgradient_v__##name;         \
@@ -1109,7 +1052,6 @@ GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_libvideo_swgfx_generic__render_preblend_
 			drv->xsw_absline_h     = &libvideo_swgfx_generic__absline_h;
 			drv->xsw_absline_v     = &libvideo_swgfx_generic__absline_v;
 			drv->xsw_absfill       = &libvideo_swgfx_generic__absfill;
-			drv->xsw_absfillmask   = &libvideo_swgfx_generic__fillmask;
 			drv->xsw_absgradient   = &libvideo_swgfx_generic__absgradient;
 			drv->xsw_absgradient_h = &libvideo_swgfx_generic__absgradient_h;
 			drv->xsw_absgradient_v = &libvideo_swgfx_generic__absgradient_v;
@@ -1119,7 +1061,6 @@ after_blend:;
 	}
 
 	/* Update:
-	 * - drv->xsw_absfillstretchmask
 	 * - drv->xsw_absline_llhh
 	 * - drv->xsw_absline_lhhl */
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_BLEND)) {
@@ -1128,29 +1069,25 @@ after_blend:;
 		case GFX_BLENDMODE_OVERRIDE:
 			if (video_gfx_getflags(self) & VIDEO_GFX_F_LINEAR)
 				goto set_generic_linear_blend_operators;
-			drv->xsw_absfillstretchmask = &libvideo_swgfx_noblend__fillstretchmask_n;
-			drv->xsw_absline_llhh       = &libvideo_swgfx_noblend__absline_llhh;
-			drv->xsw_absline_lhhl       = &libvideo_swgfx_noblend__absline_lhhl;
+			drv->xsw_absline_llhh = &libvideo_swgfx_noblend__absline_llhh;
+			drv->xsw_absline_lhhl = &libvideo_swgfx_noblend__absline_lhhl;
 			break;
-#define LINK_libvideo_swgfx_generic__render_preblend_FOO(name, mode, preblend_name, preblend)  \
-		case mode:                                                                             \
-			drv->xsw_absfillstretchmask = &libvideo_swgfx_preblend__fillstretchmask_n__##name; \
-			drv->xsw_absline_llhh       = &libvideo_swgfx_preblend__absline_llhh__##name;      \
-			drv->xsw_absline_lhhl       = &libvideo_swgfx_preblend__absline_lhhl__##name;      \
+#define LINK_libvideo_swgfx_generic__render_preblend_FOO(name, mode, preblend_name, preblend) \
+		case mode:                                                                            \
+			drv->xsw_absline_llhh = &libvideo_swgfx_preblend__absline_llhh__##name;           \
+			drv->xsw_absline_lhhl = &libvideo_swgfx_preblend__absline_lhhl__##name;           \
 			break;
 GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_libvideo_swgfx_generic__render_preblend_FOO)
 #undef LINK_libvideo_swgfx_generic__render_preblend_FOO
 		default:
 			if (video_gfx_getflags(self) & VIDEO_GFX_F_LINEAR) {
 set_generic_linear_blend_operators:
-				drv->xsw_absfillstretchmask = &libvideo_swgfx_generic__fillstretchmask_l;
-				drv->xsw_absline_llhh       = &libvideo_swgfx_generic__absline_llhh_l;
-				drv->xsw_absline_lhhl       = &libvideo_swgfx_generic__absline_lhhl_l;
+				drv->xsw_absline_llhh = &libvideo_swgfx_generic__absline_llhh_l;
+				drv->xsw_absline_lhhl = &libvideo_swgfx_generic__absline_lhhl_l;
 				break;
 			}
-			drv->xsw_absfillstretchmask = &libvideo_swgfx_generic__fillstretchmask_n;
-			drv->xsw_absline_llhh       = &libvideo_swgfx_generic__absline_llhh;
-			drv->xsw_absline_lhhl       = &libvideo_swgfx_generic__absline_lhhl;
+			drv->xsw_absline_llhh = &libvideo_swgfx_generic__absline_llhh;
+			drv->xsw_absline_lhhl = &libvideo_swgfx_generic__absline_lhhl;
 			break;
 		}
 	}
