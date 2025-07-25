@@ -545,6 +545,13 @@ extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_buffer_hascolorkey(s
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_buffer_getxdim(struct video_buffer const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_buffer_getydim(struct video_buffer const *__restrict __self);
 
+/* Set/Enable/Disable the default color-key of the buffer.
+ * This  is pretty much the only thing you can alter about
+ * a given video buffer however you please. */
+extern __ATTR_INOUT(1) void video_buffer_setcolorkey(struct video_buffer *__restrict __self, video_pixel_t __colorkey);
+extern __ATTR_INOUT(1) void video_buffer_enablecolorkey(struct video_buffer *__restrict __self, video_pixel_t __colorkey);
+extern __ATTR_INOUT(1) void video_buffer_disablecolorkey(struct video_buffer *__restrict __self);
+
 /* Check if a given video buffer uses the specified format. */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __BOOL
 video_buffer_hasformat(struct video_buffer const *__restrict __self,
@@ -665,6 +672,13 @@ __NOTHROW(video_buffer_revoke)(struct video_buffer *__restrict __self);
 #define video_buffer_hascolorkey(self) ((video_buffer_getflags(self) & VIDEO_GFX_F_COLORKEY) != 0)
 #define video_buffer_getxdim(self)     (self)->vb_xdim
 #define video_buffer_getydim(self)     (self)->vb_ydim
+#define video_buffer_setcolorkey(self, colorkey) \
+	__hybrid_atomic_store((video_pixel_t *)&(self)->vb_surf.vs_colorkey, colorkey, __ATOMIC_RELEASE)
+#define video_buffer_enablecolorkey(self, colorkey) \
+	(video_buffer_setcolorkey(self, colorkey), __hybrid_atomic_or((video_gfx_flag_t *)&(self)->vb_surf.vs_flags, VIDEO_GFX_F_COLORKEY, __ATOMIC_SEQ_CST))
+#define video_buffer_disablecolorkey(self) \
+	__hybrid_atomic_and((video_gfx_flag_t *)&(self)->vb_surf.vs_flags, ~VIDEO_GFX_F_COLORKEY, __ATOMIC_SEQ_CST)
+
 #define video_buffer_hasformat(self, format)                                                   \
 	(video_buffer_getcodec(self) == (format)->vbf_codec &&                                     \
 	 video_buffer_getflags(self) == (format)->vbf_flags &&                                     \
@@ -713,7 +727,20 @@ __NOTHROW(video_buffer_revoke)(struct video_buffer *__restrict __self);
 #endif /* !__VIDEO_BUFFER_const */
 
 struct video_buffer {
-	struct video_surface           __VIDEO_BUFFER_const vb_surf;    /* [const] Buffer surface data (`vs_buffer' is always a self-pointer; never has `VIDEO_GFX_F_RAWPAL' set) */
+	struct video_surface           __VIDEO_BUFFER_const vb_surf;    /* [const] Buffer surface data (`vs_buffer' is always a self-pointer)
+	                                                                 * The following aspects of this surface may be modified  atomically:
+	                                                                 * - vs_flags:    all flags except `VIDEO_GFX_F_XYSWAP' and `VIDEO_GFX_F_PALOBJ'
+	                                                                 *                `VIDEO_GFX_F_XYSWAP' isn't allowed since another thread may be
+	                                                                 *                doing  some logic based on the effective X/Y dimensions of the
+	                                                                 *                buffer's default surface,  which might break  if its  X/Y-dims
+	                                                                 *                were to randomly swap with each other.
+	                                                                 * - vs_colorkey: may be changed as you please
+	                                                                 * [[[
+	                                                                 * - vs_pal:   Never (technically, allowed if word-aligned reads are
+	                                                                 *             atomic, and old pal is static, and new one is static/
+	                                                                 *             object, but way too specific to be of any use)
+	                                                                 * ]]]
+	                                                                 */
 	__REF struct video_codec      *__VIDEO_BUFFER_const vb_codec;   /* [1..1][const] Buffer codec. */
 	struct video_buffer_ops const *__VIDEO_BUFFER_const vb_ops;     /* [1..1][const] Buffer operations. */
 	struct video_domain const     *__VIDEO_BUFFER_const vb_domain;  /* [1..1][const] Buffer domain (generic wrappers use `video_ramdomain()',

@@ -54,8 +54,6 @@ struct video_anim_frame {
 	REF struct video_buffer *vaf_frame;    /* [1..1] Current frame (and previous frame during) */
 	struct __timeval64       vaf_showfor;  /* How long to display the frame before showing the next */
 	video_anim_frame_id      vaf_frameid;  /* ID of this frame */
-	/* TODO: Get rid of `vaf_colorkey' -- that one's embedded within video buffers now! */
-	video_color_t            vaf_colorkey; /* Frame color key, or "0" if not needed */
 
 	/* Animation-specific frame data goes here... */
 };

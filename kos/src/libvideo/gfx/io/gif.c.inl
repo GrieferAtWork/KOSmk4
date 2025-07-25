@@ -32,6 +32,7 @@
 #include <sys/syslog.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <malloc.h>
@@ -617,7 +618,7 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		struct video_lock pal_lock;
 		REF struct video_buffer *dcol_buffer;
 		struct video_buffer_format format;
-		struct video_palette const *pal = frame->vb_surf.vs_pal;
+		struct video_palette const *pal = video_buffer_getpalette(frame);
 		assert(pal);
 
 		/* Only the transparency-config of the first frame (i.e. the "gobal transparency")
@@ -695,8 +696,8 @@ err_dcol_buffer:
 
 		free(self->gb_restore);
 		self->gb_restore = NULL;
-		self->vaf_colorkey = 0;
-		assert(pal == frame->vb_surf.vs_pal);
+		video_buffer_disablecolorkey(frame);
+		assert(pal == video_buffer_getpalette(frame));
 		assert(self->vaf_frame == frame);
 		video_buffer_decref(frame);            /* Decref old (palette) frame */
 		self->vaf_frame = frame = dcol_buffer; /* Inherit reference */
@@ -790,7 +791,7 @@ check_for_global_transparency:
 			 * canvas. */
 			if (frame_x > 0 || frame_y > 0 || frame_w < frame->vb_xdim || frame_h < frame->vb_ydim) {
 set_has_global_transparency:
-				self->vaf_colorkey = frame->vb_surf.vs_pal->vp_pal[anim->ga_cfg.gc_trans];
+				video_buffer_enablecolorkey(frame, anim->ga_cfg.gc_trans);
 				break;
 			}
 			ATTR_FALLTHROUGH
@@ -803,7 +804,7 @@ set_has_global_transparency:
 					goto set_has_global_transparency;
 				line_iter += frame_lock.vl_stride;
 			} while (--y_iter);
-			self->vaf_colorkey = 0;
+			video_buffer_disablecolorkey(frame);
 		}	break;
 
 		default: break;
@@ -946,12 +947,11 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	frame->vaf_frameid = 0;
 	gif_config_populate_showfor(&me->ga_cfg, frame);
 
-	frame->gb_cfg       = me->ga_cfg;
-	frame->gb_restore   = NULL;
-	frame->gb_scratch   = NULL;
-	frame->gb_lct       = NULL;
-	frame->gb_lct_len   = 0;
-	frame->vaf_colorkey = 0;
+	frame->gb_cfg     = me->ga_cfg;
+	frame->gb_restore = NULL;
+	frame->gb_scratch = NULL;
+	frame->gb_lct     = NULL;
+	frame->gb_lct_len = 0;
 	frame->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS = false;
 	frame->vaf_fini = &gif_frame_fini;
 
@@ -1070,7 +1070,7 @@ set_have_global_trans:
 	case GIF_ANIM_FRAME1_GLOBAL_TRANS__YES:
 have_global_trans:
 		/* Use special operators to force a color key into a GFX context */
-		frame->vaf_colorkey = result->vb_surf.vs_pal->vp_pal[me->ga_cfg.gc_trans];
+		video_buffer_enablecolorkey(result, me->ga_cfg.gc_trans);
 		break;
 
 	case GIF_ANIM_FRAME1_GLOBAL_TRANS__NO:

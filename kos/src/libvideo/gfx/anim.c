@@ -70,7 +70,6 @@ oneframe_anim_firstframe(struct video_anim const *__restrict self,
 	frame->vaf_frameid         = 0;
 	frame->vaf_showfor.tv_sec  = 999999;
 	frame->vaf_showfor.tv_usec = 999999;
-	frame->vaf_colorkey        = 0;
 	frame->vaf_frame = me->ofa_frame;
 	video_buffer_incref(me->ofa_frame);
 	return 0;
@@ -134,9 +133,8 @@ err:
 
 
 struct cached_frame {
-	REF struct video_buffer *cf_frame;    /* [1..1][const] The cached frame */
-	struct __timeval64       cf_showfor;  /* How long to display the frame before showing the next */
-	video_color_t            cf_colorkey; /* Frame color key, or "0" if not needed */
+	REF struct video_buffer *cf_frame;   /* [1..1][const] The cached frame */
+	struct __timeval64       cf_showfor; /* How long to display the frame before showing the next */
 };
 
 struct cached_anim: video_anim {
@@ -183,7 +181,6 @@ cached_anim_firstframe(struct video_anim const *__restrict self,
 		frame->vaf_frame    = cframe->cf_frame;
 		frame->vaf_showfor  = cframe->cf_showfor;
 		frame->vaf_frameid  = 0;
-		frame->vaf_colorkey = cframe->cf_colorkey;
 		video_buffer_incref(cframe->cf_frame);
 		return 0;
 	}
@@ -211,12 +208,11 @@ cached_anim_firstframe(struct video_anim const *__restrict self,
 
 	/* Copy data into "cframe" */
 	cframe->cf_showfor  = me->ca_bbuf->vaf_showfor;
-	cframe->cf_colorkey = me->ca_bbuf->vaf_colorkey;
 	video_buffer_getformat(me->ca_bbuf->vaf_frame, &frame_format);
 	if (me->ca_fmt.vbf_codec)
 		frame_format = me->ca_fmt;
-	cframe->cf_frame = libvideo_surface_convert(video_buffer_assurface(me->ca_bbuf->vaf_frame),
-	                                            me->va_domain, &frame_format);
+	cframe->cf_frame = libvideo_surface_convert_distinct(video_buffer_assurface(me->ca_bbuf->vaf_frame),
+	                                                     me->va_domain, &frame_format);
 	if unlikely(!cframe->cf_frame)
 		goto err_lock_cframe_bbuf_fini;
 
@@ -226,11 +222,10 @@ cached_anim_firstframe(struct video_anim const *__restrict self,
 
 	/* Return the now-cached frame */
 unlock_and_return_frame:
-	frame->vaf_fini     = &oneframe_frame_fini;
-	frame->vaf_frame    = cframe->cf_frame;
-	frame->vaf_showfor  = cframe->cf_showfor;
-	frame->vaf_frameid  = 0;
-	frame->vaf_colorkey = cframe->cf_colorkey;
+	frame->vaf_fini    = &oneframe_frame_fini;
+	frame->vaf_frame   = cframe->cf_frame;
+	frame->vaf_showfor = cframe->cf_showfor;
+	frame->vaf_frameid = 0;
 	video_buffer_incref(cframe->cf_frame);
 	shared_lock_release(&me->ca_lock);
 	return 0;
@@ -267,10 +262,9 @@ return_next_cached_frame:
 		atomic_dec(&frame->vaf_frame->vb_refcnt);
 		cframe = &me->ca_framev[next_id];
 		video_buffer_incref(cframe->cf_frame);
-		frame->vaf_frame    = cframe->cf_frame;
-		frame->vaf_showfor  = cframe->cf_showfor;
-		frame->vaf_frameid  = next_id;
-		frame->vaf_colorkey = cframe->cf_colorkey;
+		frame->vaf_frame   = cframe->cf_frame;
+		frame->vaf_showfor = cframe->cf_showfor;
+		frame->vaf_frameid = next_id;
 		return 0;
 	}
 
@@ -351,8 +345,8 @@ return_next_cached_frame:
 	video_buffer_getformat(me->ca_bbuf->vaf_frame, &frame_format);
 	if (me->ca_fmt.vbf_codec)
 		frame_format = me->ca_fmt;
-	cframe->cf_frame = libvideo_surface_convert(video_buffer_assurface(me->ca_bbuf->vaf_frame),
-	                                            me->va_domain, &frame_format);
+	cframe->cf_frame = libvideo_surface_convert_distinct(video_buffer_assurface(me->ca_bbuf->vaf_frame),
+	                                                     me->va_domain, &frame_format);
 	if unlikely(!cframe->cf_frame) {
 		/* Failed to convert frame -> must reset output
 		 * buffer since it's now 1 frame too far  ahead */
@@ -367,8 +361,7 @@ err_lock_bbuf_fini:
 	}
 
 	/* Copy other frame information into "cframe" */
-	cframe->cf_showfor  = me->ca_bbuf->vaf_showfor;
-	cframe->cf_colorkey = me->ca_bbuf->vaf_colorkey;
+	cframe->cf_showfor = me->ca_bbuf->vaf_showfor;
 
 	/* Remember that another frame has been loaded. */
 	next_id = me->ca_framec++;
@@ -379,10 +372,9 @@ unlock_and_return_frame:
 	atomic_dec(&frame->vaf_frame->vb_refcnt);
 	video_buffer_incref(cframe->cf_frame);
 	cframe = &me->ca_framev[next_id];
-	frame->vaf_frame    = cframe->cf_frame;
-	frame->vaf_showfor  = cframe->cf_showfor;
-	frame->vaf_frameid  = next_id;
-	frame->vaf_colorkey = cframe->cf_colorkey;
+	frame->vaf_frame   = cframe->cf_frame;
+	frame->vaf_showfor = cframe->cf_showfor;
+	frame->vaf_frameid = next_id;
 	shared_lock_release(&me->ca_lock);
 	return 0;
 err_lock:
