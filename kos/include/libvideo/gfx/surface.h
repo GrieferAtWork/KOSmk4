@@ -124,11 +124,13 @@ video_surface_getpalcolors(struct video_surface const *__restrict __self);
 
 
 /* Check if `__self' is the default surface of a `video_buffer' */
-extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_surface_isbuffer(struct video_surface const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL
+video_surface_isbuffer(struct video_surface const *__restrict __self);
 
 /* Check if properties of `__self' match the default properties of the associated
  * buffer.  Note that when `video_surface_isbuffer()' is true, this is also true. */
-extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_surface_isdefault(struct video_surface const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL
+video_surface_isdefault(struct video_surface const *__restrict __self);
 
 /* Update attributes of `__self' to match the associated buffer's default attributes */
 extern __ATTR_INOUT(1) void video_surface_setdefault(struct video_surface *__restrict __self);

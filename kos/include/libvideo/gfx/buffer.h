@@ -68,7 +68,7 @@ struct video_rect;
 struct video_buffer_format {
 	struct video_palette const *vbf_pal;      /* [0..1][valid_if(vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)] Color palette (if needed by `vbf_codec') */
 	struct video_codec         *vbf_codec;    /* [1..1] Video codec. */
-	video_gfx_flag_t            vbf_flags;    /* Default GFX flags */
+	video_gfx_flag_t            vbf_flags;    /* Default GFX flags (set of `VIDEO_GFX_F_*') */
 	video_pixel_t               vbf_colorkey; /* [valid_if(vbf_flags & VIDEO_GFX_F_COLORKEY)] Pixel value to skip during blits */
 };
 
@@ -746,6 +746,7 @@ struct video_buffer {
 	struct video_domain const     *__VIDEO_BUFFER_const vb_domain;  /* [1..1][const] Buffer domain (generic wrappers use `video_ramdomain()',
 	                                                                 * meaning a different value here implies that the buffer was created  by
 	                                                                 * that domain's `video_domain_newbuffer()' or `video_domain_formem()') */
+	/* TODO: Replace the following with "video_dim_t __VIDEO_BUFFER_const vb_dim[2]" (where 0: x, 1: y) */
 	video_dim_t                    __VIDEO_BUFFER_const vb_xdim;    /* Buffer physical dimension in X (in pixels) */
 	video_dim_t                    __VIDEO_BUFFER_const vb_ydim;    /* Buffer physical dimension in Y (in pixels) */
 	__uintptr_t                                         vb_refcnt;  /* Reference counter. */

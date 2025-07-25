@@ -308,14 +308,15 @@ do_showpic(struct video_buffer *screen,
 	{
 		static REF struct video_buffer *mask_buffer = NULL;
 		if (!mask_buffer) {
-			mask_buffer = video_buffer_create(VIDEO_BUFFER_AUTO, 64, 64,
-			                                  video_codec_lookup(VIDEO_CODEC_A1_MSB),
-			                                  NULL);
+			struct video_buffer_format format;
+			format.vbf_codec = video_codec_lookup(VIDEO_CODEC_A1_MSB);
+			format.vbf_flags = VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP;
+			mask_buffer = video_domain_newbuffer(video_buffer_getdomain(screen),
+			                                     &format, 64, 64,
+			                                     VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 			if (mask_buffer) {
 				struct video_gfx mask_gfx;
-				video_buffer_getgfx(mask_buffer, &mask_gfx,
-				                    GFX_BLENDMODE_OVERRIDE,
-				                    VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP, 0);
+				video_buffer_getgfx(mask_buffer, &mask_gfx, GFX_BLENDMODE_OVERRIDE);
 				video_gfx_fill(&mask_gfx, 0, 0, 64 - 1, 64 - 1, VIDEO_COLOR_RGBA(0, 0, 0, 0xff));
 				for (unsigned int i = 0; i < (32 / 4); ++i) {
 					unsigned int x = i * 4;
@@ -331,9 +332,7 @@ do_showpic(struct video_buffer *screen,
 		}
 		if (mask_buffer) {
 			struct video_gfx mask_gfx;
-			video_buffer_getgfx(mask_buffer, &mask_gfx,
-			                    GFX_BLENDMODE_ALPHAMASK,
-			                    VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP, 0);
+			video_buffer_getgfx(mask_buffer, &mask_gfx, GFX_BLENDMODE_ALPHAMASK);
 			/*video_gfx_stretch3(&screen_gfx, blit_x, blit_y,
 			                   &mask_gfx, 32, 32,
 			                   blit_w, blit_h,
@@ -442,22 +441,23 @@ do_showpic(struct video_buffer *screen,
 		struct video_gfx sized_gfx;
 		struct video_buffer *sized_buffer;
 #if 0 /* Using this method, pixel conversion only happens once */
-		struct video_buffer *format_buf = screen_buffer_asvideo(screen);
+		struct video_surface const *format_surf = video_buffer_assurface(screen_buffer_asvideo(screen));
 #else
-		struct video_buffer *format_buf = image;
+		struct video_surface const *format_surf = image;
 #endif
-		sized_buffer = video_buffer_create(VIDEO_BUFFER_AUTO,
-		                                   blit_w / tiles_x,
-		                                   blit_h / tiles_y,
-		                                   format_buf->vb_codec,
-		                                   format_buf->vb_surf.vs_pal);
+		struct video_buffer_format format;
+		video_surface_getformat(format_surf, &format);
+		sized_buffer = video_domain_newbuffer(video_surface_getdomain(format_surf),
+		                                      &format, blit_w / tiles_x, blit_h / tiles_y,
+		                                      VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		video_buffer_getgfx(sized_buffer, &sized_gfx, GFX_BLENDMODE_OVERRIDE);
 		video_gfx_stretch(&sized_gfx, 0, 0, video_gfx_getxdim(&sized_gfx), video_gfx_getydim(&sized_gfx),
 		                  &image_gfx, 0, 0, video_gfx_getxdim(&image_gfx), video_gfx_getydim(&image_gfx));
-		video_buffer_getgfx(sized_buffer, &sized_gfx,
-		                    video_gfx_getblend(&image_gfx),
-		                    video_gfx_getflags(&image_gfx),
-		                    video_gfx_getcolorkey(&image_gfx));
+		video_buffer_getgfx_ex(sized_buffer, &sized_gfx,
+		                       video_gfx_getblend(&image_gfx),
+		                       video_buffer_getpalette(sized_buffer),
+		                       video_gfx_getflags(&image_gfx),
+		                       video_gfx_getcolorkey(&image_gfx));
 		video_gfx_bitblit(&screen_gfx, blit_x, blit_y, &sized_gfx,
 		                  dst_offset + (video_gfx_getxdim(&sized_gfx) / 2),
 		                  dst_offset + (video_gfx_getydim(&sized_gfx) / 2),
@@ -564,7 +564,7 @@ int main(int argc, char *argv[]) {
 		rect.vr_ymin = 100;
 		rect.vr_xdim = screen_buffer_asvideo(screen)->vb_xdim - 200;
 		rect.vr_ydim = screen_buffer_asvideo(screen)->vb_ydim - 200;
-		bscreen = video_buffer_region(screen_buffer_asvideo(screen), &rect, 0);
+		bscreen = video_buffer_region(screen_buffer_asvideo(screen), &rect);
 		if (!bscreen)
 			err(EXIT_FAILURE, "Failed to load screen buffer");
 //		video_buffer_revoke(bscreen);
@@ -653,7 +653,7 @@ int main(int argc, char *argv[]) {
 	 * - dst format caching: ~97% spent sleeping  (=> x30 pixel output possible) */
 #if 0
 	anim = video_anim_cached(anim, NULL, NULL);
-#elif 0
+#elif 1
 	{
 		struct video_buffer_format format;
 		video_buffer_getformat(bscreen, &format);
