@@ -42,9 +42,11 @@
 #endif /* __cplusplus */
 
 #ifndef __INTELLISENSE__
-#include "../rect.h"
 #include "../crect.h"
+#include "../rect.h"
 #include "buffer.h"
+#include "codec/codec.h"
+#include "codec/palette.h"
 #endif /* !__INTELLISENSE__ */
 
 /* Flags for `video_gfx_update()' */
@@ -572,6 +574,31 @@ extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_gfx_flag_t video_gfx_getdef
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_pixel_t video_gfx_getdefaultcolorkey(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_hasdefaultcolorkey(struct video_gfx const *__restrict __self);
 
+/* Return a lower bound for the # of colors that a palette linked to this GFX has to
+ * have. If the GFX doesn't make use  of palettes, this returns an undefined  value. */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_pixel_t
+video_gfx_getpalcolorcount(struct video_gfx const *__restrict __self);
+
+/* Assign `__colors' to-be used as palette for `__self'. The caller must ensure that this array
+ * of colors remains allocated until a different palette is assigned, or the gfx (and any video
+ * buffer created from it) is disposed.
+ *
+ * Same as:
+ * >> video_gfx_setpalette(__self, video_palette_fromcolors(__colors), false);
+ *
+ * CAUTION: By assigning a non-object-based color palette, GFX operations will be drastically
+ *          slower, since the palette will have to be re-transmitted to the GPU or the window
+ *          manager with every GFX operation. */
+extern __ATTR_INOUT(1) __ATTR_NONNULL((2)) struct video_gfx *
+video_gfx_setpalcolors(struct video_gfx *__restrict __self,
+                       video_color_t const __colors[]);
+
+/* Return a pointer to the palette colors used by `__self', or `NULL' if no palette is being used. */
+extern __ATTR_WUNUSED __ATTR_IN(1) video_color_t const *
+video_gfx_getpalcolors(struct video_gfx const *__restrict __self);
+
+
+
 /* Helpers for reading the coords of the GFX's Clip- / I/O-Rect, relative to the
  * GFX context's buffer/surface,  AFTER being  swapped by  `VIDEO_GFX_F_XYSWAP'.
  *
@@ -1038,6 +1065,16 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 	 video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_COLORKEY))
 #define video_gfx_disablecolorkey(self) video_gfx_disableflags(self, VIDEO_GFX_UPDATE_COLORKEY)
 
+#define video_gfx_getdefaultpalette(self)  ((self)->vx_surf.vs_buffer->vb_surf.vs_pal)
+#define video_gfx_getdefaultflags(self)    ((self)->vx_surf.vs_buffer->vb_surf.vs_flags)
+#define video_gfx_getdefaultcolorkey(self) ((self)->vx_surf.vs_buffer->vb_surf.vs_colorkey)
+#define video_gfx_hasdefaultcolorkey(self) ((video_gfx_getdefaultflags(self) & VIDEO_GFX_F_COLORKEY) != 0)
+#define video_gfx_getpalcolorcount(self)   video_codec_getpalcolors(video_gfx_getcodec(self))
+#define video_gfx_setpalcolors(self, colors)                    \
+	((self)->vx_surf.vs_pal = video_palette_fromcolors(colors), \
+	 (self)->vx_surf.vs_flags &= ~VIDEO_GFX_F_PALOBJ,           \
+	 video_gfx_update(self, VIDEO_GFX_UPDATE_PALETTE))
+#define video_gfx_getpalcolors(self) video_palette_getcolors(video_gfx_getpalette(self))
 #define video_gfx_getcolor(self, x, y) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_getcolor)(self, x, y)
 #define video_gfx_putcolor(self, x, y, color) \

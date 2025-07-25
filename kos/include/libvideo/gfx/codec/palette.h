@@ -99,6 +99,18 @@ struct video_palette {
 extern __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct video_palette const *
 video_palette_fromcolors(video_color_t const __colors[]);
 
+/* Return a pointer to the array of colors described by `__self' */
+#ifdef __cplusplus
+extern "C++" {
+extern __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) video_color_t const *
+video_palette_getcolors(struct video_palette const *__restrict __self);
+extern __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) video_color_t *
+video_palette_getcolors(struct video_palette *__restrict __self);
+} /* extern "C++" */
+#else /* __cplusplus */
+#define video_palette_getcolors(self) ((self)->vp_pal)
+#endif /* !__cplusplus */
+
 /* Return the full palette object associated with `__self' */
 extern __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct video_palette_object *
 video_palette_asobject(struct video_palette const *__restrict __self);
@@ -137,6 +149,7 @@ extern __ATTR_NONNULL((1)) void video_palette_decref(/*obj*/struct video_palette
 #else /* __INTELLISENSE__ */
 #define video_palette_fromcolors(colors) \
 	((struct video_palette const *)(colors))
+#define video_palette_getcolors(self) ((self)->vp_pal)
 #define video_palette_asobject(self) \
 	((struct video_palette_object *)((__BYTE_TYPE__ *)(self) - __builtin_offsetof(struct video_palette_object, vp_pal)))
 #define video_palette_fromobject(self) \

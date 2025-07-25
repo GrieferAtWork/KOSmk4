@@ -99,16 +99,29 @@ extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_surface_hascolorkey(
 extern __ATTR_NONNULL((1)) void video_surface_enablecolorkey(struct video_surface *__restrict __self, video_pixel_t __colorkey);
 extern __ATTR_NONNULL((1)) void video_surface_disablecolorkey(struct video_surface *__restrict __self);
 
-/* Return a lower bound for the # of colors that a palette linked to this surface has to have */
+/* Return a lower bound for the # of colors that a palette linked to this surface has to
+ * have. If the surface doesn't make use  of palettes, this returns an undefined  value. */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_pixel_t
 video_surface_getpalcolorcount(struct video_surface const *__restrict __self);
 
 /* Assign `__colors' to-be used as palette for `__self'. The caller must ensure that this array
  * of  colors remains allocated until a different palette  is assigned, or the surface (and any
- * video buffer created from it) is disposed. */
+ * video buffer created from it) is disposed.
+ *
+ * Same as:
+ * >> video_surface_setpalette(__self, video_palette_fromcolors(__colors), false);
+ *
+ * CAUTION: By assigning a non-object-based color palette, GFX operations will be drastically
+ *          slower, since the palette will have to be re-transmitted to the GPU or the window
+ *          manager with every GFX operation. */
 extern __ATTR_NONNULL((1, 2)) void
 video_surface_setpalcolors(struct video_surface *__restrict __self,
                            video_color_t const __colors[]);
+
+/* Return a pointer to the palette colors used by `__self', or `NULL' if no palette is being used. */
+extern __ATTR_WUNUSED __ATTR_IN(1) video_color_t const *
+video_surface_getpalcolors(struct video_surface const *__restrict __self);
+
 
 /* Check if `__self' is the default surface of a `video_buffer' */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_surface_isbuffer(struct video_surface const *__restrict __self);
@@ -357,6 +370,7 @@ video_buffer_convert_distinct(struct video_buffer *__restrict __self,
 #define video_surface_disablecolorkey(self)            (void)((self)->vs_flags &= ~VIDEO_GFX_F_COLORKEY)
 #define video_surface_getpalcolorcount(self)           video_codec_getpalcolors(video_surface_getcodec(self))
 #define video_surface_setpalcolors(self, colors)       (void)((self)->vs_pal = video_palette_fromcolors(palette), (self)->vs_flags &= ~VIDEO_GFX_F_PALOBJ)
+#define video_surface_getpalcolors(self)               video_palette_getcolors(video_surface_getpalette(self))
 #define video_surface_getdefaultpalette(self)          video_buffer_getpalette(video_surface_getbuffer(self))
 #define video_surface_getdefaultflags(self)            video_buffer_getflags(video_surface_getbuffer(self))
 #define video_surface_getdefaultcolorkey(self)         video_buffer_getcolorkey(video_surface_getbuffer(self))
