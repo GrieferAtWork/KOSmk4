@@ -571,7 +571,7 @@ video_buffer_getgfx(struct video_buffer *__self,
                     gfx_blendmode_t __blendmode);
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_OUT(2) struct video_gfx *
 video_buffer_getgfx_ex(struct video_buffer *__self, struct video_gfx *__result,
-                       gfx_blendmode_t __blendmode, struct video_palette *__used_palette,
+                       gfx_blendmode_t __blendmode, struct video_palette const *__used_palette,
                        video_gfx_flag_t __used_flags, video_pixel_t __used_colorkey);
 
 

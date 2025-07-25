@@ -552,9 +552,6 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	/* Load default system font */
-	font = video_font_lookup(VIDEO_FONT_DEFAULT);
-
 	/* Bind the screen buffer. */
 	screen = screen_buffer_create(NULL);
 	if (!screen)
@@ -575,6 +572,10 @@ int main(int argc, char *argv[]) {
 #else
 	bscreen = screen_buffer_asvideo(screen);
 #endif
+
+	/* Load default system font */
+	font = video_font_lookup(video_buffer_getdomain(bscreen),
+	                         VIDEO_FONT_DEFAULT);
 
 #if 1
 	{

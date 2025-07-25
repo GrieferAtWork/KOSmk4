@@ -44,8 +44,9 @@ DECL_BEGIN
  *               or  an absolute path if it contains a `/'). Else, you
  *               may also pass one of `VIDEO_FONT_*'
  * @return: NULL: [errno=ENOENT] Unknown font `name' */
-INTDEF WUNUSED __REF struct video_font *CC
-libvideo_font_lookup(char const *name);
+INTDEF WUNUSED NONNULL((1)) __REF struct video_font *CC
+libvideo_font_lookup(struct video_domain const *__restrict domain,
+                     char const *name);
 
 /* Print text into a graphics context through use of this pformatprinter-compatible function. */
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC

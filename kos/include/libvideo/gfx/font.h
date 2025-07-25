@@ -35,34 +35,15 @@
 
 #include "../color.h" /* video_color_t */
 #include "../types.h"
-#include "gfx-flags.h"
-
-
-#if 0 /* TODO */
-/* Possible values for `video_font_gfx_flag_t' */
-#define VIDEO_FONT_GFX_F_NORMAL 0x0000               /* Normal font GFX flags */
-#define VIDEO_FONT_GFX_F_FGONLY VIDEO_GFX_F_COLORKEY /* Only render foreground */
-#define VIDEO_FONT_GFX_F_LINEAR VIDEO_GFX_F_LINEAR   /* Use linear interpolation when stretching non-vector glyphs */
-#endif
 
 #ifdef __CC__
 __DECL_BEGIN
-
-#if 0 /* TODO */
-/* Set of `VIDEO_FONT_GFX_F*' */
-typedef video_gfx_flag_t video_font_gfx_flag_t;
-#endif
 
 struct video_gfx;
 struct video_font;
 
 struct video_font_ops {
 	/* All operators within this structure are [1..1] */
-
-#if 0 /* TODO */
-	__ATTR_NONNULL_T((1)) void
-	(LIBVIDEO_GFX_CC *vfo_getgfx)(struct video_font *__restrict __self);
-#endif
 
 	/* Destroy the given video font object. */
 	__ATTR_NONNULL_T((1)) void
@@ -102,15 +83,9 @@ struct video_font_ops {
 
 
 struct video_font {
-#if 0 /* TODO */
-	struct video_font_ops      vf_ops;    /* [1..1][const] Operators. */
-	struct video_domain const *vf_domain; /* [1..1][const] Domain in which this font is opened. */
-	__uintptr_t                vf_refcnt; /* Reference counter. */
-	/* Remainder of this structure contains type-specific data. */
-#else
-	__uintptr_t            vf_refcnt; /* Reference counter. */
-	struct video_font_ops *vf_ops;    /* [1..1] Operators. */
-#endif
+	struct video_font_ops const *vf_ops;    /* [1..1][const] Operators. */
+	struct video_domain const   *vf_domain; /* [1..1][const] Domain for which this font was allocated. */
+	__uintptr_t                  vf_refcnt; /* Reference counter. */
 };
 
 #define video_font_destroy(self) (*(self)->vf_ops->vfo_destroy)(self)
@@ -123,37 +98,17 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_font, vf_refcnt, video_font_destroy)
 
 
 
-#if 0 /* TODO */
-struct video_font_gfx {
-	struct video_font const *vfx_font;     /* [1..1][const] The font used for printing. */
-	video_dim_t              vfx_height;   /* Glyph height. */
-	video_color_t            vfx_bg_fg[2]; /* Output colors for the next glyph. */
-	void                   *_vfx_drv1[2];  /* ... (may be used internally) */
-	video_font_gfx_flag_t    vfx_flags;    /* Set of `' */
-	void                   *_vfx_drv2[2];  /* ... (may be used internally) */
-};
-#endif
-
-
 /* Lookup and return a reference to a video font, given its name.
  * @param: name: The font's name (the name of a file in `/lib/fonts/',
  *               or  an absolute path if it contains a `/'). Else, you
  *               may also pass one of `VIDEO_FONT_*'
  * @return: NULL: [errno=ENOENT] Unknown font `name' */
-#if 0 /* TODO */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __REF struct video_font *
 (LIBVIDEO_GFX_CC *PVIDEO_FONT_LOOKUP)(struct video_domain const *__restrict __domain, char const *__name);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __REF struct video_font *LIBVIDEO_GFX_CC
 video_font_lookup(struct video_domain const *__restrict __domain, char const *__name);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-#else
-typedef __ATTR_WUNUSED_T __REF struct video_font *
-(LIBVIDEO_GFX_CC *PVIDEO_FONT_LOOKUP)(char const *__name);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_font *LIBVIDEO_GFX_CC video_font_lookup(char const *__name);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-#endif
 
 /* Special font names. */
 #define VIDEO_FONT_DEFAULT     (__CCAST(char const *)-1) /* Default system font. */

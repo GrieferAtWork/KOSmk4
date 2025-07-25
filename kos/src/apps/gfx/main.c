@@ -92,16 +92,17 @@ int main(int argc, char *argv[]) {
 
 	enable_rawtty_mode();
 
-	/* Load the video-mode font. */
-	font = video_font_lookup(VIDEO_FONT_FIXEDWIDTH);
-	if (!font)
-		err(EXIT_FAILURE, "Failed to load VIDEO_FONT_FIXEDWIDTH");
-
 	/* Bind the screen buffer. */
 	screen = screen_buffer_create(NULL);
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 	video_buffer_getgfx(screen, &gfx, GFX_BLENDMODE_ALPHA);
+
+	/* Load the video-mode font. */
+	font = video_font_lookup(video_gfx_getdomain(&gfx),
+	                         VIDEO_FONT_FIXEDWIDTH);
+	if (!font)
+		err(EXIT_FAILURE, "Failed to load VIDEO_FONT_FIXEDWIDTH");
 
 	fontprinter_data.vfp_height          = 16;
 	fontprinter_data.vfp_font            = font;

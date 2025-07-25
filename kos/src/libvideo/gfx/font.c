@@ -51,14 +51,15 @@
 
 DECL_BEGIN
 
-PRIVATE WUNUSED REF struct video_font *CC
-libvideo_font_openfile(char const *filename) {
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct video_font *CC
+libvideo_font_openfile(struct video_domain const *__restrict domain,
+                       char const *filename) {
 	struct mapfile mf;
 	REF struct video_font *result;
 	/* Map the font file into memory. */
 	if unlikely(mapfile(&mf, filename, 0, 0, (size_t)-1, 0, 0))
 		goto err;
-	result = libvideo_font_tryopen_tlft(&mf);
+	result = libvideo_font_tryopen_tlft(domain, &mf);
 	if (!result)
 		goto err_unmap;
 	if (result != (REF struct video_font *)-1)
@@ -74,8 +75,9 @@ err:
 }
 
 
-PRIVATE WUNUSED REF struct video_font *CC
-libvideo_font_create(char const *__restrict name) {
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct video_font *CC
+libvideo_font_create(struct video_domain const *__restrict domain,
+                     char const *__restrict name) {
 	char *full_name;
 	if (strchr(name, '/')) {
 		full_name = (char *)name;
@@ -90,7 +92,7 @@ libvideo_font_create(char const *__restrict name) {
 		p = (char *)mempcpy(p, name, namelen * sizeof(char));
 		*p = 0;
 	}
-	return libvideo_font_openfile(full_name);
+	return libvideo_font_openfile(domain, full_name);
 }
 
 
@@ -100,8 +102,9 @@ libvideo_font_create(char const *__restrict name) {
  *               or  an absolute path if it contains a `/'). Else, you
  *               may also pass one of `VIDEO_FONT_*'
  * @return: NULL: [errno=ENOENT] Unknown font `name' */
-INTERN WUNUSED REF struct video_font *CC
-libvideo_font_lookup(char const *name) {
+INTERN WUNUSED NONNULL((1)) REF struct video_font *CC
+libvideo_font_lookup(struct video_domain const *__restrict domain,
+                     char const *name) {
 	REF struct video_font *result;
 	if (VIDEO_FONT_ISPECIAL(name)) {
 		if (name == VIDEO_FONT_DEFAULT ||
@@ -117,7 +120,7 @@ libvideo_font_lookup(char const *name) {
 			return NULL;
 		}
 	}
-	result = libvideo_font_create(name);
+	result = libvideo_font_create(domain, name);
 	assert(!result || result->vf_ops);
 	assert(!result || result->vf_ops->vfo_destroy);
 	assert(!result || result->vf_ops->vfo_drawglyph);

@@ -125,6 +125,9 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	if (video_gfx_getxdim(src_gfx) == 0 || video_gfx_getydim(src_gfx) == 0) {
 		ctx->vbt_ops = &libvideo_emptyblitter_ops;
 	} else if (src_buffer == dst_buffer) {
+		if (video_gfx_hascolorkey(src_gfx)) {
+			/* TODO */
+		}
 		if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
 			drv->bsw_stretch         = &libvideo_swblitter_samebuf__stretch_l;
 			drv->bsw_stretch_imatrix = &libvideo_swblitter_samebuf__stretch_imatrix_l;
@@ -132,8 +135,7 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			drv->bsw_stretch         = &libvideo_swblitter_samebuf__stretch_n;
 			drv->bsw_stretch_imatrix = &libvideo_swblitter_samebuf__stretch_imatrix_n;
 		}
-		if (VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_surf.vs_colorkey) &&
-		    libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
+		if (libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
 			drv->bsw_blit         = &libvideo_swblitter_noblend_samebuf__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samebuf__blit_imatrix;
 		} else {
@@ -145,8 +147,9 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			drv->bsw_blit_imatrix = &libvideo_swblitter_samebuf__blit_imatrix;
 		}
 	} else if (libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
-		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_surf.vs_colorkey))
-			goto set_generic_operators;
+		if (video_gfx_hascolorkey(src_gfx)) {
+			/* TODO */
+		}
 		if (noblend_blit_compatible(dst_buffer->vb_codec,
 		                            src_buffer->vb_codec) &&
 		    src_buffer->vb_surf.vs_pal == dst_buffer->vb_surf.vs_pal) {
@@ -190,7 +193,11 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			}
 		}
 	} else {
-set_generic_operators:
+		/* TODO: Dedicated optimization when "src_buffer" uses P1_MSB (for TLFT font rendering) */
+
+		if (video_gfx_hascolorkey(src_gfx)) {
+			/* TODO */
+		}
 		drv->bsw_blit         = &libvideo_swblitter_generic__blit;
 		drv->bsw_blit_imatrix = &libvideo_swblitter_generic__blit_imatrix;
 		if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
@@ -236,11 +243,13 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 
 		/* TODO: Special handling when buffers overlap */
 
-		/* Filter out contexts that prevent use of special optimizations */
-		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_surf.vs_colorkey))
-			goto set_generic_operators;
-		if (!VIDEO_COLOR_ISTRANSPARENT(rddst_gfx->vx_surf.vs_colorkey))
-			goto set_generic_operators;
+		/* Special handling when surfaces have color keys */
+		if (video_gfx_hascolorkey(src_gfx)) {
+			/* TODO */
+		}
+		if (video_gfx_hascolorkey(rddst_gfx)) {
+			/* TODO */
+		}
 
 		/* Check for cases where we provide special optimizations */
 		if likely(libvideo_gfx_allow_noblend_blit3(wrdst_gfx, rddst_gfx, src_gfx)) {
@@ -306,7 +315,12 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 				}
 			}
 		} else {
-set_generic_operators:
+			if (video_gfx_hascolorkey(src_gfx)) {
+				/* TODO */
+			}
+			if (video_gfx_hascolorkey(rddst_gfx)) {
+				/* TODO */
+			}
 			drv->bsw3_blit         = &libvideo_swblitter3__blit__generic;
 			drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__generic;
 			if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
