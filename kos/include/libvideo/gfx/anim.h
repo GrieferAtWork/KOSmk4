@@ -58,7 +58,7 @@ struct video_anim_frame {
 	/* Animation-specific frame data goes here... */
 };
 
-#define video_anim_frame_fini(self) ((self)->vaf_fini)(self)
+#define video_anim_frame_fini(self) (*(self)->vaf_fini)(self)
 
 
 struct video_anim_ops {

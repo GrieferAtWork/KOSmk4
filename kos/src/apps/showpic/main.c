@@ -653,7 +653,7 @@ int main(int argc, char *argv[]) {
 	 * - dst format caching: ~97% spent sleeping  (=> x30 pixel output possible) */
 #if 0
 	anim = video_anim_cached(anim, NULL, NULL);
-#elif 1
+#elif 0
 	{
 		struct video_buffer_format format;
 		video_buffer_getformat(bscreen, &format);

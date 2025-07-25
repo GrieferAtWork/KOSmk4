@@ -334,9 +334,9 @@ return_next_cached_frame:
 		me->ca_bbuf = NULL;
 		me->ca_base = NULL;
 		shared_lock_release(&me->ca_lock);
-		video_anim_decref(old_base);
 		video_anim_frame_fini(old_bbuf);
 		free(old_bbuf);
+		video_anim_decref(old_base);
 		next_id = 0;
 		goto return_next_cached_frame;
 	}
@@ -368,7 +368,8 @@ err_lock_bbuf_fini:
 	assert(cframe == &me->ca_framev[next_id]);
 unlock_and_return_frame:
 	assert(next_id < me->ca_framec);
-	assertf(atomic_read(&frame->vaf_frame->vb_refcnt) >= 2, "1 by the cache, and one by the caller");
+	assertf(atomic_read(&frame->vaf_frame->vb_refcnt) >= 2,
+	        "1 by the cache, and one by the caller");
 	atomic_dec(&frame->vaf_frame->vb_refcnt);
 	video_buffer_incref(cframe->cf_frame);
 	cframe = &me->ca_framev[next_id];

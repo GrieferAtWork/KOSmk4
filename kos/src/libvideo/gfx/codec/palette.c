@@ -425,7 +425,8 @@ done:
 
 PRIVATE NONNULL((1)) void
 NOTHROW(CC default_video_palette_destroy)(struct video_palette *__restrict self) {
-	free(self);
+	struct video_palette_object *me = video_palette_asobject(self);
+	free(me);
 }
 
 
@@ -453,8 +454,9 @@ libvideo_generic_palette_create(struct video_domain const *__restrict domain,
 	                                                   (count * sizeof(struct video_palette_cache)));
 	if unlikely(!result)
 		goto err;
-	result->vp_color2pixel = video_palette_get_special_color2pixel(count)
-	                         ?: &linear_video_palette_color2pixel;
+	result->vp_color2pixel = video_palette_get_special_color2pixel(count);
+	if (result->vp_color2pixel == NULL)
+		result->vp_color2pixel = &linear_video_palette_color2pixel;
 	result->vp_ops    = _generic_palette_ops();
 	result->vp_refcnt = 1;
 	result->vp_cnt    = count;
