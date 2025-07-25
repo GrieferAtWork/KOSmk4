@@ -49,6 +49,22 @@ struct video_font_ops {
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *vfo_destroy)(struct video_font *__restrict __self);
 
+
+	/* TODO: Instead  of directly exposing  function to draw  glyphs, there needs to
+	 *       be an API `vfo_getgfx()' that initializes a caller-provided,  variable-
+	 *       length (as in: we define `size_t vfo_gfxsize;' here) buffer, that  then
+	 *       gets filled in similar to how `video_gfx' gets filled by `video_buffer'
+	 *
+	 * >> struct video_fontgfx *vfo_getgfx(struct video_fontgfx *__restrict __result);
+	 * - Caller has already initialized a couple of standard fields of the struct,
+	 *   including a pointer to our `struct video_font'.
+	 *
+	 * For TLFT fonts, that GFX context could then simply embed the `struct video_gfx'
+	 * used for accessing the  character bitmask within `struct video_fontgfx',  which
+	 * it currently has to re-create every time `vfo_drawglyph2()' is called. */
+
+
+
 	/* Draw a single glyph at the given coords and return its width.
 	 * If the glyph was not recognized (or when `__height' was `0'), return 0 instead. */
 	__ATTR_IN_T(1) __ATTR_IN_T(2) video_dim_t
