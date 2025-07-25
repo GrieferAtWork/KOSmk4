@@ -53,14 +53,6 @@
 
 DECL_BEGIN
 
-static_assert(offsetof(struct video_palette2, vp_color2pixel) == offsetof(struct video_palette, vp_color2pixel));
-static_assert(offsetof(struct video_palette2, vp_destroy) == offsetof(struct video_palette, vp_destroy));
-static_assert(offsetof(struct video_palette2, vp_refcnt) == offsetof(struct video_palette, vp_refcnt));
-static_assert(offsetof(struct video_palette2, _vp_tree) == offsetof(struct video_palette, _vp_tree));
-static_assert(offsetof(struct video_palette2, vp_flags) == offsetof(struct video_palette, vp_flags));
-static_assert(offsetof(struct video_palette2, vp_cnt) == offsetof(struct video_palette, vp_cnt));
-static_assert(offsetof(struct video_palette2, vp_pal) == offsetof(struct video_palette, vp_pal));
-
 PRIVATE NONNULL((1)) void FCC
 bitmask_destroy(struct video_buffer *__restrict self) {
 	free(self);
@@ -148,8 +140,8 @@ bitmask_gfx_optimize(struct video_gfx *__restrict self) {
 	if likely(drv->xsw_getcolor == &libvideo_swgfx_generic__getcolor) {
 		struct old_bitmask_buffer *me = (struct old_bitmask_buffer *)video_gfx_getbuffer(self);
 		drv->xsw_getcolor = &bitmask_gfx__getcolor;
-		drv->gbmd_pal[0] = me->bmb_pal.vp_pal[0];
-		drv->gbmd_pal[1] = me->bmb_pal.vp_pal[1];
+		drv->gbmd_pal[0] = me->bmb_pal[0];
+		drv->gbmd_pal[1] = me->bmb_pal[1];
 	}
 }
 
@@ -215,12 +207,11 @@ old_bitmask_buffer_init(struct old_bitmask_buffer *__restrict self,
 	memcpy(&self->bmb_bm, bm, sizeof(struct video_bitmask));
 	self->bmb_bm.vbm_mask = (byte_t const *)self->bmb_bm.vbm_mask + (self->bmb_bm.vbm_skip >> 3);
 	self->bmb_bm.vbm_skip &= 7;
-	self->bmb_pal.vp_cnt = 2;
-	self->bmb_pal.vp_pal[0] = bg_fg_colors[0];
-	self->bmb_pal.vp_pal[1] = bg_fg_colors[1];
-	self->vb_surf.vs_pal    = libvideo_palette_optimize((struct video_palette *)&self->bmb_pal); /* For "vp_color2pixel" */
+	self->bmb_pal[0] = bg_fg_colors[0];
+	self->bmb_pal[1] = bg_fg_colors[1];
+	self->vb_surf.vs_pal    = video_palette_fromcolors(self->bmb_pal);
 	self->vb_surf.vs_buffer = self;
-	self->vb_surf.vs_flags  = VIDEO_GFX_F_NORMAL;
+	self->vb_surf.vs_flags  = VIDEO_GFX_F_NORMAL; /* Note how `VIDEO_GFX_F_PALOBJ' isn't set here! */
 	/*self->vb_surf.vs_colorkey = 0;*/
 	self->vb_codec = libvideo_codec_lookup(VIDEO_CODEC_P1_MSB);
 	assert(self->vb_codec);
@@ -229,10 +220,7 @@ old_bitmask_buffer_init(struct old_bitmask_buffer *__restrict self,
 	self->vb_ydim = size_y;
 #ifndef NDEBUG
 	self->vb_refcnt = 0; /* To hopefully cause assert fault it someone tries to incref() */
-	self->bmb_pal.vp_refcnt = 0; /* To hopefully cause assert fault it someone tries to incref() */
 	memset(&self->vb_domain, 0xcc, sizeof(self->vb_domain));
-	memset(&self->bmb_pal._vp_tree, 0xcc, sizeof(self->bmb_pal._vp_tree));
-	memset(&self->bmb_pal.vp_destroy, 0xcc, sizeof(self->bmb_pal.vp_destroy));
 #endif /* !NDEBUG */
 	return self;
 }

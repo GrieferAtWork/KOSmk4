@@ -561,8 +561,9 @@ extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct v
 extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_domain const *video_gfx_getdomain(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_codec *video_gfx_getcodec(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_buffer *video_gfx_getbuffer(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_hasobjpalette(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) struct video_palette *video_gfx_getpalette(struct video_gfx const *__restrict __self);
-extern __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) struct video_gfx *video_gfx_setpalette(struct video_gfx *__restrict __self, struct video_palette *__palette);
+extern __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) struct video_gfx *video_gfx_setpalette(struct video_gfx *__restrict __self, struct video_palette *__palette, __BOOL __isobj);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_hascolorkey(struct video_gfx const *__restrict __self);
 extern __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct video_gfx *video_gfx_enablecolorkey(struct video_gfx *__restrict __self, video_pixel_t __colorkey);
 extern __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct video_gfx *video_gfx_disablecolorkey(struct video_gfx *__restrict __self);
@@ -1023,9 +1024,14 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 #define video_gfx_getdomain(self)             video_buffer_getdomain(video_gfx_getbuffer(self))
 #define video_gfx_getcodec(self)              video_buffer_getcodec(video_gfx_getbuffer(self))
 #define video_gfx_getbuffer(self)             (self)->vx_surf.vs_buffer
+#define video_gfx_hasobjpalette(self)         (((self)->vx_surf.vs_flags & VIDEO_GFX_F_PALOBJ) != 0)
 #define video_gfx_getpalette(self)            (self)->vx_surf.vs_pal
-#define video_gfx_setpalette(self, palette)   ((self)->vx_surf.vs_pal = (palette), video_gfx_update(self, VIDEO_GFX_UPDATE_PALETTE))
-#define video_gfx_hascolorkey(self)           ((video_gfx_getflags(self) & VIDEO_GFX_F_COLORKEY) != 0)
+#define video_gfx_setpalette(self, palette, isobj)                                 \
+	((self)->vx_surf.vs_pal   = (palette),                                         \
+	 (self)->vx_surf.vs_flags = ((self)->vx_surf.vs_flags & ~VIDEO_GFX_F_PALOBJ) | \
+	                            ((isobj) ? VIDEO_GFX_F_PALOBJ : 0),                \
+	 video_gfx_update(self, VIDEO_GFX_UPDATE_PALETTE))
+#define video_gfx_hascolorkey(self) ((video_gfx_getflags(self) & VIDEO_GFX_F_COLORKEY) != 0)
 #define video_gfx_enablecolorkey(self, colorkey)       \
 	((self)->vx_surf.vs_flags |= VIDEO_GFX_F_COLORKEY, \
 	 (self)->vx_surf.vs_colorkey = (colorkey),         \
@@ -1138,9 +1144,9 @@ public:
  * >>     struct video_gfx dst_gfx;
  * >>     struct video_gfx src_gfx;
  * >>     struct video_gfx mask_gfx;
- * >>     video_buffer_getgfx(dst, &dst_gfx, GFX_BLENDMODE_ALPHA, VIDEO_GFX_F_NORMAL, 0);
- * >>     video_buffer_getgfx(src, &src_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0); // Blend mode doesn't matter
- * >>     video_buffer_getgfx(mask, &mask_gfx, GFX_BLENDMODE_ALPHAMASK, VIDEO_GFX_F_NORMAL, 0);
+ * >>     video_buffer_getgfx(dst, &dst_gfx, GFX_BLENDMODE_ALPHA);
+ * >>     video_buffer_getgfx(src, &src_gfx, GFX_BLENDMODE_OVERRIDE); // Blend mode doesn't matter
+ * >>     video_buffer_getgfx(mask, &mask_gfx, GFX_BLENDMODE_ALPHAMASK);
  * >>     video_gfx_bitblit3(&dst_gfx, 0, 0, &mask_gfx, 0, 0, &src_gfx, 0, 0,
  * >>                        video_gfx_getxdim(&src_gfx), video_gfx_getxdim(&dst_gfx));
  * >> }

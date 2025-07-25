@@ -162,8 +162,9 @@ svga_screen_destroy(struct video_buffer *__restrict self) {
 #define LOGERR(format, ...) \
 	syslog(LOG_ERR, "[libvideo][svga-screen:%d] " format, __LINE__, ##__VA_ARGS__)
 
-PRIVATE WUNUSED NONNULL((1)) REF struct video_palette *CC
-svga_palette_new(struct svga_chipset *__restrict cs, shift_t colorbits) {
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct video_palette *CC
+svga_palette_new(struct video_domain const *__restrict domain,
+                 struct svga_chipset *__restrict cs, shift_t colorbits) {
 	video_pixel_t i, palsize;
 	struct video_palette *result;
 	struct svga_palette_color *colors;
@@ -178,7 +179,7 @@ svga_palette_new(struct svga_chipset *__restrict cs, shift_t colorbits) {
 	(*cs->sc_modeops.sco_getpal)(cs, 0, palsize, colors);
 
 	/* Allocate video palette */
-	result = libvideo_palette_create(palsize);
+	result = video_domain_newpalette(domain, palsize);
 	if unlikely(!result) {
 		LOGERR("Failed to allocate palette controller: %m\n");
 		freea(colors);
@@ -190,7 +191,7 @@ svga_palette_new(struct svga_chipset *__restrict cs, shift_t colorbits) {
 		result->vp_pal[i] = vcolor;
 	}
 	freea(colors);
-	return libvideo_palette_optimize(result);
+	return video_palette_optimize(result);
 err:
 	return NULL;
 }
@@ -446,14 +447,17 @@ find_hinted_mode:
 	 * it with whatever is currently configured  by the chipset. In theory,  we
 	 * could also just come up with a  new palette here, but again: use  what's
 	 * already there, so another program can pre-configure it for us. */
-	result->vb_surf.vs_pal = NULL;
+	result->vb_domain = _libvideo_ramdomain();
+	result->vb_surf.vs_pal   = NULL;
+	result->vb_surf.vs_flags = VIDEO_GFX_F_NORMAL;
 	if (result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
 		shift_t cbits = result->vb_codec->vc_specs.vcs_cbits;
-		result->vb_surf.vs_pal = svga_palette_new(&result->ss_cs, cbits);
+		result->vb_surf.vs_pal = svga_palette_new(result->vb_domain, &result->ss_cs, cbits);
 		if unlikely(!result->vb_surf.vs_pal) {
 			LOGERR("Failed to allocate palette controller: %m\n");
 			goto err_svga_vdlck_libsvgadrv_r_cs_mode_codec;
 		}
+		result->vb_surf.vs_flags |= VIDEO_GFX_F_PALOBJ;
 	}
 
 	/* Load physical memory mapping functions. */
@@ -489,10 +493,8 @@ find_hinted_mode:
 
 	/* Fill in remaining fields of "result" */
 	result->vb_surf.vs_buffer   = result;
-	result->vb_surf.vs_flags    = VIDEO_GFX_F_NORMAL;
 	result->vb_surf.vs_colorkey = 0;
 	result->vb_refcnt     = 1;
-	result->vb_domain     = _libvideo_ramdomain();
 	result->vb_ops        = &result->ss_ops.sbo_video;
 	result->vb_xdim       = mode->smi_resx;
 	result->vb_ydim       = mode->smi_resy;

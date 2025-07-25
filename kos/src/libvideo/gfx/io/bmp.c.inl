@@ -483,7 +483,9 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	}
 
 	/* Build output buffer codec specs. */
+	format.vbf_flags = VIDEO_GFX_F_NORMAL;
 	if (biClrUsed) {
+		struct video_palette *palette;
 		/* Palette-driven format */
 		if (biBitCount > 255)
 			Egoto(badfmt);
@@ -492,36 +494,37 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 		out_specs.vcs_gmask = out_specs.vcs_rmask;
 		out_specs.vcs_bmask = out_specs.vcs_rmask;
 
-		format.vbf_pal = libvideo_palette_create(biClrUsed);
-		if unlikely(!format.vbf_pal)
+		palette = video_domain_newpalette(domain_hint, biClrUsed);
+		if unlikely(!palette)
 			goto err;
 
 		/* Read palette */
 		if (biSize == 12) {
 			size_t i;
-			byte_t const *pal_end = reader + (format.vbf_pal->vp_cnt * 3);
+			byte_t const *pal_end = reader + (biClrUsed * 3);
 			if unlikely(pal_end >= blobEOF)
 				Egoto(badfmt_pal);
-			for (i = 0; i < format.vbf_pal->vp_cnt; ++i) {
+			for (i = 0; i < biClrUsed; ++i) {
 				uint8_t b = *reader++;
 				uint8_t g = *reader++;
 				uint8_t r = *reader++;
-				format.vbf_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
+				palette->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
 			}
 		} else {
 			size_t i;
-			byte_t const *pal_end = reader + (format.vbf_pal->vp_cnt * 4);
+			byte_t const *pal_end = reader + (biClrUsed * 4);
 			if unlikely(pal_end >= blobEOF)
 				Egoto(badfmt_pal);
-			for (i = 0; i < format.vbf_pal->vp_cnt; ++i) {
+			for (i = 0; i < biClrUsed; ++i) {
 				uint8_t b = *reader++;
 				uint8_t g = *reader++;
 				uint8_t r = *reader++;
 				++reader; /* 4th element should be ignored */
-				format.vbf_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
+				palette->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
 			}
 		}
-		format.vbf_pal = libvideo_palette_optimize(format.vbf_pal);
+		format.vbf_pal = video_palette_optimize(palette);
+		format.vbf_flags = VIDEO_GFX_F_PALOBJ;
 	} else {
 		/* Color-mask-driven format */
 		out_specs.vcs_flags = VIDEO_CODEC_FLAG_NORMAL;
@@ -537,7 +540,6 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	format.vbf_codec = libvideo_codec_fromspecs(&out_specs);
 	if unlikely(!format.vbf_codec)
 		goto err_pal;
-	format.vbf_flags = VIDEO_GFX_F_NORMAL;
 
 	/* Check for special case: try to inherit BMP file and use as-is as video buffer. */
 	if (p_mapfile && biCompression == BI_BITFIELDS &&
@@ -559,7 +561,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 			free(mapfile_cookie);
 			goto err_pal_codec;
 		}
-		if (format.vbf_pal)
+		if (format.vbf_flags & VIDEO_GFX_F_PALOBJ)
 			video_palette_decref(format.vbf_pal);
 		video_codec_decref(format.vbf_codec);
 		bzero(p_mapfile, sizeof(*p_mapfile)); /* Stolen by `mapfile_cookie' */
@@ -574,7 +576,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result)
 		goto err_pal_codec;
-	if (format.vbf_pal)
+	if (format.vbf_flags & VIDEO_GFX_F_PALOBJ)
 		video_palette_decref(format.vbf_pal);
 	video_codec_decref(format.vbf_codec);
 	if unlikely(video_buffer_wlock(result, &result_lock))
@@ -631,7 +633,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 		fix_missing_alpha_channel(result);
 	return result;
 badfmt_pal:
-	if (format.vbf_pal)
+	if (format.vbf_flags & VIDEO_GFX_F_PALOBJ)
 		video_palette_decref(format.vbf_pal);
 badfmt:
 	return VIDEO_BUFFER_WRONG_FMT;
@@ -641,7 +643,7 @@ err_r:
 err_pal_codec:
 	video_codec_decref(format.vbf_codec);
 err_pal:
-	if (format.vbf_pal)
+	if (format.vbf_flags & VIDEO_GFX_F_PALOBJ)
 		video_palette_decref(format.vbf_pal);
 err:
 	return NULL;
@@ -673,9 +675,10 @@ libvideo_surface_save_bmp(struct video_surface const *__restrict self,
 	DWORD dwPixelScanline;
 
 	/* Check for codec types that cannot be written as-it into a BMP file */
-	if ((codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM))
-	    ? (codec->vc_specs.vcs_bpp > 8 || codec->vc_specs.vcs_amask || (pal && pal->vp_cnt > 256))
-	    : (codec->vc_specs.vcs_bpp <= 8)) {
+	if (((codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM))
+	     ? (codec->vc_specs.vcs_bpp > 8 || codec->vc_specs.vcs_amask)
+	     : (codec->vc_specs.vcs_bpp <= 8)) ||
+	    (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_SPECIAL)) {
 		/* Codecs with BPP <= 8 **MUST** use a palette (or the emulated grayscale palette).
 		 * If that isn't the case  for "self", then we must  convert to a different  codec. */
 		int result;
@@ -751,12 +754,13 @@ libvideo_surface_save_bmp(struct video_surface const *__restrict self,
 	if (pal) {
 		/* Got a palette: must use "BI_RGB" and encode it */
 		size_t i;
+		video_pixel_t colors = (video_pixel_t)1 << codec->vc_specs.vcs_cbits;
 		hdr.bmInfo.biCompression = BI_RGB;
-		hdr.bmInfo.biClrUsed     = pal->vp_cnt;
+		hdr.bmInfo.biClrUsed     = colors;
 		hdr.bmInfo.biSize        = sizeof(hdr.bmInfo);
 		hdr.bmFile.bfOffBits = offsetof(struct bm_hdr, bmPalette) +
-		                       (pal->vp_cnt * sizeof(struct bmp_pal_color));
-		for (i = 0; i < pal->vp_cnt; ++i) {
+		                       (colors * sizeof(struct bmp_pal_color));
+		for (i = 0; i < colors; ++i) {
 			video_color_t col = pal->vp_pal[i];
 			hdr.bmPalette[i].r = VIDEO_COLOR_GET_RED(col);
 			hdr.bmPalette[i].g = VIDEO_COLOR_GET_GREEN(col);

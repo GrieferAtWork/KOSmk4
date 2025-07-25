@@ -51,6 +51,7 @@
 
 #include "buffer.h"
 #include "buffer/utils.h"
+#include "codec/palette.h"
 #include "gfx-empty.h"
 #include "ramdomain.h"
 
@@ -379,6 +380,7 @@ DEFINE_PUBLIC_ALIAS(video_ramdomain, _libvideo_ramdomain);
 INTERN /*ATTR_CONST*/ ATTR_RETNONNULL WUNUSED
 struct video_domain const *CC _libvideo_ramdomain(void) {
 	if unlikely(!libvideo_ramdomain.vd_newbuffer) {
+		libvideo_ramdomain.vd_newpalette      = &libvideo_generic_palette_create;
 		libvideo_ramdomain.vd_supported_codec = &libvideo_ramdomain_supported_codec;
 		libvideo_ramdomain.vd_formem          = &libvideo_ramdomain_formem;
 		COMPILER_WRITE_BARRIER();

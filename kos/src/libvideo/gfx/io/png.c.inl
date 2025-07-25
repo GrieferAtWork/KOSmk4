@@ -277,7 +277,9 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 		color_type |= LIBPNG_COLOR_MASK_ALPHA;
 	}
 
+	result_format.vbf_flags = VIDEO_GFX_F_NORMAL;
 	if (color_type & LIBPNG_COLOR_MASK_PALETTE) {
+		struct video_palette *palette;
 		libpng_colorp png_palette;
 		int png_num_palette;
 		unsigned int pal_i;
@@ -309,16 +311,17 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 		}
 
 		/* Construct palette */
-		result_format.vbf_pal = libvideo_palette_create((unsigned int)png_num_palette);
-		if unlikely(!result_format.vbf_pal)
+		palette = video_domain_newpalette(domain_hint, (unsigned int)png_num_palette);
+		if unlikely(!palette)
 			goto err_png_ptr_info_ptr;
 		for (pal_i = 0; pal_i < (unsigned int)png_num_palette; ++pal_i) {
 			video_color_t color = VIDEO_COLOR_RGB(png_palette[pal_i].red,
 			                                      png_palette[pal_i].green,
 			                                      png_palette[pal_i].blue);
-			result_format.vbf_pal->vp_pal[pal_i] = color;
+			palette->vp_pal[pal_i] = color;
 		}
-		result_format.vbf_pal = libvideo_palette_optimize(result_format.vbf_pal);
+		result_format.vbf_pal = video_palette_optimize(palette);
+		result_format.vbf_flags |= VIDEO_GFX_F_PALOBJ;
 	} else if (!(color_type & LIBPNG_COLOR_MASK_COLOR)) {
 		/* Grayscale (aka. luminance) */
 		/*png_set_packswap(png_ptr);*/ /* If we called this, below would become *_LSB */
@@ -366,7 +369,6 @@ do_rgb_format:
 	assertf(result_format.vbf_codec, "Built-in codec should have been recognized");
 
 	/* Allocate result video buffer. */
-	result_format.vbf_flags = VIDEO_GFX_F_NORMAL;
 	result = _video_domain_newbuffer(domain_hint, &result_format,
 	                                 width, height, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result) {

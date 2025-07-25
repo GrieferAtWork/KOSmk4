@@ -32,39 +32,15 @@
 
 DECL_BEGIN
 
-/* Create a new (uninitialized) palette for `count' colors.
- *
- * This function is allowed to allocate a larger palette  than
- * requested if doing  so improves  performances, though  when
- * this is done, all additional palette entries will have been
- * initialized to `0'
- *
- * On success, the caller must initialize:
- * - return->vp_pal[0]
- * - return->vp_pal[1]
- * - ...
- * - return->vp_pal[count - 2]
- * - return->vp_pal[count - 1]
- *
- * @return: * :   The newly created palette
- * @return: NULL: Out of memory */
-INTDEF WUNUSED REF struct video_palette *FCC
-libvideo_palette_create(video_pixel_t count);
+/* Generic (slow/fallback) pixel->color conversion function */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+libvideo_palette_color2pixel_generic(struct video_palette const *__restrict self,
+                                     video_pixel_t n_colors, video_color_t color);
 
-
-/* Optimize lookup times for `self', making `self->vp_color2pixel'
- * execute in sub-linear time (if possible). This function must be
- * called whenever `vp_pal' was  modified, and was called  before.
- * Prior  to being called, `self->vp_color2pixel' still works, but
- * executed in linear time (so you really want to call this one to
- * speed up palette lookups)
- *
- * This  function  is NOT  thread-safe,  so `self->vp_color2pixel'
- * must not be called by other threads until this function returns
- * @return: * : The optimized color palette */
-INTDEF ATTR_RETNONNULL WUNUSED ATTR_INOUT(1) REF struct video_palette *FCC
-libvideo_palette_optimize(/*inherited(always)*/ REF struct video_palette *__restrict self);
-
+/* Generic palette object creator (used by ramdomain) */
+INTDEF WUNUSED NONNULL((1)) REF struct video_palette *CC
+libvideo_generic_palette_create(struct video_domain const *__restrict domain,
+                                video_pixel_t count);
 
 DECL_END
 

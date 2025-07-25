@@ -617,7 +617,7 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		struct video_lock pal_lock;
 		REF struct video_buffer *dcol_buffer;
 		struct video_buffer_format format;
-		struct video_palette *pal = frame->vb_surf.vs_pal;
+		struct video_palette const *pal = frame->vb_surf.vs_pal;
 		assert(pal);
 
 		/* Only the transparency-config of the first frame (i.e. the "gobal transparency")
@@ -935,6 +935,7 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	byte_t const *reader = me->ga_frame1;
 	byte_t const *eof = me->ga_eof;
 	struct video_buffer_format format;
+	struct video_palette *palette;
 	byte_t ctrl;
 	uint16_t frame_x, frame_y;
 	uint16_t frame_w, frame_h;
@@ -980,8 +981,8 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	/* First frame can always be rendered using a palette */
 	format.vbf_codec = libvideo_codec_lookup(VIDEO_CODEC_P8);
 	assertf(format.vbf_codec, "Built-in codec should have been recognized");
-	format.vbf_pal = libvideo_palette_create(256);
-	if unlikely(!format.vbf_pal)
+	palette = video_domain_newpalette(me->va_domain, 256);
+	if unlikely(!palette)
 		goto err;
 	{
 		video_pixel_t i;
@@ -990,16 +991,17 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 			byte_t r = *lct_reader++;
 			byte_t g = *lct_reader++;
 			byte_t b = *lct_reader++;
-			format.vbf_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
+			palette->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
 			if (i == me->ga_cfg.gc_trans)
-				format.vbf_pal->vp_pal[i] = 0;
+				palette->vp_pal[i] = 0;
 		}
 		/* Optimize palette after it was populated */
-		format.vbf_pal = libvideo_palette_optimize(format.vbf_pal);
+		palette = video_palette_optimize(palette);
 	}
 
 	/* Create main animation frame buffer */
-	format.vbf_flags = VIDEO_GFX_F_NORMAL;
+	format.vbf_pal   = palette;
+	format.vbf_flags = VIDEO_GFX_F_PALOBJ;
 	result = _video_domain_newbuffer(me->va_domain, &format,
 	                                 me->va_xdim, me->va_ydim,
 	                                 (me->ga_cfg.gc_trans <= 0xff && me->ga_cfg.gc_trans != 0)

@@ -46,10 +46,10 @@ struct video_buffer;
  *       as argument) don't have to add any offset before  derefing
  *       the surface argument in order to access the palette. */
 struct video_surface {
-	struct video_palette *vs_pal;      /* [0..1] Used color palette */
-	struct video_buffer  *vs_buffer;   /* [1..1] Video buffer. */
-	video_gfx_flag_t      vs_flags;    /* Special buffer/gfx flags (set of `VIDEO_GFX_F_*') */
-	video_pixel_t         vs_colorkey; /* [valid_if(vs_flags & VIDEO_GFX_F_COLORKEY)] Color key */
+	struct video_palette const *vs_pal;      /* [0..1] Used color palette (only object-based if `vs_flags & VIDEO_GFX_F_PALOBJ') */
+	struct video_buffer        *vs_buffer;   /* [1..1] Video buffer. */
+	video_gfx_flag_t            vs_flags;    /* Special buffer/gfx flags (set of `VIDEO_GFX_F_*') */
+	video_pixel_t               vs_colorkey; /* [valid_if(vs_flags & VIDEO_GFX_F_COLORKEY)] Color key */
 };
 
 __DECL_END

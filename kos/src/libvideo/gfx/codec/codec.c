@@ -3089,27 +3089,33 @@ DEFINE_FORMAT_CONVERTER_RGBX(xbgr2222, uint8_t, 2, 2, 2, (
 INTERN ATTR_PURE WUNUSED NONNULL((1)) video_color_t
 (FCC pal_pixel2color)(struct video_surface const *__restrict surface,
                       video_pixel_t pixel) {
-	struct video_palette const *pal = surface->vs_pal;
-	codec_assert(pixel < pal->vp_cnt);
-	return pal->vp_pal[pixel];
+	struct video_palette const *pal = video_surface_getpalette(surface);
+	return video_palette_pixel2color(pal, pixel);
 }
 
-#define pal_color2pixel(surface, color) \
-	video_palette_getpixel(surface->vs_pal, color)
 INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t
 (FCC pal_color2pixel)(struct video_surface const *__restrict surface,
-                     video_color_t color) {
-	return video_palette_getpixel(surface->vs_pal, color);
+                      video_color_t color) {
+	struct video_palette const *pal = video_surface_getpalette(surface);
+
+	/* If the surface has an object-palette, can do a fast pixel lookup */
+	if likely(video_surface_hasobjpalette(surface))
+		return video_palette_color2pixel(pal, color);
+
+	/* Else: must do a slow (fallback) pixel calculation */
+	return libvideo_palette_color2pixel_generic(pal,
+	                                            video_codec_getpalcolors(video_surface_getcodec(surface)),
+	                                            color);
 }
 
 
-#define _paletN_tocolor(v, n) ((surface)->vs_pal->vp_pal[v] & ~VIDEO_COLOR_ALPHA_MASK)
-#define palet1_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 2), _paletN_tocolor(v, 1))
-#define palet2_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 4), _paletN_tocolor(v, 2))
-#define palet3_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 8), _paletN_tocolor(v, 3))
-#define palet4_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 16), _paletN_tocolor(v, 4))
-#define palet7_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 128), _paletN_tocolor(v, 7))
-#define palet8_tocolor(v)     (codec_assert(surface->vs_pal->vp_cnt >= 256), _paletN_tocolor(v, 8))
+#define _paletN_tocolor(v, n) (video_palette_pixel2color(video_surface_getpalette(surface), v) & ~VIDEO_COLOR_ALPHA_MASK)
+#define palet1_tocolor(v)     (_paletN_tocolor(v, 1))
+#define palet2_tocolor(v)     (_paletN_tocolor(v, 2))
+#define palet3_tocolor(v)     (_paletN_tocolor(v, 3))
+#define palet4_tocolor(v)     (_paletN_tocolor(v, 4))
+#define palet7_tocolor(v)     (_paletN_tocolor(v, 7))
+#define palet8_tocolor(v)     (_paletN_tocolor(v, 8))
 
 #if 1 /* Assume that the palette isn't too large (if it is, we'll encode bad pixel data) */
 #define color_getpaletN(v, mask) pal_color2pixel(surface, color)

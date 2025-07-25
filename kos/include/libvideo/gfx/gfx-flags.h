@@ -39,6 +39,7 @@
 #define VIDEO_GFX_F_YWRAP    0x0020 /* OOB Y coords wrap to the other side of the Clip Rect (else: coords are clamped) */
 #define VIDEO_GFX_F_NEAREST  0x0000 /* Use nearest interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
 #define VIDEO_GFX_F_LINEAR   0x0040 /* Use linear interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
+#define VIDEO_GFX_F_PALOBJ   0x0080 /* The palette being used is non-NULL, object-based, and was allocated by the same domain as the `video_buffer' */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -52,7 +53,7 @@ typedef __UINT32_TYPE__ video_gfx_flag_t;
 #define _VIDEO_GFX_XFLAGS    (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_XMIRROR)
 #define _VIDEO_GFX_YFLAGS    (VIDEO_GFX_F_YWRAP | VIDEO_GFX_F_YMIRROR)
 #define _VIDEO_GFX_AND_FLAGS (0)
-#define _VIDEO_GFX_OR_FLAGS  (VIDEO_GFX_F_LINEAR)
+#define _VIDEO_GFX_OR_FLAGS  (VIDEO_GFX_F_LINEAR | VIDEO_GFX_F_PALOBJ)
 #define _VIDEO_GFX_XOR_FLAGS (~(_VIDEO_GFX_AND_FLAGS | _VIDEO_GFX_OR_FLAGS))
 
 /* Combine pre-existing GFX flags `__old_flags' with `__more_flags' */

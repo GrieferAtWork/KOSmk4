@@ -95,11 +95,11 @@ do_dump_buffer_specs(struct video_surface const *surface,
 		unsigned int cell_h            = 8;
 		unsigned int cells_per_row_max = ((io->vfp_lnend - io->vfp_curx) - (cells_padding * 2)) / cell_w;
 		unsigned int cells_per_row     = cells_per_row_max > 32 ? 32 : cells_per_row_max;
-		unsigned int rows              = CEILDIV(palette->vp_cnt, cells_per_row);
+		unsigned int rows              = CEILDIV(video_surface_getpalcolorcount(surface), cells_per_row);
 		unsigned int rows_width        = (cells_per_row * cell_w);
 		unsigned int rows_height       = (rows * cell_h);
 		unsigned int pal_x, pal_y;
-		gfx_printf("Palette (%u):\n", palette->vp_cnt);
+		gfx_printf("Palette (%u):\n", video_surface_getpalcolorcount(surface));
 		io->vfp_cury += 2;
 		video_gfx_rect(io->vfp_gfx, io->vfp_curx, io->vfp_cury,
 		               rows_width + cells_padding * 2,
@@ -110,7 +110,7 @@ do_dump_buffer_specs(struct video_surface const *surface,
 			for (pal_x = 0; pal_x < cells_per_row; ++pal_x) {
 				video_color_t color;
 				video_pixel_t index = pal_x + (pal_y * cells_per_row);
-				if (index >= palette->vp_cnt)
+				if (index >= video_surface_getpalcolorcount(surface))
 					break;
 				color = palette->vp_pal[index];
 				video_gfx_fill(io->vfp_gfx,
@@ -154,19 +154,20 @@ palettize(struct video_gfx const *self, video_pixel_t num_colors, unsigned int m
 	struct video_gfx result_gfx;
 	REF struct video_buffer *result;
 	struct video_buffer_format result_format;
+	struct video_palette *palette;
 	video_codec_t result_codec_id;
 
 	/* Create palette with the requested # of colors */
-	result_format.vbf_pal = video_palette_create(num_colors);
-	if unlikely(!result_format.vbf_pal)
+	palette = video_domain_newpalette(video_gfx_getdomain(self), num_colors);
+	if unlikely(!palette)
 		goto err;
 
 	/* Palettize source video buffer and store results in "pal" */
 	if unlikely(video_gfx_palettize(self, num_colors,
-	                                result_format.vbf_pal->vp_pal,
+	                                palette->vp_pal,
 	                                method))
 		goto err_pal;
-	result_format.vbf_pal = video_palette_optimize(result_format.vbf_pal);
+	result_format.vbf_pal = video_palette_optimize(palette);
 
 	/* Figure out appropriate codec for result buffer */
 	if (num_colors <= 2) {
@@ -181,10 +182,10 @@ palettize(struct video_gfx const *self, video_pixel_t num_colors, unsigned int m
 	result_format.vbf_codec = video_codec_lookup(result_codec_id);
 	if unlikely(!result_format.vbf_codec)
 		goto err_pal;
-	result_format.vbf_flags = video_gfx_getflags(self);
+	result_format.vbf_flags = video_gfx_getflags(self) | VIDEO_GFX_F_PALOBJ;
 	if (result_format.vbf_flags & VIDEO_GFX_F_COLORKEY) {
 		video_color_t c = video_gfx_pixel2color(self, video_gfx_getcolorkey(self));
-		result_format.vbf_colorkey = video_palette_getpixel(result_format.vbf_pal, c);
+		result_format.vbf_colorkey = video_palette_color2pixel(result_format.vbf_pal, c);
 	}
 
 	/* Allocate result buffer */
@@ -450,7 +451,7 @@ do_showpic(struct video_buffer *screen,
 		                                   blit_h / tiles_y,
 		                                   format_buf->vb_codec,
 		                                   format_buf->vb_surf.vs_pal);
-		video_buffer_getgfx(sized_buffer, &sized_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+		video_buffer_getgfx(sized_buffer, &sized_gfx, GFX_BLENDMODE_OVERRIDE);
 		video_gfx_stretch(&sized_gfx, 0, 0, video_gfx_getxdim(&sized_gfx), video_gfx_getydim(&sized_gfx),
 		                  &image_gfx, 0, 0, video_gfx_getxdim(&image_gfx), video_gfx_getydim(&image_gfx));
 		video_buffer_getgfx(sized_buffer, &sized_gfx,

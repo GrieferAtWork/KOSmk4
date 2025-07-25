@@ -2854,7 +2854,7 @@
 #define DEFINE_libvideo_swgfx_generic__putcolor_FOO(name,...) void libvideo_swgfx_generic__putcolor_##name(struct video_gfx const*__restrict self,video_coord_t x,video_coord_t y,video_color_t color){}
 #define DECLARE_libvideo_ramgfx__putcolor_FOO(name,...) void libvideo_ramgfx__putcolor_##name(struct video_gfx const*__restrict self,video_coord_t x,video_coord_t y,video_color_t color);
 #define DEFINE_libvideo_ramgfx__putcolor_FOO(name,...) void libvideo_ramgfx__putcolor_##name(struct video_gfx const*__restrict self,video_coord_t x,video_coord_t y,video_color_t color){}
-#define DEFINE_vp_kd_treeN_find(N)void vp_kd_tree##N##_find(struct video_palette_tree const*node,video_color_t color,unsigned int chan_id,struct kd_tree_result*result){}
+#define DEFINE_vp_kd_treeN_find(N)void vp_kd_tree##N##_find(struct video_palette_cache const*node,video_color_t color,unsigned int chan_id,struct kd_tree_result*result){}
 #define LOCAL_IF_IMATRIX(x)
 #define LOCAL_ATTR
 #define DEFINE_PIXEL2COLOR64_WRAPPER32(d,_,x)video_color64_t x(struct video_surface const*__restrict surface,video_pixel64_t pixel){}

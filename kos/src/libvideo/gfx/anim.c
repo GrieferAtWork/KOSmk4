@@ -469,9 +469,11 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 		result->ca_fmt = *format;
 		if (result->ca_fmt.vbf_pal) {
 			if (result->ca_fmt.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-				video_palette_incref(result->ca_fmt.vbf_pal);
+				if (result->ca_fmt.vbf_flags & VIDEO_GFX_F_PALOBJ)
+					video_palette_incref(result->ca_fmt.vbf_pal);
 			} else {
 				result->ca_fmt.vbf_pal = NULL;
+				result->ca_fmt.vbf_flags &= ~VIDEO_GFX_F_PALOBJ;
 			}
 		} else if (result->ca_fmt.vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
 			errno = EINVAL;

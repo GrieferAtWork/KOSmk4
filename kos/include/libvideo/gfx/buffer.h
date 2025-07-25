@@ -66,10 +66,10 @@ struct video_rect;
 
 /* Descriptor for the format of a video buffer */
 struct video_buffer_format {
-	struct video_palette *vbf_pal;      /* [0..1][valid_if(vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)] Color palette (if needed by `vbf_codec') */
-	struct video_codec   *vbf_codec;    /* [1..1] Video codec. */
-	video_gfx_flag_t      vbf_flags;    /* Default GFX flags */
-	video_pixel_t         vbf_colorkey; /* [valid_if(vbf_flags & VIDEO_GFX_F_COLORKEY)] Pixel value to skip during blits */
+	struct video_palette const *vbf_pal;      /* [0..1][valid_if(vbf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)] Color palette (if needed by `vbf_codec') */
+	struct video_codec         *vbf_codec;    /* [1..1] Video codec. */
+	video_gfx_flag_t            vbf_flags;    /* Default GFX flags */
+	video_pixel_t               vbf_colorkey; /* [valid_if(vbf_flags & VIDEO_GFX_F_COLORKEY)] Pixel value to skip during blits */
 };
 
 #define video_buffer_format_equals(a, b)                               \
@@ -154,7 +154,40 @@ struct video_domain {
 	(LIBVIDEO_GFX_CC *vd_supported_codec)(struct video_domain const *__restrict __self,
 	                                      struct video_codec const *__restrict __codec);
 
-	void (*_vd_pad[13])(void); /* Reserved for future expansion */
+	/* Create a new palette for at least `__count' colors.
+	 *
+	 * This function is allowed to allocate a larger palette  than
+	 * requested if doing  so improves  performances, though  when
+	 * this is done, all additional palette entries will have been
+	 * initialized to `0'
+	 *
+	 * On success, the caller must initialize:
+	 * - return->vp_pal[0]
+	 * - return->vp_pal[1]
+	 * - ...
+	 * - return->vp_pal[__count - 2]
+	 * - return->vp_pal[__count - 1]
+	 *
+	 * Once  this is done, the caller must indicate that the palette
+	 * has been updated by calling `video_palette_optimize()' on the
+	 * returned palette. The  same needs to  be repeated every  time
+	 * further changes are made  to `return->vp_pal[x]' in order  to
+	 * communicate those changes to the underlying video domain.
+	 *
+	 * When using the returned video palette with some video_buffer,
+	 * or  video_surface, you should always set `VIDEO_GFX_F_PALOBJ'
+	 * in order to have the  `video_buffer' hold a reference to  the
+	 * palette,  or allow `video_surface'  to do faster color->pixel
+	 * conversion (since managed palettes usually have lookup caches
+	 * to encode color values more quickly).
+	 *
+	 * @return: * :   The newly created palette
+	 * @return: NULL: Out of memory */
+	__ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __REF struct video_palette *
+	(LIBVIDEO_GFX_CC *vd_newpalette)(struct video_domain const *__restrict __self,
+	                                 video_pixel_t __count);
+
+	void (*_vd_pad[12])(void); /* Reserved for future expansion */
 
 	/* TODO: Function for getting memory usage (for the ram-domain,
 	 *       just return regular ram usage info as per `sysinfo(2)) */
@@ -289,6 +322,39 @@ _video_domain_formem(struct video_domain const *__restrict __self,
 extern __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_NONNULL((1)) struct video_codec *LIBVIDEO_GFX_CC
 video_domain_supported_codec(struct video_domain const *__restrict __self,
                              struct video_codec const *__restrict __codec);
+
+/* Create a new palette for at least `__count' colors.
+ *
+ * This function is allowed to allocate a larger palette  than
+ * requested if doing  so improves  performances, though  when
+ * this is done, all additional palette entries will have been
+ * initialized to `0'
+ *
+ * On success, the caller must initialize:
+ * - return->vp_pal[0]
+ * - return->vp_pal[1]
+ * - ...
+ * - return->vp_pal[__count - 2]
+ * - return->vp_pal[__count - 1]
+ *
+ * Once  this is done, the caller must indicate that the palette
+ * has been updated by calling `video_palette_optimize()' on the
+ * returned palette. The  same needs to  be repeated every  time
+ * further changes are made  to `return->vp_pal[x]' in order  to
+ * communicate those changes to the underlying video domain.
+ *
+ * When using the returned video palette with some video_buffer,
+ * or  video_surface, you should always set `VIDEO_GFX_F_PALOBJ'
+ * in order to have the  `video_buffer' hold a reference to  the
+ * palette,  or allow `video_surface'  to do faster color->pixel
+ * conversion (since managed palettes usually have lookup caches
+ * to encode color values more quickly).
+ *
+ * @return: * :   The newly created palette
+ * @return: NULL: Out of memory */
+extern __ATTR_WUNUSED __ATTR_NONNULL((1)) __REF struct video_palette *
+video_domain_newpalette(struct video_domain const *__restrict __self,
+                        video_pixel_t __count);
 #else /* __INTELLISENSE__ */
 #define _video_domain_newbuffer(self, format, buffer_xdim, buffer_ydim, flags) \
 	(*(self)->vd_newbuffer)(self, format, buffer_xdim, buffer_ydim, flags)
@@ -302,6 +368,8 @@ video_domain_supported_codec(struct video_domain const *__restrict __self,
 	                                                       : _video_domain_formem(self, format, ydim, xdim, mem, stride, release_mem, release_mem_cookie, flags))
 #define video_domain_supported_codec(self, codec) \
 	(*(self)->vd_supported_codec)(self, codec)
+#define video_domain_newpalette(self, count) \
+	(*(self)->vd_newpalette)(self, count)
 #endif /* !__INTELLISENSE__ */
 
 
@@ -645,7 +713,7 @@ __NOTHROW(video_buffer_revoke)(struct video_buffer *__restrict __self);
 #endif /* !__VIDEO_BUFFER_const */
 
 struct video_buffer {
-	struct video_surface           __VIDEO_BUFFER_const vb_surf;    /* [const] Buffer surface data (`vs_buffer' is always a self-pointer) */
+	struct video_surface           __VIDEO_BUFFER_const vb_surf;    /* [const] Buffer surface data (`vs_buffer' is always a self-pointer; never has `VIDEO_GFX_F_RAWPAL' set) */
 	__REF struct video_codec      *__VIDEO_BUFFER_const vb_codec;   /* [1..1][const] Buffer codec. */
 	struct video_buffer_ops const *__VIDEO_BUFFER_const vb_ops;     /* [1..1][const] Buffer operations. */
 	struct video_domain const     *__VIDEO_BUFFER_const vb_domain;  /* [1..1][const] Buffer domain (generic wrappers use `video_ramdomain()',
@@ -673,14 +741,15 @@ struct video_buffer {
 #define __video_buffer_init_common(self) ((self)->vb_surf.vs_buffer = (self))
 #define __video_buffer_fini_common(self) (void)((self)->vb_surf.vs_buffer = (self))
 #else /* __INTELLISENSE__ */
-#define __video_buffer_init_common(self)            \
-	(video_codec_incref((self)->vb_codec),          \
-	 video_palette_xincref((self)->vb_surf.vs_pal), \
-	 (self)->vb_surf.vs_buffer = (self))
+#define __video_buffer_init_common(self)                 \
+	(!((self)->vb_surf.vs_flags & VIDEO_GFX_F_PALOBJ) || \
+	 (video_palette_incref((self)->vb_surf.vs_pal), 0),  \
+	 video_codec_incref((self)->vb_codec), (self)->vb_surf.vs_buffer = (self))
 #define __video_buffer_fini_common(self)                         \
 	(void)(__hybrid_assert((self)->vb_surf.vs_buffer == (self)), \
-	       video_palette_xdecref((self)->vb_surf.vs_pal),        \
-	       video_codec_decref((self)->vb_codec))
+	       video_codec_decref((self)->vb_codec),                 \
+	       !((self)->vb_surf.vs_flags & VIDEO_GFX_F_PALOBJ) ||   \
+	       (video_palette_decref((self)->vb_surf.vs_pal), 0))
 #endif /* !__INTELLISENSE__ */
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 

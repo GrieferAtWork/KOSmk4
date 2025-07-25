@@ -218,10 +218,12 @@ lockable_readpixels(struct lockable_buffer const *__restrict self) {
 	lockable_asram(&dst, self);
 	p_srcgfx = video_buffer_getgfx_ex(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(self->lb_base),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(self->lb_base) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	p_dstgfx = video_buffer_getgfx_ex(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(&dst),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(&dst) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, 0, 0,
@@ -239,10 +241,12 @@ lockable_writepixels(struct lockable_buffer const *__restrict self) {
 	lockable_asram(&src, self);
 	p_srcgfx = video_buffer_getgfx_ex(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(&src),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(&src) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	p_dstgfx = video_buffer_getgfx_ex(self->lb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(self->lb_base),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(self->lb_base) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, 0, 0, p_srcgfx, 0, 0,
@@ -261,10 +265,12 @@ lockable_readpixels_region(struct lockable_buffer const *__restrict self,
 	lockable_asram(&dst, self);
 	p_srcgfx = video_buffer_getgfx_ex(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(self->lb_base),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(self->lb_base) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	p_dstgfx = video_buffer_getgfx_ex(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(&dst),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(&dst) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, region->_vrl_rect.vcr_xmin, region->_vrl_rect.vcr_ymin,
@@ -283,10 +289,12 @@ lockable_writepixels_region(struct lockable_buffer const *__restrict self,
 	lockable_asram(&src, self);
 	p_srcgfx = video_buffer_getgfx_ex(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(&src),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(&src) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	p_dstgfx = video_buffer_getgfx_ex(self->lb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(self->lb_base),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(self->lb_base) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, region->_vrl_rect.vcr_xmin, region->_vrl_rect.vcr_ymin,
@@ -440,10 +448,12 @@ lockable_subregion_readpixels(struct lockable_buffer_subregion const *__restrict
 	lockable_subregion_asram(&dst, self);
 	p_srcgfx = video_buffer_getgfx_ex(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(self->lb_base),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(self->lb_base) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	p_dstgfx = video_buffer_getgfx_ex(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(&dst),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(&dst) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, self->lbsb_bxrem, 0,
@@ -461,10 +471,12 @@ lockable_subregion_writepixels(struct lockable_buffer_subregion const *__restric
 	lockable_subregion_asram(&src, self);
 	p_srcgfx = video_buffer_getgfx_ex(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(&src),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(&src) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	p_dstgfx = video_buffer_getgfx_ex(self->lb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(self->lb_base),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(self->lb_base) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, self->lbsb_xoff, self->lbsb_yoff,
@@ -484,10 +496,12 @@ lockable_subregion_readpixels_region(struct lockable_buffer_subregion const *__r
 	lockable_subregion_asram(&dst, self);
 	p_srcgfx = video_buffer_getgfx_ex(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(self->lb_base),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(self->lb_base) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	p_dstgfx = video_buffer_getgfx_ex(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(&dst),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(&dst) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx,
@@ -510,10 +524,12 @@ lockable_subregion_writepixels_region(struct lockable_buffer_subregion const *__
 	lockable_subregion_asram(&src, self);
 	p_srcgfx = video_buffer_getgfx_ex(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(&src),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(&src) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	p_dstgfx = video_buffer_getgfx_ex(self->lb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE,
 	                                  video_buffer_getpalette(self->lb_base),
-	                                  VIDEO_GFX_F_NORMAL, 0);
+	                                  video_buffer_getflags(self->lb_base) & VIDEO_GFX_F_PALOBJ,
+	                                  0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx,

@@ -88,8 +88,9 @@ extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_co
 extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_buffer *video_surface_getbuffer(struct video_surface const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_surface_getxdim(struct video_surface const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_surface_getydim(struct video_surface const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_surface_hasobjpalette(struct video_surface const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) struct video_palette *video_surface_getpalette(struct video_surface const *__restrict __self);
-extern __ATTR_NONNULL((1, 2)) void video_surface_setpalette(struct video_surface *__restrict __self, struct video_palette *__palette);
+extern __ATTR_NONNULL((1, 2)) void video_surface_setpalette(struct video_surface *__restrict __self, struct video_palette const *__palette, __BOOL __isobj);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_gfx_flag_t video_surface_getflags(struct video_surface const *__restrict __self);
 extern __ATTR_NONNULL((1)) void video_surface_setflags(struct video_surface *__restrict __self, video_gfx_flag_t __flags);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_pixel_t video_surface_getcolorkey(struct video_surface const *__restrict __self);
@@ -97,6 +98,17 @@ extern __ATTR_NONNULL((1)) void video_surface_setcolorkey(struct video_surface *
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_surface_hascolorkey(struct video_surface const *__restrict __self);
 extern __ATTR_NONNULL((1)) void video_surface_enablecolorkey(struct video_surface *__restrict __self, video_pixel_t __colorkey);
 extern __ATTR_NONNULL((1)) void video_surface_disablecolorkey(struct video_surface *__restrict __self);
+
+/* Return a lower bound for the # of colors that a palette linked to this surface has to have */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_pixel_t
+video_surface_getpalcolorcount(struct video_surface const *__restrict __self);
+
+/* Assign `__colors' to-be used as palette for `__self'. The caller must ensure that this array
+ * of  colors remains allocated until a different palette  is assigned, or the surface (and any
+ * video buffer created from it) is disposed. */
+extern __ATTR_NONNULL((1, 2)) void
+video_surface_setpalcolors(struct video_surface *__restrict __self,
+                           video_color_t const __colors[]);
 
 /* Check if `__self' is the default surface of a `video_buffer' */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_surface_isbuffer(struct video_surface const *__restrict __self);
@@ -288,8 +300,14 @@ video_buffer_convert_distinct(struct video_buffer *__restrict __self,
                               struct video_buffer_format const *__format);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 #else /* __INTELLISENSE__ */
-#define video_surface_incref(self) (void)(video_buffer_incref(video_surface_getbuffer(self)), video_palette_xincref(video_surface_getpalette(self)))
-#define video_surface_decref(self) (void)(video_palette_xdecref(video_surface_getpalette(self)).video_buffer_decref(video_surface_getbuffer(self)))
+#define video_surface_incref(self)                                    \
+	(void)(!(video_surface_getflags(self) & VIDEO_GFX_F_PALOBJ) ||    \
+	       (video_palette_incref(video_surface_getpalette(self)), 0), \
+	       video_buffer_incref(video_surface_getbuffer(self)))
+#define video_surface_decref(self)                                 \
+	(void)(video_buffer_decref(video_surface_getbuffer(self)),     \
+	       !(video_surface_getflags(self) & VIDEO_GFX_F_PALOBJ) || \
+	       (video_palette_decref(video_surface_getpalette(self)), 0))
 #define video_surface_hasformat(self, format)                                            \
 	(video_surface_getcodec(self) == (format)->vbf_codec &&                              \
 	 video_surface_getflags(self) == (format)->vbf_flags &&                              \
@@ -311,38 +329,43 @@ video_buffer_convert_distinct(struct video_buffer *__restrict __self,
 	(video_surface_getpalette(self) == video_surface_getdefaultpalette(self) && \
 	 video_surface_getflags(self) == video_surface_getdefaultflags(self) &&     \
 	 video_surface_getcolorkey(self) == video_surface_getdefaultcolorkey(self))
-#define video_surface_setdefault(self)                                            \
-	(void)(video_surface_setpalette(self, video_surface_getdefaultpalette(self)), \
-	       video_surface_setflags(self, video_surface_getdefaultflags(self)),     \
-	       video_surface_setcolorkey(self, video_surface_getdefaultcolorkey(self)))
-#define video_surface_copyattrib(self, src)                               \
-	(void)(video_surface_setpalette(self, video_surface_getpalette(src)), \
-	       video_surface_setflags(self, video_surface_getflags(src)),     \
-	       video_surface_setcolorkey(self, video_surface_getcolorkey(src)))
-#define video_surface_getdomain(self)                video_buffer_getdomain(video_surface_getbuffer(self))
-#define video_surface_getcodec(self)                 video_buffer_getcodec(video_surface_getbuffer(self))
-#define video_surface_getbuffer(self)                (self)->vs_buffer
-#define video_surface_getbufferxdim(self)            video_buffer_getxdim(video_surface_getbuffer(self))
-#define video_surface_getbufferydim(self)            video_buffer_getydim(video_surface_getbuffer(self))
+#define video_surface_setdefault(self)                                  \
+	(void)((self)->vs_pal      = video_surface_getdefaultpalette(self), \
+	       (self)->vs_flags    = video_surface_getdefaultflags(self),   \
+	       (self)->vs_colorkey = video_surface_getdefaultcolorkey(self))
+#define video_surface_copyattrib(self, src)                     \
+	(void)((self)->vs_pal      = video_surface_getpalette(src), \
+	       (self)->vs_flags    = video_surface_getflags(src),   \
+	       (self)->vs_colorkey = video_surface_getcolorkey(src))
+#define video_surface_getdomain(self)                  video_buffer_getdomain(video_surface_getbuffer(self))
+#define video_surface_getcodec(self)                   video_buffer_getcodec(video_surface_getbuffer(self))
+#define video_surface_getbuffer(self)                  (self)->vs_buffer
+#define video_surface_getbufferxdim(self)              video_buffer_getxdim(video_surface_getbuffer(self))
+#define video_surface_getbufferydim(self)              video_buffer_getydim(video_surface_getbuffer(self))
 /* TODO: Change vb_xdim / vb_ydim into vb_dim[2] and use ((flags & VIDEO_GFX_F_XYSWAP) [^ 1]) as index */
-#define video_surface_getxdim(self)                  (__unlikely(video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) ? video_surface_getbufferydim(self) : video_surface_getbufferxdim(self))
-#define video_surface_getydim(self)                  (__unlikely(video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) ? video_surface_getbufferxdim(self) : video_surface_getbufferydim(self))
-#define video_surface_getpalette(self)               (self)->vs_pal
-#define video_surface_setpalette(self, palette)      (void)((self)->vs_pal = (palette))
-#define video_surface_getflags(self)                 (self)->vs_flags
-#define video_surface_setflags(self, flags)          (void)((self)->vs_flags = (flags))
-#define video_surface_getcolorkey(self)              (self)->vs_colorkey
-#define video_surface_setcolorkey(self, colorkey)    (void)((self)->vs_colorkey = (colorkey))
-#define video_surface_hascolorkey(self)              ((video_surface_getflags(self) & VIDEO_GFX_F_COLORKEY) != 0)
-#define video_surface_enablecolorkey(self, colorkey) (void)((self)->vs_colorkey = (colorkey), (self)->vs_flags |= VIDEO_GFX_F_COLORKEY)
-#define video_surface_disablecolorkey(self)          (void)((self)->vs_flags &= ~VIDEO_GFX_F_COLORKEY)
-#define video_surface_getdefaultpalette(self)        video_buffer_getpalette(video_surface_getbuffer(self))
-#define video_surface_getdefaultflags(self)          video_buffer_getflags(video_surface_getbuffer(self))
-#define video_surface_getdefaultcolorkey(self)       video_buffer_getcolorkey(video_surface_getbuffer(self))
-#define video_surface_hasdefaultcolorkey(self)       video_buffer_hascolorkey(video_surface_getbuffer(self))
+#define video_surface_getxdim(self)                    (__unlikely(video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) ? video_surface_getbufferydim(self) : video_surface_getbufferxdim(self))
+#define video_surface_getydim(self)                    (__unlikely(video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) ? video_surface_getbufferxdim(self) : video_surface_getbufferydim(self))
+#define video_surface_hasobjpalette(self)              (((self)->vs_flags & VIDEO_GFX_F_PALOBJ) != 0)
+#define video_surface_getpalette(self)                 (self)->vs_pal
+#define video_surface_setpalette(self, palette, isobj) (void)((self)->vs_pal = (palette), (self)->vs_flags = ((self)->vs_flags & ~VIDEO_GFX_F_PALOBJ) | ((isobj) ? VIDEO_GFX_F_PALOBJ : 0))
+#define video_surface_getflags(self)                   (self)->vs_flags
+#define video_surface_setflags(self, flags)            (void)((self)->vs_flags = (flags))
+#define video_surface_getcolorkey(self)                (self)->vs_colorkey
+#define video_surface_setcolorkey(self, colorkey)      (void)((self)->vs_colorkey = (colorkey))
+#define video_surface_hascolorkey(self)                ((video_surface_getflags(self) & VIDEO_GFX_F_COLORKEY) != 0)
+#define video_surface_enablecolorkey(self, colorkey)   (void)((self)->vs_colorkey = (colorkey), (self)->vs_flags |= VIDEO_GFX_F_COLORKEY)
+#define video_surface_disablecolorkey(self)            (void)((self)->vs_flags &= ~VIDEO_GFX_F_COLORKEY)
+#define video_surface_getpalcolorcount(self)           video_codec_getpalcolors(video_surface_getcodec(self))
+#define video_surface_setpalcolors(self, colors)       (void)((self)->vs_pal = video_palette_fromcolors(palette), (self)->vs_flags &= ~VIDEO_GFX_F_PALOBJ)
+#define video_surface_getdefaultpalette(self)          video_buffer_getpalette(video_surface_getbuffer(self))
+#define video_surface_getdefaultflags(self)            video_buffer_getflags(video_surface_getbuffer(self))
+#define video_surface_getdefaultcolorkey(self)         video_buffer_getcolorkey(video_surface_getbuffer(self))
+#define video_surface_hasdefaultcolorkey(self)         video_buffer_hascolorkey(video_surface_getbuffer(self))
 #define video_surface_hasalpha(self)                            \
 	((video_surface_getcodec(self)->vc_specs.vcs_amask != 0) || \
-	 (video_surface_getpalette(self) && (video_surface_getpalette(self)->vp_flags & VIDEO_PALETTE_F_ALPHA)))
+	 (video_surface_getpalette(self) &&                         \
+	  (!video_surface_hasobjpalette(self) ||                    \
+	   video_palette_asobject(video_surface_getpalette(self))->vp_flags & VIDEO_PALETTE_F_ALPHA)))
 #define video_surface_pixel2color(self, pixel)            (*video_surface_getcodec(self)->vc_pixel2color)(self, pixel)
 #define video_surface_color2pixel(self, color)            (*video_surface_getcodec(self)->vc_color2pixel)(self, color)
 #define _video_surface_getlinepixel(self, line, x)        (*video_surface_getcodec(self)->vc_getpixel)(line, x)

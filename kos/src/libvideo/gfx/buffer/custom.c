@@ -620,8 +620,9 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
 	if unlikely(!result)
 		goto err;
 	__video_buffer_setformat(result, format);
-	if (result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+	if (!(result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
 		result->vb_surf.vs_pal = NULL;
+		result->vb_surf.vs_flags &= ~VIDEO_GFX_F_PALOBJ;
 	} else if (!result->vb_surf.vs_pal) {
 		errno = EINVAL;
 		goto err_r;

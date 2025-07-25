@@ -470,6 +470,16 @@ struct video_codec {
 };
 
 
+#ifdef __INTELLISENSE__
+/* Return the # of colors needed by palettes used with this codec. If the
+ * codec doesn't make use of  palettes, this returns an undefined  value. */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_pixel_t
+video_codec_getpalcolors(struct video_codec const *__restrict self);
+#else /* __INTELLISENSE__ */
+#define video_codec_getpalcolors(self) ((video_pixel_t)1 << (self)->vc_specs.vcs_cbits)
+#endif /* !__INTELLISENSE__ */
+
+
 /* Reference counter controls for `struct video_codec' */
 #define video_codec_destroy(self) (*(self)->vc_destroy)(self)
 #define video_codec_incref(self) \

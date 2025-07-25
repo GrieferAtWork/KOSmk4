@@ -94,14 +94,12 @@ struct video_anim_ops {
 	 * >> data = (struct video_anim_frame *)malloca(video_anim_sizeof_frame(anim));
 	 * >>
 	 * >> video_anim_firstframe(anim, data);
-	 * >> video_buffer_getgfx((struct video_buffer *)screen, &screen_gfx,
-	 * >>                     GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	 * >> video_buffer_getgfx((struct video_buffer *)screen, &screen_gfx, GFX_BLENDMODE_OVERRIDE);
 	 * >> gettimeofday(&frame_start, NULL);
 	 * >> for (;;) {
 	 * >>
 	 * >>     // Display current frame on-screen (here: stretched)
-	 * >>     video_buffer_getgfx(data->vaf_frame, &frame_gfx,
-	 * >>                         GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	 * >>     video_buffer_getgfx(data->vaf_frame, &frame_gfx, GFX_BLENDMODE_OVERRIDE);
 	 * >>     video_gfx_stretch(&screen_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX,
 	 * >>                       &frame_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
 	 * >>     struct video_crect update_rect = VIDEO_CRECT_INIT_FULL;
