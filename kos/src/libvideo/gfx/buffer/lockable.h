@@ -25,9 +25,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/sched/atomic-lock.h>
-#include <hybrid/sequence/list.h>
-
 #include <kos/anno.h>
 #include <kos/types.h>
 
@@ -41,40 +38,31 @@
 
 DECL_BEGIN
 
-struct lockable_buffer_base: video_buffer {
-	REF struct video_buffer *lbb_base;   /* [1..1][const] Underlying video buffer */
-	byte_t                  *lbb_data;   /* [0..vl_size][owned][lock(WRITE_ONCE)] Cached video data */
-	size_t                   lbb_stride; /* [valid_if(lbb_data)] Scanline width (in bytes) */
-	byte_t                  *lbb_edata;  /* [valid_if(lbb_data)] End of lock data */
+struct lockable_buffer: video_buffer {
+	REF struct video_buffer *lb_base;   /* [1..1][const] Underlying video buffer */
+	byte_t                  *lb_data;   /* [0..vl_size][owned][lock(WRITE_ONCE)] Cached video data */
+	size_t                   lb_stride; /* [valid_if(lb_data)] Scanline width (in bytes) */
+	byte_t                  *lb_edata;  /* [valid_if(lb_data)] End of lock data */
 };
 
 /* Wrap `surface' as the surface of a lockable buffer. */
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_OUT(1) ATTR_IN(2) struct video_surface const *CC
-lockable_buffer_initbase(struct lockable_buffer_base *self,
-                         struct video_surface const *__restrict surface);
-#define lockable_buffer_finibase(self) __libc_free((self)->lbb_data)
+lockable_buffer_init(struct lockable_buffer *self,
+                     struct video_surface const *__restrict surface);
+#define lockable_buffer_fini(self) __libc_free((self)->lb_data)
 
 /* Check if "self" is *always* lockable */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) bool CC
 libvideo_buffer_islockable(struct video_buffer const *__restrict self);
 
 
-
-struct lockable_buffer_subregion;
-LIST_HEAD(lockable_buffer_subregion_list, lockable_buffer_subregion);
-struct lockable_buffer: lockable_buffer_base {
-	struct lockable_buffer_subregion_list lb_subregion_list; /* [0..n][lock(lb_subregion_lock)] List of sub-regions */
-	struct atomic_lock                    lb_subregion_lock; /* Lock for `lb_subregion_list' */
-};
-struct lockable_buffer_subregion: lockable_buffer {    /* [OVERRIDE(.lbb_data, [0..1][lock(WRITE_ONCE)][NOT(owned)])]
-                                                        * [OVERRIDE(.lbb_base, [NOT(REF)])] */
-	video_coord_t                         lbsb_xoff;   /* [const] X offset */
-	video_coord_t                         lbsb_yoff;   /* [const] Y offset */
-	video_coord_t                         lbsb_bxrem;  /* [const] X coord remainder that needs to be added to `lbb_data' */
-	size_t                                lbsb_bxoff;  /* [const] X byte offset that needs to be added to `lbb_data->lbb_base' */
-	struct lockable_buffer               *lbsb_orig;   /* [1..1][const] Original lockable buffer */
-	REF struct lockable_buffer           *lbsb_parent; /* [1..1][const] Parent buffer */
-	LIST_ENTRY(lockable_buffer_subregion) lbsb_chain;  /* [0..n][lock(lbsb_parent->lb_subregion_lock)] Entry in chain of sub-region of `lbsb_parent' */
+struct lockable_buffer_subregion: lockable_buffer { /* [OVERRIDE(.lb_data, [0..1][lock(WRITE_ONCE)][NOT(owned)])]
+                                                     * [OVERRIDE(.lb_base, [NOT(REF)])] */
+	video_coord_t               lbsb_xoff;     /* [const] X offset */
+	video_coord_t               lbsb_yoff;     /* [const] Y offset */
+	video_coord_t               lbsb_bxrem;    /* [const] X coord remainder that needs to be added to `lb_data' */
+	size_t                      lbsb_bxoff;    /* [const] X byte offset that needs to be added to `lb_data->lb_base' */
+	REF struct lockable_buffer *lbsb_lockable; /* [1..1][const] Original lockable buffer */
 };
 
 
@@ -96,7 +84,6 @@ INTDEF NONNULL((1)) void FCC lockable_buffer_subregion__destroy(struct video_buf
 
 /* REVOKE+SUBREGION */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC lockable_buffer__revoke)(struct video_buffer *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC lockable_buffer_subregion__revoke)(struct video_buffer *__restrict self);
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC lockable_buffer__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC lockable_buffer_subregion__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
 
@@ -117,7 +104,7 @@ INTDEF ATTR_INOUT(1) NONNULL((2)) void NOTHROW(FCC lockable_buffer_subregion__un
 /* GFX */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC lockable_buffer__initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC lockable_buffer_subregion__initgfx(struct video_gfx *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC lockable_buffer__updategfx(struct video_gfx *__restrict self, unsigned int what);
+#define lockable_buffer__updategfx (*(struct video_gfx *(FCC *)(struct video_gfx *__restrict, unsigned int))(void *)-1)
 
 
 

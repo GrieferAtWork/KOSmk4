@@ -520,10 +520,10 @@ do_convert:
 	if (!libvideo_buffer_islockable(buffer)) {
 		/* Must wrap as a lockable buffer */
 		int result;
-		struct lockable_buffer_base lockable;
-		self   = lockable_buffer_initbase(&lockable, self);
+		struct lockable_buffer lockable;
+		self   = lockable_buffer_init(&lockable, self);
 		result = libvideo_surface_save_jpg(self, stream, options);
-		lockable_buffer_finibase(&lockable);
+		lockable_buffer_fini(&lockable);
 		return result;
 	}
 

@@ -381,7 +381,7 @@ libvideo_swblitter_samebuf__stretch__with_temporary(struct video_blitter const *
                                                     video_coord_t src_x, video_coord_t src_y,
                                                     video_dim_t src_size_x, video_dim_t src_size_y) {
 	struct video_buffer const *srcbuf = video_gfx_getbuffer(self->vbt_src);
-	struct video_rambuffer_base rb;
+	struct video_rambuffer rb;
 	struct video_blitter blitter;
 	struct video_gfx rb_gfx;
 	size_t rb_total;

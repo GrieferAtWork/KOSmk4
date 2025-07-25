@@ -392,22 +392,14 @@ LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_r
  * CAUTION: Just like with `video_buffer_region()', pixel  data
  *          of the returned buffer will be rotated in GFX-only!
  *
- * NOTE: `video_gfx_asbuffer_distinct()' never returns `video_gfx_getbuffer()',
- *       even  if the GFX  context isn't doing anything  that would require the
- *       creation of a separate sub-buffer.
- *
  * @return: * : The video buffer representing a wrapped and const-i-fied copy of `__self'
  * @return: NULL: [errno=ENOMEM] Insufficient memory
  * @return: NULL: [errno=*] Failed to create wrapper for some other reason */
 typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_GFX_ASBUFFER)(struct video_gfx const *__restrict __self);
-typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __REF struct video_buffer *
-(LIBVIDEO_GFX_CC *PVIDEO_GFX_ASBUFFER_DISTINCT)(struct video_gfx const *__restrict __self);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_gfx_asbuffer(struct video_gfx const *__restrict __self);
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __REF struct video_buffer *LIBVIDEO_GFX_CC
-video_gfx_asbuffer_distinct(struct video_gfx const *__restrict __self);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 

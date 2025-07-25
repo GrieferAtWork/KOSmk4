@@ -596,13 +596,8 @@ int main(int argc, char *argv[]) {
 		position.vwp_attr.vwa_flags = VIDEO_WINDOW_F_PASSTHRU;
 		position.vwp_attr.vwa_rect.vr_xmin = 80;
 		position.vwp_attr.vwa_rect.vr_ymin = 80;
-#if 1 /* FIXME: This, plus the "VIDEO_GFX_F_XYSWAP" in "screen.c" breaks */
-		position.vwp_attr.vwa_rect.vr_xdim = video_buffer_getxdim(bscreen) - 160;
-		position.vwp_attr.vwa_rect.vr_ydim = video_buffer_getydim(bscreen) - 160;
-#else
 		position.vwp_attr.vwa_rect.vr_xdim = video_surface_getxdim(video_buffer_assurface(bscreen)) - 160;
 		position.vwp_attr.vwa_rect.vr_ydim = video_surface_getydim(video_buffer_assurface(bscreen)) - 160;
-#endif
 		window1 = video_compositor_newwindow(compositor, &position, NULL);
 		if unlikely(!window1)
 			err(EXIT_FAILURE, "Failed to allocate window1");

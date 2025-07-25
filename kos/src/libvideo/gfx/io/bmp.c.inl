@@ -217,7 +217,7 @@ fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 		uint8_t a;
 	};
 	video_coord_t y;
-	struct video_rambuffer_base *me = (struct video_rambuffer_base *)self;
+	struct video_rambuffer *me = (struct video_rambuffer *)self;
 	assert(me->vb_domain == &libvideo_ramdomain);
 	assert(me->vb_ops == &rambuffer_ops ||
 	       me->vb_ops == &rambuffer_formem_ops);
@@ -790,10 +790,10 @@ libvideo_surface_save_bmp(struct video_surface const *__restrict self,
 		if (errno != ENOMEM) {
 			/* Try with a force-lockable buffer */
 			int result;
-			struct lockable_buffer_base lockable;
-			self   = lockable_buffer_initbase(&lockable, self);
+			struct lockable_buffer lockable;
+			self   = lockable_buffer_init(&lockable, self);
 			result = libvideo_surface_save_bmp(self, stream, options);
-			lockable_buffer_finibase(&lockable);
+			lockable_buffer_fini(&lockable);
 			return result;
 		}
 		goto err;

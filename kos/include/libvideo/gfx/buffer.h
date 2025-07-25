@@ -180,6 +180,32 @@ LIBVIDEO_GFX_DECL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED
 struct video_domain const *LIBVIDEO_GFX_CC video_ramdomain(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
+/* TODO: video_ramfddomain() -- Same as `video_ramdomain()', but buffers (and sub-regions)
+ *       all  use their own, distinct `memfd' file  descriptors allowing them to be shared
+ *       between processes.
+ *
+ * TODO: Kernel must offer some way to create sub-region aliases for mfile-s that can still
+ *       be mmap'd just like the  original file, and as a  matter of fact: perfectly  alias
+ *       the  mappings of the original file (meaning: shared memory), but can be revoked by
+ *       having all mappings  replaced with  /dev/void at  a moment's  notice, and  without
+ *       running the chance of this revocation failing due to OOM.
+ *       XXX: Does it really need to be /dev/void ??? Shouldn't the good, 'ol mfile_delete
+ *            mechanism for anonymizing  all the  file's memory mappings  be good  enough?
+ *       XXX: The real complication here would really  just be to track and  differentiate
+ *            mappings created from a sub-region file vs. mappings created on the original
+ *            file, such that only the sub-region mappings get anonymized.
+ *
+ * For an initial prove-of-concept,  this sort of functionality  is only really gonna  be
+ * needed for creating sub-regions of /dev/mem, which is way easier since here those sub-
+ * region mfile-s don't actually need to be  related (iow: don't have to share  mpart-s).
+ *
+ * A full implementation would  require creation of sub-region  for memfd files, too,  since
+ * that's needed when wanting to create a recursive compositor that operates not on a screen
+ * buffer (backed by /dev/mem), but one that is backed by video_ramfddomain() buffer.
+ *
+ * s.a.: The TODOs in `mpart_tree_forall_makeanon_and_unlock_decref()' and `mfile_truncate()'
+ */
+
 
 #ifdef __INTELLISENSE__
 /* Create a video buffer, or return NULL and set errno if creation failed.
@@ -392,20 +418,6 @@ struct video_buffer_ops {
 	__NOTHROW_T(LIBVIDEO_GFX_FCC *vi_unlockregion)(struct video_buffer *__restrict __self,
 	                                               struct video_regionlock *__restrict __lock);
 
-
-	/* Revoke access to non-anonymous pixel data (and maybe even anonymous) of this video buffer.
-	 * Access  to pixel data of any sub-region created from `__self' (or recursively created form
-	 * one of those buffers) is also revoked.
-	 *
-	 * All types of video buffers can have their access revoked, except for buffers returned by
-	 * `video_domain_newbuffer[_ex]()' (though sub-region buffers of those can be revoked,  and
-	 * calling this function for one such buffer will do exactly that).
-	 *
-	 * @return: * : Always re-returns `__self' */
-	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_buffer *
-	__NOTHROW_T(LIBVIDEO_GFX_FCC *vi_revoke)(struct video_buffer *__restrict __self);
-
-
 	/* Create  a new hard subregion-proxy of `__self'.  The caller is responsible to ensure
 	 * that  the given `__rect' does not exceed `__self->vb_xdim' / `__self->vb_ydim'. Note
 	 * that this function behaves slightly different from `video_surface_region()', in that
@@ -415,31 +427,38 @@ struct video_buffer_ops {
 	 * On the other hand, this function only works for creating **true** sub-rects, but
 	 * since this one is implemented by individual buffers, it is probably faster, too.
 	 *
-	 * Buffers returned by this function are guarantied to share pixel access with `__self',
-	 * and `vi_revoke' is to `__self' will also revoke access for `return' (either directly,
-	 * by keeping a list of sub-region buffers  in `__self', or indirectly, by having  every
-	 * access to pixel-data in `return' check if `__self' has been revoked).
+	 * This operator never re-returns `__self'. If such behavior is wanted, such checks
+	 * must be performed by the caller.
 	 *
-	 * NOTE: This function will never re-return `__self', even if `__rect' is the  full
-	 *       rect of `__self', and `__self' describes the buffer's default format. This
-	 *       is because doing also cause `vi_revoke' invoked on the returned buffer  to
-	 *       revoke `__self'.
-	 *
-	 * @assume(__rect->vcr_xdim > 0);
-	 * @assume(__rect->vcr_ydim > 0);
-	 * @assume((__rect->vcr_xmin + __rect->vcr_xdim) > __rect->vcr_xmin);
-	 * @assume((__rect->vcr_ymin + __rect->vcr_ydim) > __rect->vcr_ymin);
-	 * @assume((__rect->vcr_xmin + __rect->vcr_xdim) <= __self->vb_xdim);
-	 * @assume((__rect->vcr_ymin + __rect->vcr_ydim) <= __self->vb_ydim);
-	 * @param: __self: Video surface to create a sub-region of (returned
-	 *                 buffer's format  is derived  from this  surface).
-	 * @param: __rect: Sub-region rect of `__self' to-be returned
-	 * @return: * : The newly created sub-region buffer
+	 * @assume(__phys_rect->vcr_xdim > 0);
+	 * @assume(__phys_rect->vcr_ydim > 0);
+	 * @assume((__phys_rect->vcr_xmin + __phys_rect->vcr_xdim) > __phys_rect->vcr_xmin);
+	 * @assume((__phys_rect->vcr_ymin + __phys_rect->vcr_ydim) > __phys_rect->vcr_ymin);
+	 * @assume((__phys_rect->vcr_xmin + __phys_rect->vcr_xdim) <= video_surface_getbufferxdim(__self));
+	 * @assume((__phys_rect->vcr_ymin + __phys_rect->vcr_ydim) <= video_surface_getbufferydim(__self));
+	 * @param: __self:      Video surface to create a sub-region of (returned
+	 *                      buffer's format  is derived  from this  surface).
+	 * @param: __phys_rect: Sub-region rect of `video_surface_getbuffer(__self)' to-be returned
+	 * @return: * :         The newly created sub-region buffer
 	 * @return: NULL: [errno=ENOMEM] Insufficient memory
 	 * @return: NULL: [errno=*] Failed to create sub-region for some other reason */
 	__ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
 	(LIBVIDEO_GFX_FCC *vi_subregion)(struct video_surface const *__restrict __self,
-	                                 struct video_crect const *__restrict __rect);
+	                                 struct video_crect const *__restrict __phys_rect);
+
+
+	/* When `__self' is a serializable buffer, or is a wrapper for such a buffer,
+	 * revoke any further access to pixel data by replacing all currently-active,
+	 * or future memory mappings of  the buffer with `/dev/void'. Similarly,  any
+	 * GFX operations performed on the buffer after this call will result in weak
+	 * undefined behavior (meaning writes will be lost, and reads yield undefined
+	 * pixel values).
+	 *
+	 * For non-serializable buffers, this function is simply a no-op.
+	 *
+	 * @return: * : Always re-returns `__self' */
+	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_buffer *
+	__NOTHROW_T(LIBVIDEO_GFX_FCC *vi_revoke)(struct video_buffer *__restrict __self);
 };
 
 
@@ -554,13 +573,14 @@ extern __ATTR_INOUT(1) __ATTR_NONNULL((2)) void
 video_buffer_unlockregion(struct video_buffer *__self, struct video_regionlock *__lock);
 
 
-/* Revoke access to non-anonymous pixel data (and maybe even anonymous) of this video buffer.
- * Access  to pixel data of any sub-region created from `__self' (or recursively created form
- * one of those buffers) is also revoked.
+/* When `__self' is a serializable buffer, or is a wrapper for such a buffer,
+ * revoke any further access to pixel data by replacing all currently-active,
+ * or future memory mappings of  the buffer with `/dev/void'. Similarly,  any
+ * GFX operations performed on the buffer after this call will result in weak
+ * undefined behavior (meaning writes will be lost, and reads yield undefined
+ * pixel values).
  *
- * All types of video buffers can have their access revoked, except for buffers returned by
- * `video_domain_newbuffer[_ex]()' (though sub-region buffers of those can be revoked,  and
- * calling this function for one such buffer will do exactly that).
+ * For non-serializable buffers, this function is simply a no-op.
  *
  * @return: * : Always re-returns `__self' */
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_buffer *
@@ -631,19 +651,19 @@ struct video_buffer {
 	struct video_domain const     *__VIDEO_BUFFER_const vb_domain;  /* [1..1][const] Buffer domain (generic wrappers use `video_ramdomain()',
 	                                                                 * meaning a different value here implies that the buffer was created  by
 	                                                                 * that domain's `video_domain_newbuffer()' or `video_domain_formem()') */
-	video_dim_t                    __VIDEO_BUFFER_const vb_xdim;    /* Buffer dimension in X (in pixels) */
-	video_dim_t                    __VIDEO_BUFFER_const vb_ydim;    /* Buffer dimension in Y (in pixels) */
+	video_dim_t                    __VIDEO_BUFFER_const vb_xdim;    /* Buffer physical dimension in X (in pixels) */
+	video_dim_t                    __VIDEO_BUFFER_const vb_ydim;    /* Buffer physical dimension in Y (in pixels) */
 	__uintptr_t                                         vb_refcnt;  /* Reference counter. */
 	/* Buffer-specific fields go here */
 };
 
 /* Acquire/release references to sub-objects that any (initialized) buffer must hold */
 #ifdef LIBVIDEO_GFX_EXPOSE_INTERNALS
-#define __video_buffer_setsubregion(self, parent_surface, parent_buffer)                   \
-	(void)((self)->vb_surf.vs_pal      = (format)->vbf_pal,      \
-	       (self)->vb_surf.vs_flags    = (format)->vbf_flags,    \
-	       (self)->vb_surf.vs_colorkey = (format)->vbf_colorkey, \
-	       (self)->vb_codec            = (format)->vbf_codec)
+#define __video_buffer_setsubregion(self, parent_surface, parent_buffer) \
+	(void)((self)->vb_surf.vs_pal      = (parent_surface)->vs_pal,       \
+	       (self)->vb_surf.vs_flags    = (parent_surface)->vs_flags,     \
+	       (self)->vb_surf.vs_colorkey = (parent_surface)->vs_colorkey,  \
+	       (self)->vb_codec            = (parent_buffer)->vb_codec)
 #define __video_buffer_setformat(self, format)                   \
 	(void)((self)->vb_surf.vs_pal      = (format)->vbf_pal,      \
 	       (self)->vb_surf.vs_flags    = (format)->vbf_flags,    \

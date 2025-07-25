@@ -76,17 +76,11 @@ INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rrot90n(struct video_gfx
  * CAUTION: Just like with `video_buffer_region()', pixel  data
  *          of the returned buffer will be rotated in GFX-only!
  *
- * NOTE: `video_gfx_asbuffer_distinct()' never returns `video_gfx_getbuffer()',
- *       even  if the GFX  context isn't doing anything  that would require the
- *       creation of a separate sub-buffer.
- *
  * @return: * : The video buffer representing a wrapped and const-i-fied copy of `self'
  * @return: NULL: [errno=ENOMEM] Insufficient memory
  * @return: NULL: [errno=*] Failed to create wrapper for some other reason */
 INTDEF WUNUSED ATTR_IN(1) REF struct video_buffer *CC
 libvideo_gfx_asbuffer(struct video_gfx const *__restrict self);
-INTDEF WUNUSED ATTR_IN(1) REF struct video_buffer *CC
-libvideo_gfx_asbuffer_distinct(struct video_gfx const *__restrict self);
 
 
 

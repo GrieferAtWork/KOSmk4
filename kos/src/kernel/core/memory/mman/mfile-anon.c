@@ -349,6 +349,19 @@ again:
 		if (atomic_fetchand(&root->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 			decref_nokill(root);
 
+		/* TODO: There needs to be an operator in "file" that gets called  here
+		 *       in order to facilitate revocation of memory mappings in places
+		 *       such as revocable sub-region mappings of /dev/mem (as used  by
+		 *       the  compositor to share direct access to the screen buffer to
+		 *       user processes)
+		 * TODO: But such an operator would also require locks to all mman-s that
+		 *       are currently mapping our mpart ("root"), which is something our
+		 *       caller didn't acquire for us...
+		 * For this, the  compositor creates custom  sub-region files of  /dev/mem
+		 * which, when  deleted, must  forcefully  replace all  still-live  memory
+		 * mapping of the screen buffer with /dev/void (and do so NOBLOCK+NOTHROW) */
+
+
 		/* Try to merge mem-parts after changing the pointed-to file.
 		 * This  must be done to prevent a race condition relating to
 		 * some very rare cases of async mem-part merging, as well as

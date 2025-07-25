@@ -343,6 +343,19 @@ again_locked:
 				}
 			}
 
+			/* TODO: There needs to be an operator in "self" that gets called  here
+			 *       in order to facilitate revocation of memory mappings in places
+			 *       such as revocable sub-region mappings of /dev/mem (as used  by
+			 *       the  compositor to share direct access to the screen buffer to
+			 *       user processes)
+			 * TODO: But such an operator would also require locks to all mman-s that
+			 *       are currently mapping our mpart ("dropped_part"), which we don't
+			 *       currently acquire above...
+			 * For this, the  compositor creates custom  sub-region files of  /dev/mem
+			 * which, when  deleted, must  forcefully  replace all  still-live  memory
+			 * mapping of the screen buffer with /dev/void (and do so NOBLOCK+NOTHROW) */
+
+
 			/* And with that, this part's been marked made anonymous! */
 			mpart_lock_release(dropped_part);
 

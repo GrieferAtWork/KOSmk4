@@ -452,18 +452,20 @@ libvideo_gfx_rrot90n(struct video_gfx *__restrict self, int n) {
  * CAUTION: Just like with `video_buffer_region()', pixel  data
  *          of the returned buffer will be rotated in GFX-only!
  *
- * NOTE: `video_gfx_asbuffer_distinct()' never returns `video_gfx_getbuffer()',
- *       even  if the GFX  context isn't doing anything  that would require the
- *       creation of a separate sub-buffer.
- *
  * @return: * : The video buffer representing a wrapped and const-i-fied copy of `self'
  * @return: NULL: [errno=ENOMEM] Insufficient memory
  * @return: NULL: [errno=*] Failed to create wrapper for some other reason */
 DEFINE_PUBLIC_ALIAS(video_gfx_asbuffer, libvideo_gfx_asbuffer);
-DEFINE_PUBLIC_ALIAS(video_gfx_asbuffer_distinct, libvideo_gfx_asbuffer_distinct);
 INTERN WUNUSED ATTR_IN(1) REF struct video_buffer *CC
-libvideo_gfx_asbuffer_distinct(struct video_gfx const *__restrict self) {
-	struct video_surface surface = *video_gfx_assurface(self);
+libvideo_gfx_asbuffer(struct video_gfx const *__restrict self) {
+	struct video_surface surface;
+
+	/* If the Clip Rect matches the associated surface, then no region shenanigans are needed. */
+	if (video_gfx_issurfclip(self))
+		return video_surface_asbuffer(video_gfx_assurface(self));
+
+	/* Will always need to create a separate buffer. */
+	surface = *video_gfx_assurface(self);
 	video_buffer_incref(surface.vs_buffer);
 	if (!video_gfx_issurfio(self)) {
 		/* Must create a custom sub-region for the I/O-Rect */
@@ -507,17 +509,6 @@ libvideo_gfx_asbuffer_distinct(struct video_gfx const *__restrict self) {
 err_surface_buffer:
 	video_buffer_decref(surface.vs_buffer);
 	return NULL;
-}
-
-INTERN WUNUSED ATTR_IN(1) REF struct video_buffer *CC
-libvideo_gfx_asbuffer(struct video_gfx const *__restrict self) {
-	/* If the Clip Rect matches the associated surface, then no region shenanigans are needed. */
-	if (video_gfx_issurfclip(self))
-		return video_surface_asbuffer(video_gfx_assurface(self));
-
-	/* Will always need to create a separate buffer, so
-	 * just let the *_distinct variant do all the work. */
-	return libvideo_gfx_asbuffer_distinct(self);
 }
 
 

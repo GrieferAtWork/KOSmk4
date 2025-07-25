@@ -324,6 +324,9 @@ libvideo_swgfx_noblend__absfill(struct video_gfx const *__restrict self,
 	video_pixel_t pixel = video_surface_color2pixel(surface, color);
 	gfx_assert(size_x > 0);
 	gfx_assert(size_y > 0);
+	TRACE_START("swgfx_noblend__absfill("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, color: %#" PRIxCOL ")\n",
+	            dst_x, dst_y, size_x, size_y, color);
 	if likely(LL_wlockregion(buffer, &lock, dst_x, dst_y, size_x, size_y)) {
 		/* Use the low-level linefill operator from the video codec */
 		video_codec_rectfill_t vc_rectfill = video_buffer_getcodec(buffer)->vc_rectfill;
@@ -334,6 +337,7 @@ libvideo_swgfx_noblend__absfill(struct video_gfx const *__restrict self,
 		/* Use pixel-based rendering */
 		libvideo_swgfx_noblend__absfill__bypixel(self, dst_x, dst_y, size_x, size_y, pixel);
 	}
+	TRACE_END("swgfx_noblend__absfill()");
 }
 
 PRIVATE ATTR_IN(1) ATTR_IN(6) void CC
@@ -431,7 +435,7 @@ libvideo_swgfx_noblend_interp8888__absgradient(struct video_gfx const *__restric
 	pixels[1][0] = video_surface_color2pixel(surface, colors[1][0]);
 	pixels[1][1] = video_surface_color2pixel(surface, colors[1][1]);
 
-	TRACE_START("noblend_interp8888__absgradient("
+	TRACE_START("swgfx_noblend_interp8888__absgradient("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "colors: {{%#" PRIxCOL ", %#" PRIxCOL "}, {%#" PRIxCOL ", %#" PRIxCOL "}})\n",
 	            dst_x_, dst_y_, size_x_, size_y_,
@@ -508,7 +512,7 @@ libvideo_swgfx_noblend_interp8888__absgradient(struct video_gfx const *__restric
 	} else {
 		libvideo_swgfx_noblend_interp8888__absgradient__bypixel(self, dst_x_, dst_y_, size_x_, size_y_, pixels);
 	}
-	TRACE_END("noblend_interp8888__absgradient()\n");
+	TRACE_END("swgfx_noblend_interp8888__absgradient()\n");
 }
 
 PRIVATE ATTR_IN(1) void CC
@@ -556,7 +560,7 @@ libvideo_swgfx_noblend_interp8888__absgradient_h(struct video_gfx const *__restr
 		return;
 	}
 
-	TRACE_START("noblend_interp8888__absgradient_h("
+	TRACE_START("swgfx_noblend_interp8888__absgradient_h("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "colors: {%#" PRIxCOL ", %#" PRIxCOL "})\n",
 	            dst_x, dst_y, size_x, size_y,
@@ -594,7 +598,7 @@ libvideo_swgfx_noblend_interp8888__absgradient_h(struct video_gfx const *__restr
 		                                                          lopixel, hipixel, pad_xmin, pad_xmax,
 		                                                          fp_src_x, fp_step_x);
 	}
-	TRACE_END("noblend_interp8888__absgradient_h()\n");
+	TRACE_END("swgfx_noblend_interp8888__absgradient_h()\n");
 }
 
 PRIVATE ATTR_IN(1) void CC
@@ -642,7 +646,7 @@ libvideo_swgfx_noblend_interp8888__absgradient_v(struct video_gfx const *__restr
 		return;
 	}
 
-	TRACE_START("noblend_interp8888__absgradient_v("
+	TRACE_START("swgfx_noblend_interp8888__absgradient_v("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "colors: {%#" PRIxCOL ", %#" PRIxCOL "})\n",
 	            dst_x, dst_y, size_x, size_y,
@@ -680,7 +684,7 @@ libvideo_swgfx_noblend_interp8888__absgradient_v(struct video_gfx const *__restr
 		                                                          lopixel, hipixel, pad_ymin, pad_ymax,
 		                                                          fp_src_y, fp_step_y);
 	}
-	TRACE_END("noblend_interp8888__absgradient_v()\n");
+	TRACE_END("swgfx_noblend_interp8888__absgradient_v()\n");
 }
 
 
@@ -737,7 +741,7 @@ libvideo_swgfx_noblend__fillmask1(struct video_gfx const *__restrict self,
 	struct video_surface const *surface = video_gfx_assurface(self);
 	struct video_buffer *buffer = video_surface_getbuffer(surface);
 	video_pixel_t pixel = video_surface_color2pixel(surface, color);
-	TRACE_START("noblend__fillmask1("
+	TRACE_START("swgfx_noblend__fillmask1("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", bm: %p+%" PRIuPTR ", "
 	            "bm_xor: %#" PRIxN(__SIZEOF_REGISTER__) ")\n",
@@ -853,7 +857,7 @@ next_row:
 	                                           size_x, size_y,
 	                                           pixel, bm, bm_xor);
 done:
-	TRACE_END("noblend__fillmask1()\n");
+	TRACE_END("swgfx_noblend__fillmask1()\n");
 }
 
 PRIVATE ATTR_IN(1) ATTR_IN(7) void CC
@@ -908,7 +912,7 @@ libvideo_swgfx_noblend__fillmask(struct video_gfx const *__restrict self,
 	video_pixel_t bg_fg_pixel[2];
 	bg_fg_pixel[0] = video_surface_color2pixel(surface, bg_fg_colors[0]);
 	bg_fg_pixel[1] = video_surface_color2pixel(surface, bg_fg_colors[1]);
-	TRACE_START("noblend__fillmask("
+	TRACE_START("swgfx_noblend__fillmask("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "bg_fg_colors: {%#" PRIxCOL ", %#" PRIxCOL "}, bm: %p+%" PRIuPTR ")\n",
 	            dst_x, dst_y, size_x, size_y, bg_fg_colors[0], bg_fg_colors[1],
@@ -1034,7 +1038,7 @@ libvideo_swgfx_noblend__fillmask(struct video_gfx const *__restrict self,
 	/* Use pixel-based rendering */
 	libvideo_swgfx_noblend__fillmask__bypixel(self, dst_x, dst_y, size_x, size_y, bg_fg_pixel, bm);
 done:
-	TRACE_END("noblend__fillmask()\n");
+	TRACE_END("swgfx_noblend__fillmask()\n");
 }
 
 DECL_END

@@ -192,25 +192,21 @@ video_surface_getgfx(struct video_surface const *__self,
  * On the other hand, this function only works for creating **true** sub-rects, but
  * since this one is implemented by individual buffers, it is probably faster, too.
  *
- * Buffers  returned by this function are guarantied  to share pixel access with `__self',
- * and `video_buffer_revoke' is to `__self' will  also revoke access for `return'  (either
- * directly, by keeping a list of sub-region buffers in `__self', or indirectly, by having
- * every access to pixel-data in `return' check if `__self' has been revoked).
- *
- * NOTE: This function will never re-return `__self', even if `__rect' is the  full
- *       rect of `__self', and `__self' describes the buffer's default format. This
- *       is because doing also cause `vi_revoke' invoked on the returned buffer  to
- *       revoke `__self'.
- *
  * @assume(__rect->vcr_xdim > 0);
  * @assume(__rect->vcr_ydim > 0);
  * @assume((__rect->vcr_xmin + __rect->vcr_xdim) > __rect->vcr_xmin);
  * @assume((__rect->vcr_ymin + __rect->vcr_ydim) > __rect->vcr_ymin);
  * @assume((__rect->vcr_xmin + __rect->vcr_xdim) <= video_surface_getxdim(__self));
  * @assume((__rect->vcr_ymin + __rect->vcr_ydim) <= video_surface_getydim(__self));
+ * @assume(__buffer_rect->vcr_xdim > 0);
+ * @assume(__buffer_rect->vcr_ydim > 0);
+ * @assume((__buffer_rect->vcr_xmin + __buffer_rect->vcr_xdim) > __buffer_rect->vcr_xmin);
+ * @assume((__buffer_rect->vcr_ymin + __buffer_rect->vcr_ydim) > __buffer_rect->vcr_ymin);
+ * @assume((__buffer_rect->vcr_xmin + __buffer_rect->vcr_xdim) <= video_surface_getbufferxdim(__self));
+ * @assume((__buffer_rect->vcr_ymin + __buffer_rect->vcr_ydim) <= video_surface_getbufferydim(__self));
  * @param: __self: Video surface to create a sub-region of (returned
  *                 buffer's format  is derived  from this  surface).
- * @param: __rect: Sub-region rect of `__self' to-be returned
+ * @param: __rect/__buffer_rect: Sub-region rect of `__self' (or its buffer) to-be returned
  * @return: * : The newly created sub-region buffer
  * @return: NULL: [errno=ENOMEM] Insufficient memory
  * @return: NULL: [errno=*] Failed to create sub-region for some other reason */
@@ -231,17 +227,17 @@ _video_surface_subregion_distinct(struct video_surface const *__restrict __self,
 /* Helpers wrappers for applying `video_surface' operations directly to `video_buffer' */
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *
 video_buffer_subregion(struct video_buffer *__restrict __self,
-                       struct video_crect const *__restrict __rect);
+                       struct video_crect const *__restrict __buffer_rect);
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *
 video_buffer_subregion_distinct(struct video_buffer *__restrict __self,
-                                struct video_crect const *__restrict __rect);
+                                struct video_crect const *__restrict __buffer_rect);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *
 video_buffer_region(struct video_buffer *__restrict __self,
-                    struct video_rect const *__restrict __rect);
+                    struct video_rect const *__restrict __buffer_rect);
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *
 video_buffer_region_distinct(struct video_buffer *__restrict __self,
-                             struct video_rect const *__restrict __rect);
+                             struct video_rect const *__restrict __buffer_rect);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Do the inverse of `video_buffer_*open' and save the contents of a video buffer
@@ -391,13 +387,13 @@ video_buffer_convert_distinct(struct video_buffer *__restrict __self,
 __LOCAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __REF struct video_buffer *
 video_surface_subregion_distinct(struct video_surface const *__restrict __self,
                                  struct video_crect const *__restrict __rect) {
+	struct video_crect __buffer_rect;
 	if unlikely(video_surface_getflags(__self) & VIDEO_GFX_F_XYSWAP) {
-		struct video_crect __buffer_rect;
 		__buffer_rect.vcr_xmin = __rect->vcr_ymin;
 		__buffer_rect.vcr_ymin = __rect->vcr_xmin;
 		__buffer_rect.vcr_xdim = __rect->vcr_ydim;
 		__buffer_rect.vcr_ydim = __rect->vcr_xdim;
-		return _video_surface_subregion_distinct(__self, &__buffer_rect);
+		__rect = &__buffer_rect;
 	}
 	return _video_surface_subregion_distinct(__self, __rect);
 }
@@ -530,6 +526,12 @@ typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_IN_T(2) __REF struct video_buffer
 typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_SURFACE_REGION_DISTINCT)(struct video_surface const *__restrict __self,
                                                   struct video_rect const *__restrict __rect);
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *P_VIDEO_SURFACE_REGION)(struct video_surface const *__restrict __self,
+                                          struct video_rect const *__restrict __buffer_rect);
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *P_VIDEO_SURFACE_REGION_DISTINCT)(struct video_surface const *__restrict __self,
+                                                   struct video_rect const *__restrict __buffer_rect);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_surface_region(struct video_surface const *__restrict __self,
@@ -539,34 +541,10 @@ video_surface_region_distinct(struct video_surface const *__restrict __self,
                               struct video_rect const *__restrict __rect);
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
 _video_surface_region(struct video_surface const *__restrict __self,
-                      struct video_rect const *__restrict __buffer_rect) {
-#ifndef __INTELLISENSE__
-	if unlikely(video_surface_getflags(__self) & VIDEO_GFX_F_XYSWAP) {
-		struct video_rect __rect;
-		__rect.vr_xmin = __buffer_rect->vr_ymin;
-		__rect.vr_ymin = __buffer_rect->vr_xmin;
-		__rect.vr_xdim = __buffer_rect->vr_ydim;
-		__rect.vr_ydim = __buffer_rect->vr_xdim;
-		return video_surface_region(__self, &__rect);
-	}
-	return video_surface_region(__self, __buffer_rect);
-#endif /* !__INTELLISENSE__ */
-}
+                      struct video_rect const *__restrict __buffer_rect);
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
 _video_surface_region_distinct(struct video_surface const *__restrict __self,
-                               struct video_rect const *__restrict __buffer_rect) {
-#ifndef __INTELLISENSE__
-	if unlikely(video_surface_getflags(__self) & VIDEO_GFX_F_XYSWAP) {
-		struct video_rect __rect;
-		__rect.vr_xmin = __buffer_rect->vr_ymin;
-		__rect.vr_ymin = __buffer_rect->vr_xmin;
-		__rect.vr_xdim = __buffer_rect->vr_ydim;
-		__rect.vr_ydim = __buffer_rect->vr_xdim;
-		return video_surface_region_distinct(__self, &__rect);
-	}
-	return video_surface_region_distinct(__self, __buffer_rect);
-#endif /* !__INTELLISENSE__ */
-}
+                               struct video_rect const *__restrict __buffer_rect);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
@@ -615,9 +593,7 @@ video_surface_asbuffer_distinct(struct video_surface const *__restrict __self) {
 __LOCAL __ATTR_WUNUSED __ATTR_IN(1) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_surface_asbuffer(struct video_surface const *__restrict __self) {
 #ifndef __INTELLISENSE__
-	if (video_surface_getflags(__self) == video_surface_getdefaultflags(__self) &&
-	    video_surface_getpalette(__self) == video_surface_getdefaultpalette(__self) &&
-	    video_surface_getcolorkey(__self) == video_surface_getdefaultcolorkey(__self)) {
+	if (video_surface_isdefault(__self)) {
 		__REF struct video_buffer *__result = video_surface_getbuffer(__self);
 		video_buffer_incref(__result);
 		return __result;
@@ -625,7 +601,6 @@ video_surface_asbuffer(struct video_surface const *__restrict __self) {
 	return video_surface_asbuffer_distinct(__self);
 #endif /* !__INTELLISENSE__ */
 }
-
 
 __DECL_END
 #endif /* __CC__ */
