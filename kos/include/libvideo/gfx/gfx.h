@@ -1259,9 +1259,6 @@ struct video_gfxhdr {
 //	video_dim_t                 vxh_bydim;    /* [== vxh_byend - vxh_bymin][<= vxh_cydim] I/O Rect height */
 };
 
-#define _video_gfxhdr_bxsiz(self) ((self)->vxh_bxend - (self)->vxh_bxmin)
-#define _video_gfxhdr_bysiz(self) ((self)->vxh_byend - (self)->vxh_bymin)
-
 struct video_gfx {
 	struct video_surface vx_surf;  /* Video surface with which to interact. */
 	/* TODO: Rename "video_gfxhdr" to something like "video_gfxclip" (and also rename `vx_hdr' to `vx_clip') */

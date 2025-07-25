@@ -126,7 +126,7 @@ frame2anim(REF struct video_buffer *frame) {
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
 convert_to_wanted_domain(struct video_domain const *__restrict domain,
                          /*inherit(always)*/ REF struct video_buffer *__restrict self) {
-	if unlikely(self->vb_domain != domain) {
+	if unlikely(video_buffer_getdomain(self) != domain) {
 		REF struct video_buffer *converted;
 		struct video_buffer_format result_format;
 		video_buffer_getformat(self, &result_format);

@@ -151,9 +151,8 @@ lockable_buffer__subregion_impl(struct video_surface const *__restrict surface,
 	result->lb_stride = self->lb_stride;
 	result->lb_data += base_yoff * result->lb_stride;
 	result->lb_data += base_yoff * result->lb_stride;
-	video_codec_xcoord_to_offset(result->vb_codec, base_xoff,
-	                             &result->lbsb_bxoff,
-	                             &result->lbsb_bxrem);
+	video_codec_xcoord_to_offset(video_buffer_getcodec(result), base_xoff,
+	                             &result->lbsb_bxoff, &result->lbsb_bxrem);
 	result->lbsb_xoff     = base_xoff;
 	result->lbsb_yoff     = base_yoff;
 	result->lbsb_lockable = self;
@@ -732,7 +731,7 @@ lockable_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
 INTERN ATTR_PURE WUNUSED ATTR_IN(1) bool CC
 libvideo_buffer_islockable(struct video_buffer const *__restrict self) {
 	/* List of RAM-domain buffers that are known to always be lockable */
-	if (self->vb_domain == &libvideo_ramdomain) {
+	if (video_buffer_getdomain(self) == &libvideo_ramdomain) {
 		if (self->vb_ops == &lockable_buffer_ops)
 			goto yes;
 		if (self->vb_ops == &lockable_buffer_subregion_norem_ops)

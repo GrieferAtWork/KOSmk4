@@ -242,8 +242,8 @@ hist_palettize(struct video_gfx const *__restrict self,
 
 	/* Check if the histogram is usable */
 	if (fail_if_too_many_bins) {
-		video_dim_t io_sx = _video_gfxhdr_bxsiz(&self->vx_hdr);
-		video_dim_t io_sy = _video_gfxhdr_bysiz(&self->vx_hdr);
+		video_dim_t io_sx = video_gfx_getioxdim(self);
+		video_dim_t io_sy = video_gfx_getioydim(self);
 		size_t io_pixels  = (size_t)io_sx * io_sy;
 		video_pixel_t i;
 		size_t pal_pixels = 0;
@@ -265,8 +265,8 @@ hist_palettize(struct video_gfx const *__restrict self,
 		video_pixel_t i;
 		uint64_t pal_pixels_adj;
 		size_t pal_pixels = 0;
-		video_dim_t io_sx = _video_gfxhdr_bxsiz(&self->vx_hdr);
-		video_dim_t io_sy = _video_gfxhdr_bysiz(&self->vx_hdr);
+		video_dim_t io_sx = video_gfx_getioxdim(self);
+		video_dim_t io_sy = video_gfx_getioydim(self);
 		size_t io_pixels  = (size_t)io_sx * io_sy;
 		for (i = 0; i < palsize; ++i) {
 			video_color_t c = h->h_colors[i].hb_color;
@@ -471,7 +471,7 @@ PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_GFX_FCC
 median_io_gfx(void const *cookie, mc_index_t i) {
 	/* Fallback median-cut I/O callback using direct GFX color reads (slow) */
 	struct video_gfx const *self = (struct video_gfx const *)cookie;
-	video_dim_t io_sx = _video_gfxhdr_bxsiz(&self->vx_hdr);
+	video_dim_t io_sx = video_gfx_getioxdim(self);
 	video_coord_t y = self->vx_hdr.vxh_bymin + (i / io_sx);
 	video_coord_t x = self->vx_hdr.vxh_bxmin + (i % io_sx);
 	/* TODO: Check that "self" is SW-based */
@@ -490,10 +490,10 @@ median_cut_start(struct video_gfx const *__restrict self,
                  video_color_t constant_alpha) {
 	struct median_io io;
 	if (video_gfx_issurfio(self) &&
-	    /* TODO: This actually works for any XXXX8888 codec. Just need  to
-	     *       "video_gfx_getbuffer(self)->vb_codec->vc_color2pixel" the
-	     *       produced  palette entries afterwards, and always pass the
-	     *       codec's alpha-mask instead of "constant_alpha". */
+	    /* TODO: This actually works for any XXXX8888 codec. Just need to
+	     *       "video_gfx_getcodec(self)->vc_color2pixel" the  produced
+	     *       palette  entries afterwards, and always pass the codec's
+	     *       alpha-mask instead of "constant_alpha". */
 	    video_gfx_getcodec(self)->vc_codec == VIDEO_CODEC_RGBA8888) {
 		struct video_lock lock;
 		if (video_buffer_rlock(video_gfx_getbuffer(self), &lock) == 0) {
@@ -537,8 +537,8 @@ median_cut_palettize(struct video_gfx const *__restrict self,
 	 *       its speed against mine (maybe mine just sucks?)
 	 * TODO: Live with median_cut being slow, and adjust documentation accordingly. */
 	mc_index_t i, io_pixels, *gfx_indices;
-	video_dim_t io_sx = _video_gfxhdr_bxsiz(&self->vx_hdr);
-	video_dim_t io_sy = _video_gfxhdr_bysiz(&self->vx_hdr);
+	video_dim_t io_sx = video_gfx_getioxdim(self);
+	video_dim_t io_sy = video_gfx_getioydim(self);
 	shift_t pal_depth;
 	if (OVERFLOW_UMUL(io_sx, io_sy, &io_pixels)) {
 		errno = EOVERFLOW;

@@ -219,22 +219,22 @@ libvideo_gfx_offset2coord__generic(struct video_gfx const *__restrict self,
                                    video_offset_t x, video_offset_t y,
                                    video_coord_t coords[2]) {
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxdim - 1) - x;
+		x = (video_gfx_getclipxdim(self) - 1) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cydim - 1) - y;
+		y = (video_gfx_getclipydim(self) - 1) - y;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxdim);
+		x = wrap(x, video_gfx_getclipxdim(self));
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxdim);
-	x += self->vx_hdr.vxh_cxoff;
-	y += self->vx_hdr.vxh_cyoff;
-	if unlikely((video_coord_t)x < self->vx_hdr.vxh_bxmin)
+		y = wrap(y, video_gfx_getclipydim(self));
+	x += video_gfx_getclipxmin(self);
+	y += video_gfx_getclipymin(self);
+	if unlikely((video_coord_t)x < video_gfx_getioxmin(self))
 		goto fail;
-	if unlikely((video_coord_t)y < self->vx_hdr.vxh_bymin)
+	if unlikely((video_coord_t)y < video_gfx_getioymin(self))
 		goto fail;
-	if unlikely((video_coord_t)x >= self->vx_hdr.vxh_bxend)
+	if unlikely((video_coord_t)x >= video_gfx_getioxend(self))
 		goto fail;
-	if unlikely((video_coord_t)y >= self->vx_hdr.vxh_byend)
+	if unlikely((video_coord_t)y >= video_gfx_getioyend(self))
 		goto fail;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP) {
 		video_offset_t temp;
@@ -265,20 +265,20 @@ libvideo_gfx_coord2offset__generic(struct video_gfx const *__restrict self,
 		x    = y;
 		y    = temp;
 	}
-	if unlikely(x < self->vx_hdr.vxh_bxmin)
+	if unlikely(x < video_gfx_getioxmin(self))
 		goto fail;
-	if unlikely(y < self->vx_hdr.vxh_bymin)
+	if unlikely(y < video_gfx_getioymin(self))
 		goto fail;
-	if unlikely(x >= self->vx_hdr.vxh_bxend)
+	if unlikely(x >= video_gfx_getioxend(self))
 		goto fail;
-	if unlikely(y >= self->vx_hdr.vxh_byend)
+	if unlikely(y >= video_gfx_getioyend(self))
 		goto fail;
-	x -= self->vx_hdr.vxh_cxoff;
-	y -= self->vx_hdr.vxh_cyoff;
+	x -= video_gfx_getclipxmin(self);
+	y -= video_gfx_getclipymin(self);
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		x = (self->vx_hdr.vxh_cxdim - 1) - x;
+		x = (video_gfx_getclipxdim(self) - 1) - x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		y = (self->vx_hdr.vxh_cydim - 1) - y;
+		y = (video_gfx_getclipydim(self) - 1) - y;
 	offsets[0] = (video_offset_t)x;
 	offsets[1] = (video_offset_t)y;
 	return true;

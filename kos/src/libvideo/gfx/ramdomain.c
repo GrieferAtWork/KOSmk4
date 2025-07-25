@@ -135,7 +135,7 @@ rambuffer__subregion__common(struct video_surface const *__restrict surface,
 	if unlikely(!result)
 		goto err;
 	__video_buffer_init_subregion(result, surface, self, rect);
-	video_codec_xcoord_to_offset(result->vb_codec, rect->vcr_xmin,
+	video_codec_xcoord_to_offset(video_buffer_getcodec(result), rect->vcr_xmin,
 	                             &x_byte_offset, &result->rbs_bxrem);
 	__video_buffer_init_ops(result, result->rbs_bxrem ? _rambuffer_subregion_ops()
 	                                                  : _rambuffer_subregion_norem_ops());
@@ -285,9 +285,9 @@ libvideo_ramdomain_formem(struct video_domain const *__restrict self,
 	}
 
 	/* Must use a different, fallback "codec" that can deal with bad alignment */
-	if (!IS_ALIGNED(stride, result->vb_codec->vc_align) ||
-	    !IS_ALIGNED((uintptr_t)mem, result->vb_codec->vc_align))
-		result->vb_codec = result->vb_codec->vc_nalgn;
+	if (!IS_ALIGNED(stride, video_buffer_getcodec(result)->vc_align) ||
+	    !IS_ALIGNED((uintptr_t)mem, video_buffer_getcodec(result)->vc_align))
+		result->vb_codec = video_buffer_getcodec(result)->vc_nalgn;
 
 	/* Validate palette configuration */
 	__video_buffer_init_domain(result, self);

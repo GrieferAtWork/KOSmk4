@@ -393,7 +393,7 @@ libvideo_swblitter_samebuf__stretch__with_temporary(struct video_blitter const *
 	__video_buffer_init_ops(&rb, _rambuffer_ops());
 	__video_buffer_init_dim(&rb, common_size_x, common_size_y);
 	(*rb.vb_codec->vc_rambuffer_requirements)(common_size_x, common_size_y, &req);
-	rb.vb_codec  = srcbuf->vb_codec;
+	rb.vb_codec  = video_buffer_getcodec(srcbuf);
 	rb.rb_stride = req.vbs_stride;
 	rb.rb_data   = (byte_t *)malloca(req.vbs_bufsize);
 	if unlikely(!rb.rb_data) {

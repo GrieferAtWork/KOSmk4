@@ -165,6 +165,7 @@ typedef __ATTR_NONNULL_T((2, 3)) __ssize_t
 
 
 struct svga_palette_color {
+	/* TODO: Instead of this, just use `video_color_t' (so libvideo doesn't have to use an intermediate buffer) */
 	__uint8_t spc_r; /* Red */
 	__uint8_t spc_g; /* Green */
 	__uint8_t spc_b; /* Blue */

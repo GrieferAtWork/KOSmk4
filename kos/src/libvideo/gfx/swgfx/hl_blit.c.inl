@@ -226,8 +226,8 @@ LOCAL_libvideo_swblitter_blit_rdwrap(LOCAL_struct_video_blitter const *__restric
 		 * NOTE: Don't convert the entire "src" buffer; only the rect that will
 		 *       be accessed below needs to be copied! */
 		if ((size_x > src->vx_hdr.vxh_cxdim || size_y > src->vx_hdr.vxh_cydim) &&
-		    (src->vx_surf.vs_buffer->vb_codec != dst->vx_surf.vs_buffer->vb_codec ||
-		     src->vx_surf.vs_buffer->vb_surf.vs_pal != dst->vx_surf.vs_buffer->vb_surf.vs_pal)) {
+		    (video_gfx_getcodec(src) != video_gfx_getcodec(dst) ||
+		     video_gfx_getpalette(src) != video_gfx_getpalette(dst))) {
 			/* TODO */
 		}
 #endif /* !LOCAL_USE_SWBLITTER3 */
@@ -500,8 +500,8 @@ LOCAL_libvideo_swblitter_stretch_rdwrap(LOCAL_struct_video_blitter const *__rest
 		 * NOTE: Don't convert the entire "src" buffer; only the rect that will
 		 *       be accessed below needs to be copied! */
 		if ((src_size_x > src->vx_hdr.vxh_cxdim || src_size_y > src->vx_hdr.vxh_cydim) &&
-		    (src->vx_surf.vs_buffer->vb_codec != dst->vx_surf.vs_buffer->vb_codec ||
-		     src->vx_surf.vs_buffer->vb_surf.vs_pal != dst->vx_surf.vs_buffer->vb_surf.vs_pal)) {
+		    (video_gfx_getcodec(src) != video_gfx_getcodec(dst) ||
+		     video_gfx_getpalette(src) != video_gfx_getpalette(dst))) {
 			/* TODO */
 		}
 #endif /* !LOCAL_USE_SWBLITTER3 */

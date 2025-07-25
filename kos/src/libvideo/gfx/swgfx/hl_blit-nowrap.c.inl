@@ -491,12 +491,12 @@ LOCAL_libvideo_swblitter_blit(LOCAL_struct_video_blitter const *__restrict self
 #endif /* !LOCAL_USE_SWBLITTER3 */
 	if (src->vx_surf.vs_flags & VIDEO_GFX_F_XMIRROR) {
 		src_x -= src->vx_hdr.vxh_bxmin;
-		src_x = (_video_gfxhdr_bxsiz(&src->vx_hdr) - LOCAL_src_size_x) - src_x;
+		src_x = (video_gfx_getioxdim(src) - LOCAL_src_size_x) - src_x;
 		src_x += src->vx_hdr.vxh_bxmin;
 	}
 	if (src->vx_surf.vs_flags & VIDEO_GFX_F_YMIRROR) {
 		src_y -= src->vx_hdr.vxh_bymin;
-		src_y = (_video_gfxhdr_bysiz(&src->vx_hdr) - LOCAL_src_size_y) - src_y;
+		src_y = (video_gfx_getioydim(src) - LOCAL_src_size_y) - src_y;
 		src_y += src->vx_hdr.vxh_bymin;
 	}
 

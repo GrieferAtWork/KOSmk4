@@ -197,7 +197,7 @@ custom_buffer__subregion_impl(struct video_surface const *__restrict surface,
 	__video_buffer_init_subregion(result, surface, parent, rect);
 	result->cbsr_xoff = parent_xoff + rect->vcr_xmin;
 	result->cbsr_yoff = parent_yoff + rect->vcr_ymin;
-	video_codec_xcoord_to_offset(result->vb_codec, result->cbsr_xoff,
+	video_codec_xcoord_to_offset(video_buffer_getcodec(result), result->cbsr_xoff,
 	                             &result->cbsr_bxoff, &result->cbsr_bxrem);
 	result->vb_ops = !result->cbsr_xoff && !result->cbsr_yoff
 	                 ? _custom_buffer_subregion_nooff_ops()
@@ -364,7 +364,7 @@ custom_buffer__rlockregion(struct video_buffer *__restrict self,
 	if (rlock) {
 		int result;
 		size_t xoff;
-		video_codec_xcoord_to_offset(me->vb_codec,
+		video_codec_xcoord_to_offset(video_buffer_getcodec(me),
 		                             lock->_vrl_rect.vcr_xmin,
 		                             &xoff, &lock->vrl_xbas);
 		result = (*rlock)(me->cbc_cookie, &lock->vrl_lock);
@@ -400,7 +400,7 @@ custom_buffer__wlockregion(struct video_buffer *__restrict self,
 	if (wlock) {
 		int result;
 		size_t xoff;
-		video_codec_xcoord_to_offset(me->vb_codec,
+		video_codec_xcoord_to_offset(video_buffer_getcodec(me),
 		                             lock->_vrl_rect.vcr_xmin,
 		                             &xoff, &lock->vrl_xbas);
 		result = (*wlock)(me->cbc_cookie, &lock->vrl_lock);
@@ -426,7 +426,7 @@ NOTHROW(FCC custom_buffer__unlockregion)(struct video_buffer *__restrict self,
 	} else if (me->cbc_unlock) {
 		size_t xoff;
 		video_coord_t xrem;
-		video_codec_xcoord_to_offset(self->vb_codec,
+		video_codec_xcoord_to_offset(video_buffer_getcodec(self),
 		                             lock->_vrl_rect.vcr_xmin,
 		                             &xoff, &xrem);
 		assert(xrem == lock->vrl_xbas);

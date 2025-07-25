@@ -60,7 +60,7 @@ rambuffer__initgfx_common(struct video_gfx *__restrict self) {
 	static_assert(sizeof(struct gfx_ramdrv) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)));
 	struct video_rambuffer *me = (struct video_rambuffer *)video_gfx_getbuffer(self);
 	struct gfx_ramdrv *drv = video_ramgfx_getdrv(self);
-	drv->grd_codec  = me->vb_codec;
+	drv->grd_codec  = video_buffer_getcodec(me);
 	drv->grd_stride = me->rb_stride;
 	drv->grd_data   = me->rb_data;
 
@@ -70,7 +70,7 @@ rambuffer__initgfx_common(struct video_gfx *__restrict self) {
 
 	/* Load optimized pixel accessors if applicable to the loaded format. */
 #ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
-	switch (me->vb_codec->vc_specs.vcs_bpp) {
+	switch (video_buffer_getcodec(me)->vc_specs.vcs_bpp) {
 	case 8:
 		drv->xsw_setpixel = &ramgfx__setpixel8;
 		drv->xsw_getpixel = &ramgfx__getpixel8;
@@ -114,7 +114,7 @@ rambuffer__initgfx_common(struct video_gfx *__restrict self) {
 	}
 
 	/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
-	if (me->vb_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+	if (video_buffer_getcodec(me)->vc_codec == VIDEO_CODEC_RGBA8888) {
 		if (drv->xsw_getcolor == &ramgfx__getcolor)
 			drv->xsw_getcolor = drv->xsw_getpixel;
 		if (drv->xsw_putcolor == &ramgfx__putcolor_noblend) {

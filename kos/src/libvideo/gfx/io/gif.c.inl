@@ -606,7 +606,7 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 	}
 
 	/* Check if we need to convert from a palette-based output buffer to a direct-color one */
-	codec = frame->vb_codec;
+	codec = video_buffer_getcodec(frame);
 	if ((self->gb_lct != lct) &&
 	    (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) &&
 	    /* When the old frame gets disposed, then we also don't need DCOL mode */
@@ -702,7 +702,7 @@ err_dcol_buffer:
 		assert(self->vaf_frame == frame);
 		video_buffer_decref(frame);            /* Decref old (palette) frame */
 		self->vaf_frame = frame = dcol_buffer; /* Inherit reference */
-		codec = frame->vb_codec;
+		codec = video_buffer_getcodec(frame);
 	} else {
 		if unlikely(video_buffer_wlock(frame, &frame_lock))
 			goto err;
