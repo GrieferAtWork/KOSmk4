@@ -53,6 +53,9 @@ struct video_palette {
 	struct video_palette_tree              *_vp_tree;   /* [0..1] Internal cache used by `video_palette_optimize()' */
 	video_palette_flag_t                     vp_flags;  /* [const] Video palette flags (filled in by `video_palette_optimize()') */
 	video_pixel_t                            vp_cnt;    /* [const] # of colors (must be >= what is required by the associated codec) */
+	/* TODO: Change `struct video_palette' such that `vp_pal' is at offset=0,
+	 *       and all other fields above are at negative offsets (meaning that
+	 *       the struct's reference base is right here). */
 	__COMPILER_FLEXIBLE_ARRAY(video_color_t, vp_pal);   /* [vp_cnt] Palette colors */
 };
 

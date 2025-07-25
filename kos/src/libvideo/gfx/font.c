@@ -187,7 +187,7 @@ libvideo_fontprintch(struct video_fontprinter_data *__restrict self,
 again_do_render:
 		if (self->vfp_lnstart < self->vfp_lnend) {
 			/* Must force wrap-around when a line grows too long. */
-			result = self->vfp_font->glyphsize(self->vfp_height, ch);
+			result = video_font_glyphsize(self->vfp_font, self->vfp_height, ch);
 			if (self->vfp_curx + (video_offset_t)result > self->vfp_lnend) {
 				self->vfp_curx  = self->vfp_lnstart;
 				self->vfp_cury += self->vfp_height;
@@ -195,11 +195,12 @@ again_do_render:
 		}
 
 		/* Can just render text without worrying about anything! */
-		result = self->vfp_font->drawglyph2(self->vfp_gfx,
-		                                    self->vfp_curx,
-		                                    self->vfp_cury,
-		                                    self->vfp_height, ch,
-		                                    self->vfp_bg_fg_colors);
+		result = video_font_drawglyph2(self->vfp_font,
+		                               self->vfp_gfx,
+		                               self->vfp_curx,
+		                               self->vfp_cury,
+		                               self->vfp_height, ch,
+		                               self->vfp_bg_fg_colors);
 		if (!result && self->vfp_height != 0) {
 			/* Try a bunch of substitution characters */
 			switch (ch) {

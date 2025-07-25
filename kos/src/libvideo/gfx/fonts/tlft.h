@@ -36,6 +36,28 @@
 
 DECL_BEGIN
 
+#if 0 /* TODO */
+struct video_buffer;
+struct tlft_font: video_font {
+#define tlft_font_gethdr(self) ((TLFT_Hdr *)(self)->tf_map.mf_addr)
+	uintptr_t                tf_weakrefcnt; /* Weak reference counter */
+	struct mapfile           tf_map;        /* [const] Memory mapping of tlft file */
+	TLFT_UniGroup           *tf_grps;       /* [0..tlft_font_gethdr(this)->h_ngroups][const] Unicode groups. */
+	byte_t                  *tf_ascii;      /* [1..1][const] Ascii character bitmaps (`h_ascii'). */
+	uintptr_t                tf_bestheight; /* [const] Font height for best results, and Y-delta between characters in `tf_'. */
+	REF struct video_buffer *tf_chars;      /* [1..1][const] P1_MSB video buffer for font mappings */
+};
+
+/* Return the V-table used by `struct tlft_font' */
+INTDEF ATTR_RETNONNULL WUNUSED struct video_font_ops *CC _libvideo_tlft_ops(void);
+#define libvideo_tlft_ops (*_libvideo_tlft_ops())
+
+/* Returns `(REF struct video_font *)-1' if not a tlft file.
+ * Upon  success,  the  mmap-ed  region  `mf'  is inherited. */
+INTDEF WUNUSED NONNULL((1, 2)) REF struct video_font *CC
+libvideo_font_tryopen_tlft(struct video_domain const *__restrict domain,
+                           struct mapfile const *__restrict mf);
+#else
 struct tlft_font: video_font {
 	struct mapfile tf_map;
 #define tlft_font_gethdr(self) ((TLFT_Hdr *)(self)->tf_map.mf_addr)
@@ -53,6 +75,7 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_font_ops *CC _libvideo_tlft_ops(void
  * Upon  success,  the  mmap-ed  region  `mf'  is inherited. */
 INTDEF WUNUSED NONNULL((1)) REF struct video_font *CC
 libvideo_font_tryopen_tlft(struct mapfile const *__restrict mf);
+#endif
 
 DECL_END
 
