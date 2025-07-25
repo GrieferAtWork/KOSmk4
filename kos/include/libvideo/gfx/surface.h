@@ -357,9 +357,30 @@ video_buffer_convert_distinct(struct video_buffer *__restrict __self,
 #define video_surface_getbuffer(self)                  (self)->vs_buffer
 #define video_surface_getbufferxdim(self)              video_buffer_getxdim(video_surface_getbuffer(self))
 #define video_surface_getbufferydim(self)              video_buffer_getydim(video_surface_getbuffer(self))
-/* TODO: Change vb_xdim / vb_ydim into vb_dim[2] and use ((flags & VIDEO_GFX_F_XYSWAP) [^ 1]) as index */
-#define video_surface_getxdim(self)                    (__unlikely(video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) ? video_surface_getbufferydim(self) : video_surface_getbufferxdim(self))
-#define video_surface_getydim(self)                    (__unlikely(video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) ? video_surface_getbufferxdim(self) : video_surface_getbufferydim(self))
+#if VIDEO_GFX_F_XYSWAP == 1
+#define __video_surface_getxbit(self) (video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP)
+#elif VIDEO_GFX_F_XYSWAP == 2
+#define __video_surface_getxbit(self) ((video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) >> 1)
+#elif VIDEO_GFX_F_XYSWAP == 4
+#define __video_surface_getxbit(self) ((video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) >> 2)
+#elif VIDEO_GFX_F_XYSWAP == 8
+#define __video_surface_getxbit(self) ((video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) >> 3)
+#elif VIDEO_GFX_F_XYSWAP == 16
+#define __video_surface_getxbit(self) ((video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) >> 4)
+#elif VIDEO_GFX_F_XYSWAP == 32
+#define __video_surface_getxbit(self) ((video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) >> 5)
+#elif VIDEO_GFX_F_XYSWAP == 64
+#define __video_surface_getxbit(self) ((video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) >> 6)
+#elif VIDEO_GFX_F_XYSWAP == 128
+#define __video_surface_getxbit(self) ((video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) >> 7)
+#elif VIDEO_GFX_F_XYSWAP == 256
+#define __video_surface_getxbit(self) ((video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) >> 8)
+#else /* VIDEO_GFX_F_XYSWAP == ... */
+#define __video_surface_getxbit(self) ((video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP) ? 1 : 0)
+#endif /* VIDEO_GFX_F_XYSWAP != ... */
+#define __video_surface_getybit(self) (__video_surface_getxbit(self) ^ 1)
+#define video_surface_getxdim(self)                    video_surface_getbuffer(self)->vb_dim[__video_surface_getxbit(self)]
+#define video_surface_getydim(self)                    video_surface_getbuffer(self)->vb_dim[__video_surface_getybit(self)]
 #define video_surface_hasobjpalette(self)              (((self)->vs_flags & VIDEO_GFX_F_PALOBJ) != 0)
 #define video_surface_getpalette(self)                 (self)->vs_pal
 #define video_surface_setpalette(self, palette, isobj) (void)((self)->vs_pal = (palette), (self)->vs_flags = ((self)->vs_flags & ~VIDEO_GFX_F_PALOBJ) | ((isobj) ? VIDEO_GFX_F_PALOBJ : 0))

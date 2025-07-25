@@ -670,8 +670,8 @@ __NOTHROW(video_buffer_revoke)(struct video_buffer *__restrict __self);
 #define video_buffer_getflags(self)    (self)->vb_surf.vs_flags
 #define video_buffer_getcolorkey(self) (self)->vb_surf.vs_colorkey
 #define video_buffer_hascolorkey(self) ((video_buffer_getflags(self) & VIDEO_GFX_F_COLORKEY) != 0)
-#define video_buffer_getxdim(self)     (self)->vb_xdim
-#define video_buffer_getydim(self)     (self)->vb_ydim
+#define video_buffer_getxdim(self)     (self)->vb_dim[0]
+#define video_buffer_getydim(self)     (self)->vb_dim[1]
 #define video_buffer_setcolorkey(self, colorkey) \
 	__hybrid_atomic_store((video_pixel_t *)&(self)->vb_surf.vs_colorkey, colorkey, __ATOMIC_RELEASE)
 #define video_buffer_enablecolorkey(self, colorkey) \
@@ -746,9 +746,7 @@ struct video_buffer {
 	struct video_domain const     *__VIDEO_BUFFER_const vb_domain;  /* [1..1][const] Buffer domain (generic wrappers use `video_ramdomain()',
 	                                                                 * meaning a different value here implies that the buffer was created  by
 	                                                                 * that domain's `video_domain_newbuffer()' or `video_domain_formem()') */
-	/* TODO: Replace the following with "video_dim_t __VIDEO_BUFFER_const vb_dim[2]" (where 0: x, 1: y) */
-	video_dim_t                    __VIDEO_BUFFER_const vb_xdim;    /* Buffer physical dimension in X (in pixels) */
-	video_dim_t                    __VIDEO_BUFFER_const vb_ydim;    /* Buffer physical dimension in Y (in pixels) */
+	video_dim_t                    __VIDEO_BUFFER_const vb_dim[2];  /* Buffer physical dimension in X and Y (in pixels) */
 	__uintptr_t                                         vb_refcnt;  /* Reference counter. */
 	/* Buffer-specific fields go here */
 };
@@ -769,7 +767,7 @@ struct video_buffer {
 	(void)((self)->vb_domain = (domain))
 /* Initialize dimensions of a buffer */
 #define __video_buffer_init_dim(self, xdim, ydim) \
-	(void)((self)->vb_xdim = (xdim), (self)->vb_ydim = (ydim))
+	(void)((self)->vb_dim[0] = (xdim), (self)->vb_dim[1] = (ydim))
 /* Initialize format+domain+dim for a subregion buffer */
 #define __video_buffer_init_subregion(self, parent_surface, parent_buffer, rect) \
 	(void)((self)->vb_surf.vs_pal      = (parent_surface)->vs_pal,               \

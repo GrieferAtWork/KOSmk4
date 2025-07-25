@@ -338,8 +338,7 @@ PRIVATE struct video_buffer libvideo_emptybuffer = {
 	.vb_codec  = NULL, /* Initialized lazily */
 	.vb_ops    = NULL, /* Initialized lazily */
 	.vb_domain = NULL, /* Initialized lazily */
-	.vb_xdim = 0,
-	.vb_ydim = 0,
+	.vb_dim    = { 0, 0 },
 	.vb_refcnt = 0x7fff,
 };
 

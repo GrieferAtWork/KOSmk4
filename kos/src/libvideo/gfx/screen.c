@@ -496,9 +496,9 @@ find_hinted_mode:
 	/* Fill in remaining fields of "result" */
 	result->vb_surf.vs_buffer   = result;
 	result->vb_surf.vs_colorkey = 0;
-	result->vb_refcnt     = 1;
 	__video_buffer_init_ops(result, &result->ss_ops.sbo_video);
 	__video_buffer_init_dim(result, mode->smi_resx, mode->smi_resy);
+	result->vb_refcnt     = 1;
 	result->ss_vdlck      = vdlck.of_hint;
 	result->ss_libsvgadrv = libsvgadrv;
 	result->ss_drv        = driver;
