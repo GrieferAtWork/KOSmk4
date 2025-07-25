@@ -1198,7 +1198,7 @@ struct video_gfxhdr {
 	 * - VIDEO_GFX_F_XMIRROR/*Y mirror the "I/O Rect"
 	 *
 	 * Coords of these rects are (in absolute "video_coord_t" coords):
-	 * - Buffer:    {xy: {0,0}, wh: {vx_surf.vs_buffer->vb_xdim,vx_surf.vs_buffer->vb_ydim}}
+	 * - Buffer:    {xy: {0,0}, wh: video_buffer_getXYdim(vx_surf.vs_buffer)}
 	 * - Clip Rect: {xy: {vxh_cxoff,vxh_cyoff}, wh: {vxh_cxdim,vxh_cydim}}
 	 * - I/O Rect:  {xy: {vxh_bxmin,vxh_bymin}, wh: {vxh_bxsiz,vxh_bysiz}}
 	 *
@@ -1253,8 +1253,8 @@ struct video_gfxhdr {
 	 * NOTE: The I/O Rect is already pre-adjusted for VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR */
 	video_coord_t               vxh_bxmin;    /* [<= vxh_bxend][>= vxh_cxoff] Absolute buffer start coord in X (start of acc) */
 	video_coord_t               vxh_bymin;    /* [<= vxh_byend][>= vxh_cyoff] Absolute buffer start coord in Y */
-	video_coord_t               vxh_bxend;    /* [<= vx_surf.vs_buffer->vb_xdim] Absolute buffer end coord in X (<= `vx_surf.vs_buffer->vb_xdim') */
-	video_coord_t               vxh_byend;    /* [<= vx_surf.vs_buffer->vb_ydim] Absolute buffer end coord in Y (<= `vx_surf.vs_buffer->vb_ydim') */
+	video_coord_t               vxh_bxend;    /* [<= video_buffer_getxdim(:vx_surf.vs_buffer)] Absolute buffer end coord in X */
+	video_coord_t               vxh_byend;    /* [<= video_buffer_getydim(:vx_surf.vs_buffer)] Absolute buffer end coord in Y */
 //	video_dim_t                 vxh_bxdim;    /* [== vxh_bxend - vxh_bxmin][<= vxh_cxdim] I/O Rect width */
 //	video_dim_t                 vxh_bydim;    /* [== vxh_byend - vxh_bymin][<= vxh_cydim] I/O Rect height */
 };

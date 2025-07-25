@@ -183,8 +183,8 @@ rambuffer_subregion__initgfx(struct video_gfx *__restrict self) {
 	if unlikely(video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP) {
 		self->vx_hdr.vxh_cxoff = me->rbs_yoff;
 		self->vx_hdr.vxh_cyoff = me->rbs_xoff;
-		self->vx_hdr.vxh_cxdim = me->vb_ydim;
-		self->vx_hdr.vxh_cydim = me->vb_xdim;
+		self->vx_hdr.vxh_cxdim = video_buffer_getydim(me);
+		self->vx_hdr.vxh_cydim = video_buffer_getxdim(me);
 		self->vx_hdr.vxh_bxmin = me->rbs_yoff;
 		self->vx_hdr.vxh_bymin = me->rbs_xoff;
 		self->vx_hdr.vxh_bxend = me->rbs_yend;
@@ -192,8 +192,8 @@ rambuffer_subregion__initgfx(struct video_gfx *__restrict self) {
 	} else {
 		self->vx_hdr.vxh_cxoff = me->rbs_xoff;
 		self->vx_hdr.vxh_cyoff = me->rbs_yoff;
-		self->vx_hdr.vxh_cxdim = me->vb_xdim;
-		self->vx_hdr.vxh_cydim = me->vb_ydim;
+		self->vx_hdr.vxh_cxdim = video_buffer_getxdim(me);
+		self->vx_hdr.vxh_cydim = video_buffer_getydim(me);
 		self->vx_hdr.vxh_bxmin = me->rbs_xoff;
 		self->vx_hdr.vxh_bymin = me->rbs_yoff;
 		self->vx_hdr.vxh_bxend = me->rbs_xend;

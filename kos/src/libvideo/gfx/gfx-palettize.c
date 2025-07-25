@@ -483,57 +483,18 @@ median_io_buf(void const *cookie, mc_index_t i) {
 	return ((video_color_t const *)cookie)[i];
 }
 
-PRIVATE ATTR_NOINLINE ATTR_OUT(1) ATTR_IN(2) int LIBVIDEO_GFX_FCC
-video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
-                             struct video_gfx const *__restrict self) {
-	struct video_gfx gfx = *self;
-	struct video_gfx result_gfx;
-	size_t stride, total;
-	video_gfx_clip(&gfx, /* Set clip rect to I/O area */
-	               (video_offset_t)gfx.vx_hdr.vxh_bxmin - gfx.vx_hdr.vxh_cxoff,
-	               (video_offset_t)gfx.vx_hdr.vxh_bymin - gfx.vx_hdr.vxh_cyoff,
-	               _video_gfxhdr_bxsiz(&gfx.vx_hdr),
-	               _video_gfxhdr_bysiz(&gfx.vx_hdr));
-	stride = video_gfx_getxdim(&gfx) * 4;
-	total  = video_gfx_getydim(&gfx) * stride;
-	result->rb_data = (byte_t *)malloc(total);
-	if unlikely(!result->rb_data)
-		goto err;
-	result->rb_stride          = stride;
-/*	result->vb_refcnt          = 1;*/ /* Unused */
-/*	result->vb_domain          = _libvideo_ramdomain();*/ /* Unused */
-	result->vb_ops             = _rambuffer_ops();
-	result->vb_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
-	result->vb_surf.vs_pal   = NULL;
-	result->vb_xdim            = video_gfx_getxdim(&gfx);
-	result->vb_ydim            = video_gfx_getydim(&gfx);
-	assertf(result->vb_codec, "Built-in codec should have been recognized");
-	video_buffer_getgfx(result, &result_gfx,
-	                    GFX_BLENDMODE_OVERRIDE);
-	video_gfx_bitblit(&result_gfx, 0, 0, &gfx, 0, 0,
-	                  video_gfx_getxdim(&gfx),
-	                  video_gfx_getydim(&gfx));
-	return 0;
-err:
-	return -1;
-}
-
 PRIVATE ATTR_IN(1) NONNULL((2)) void CC
 median_cut_start(struct video_gfx const *__restrict self,
                  mc_index_t *gfx_indices, mc_index_t io_pixels,
                  video_color_t *pal, shift_t pal_depth,
                  video_color_t constant_alpha) {
 	struct median_io io;
-	struct video_rambuffer rgba_buf;
-	if (video_gfx_getbuffer(self)->vb_codec->vc_codec == VIDEO_CODEC_RGBA8888 &&
+	if (video_gfx_issurfio(self) &&
 	    /* TODO: This actually works for any XXXX8888 codec. Just need  to
 	     *       "video_gfx_getbuffer(self)->vb_codec->vc_color2pixel" the
 	     *       produced  palette entries afterwards, and always pass the
 	     *       codec's alpha-mask instead of "constant_alpha". */
-	    self->vx_hdr.vxh_bxmin == 0 &&
-	    self->vx_hdr.vxh_bymin == 0 &&
-	    self->vx_hdr.vxh_bxend == video_gfx_getbuffer(self)->vb_xdim &&
-	    self->vx_hdr.vxh_byend == video_gfx_getbuffer(self)->vb_ydim) {
+	    video_gfx_getcodec(self)->vc_codec == VIDEO_CODEC_RGBA8888) {
 		struct video_lock lock;
 		if (video_buffer_rlock(video_gfx_getbuffer(self), &lock) == 0) {
 			if (lock.vl_stride == (self->vx_hdr.vxh_byend * 4)) {
@@ -546,19 +507,6 @@ median_cut_start(struct video_gfx const *__restrict self,
 			}
 			video_buffer_unlock(video_gfx_getbuffer(self), &lock);
 		}
-	}
-
-	/* Try to convert the I/O area into an RGBA8888 buffer, so we
-	 * can do faster I/O when  it comes to accessing pixel  data. */
-	if (video_gfx_iorect_as_rgba8888(&rgba_buf, self) == 0) {
-		assert(rgba_buf.rb_stride == rgba_buf.vb_xdim * 4);
-		assert(io_pixels == rgba_buf.vb_xdim * rgba_buf.vb_ydim);
-		io.mio_cookie   = rgba_buf.rb_data;
-		io.mio_getcolor = &median_io_buf;
-		median_cut_start_impl(&io, gfx_indices, io_pixels,
-		                      pal, pal_depth, constant_alpha);
-		free(rgba_buf.rb_data);
-		return;
 	}
 
 	io.mio_cookie = self;

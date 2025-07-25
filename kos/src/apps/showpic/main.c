@@ -562,8 +562,8 @@ int main(int argc, char *argv[]) {
 		struct video_rect rect;
 		rect.vr_xmin = 100;
 		rect.vr_ymin = 100;
-		rect.vr_xdim = screen_buffer_asvideo(screen)->vb_xdim - 200;
-		rect.vr_ydim = screen_buffer_asvideo(screen)->vb_ydim - 200;
+		rect.vr_xdim = video_buffer_getxdim(screen_buffer_asvideo(screen)) - 200;
+		rect.vr_ydim = video_buffer_getydim(screen_buffer_asvideo(screen)) - 200;
 		bscreen = video_buffer_region(screen_buffer_asvideo(screen), &rect);
 		if (!bscreen)
 			err(EXIT_FAILURE, "Failed to load screen buffer");
@@ -643,7 +643,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 	/* Load the named file as a video buffer. */
-	anim = video_anim_open(bscreen->vb_domain, argv[1]);
+	anim = video_anim_open(video_buffer_getdomain(bscreen), argv[1]);
 	if unlikely(!anim)
 		err(EXIT_FAILURE, "Failed to open image");
 
@@ -657,7 +657,7 @@ int main(int argc, char *argv[]) {
 	{
 		struct video_buffer_format format;
 		video_buffer_getformat(bscreen, &format);
-		anim = video_anim_cached(anim, bscreen->vb_domain, &format);
+		anim = video_anim_cached(anim, video_buffer_getdomain(bscreen), &format);
 	}
 #endif
 

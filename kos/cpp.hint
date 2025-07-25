@@ -2733,8 +2733,11 @@
 #define MPFR_DEPRECATED
 #define MPFR_RETURNS_NONNULL
 #define __MPC_DECLSPEC
-#define PARAMS(x) x
+#define PARAMS(p)p
 #define INLINE
+#define EXTERN(x)extern x
+#define JPP(p)p
+#define JMETHOD(T,n,p)T(*n)p
 
 
 

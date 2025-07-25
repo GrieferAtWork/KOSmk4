@@ -366,17 +366,16 @@ libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
 	/* When rotated right, the virtual origin
 	 * >> vX=0, vY=0
 	 * maps to the physical origin at
-	 * >> pX=0, pY=video_gfx_getbuffer(self)->vb_ydim-1
+	 * >> pX=0, pY=video_buffer_getydim(video_gfx_getbuffer(self))-1
 	 *
 	 * via the formula:
-	 * >> pX = vY, pY = (video_gfx_getbuffer(self)->vb_ydim - 1) - vX
+	 * >> pX = vY, pY = (video_buffer_getydim(video_gfx_getbuffer(self))-1) - vX
 	 *
-	 * Since mirroring  always  happens  before  X/Y-swap,
-	 * and since `_libvideo_gfx_xyswap' already made it so
-	 * `self->vx_hdr.vxh_cxdim = video_gfx_getbuffer(self)->vb_ydim-1'
-	 * (assuming  no  custom  clip  rect),  we  have  to  toggle   the
-	 * XMIRROR   flag   here   (since   mirror   happens   before  X/Y
-	 * swapping)
+	 * Since mirroring always happens before X/Y-swap, and
+	 * since  `_libvideo_gfx_xyswap'  already made  it so:
+	 * >> `self->vx_hdr.vxh_cxdim = video_buffer_getydim(video_gfx_getbuffer(self))-1'
+	 * (assuming no custom clip rect), we have to toggle the
+	 * XMIRROR flag here (since mirror happens before X/Y swapping)
 	 *
 	 * This also means that rotating the screen 90° right actually
 	 * places the physical origin bottom-left -- THAT IS CORRECT!!

@@ -29,23 +29,18 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/align.h>
-#include <hybrid/sched/atomic-lock.h>
-#include <hybrid/sequence/list.h>
 
 #include <kos/anno.h>
 #include <kos/types.h>
 
 #include <assert.h>
-#include <atomic.h>
 #include <errno.h>
 #include <malloc.h>
-#include <sched.h>
 #include <stddef.h>
 #include <stdint.h>
 
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
-#include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
@@ -135,28 +130,15 @@ rambuffer__subregion__common(struct video_surface const *__restrict surface,
                              struct video_crect const *__restrict rect) {
 	size_t x_byte_offset;
 	REF struct video_rambuffer_subregion *result;
-	assert((rect->vcr_xmin + rect->vcr_xdim) > rect->vcr_xmin);
-	assert((rect->vcr_ymin + rect->vcr_ydim) > rect->vcr_ymin);
-	assertf((rect->vcr_xmin + rect->vcr_xdim) <= self->vb_xdim,
-	        "X[=%" PRIuCRD "]+SX[=%" PRIuDIM "][=%" PRIuCRD "] exceeds XDIM[=%" PRIuDIM "]",
-	        rect->vcr_xmin, rect->vcr_xdim,
-	        rect->vcr_xmin + rect->vcr_xdim, self->vb_xdim);
-	assertf((rect->vcr_ymin + rect->vcr_ydim) <= self->vb_ydim,
-	        "Y[=%" PRIuCRD "]+SY[=%" PRIuDIM "][=%" PRIuCRD "] eyceeds YDIM[=%" PRIuDIM "]",
-	        rect->vcr_ymin, rect->vcr_ydim,
-	        rect->vcr_ymin + rect->vcr_ydim, self->vb_ydim);
+	video_buffer_assert_rect(self, rect);
 	result = (REF struct video_rambuffer_subregion *)malloc(sizeof(struct video_rambuffer_subregion));
 	if unlikely(!result)
 		goto err;
-	__video_buffer_setsubregion(result, surface, self);
-	result->vb_domain = self->vb_domain;
-	result->vb_xdim   = rect->vcr_xdim;
-	result->vb_ydim   = rect->vcr_ydim;
-	result->vb_refcnt = 1;
+	__video_buffer_init_subregion(result, surface, self, rect);
 	video_codec_xcoord_to_offset(result->vb_codec, rect->vcr_xmin,
 	                             &x_byte_offset, &result->rbs_bxrem);
-	result->vb_ops    = result->rbs_bxrem ? _rambuffer_subregion_ops()
-	                                      : _rambuffer_subregion_norem_ops();
+	__video_buffer_init_ops(result, result->rbs_bxrem ? _rambuffer_subregion_ops()
+	                                                  : _rambuffer_subregion_norem_ops());
 	result->rb_data   = self->rb_data + x_byte_offset + rect->vcr_ymin * self->rb_stride;
 	result->rb_stride = self->rb_stride;
 	result->rbs_base  = self;
@@ -202,16 +184,7 @@ INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
 rambuffer__lockregion(struct video_buffer *__restrict self,
                       struct video_regionlock *__restrict lock) {
 	struct video_rambuffer *me = (struct video_rambuffer *)self;
-	assert((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) > lock->_vrl_rect.vcr_xmin);
-	assert((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) > lock->_vrl_rect.vcr_ymin);
-	assertf((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) <= me->vb_xdim,
-	        "X[=%" PRIuCRD "]+SX[=%" PRIuDIM "][=%" PRIuCRD "] exceeds XDIM[=%" PRIuDIM "]",
-	        lock->_vrl_rect.vcr_xmin, lock->_vrl_rect.vcr_xdim,
-	        lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim, me->vb_xdim);
-	assertf((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) <= me->vb_ydim,
-	        "Y[=%" PRIuCRD "]+SY[=%" PRIuDIM "][=%" PRIuCRD "] eyceeds YDIM[=%" PRIuDIM "]",
-	        lock->_vrl_rect.vcr_ymin, lock->_vrl_rect.vcr_ydim,
-	        lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim, me->vb_ydim);
+	video_regionlock_assert(me, lock);
 	lock->vrl_lock.vl_data   = me->rb_data + lock->_vrl_rect.vcr_ymin * me->rb_stride;
 	lock->vrl_lock.vl_stride = me->rb_stride;
 	lock->vrl_xbas = lock->_vrl_rect.vcr_xmin;
@@ -222,16 +195,7 @@ INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
 rambuffer_subregion__lockregion(struct video_buffer *__restrict self,
                                 struct video_regionlock *__restrict lock) {
 	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)self;
-	assert((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) > lock->_vrl_rect.vcr_xmin);
-	assert((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) > lock->_vrl_rect.vcr_ymin);
-	assertf((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) <= me->vb_xdim,
-	        "X[=%" PRIuCRD "]+SX[=%" PRIuDIM "][=%" PRIuCRD "] exceeds XDIM[=%" PRIuDIM "]",
-	        lock->_vrl_rect.vcr_xmin, lock->_vrl_rect.vcr_xdim,
-	        lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim, me->vb_xdim);
-	assertf((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) <= me->vb_ydim,
-	        "Y[=%" PRIuCRD "]+SY[=%" PRIuDIM "][=%" PRIuCRD "] eyceeds YDIM[=%" PRIuDIM "]",
-	        lock->_vrl_rect.vcr_ymin, lock->_vrl_rect.vcr_ydim,
-	        lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim, me->vb_ydim);
+	video_regionlock_assert(me, lock);
 	lock->vrl_lock.vl_data   = me->rb_data + lock->_vrl_rect.vcr_ymin * me->rb_stride;
 	lock->vrl_lock.vl_stride = me->rb_stride;
 	lock->vrl_xbas = lock->_vrl_rect.vcr_xmin + me->rbs_bxrem;
@@ -266,19 +230,13 @@ libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
 		goto err;
 
 	/* Initialize meta-data */
-	__video_buffer_setformat(result, format);
-	result->vb_ops    = _rambuffer_ops();
-	result->vb_domain = self;
-	result->vb_refcnt = 1;
-	result->vb_xdim   = xdim;
-	result->vb_ydim   = ydim;
-	if (result->vb_surf.vs_pal) {
-		if unlikely(!(result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
-			result->vb_surf.vs_pal = NULL;
-	} else if unlikely(result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+	if unlikely(!__video_buffer_init_format(result, format)) {
 		errno = EINVAL;
 		goto err_result_data;
 	}
+	__video_buffer_init_domain(result, self);
+	__video_buffer_init_ops(result, _rambuffer_ops());
+	__video_buffer_init_dim(result, xdim, ydim);
 
 	/* Allocate buffer data */
 	result->rb_data = (flags & VIDEO_DOMAIN_NEWBUFFER_F_CALLOC)
@@ -321,7 +279,10 @@ libvideo_ramdomain_formem(struct video_domain const *__restrict self,
 	result = (REF struct video_rambuffer_formem *)malloc(sizeof(struct video_rambuffer_formem));
 	if unlikely(!result)
 		goto err;
-	__video_buffer_setformat(result, format);
+	if unlikely(!__video_buffer_init_format(result, format)) {
+		errno = EINVAL;
+		goto err_r;
+	}
 
 	/* Must use a different, fallback "codec" that can deal with bad alignment */
 	if (!IS_ALIGNED(stride, result->vb_codec->vc_align) ||
@@ -329,18 +290,9 @@ libvideo_ramdomain_formem(struct video_domain const *__restrict self,
 		result->vb_codec = result->vb_codec->vc_nalgn;
 
 	/* Validate palette configuration */
-	if (result->vb_surf.vs_pal) {
-		if unlikely(!(result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
-			result->vb_surf.vs_pal = NULL;
-	} else if unlikely(result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-		errno = EINVAL;
-		goto err_r;
-	}
-	result->vb_ops    = _rambuffer_formem_ops();
-	result->vb_domain = self;
-	result->vb_refcnt = 1;
-	result->vb_xdim   = xdim;
-	result->vb_ydim   = ydim;
+	__video_buffer_init_domain(result, self);
+	__video_buffer_init_ops(result, _rambuffer_formem_ops());
+	__video_buffer_init_dim(result, xdim, ydim);
 	result->rb_data   = (byte_t *)mem;
 	result->rb_stride = stride;
 	result->rbfm_release_mem        = release_mem;

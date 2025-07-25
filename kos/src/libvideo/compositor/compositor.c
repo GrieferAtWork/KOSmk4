@@ -2229,14 +2229,10 @@ add_alpha(struct video_codec *__restrict codec) {
 PRIVATE ATTR_INOUT(1) void CC
 local_compositor_updatebuffercaches(struct local_compositor *__restrict me) {
 	struct video_buffer *buffer = me->lc_buffer;
-
-	me->lc_domain                  = buffer->vb_domain;
-	me->lc_nalpha_format.vbf_codec = video_buffer_getcodec(buffer);
-	me->lc_nalpha_format.vbf_pal   = buffer->vb_surf.vs_pal;
-	me->lc_nalpha_format.vbf_flags = video_buffer_getflags(buffer) & ~VIDEO_GFX_F_COLORKEY;
-	me->lc_yalpha_format.vbf_codec = add_alpha(video_buffer_getcodec(buffer));
-	me->lc_yalpha_format.vbf_pal   = buffer->vb_surf.vs_pal;
-	me->lc_yalpha_format.vbf_flags = me->lc_nalpha_format.vbf_flags;
+	me->lc_domain = video_buffer_getdomain(buffer);
+	video_buffer_getformat(buffer, &me->lc_nalpha_format);
+	me->lc_yalpha_format = me->lc_nalpha_format;
+	me->lc_yalpha_format.vbf_codec = add_alpha(me->lc_yalpha_format.vbf_codec);
 
 	/* Generate new (pre-cached) GFX contexts */
 	DBG_memset(&me->lc_buffer_gfx_write, 0xcc, sizeof(me->lc_buffer_gfx_write));

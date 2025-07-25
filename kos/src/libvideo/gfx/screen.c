@@ -119,16 +119,18 @@ svga_screen_updaterect_cs(struct screen_buffer *__restrict self,
                           struct video_crect const *__restrict rect) {
 	struct svga_screen *me = (struct svga_screen *)self;
 	struct svga_rect cs_rect;
-	if (OVERFLOW_UCAST(rect->vcr_xmin, &cs_rect.svr_x) || cs_rect.svr_x >= self->vb_xdim)
+	if (OVERFLOW_UCAST(rect->vcr_xmin, &cs_rect.svr_x) ||
+	    cs_rect.svr_x >= video_buffer_getxdim(me))
 		return;
-	if (OVERFLOW_UCAST(rect->vcr_ymin, &cs_rect.svr_y) || cs_rect.svr_y >= self->vb_ydim)
+	if (OVERFLOW_UCAST(rect->vcr_ymin, &cs_rect.svr_y) ||
+	    cs_rect.svr_y >= video_buffer_getydim(me))
 		return;
 	if (OVERFLOW_UCAST(rect->vcr_xdim, &cs_rect.svr_w) ||
-	    cs_rect.svr_w > (self->vb_xdim - cs_rect.svr_x))
-		cs_rect.svr_w = (self->vb_xdim - cs_rect.svr_x);
+	    cs_rect.svr_w > (video_buffer_getxdim(me) - cs_rect.svr_x))
+		cs_rect.svr_w = (video_buffer_getxdim(me) - cs_rect.svr_x);
 	if (OVERFLOW_UCAST(rect->vcr_ydim, &cs_rect.svr_h) ||
-	    cs_rect.svr_h > (self->vb_ydim - cs_rect.svr_y))
-		cs_rect.svr_h = (self->vb_ydim - cs_rect.svr_y);
+	    cs_rect.svr_h > (video_buffer_getydim(me) - cs_rect.svr_y))
+		cs_rect.svr_h = (video_buffer_getydim(me) - cs_rect.svr_y);
 	svga_screen_cs_acquire(me);
 	(*me->ss_cs.sc_modeops.sco_updaterect)(&me->ss_cs, &cs_rect);
 	svga_screen_cs_release(me);
@@ -495,9 +497,8 @@ find_hinted_mode:
 	result->vb_surf.vs_buffer   = result;
 	result->vb_surf.vs_colorkey = 0;
 	result->vb_refcnt     = 1;
-	result->vb_ops        = &result->ss_ops.sbo_video;
-	result->vb_xdim       = mode->smi_resx;
-	result->vb_ydim       = mode->smi_resy;
+	__video_buffer_init_ops(result, &result->ss_ops.sbo_video);
+	__video_buffer_init_dim(result, mode->smi_resx, mode->smi_resy);
 	result->ss_vdlck      = vdlck.of_hint;
 	result->ss_libsvgadrv = libsvgadrv;
 	result->ss_drv        = driver;

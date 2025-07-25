@@ -194,14 +194,9 @@ custom_buffer__subregion_impl(struct video_surface const *__restrict surface,
 	result = (REF struct custom_buffer_subregion *)malloc(sizeof(struct custom_buffer_subregion));
 	if unlikely(!result)
 		goto err;
-	video_surface_copyattrib(&result->vb_surf, surface);
-	result->vb_codec   = video_buffer_getcodec(parent);
-	result->vb_domain  = video_buffer_getdomain(parent);
-	result->vb_xdim    = rect->vcr_xdim;
-	result->vb_ydim    = rect->vcr_ydim;
-	result->vb_refcnt  = 1;
-	result->cbsr_xoff  = parent_xoff + rect->vcr_xmin;
-	result->cbsr_yoff  = parent_yoff + rect->vcr_ymin;
+	__video_buffer_init_subregion(result, surface, parent, rect);
+	result->cbsr_xoff = parent_xoff + rect->vcr_xmin;
+	result->cbsr_yoff = parent_yoff + rect->vcr_ymin;
 	video_codec_xcoord_to_offset(result->vb_codec, result->cbsr_xoff,
 	                             &result->cbsr_bxoff, &result->cbsr_bxrem);
 	result->vb_ops = !result->cbsr_xoff && !result->cbsr_yoff
@@ -355,6 +350,7 @@ custom_buffer__rlockregion(struct video_buffer *__restrict self,
 	struct custom_buffer *me = (struct custom_buffer *)self;
 	video_buffer_custom_lockregion_t rlockregion;
 	video_buffer_custom_lock_t rlock;
+	video_regionlock_assert(me, lock);
 	atomic_inc(&me->cbc_inuse);
 	rlockregion = atomic_read(&me->cbc_rlockregion);
 	if (rlockregion) {
@@ -390,6 +386,7 @@ custom_buffer__wlockregion(struct video_buffer *__restrict self,
 	struct custom_buffer *me = (struct custom_buffer *)self;
 	video_buffer_custom_lockregion_t wlockregion;
 	video_buffer_custom_lock_t wlock;
+	video_regionlock_assert(me, lock);
 	atomic_inc(&me->cbc_inuse);
 	wlockregion = atomic_read(&me->cbc_wlockregion);
 	if (wlockregion) {
@@ -423,6 +420,7 @@ INTERN ATTR_INOUT(1) NONNULL((2)) void
 NOTHROW(FCC custom_buffer__unlockregion)(struct video_buffer *__restrict self,
                                          struct video_regionlock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
+	video_regionlock_assert(me, lock);
 	if (me->cbc_unlockregion) {
 		(*me->cbc_unlockregion)(me->cbc_cookie, lock);
 	} else if (me->cbc_unlock) {
@@ -444,6 +442,7 @@ custom_buffer_subregion__rlockregion(struct video_buffer *__restrict self,
                                      struct video_regionlock *__restrict lock) {
 	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
 	video_buffer_custom_lockregion_t rlockregion;
+	video_regionlock_assert(me, lock);
 	lock->_vrl_rect.vcr_xmin += me->cbsr_xoff;
 	lock->_vrl_rect.vcr_ymin += me->cbsr_yoff;
 	atomic_inc(&me->cbc_inuse);
@@ -464,6 +463,7 @@ custom_buffer_subregion__wlockregion(struct video_buffer *__restrict self,
                                      struct video_regionlock *__restrict lock) {
 	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
 	video_buffer_custom_lockregion_t wlockregion;
+	video_regionlock_assert(me, lock);
 	lock->_vrl_rect.vcr_xmin += me->cbsr_xoff;
 	lock->_vrl_rect.vcr_ymin += me->cbsr_yoff;
 	atomic_inc(&me->cbc_inuse);
@@ -488,6 +488,7 @@ NOTHROW(FCC custom_buffer_subregion__unlockregion)(struct video_buffer *__restri
 	atomic_dec(&me->cbc_inuse);
 	lock->_vrl_rect.vcr_ymin -= me->cbsr_yoff;
 	lock->_vrl_rect.vcr_xmin -= me->cbsr_xoff;
+	video_regionlock_assert(me, lock);
 }
 
 /* GFX */
@@ -619,19 +620,13 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
 	result = (REF struct custom_buffer *)malloc(sizeof(struct custom_buffer));
 	if unlikely(!result)
 		goto err;
-	__video_buffer_setformat(result, format);
-	if (!(result->vb_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
-		result->vb_surf.vs_pal = NULL;
-		result->vb_surf.vs_flags &= ~VIDEO_GFX_F_PALOBJ;
-	} else if (!result->vb_surf.vs_pal) {
+	if unlikely(!__video_buffer_init_format(result, format)) {
 		errno = EINVAL;
 		goto err_r;
 	}
-	result->vb_ops    = _custom_buffer_ops();
-	result->vb_domain = _libvideo_ramdomain();
-	result->vb_xdim          = size_x;
-	result->vb_ydim          = size_y;
-	result->vb_refcnt        = 1;
+	__video_buffer_init_domain(result, _libvideo_ramdomain());
+	__video_buffer_init_ops(result, _custom_buffer_ops());
+	__video_buffer_init_dim(result, size_x, size_y);
 	result->cbc_getpixel     = getpixel;
 	result->cbc_setpixel     = setpixel;
 	result->cbc_rlock        = rlock ? rlock : wlock;

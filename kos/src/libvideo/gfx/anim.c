@@ -115,9 +115,9 @@ libvideo_anim_fromframe(struct video_buffer *__restrict frame) {
 	if unlikely(!result)
 		goto err;
 	result->va_ops    = _oneframe_anim_ops();
-	result->va_domain = frame->vb_domain;
-	result->va_xdim   = frame->vb_xdim;
-	result->va_ydim   = frame->vb_ydim;
+	result->va_domain = video_buffer_getdomain(frame);
+	result->va_xdim   = video_buffer_getxdim(frame);
+	result->va_ydim   = video_buffer_getydim(frame);
 	result->va_refcnt = 1;
 	result->ofa_frame = frame;
 	video_buffer_incref(frame);
@@ -430,7 +430,7 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 		REF struct video_buffer *converted;
 		struct oneframe_anim *me = (struct oneframe_anim *)self;
 		struct video_buffer *frame = me->ofa_frame;
-		if (frame->vb_domain == domain &&
+		if (video_buffer_getdomain(frame) == domain &&
 		    (!format || video_buffer_hasformat(frame, format))) {
 			video_anim_incref(me);
 			return me;

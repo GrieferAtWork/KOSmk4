@@ -381,26 +381,28 @@ libvideo_swblitter_samebuf__stretch__with_temporary(struct video_blitter const *
                                                     video_coord_t src_x, video_coord_t src_y,
                                                     video_dim_t src_size_x, video_dim_t src_size_y) {
 	struct video_buffer const *srcbuf = video_gfx_getbuffer(self->vbt_src);
+	video_dim_t common_size_x, common_size_y;
+	struct video_rambuffer_requirements req;
 	struct video_rambuffer rb;
 	struct video_blitter blitter;
 	struct video_gfx rb_gfx;
-	size_t rb_total;
 
 	/*rb.vb_refcnt = 1;*/
-	rb.vb_ops    = _rambuffer_ops();
-	rb.vb_codec = srcbuf->vb_codec;
-	rb.vb_xdim   = min(dst_size_x, src_size_x);
-	rb.vb_ydim   = min(dst_size_y, src_size_y);
-	rb.rb_stride = rb.vb_xdim * rb.vb_codec->vc_specs.vcs_pxsz;
-	rb.rb_stride = CEIL_ALIGN(rb.rb_stride, rb.vb_codec->vc_align);
-	rb_total     = rb.rb_stride * rb.vb_ydim;
-	rb.rb_data   = (byte_t *)malloca(rb_total);
+	common_size_x = min(dst_size_x, src_size_x);
+	common_size_y = min(dst_size_y, src_size_y);
+	__video_buffer_init_ops(&rb, _rambuffer_ops());
+	__video_buffer_init_dim(&rb, common_size_x, common_size_y);
+	(*rb.vb_codec->vc_rambuffer_requirements)(common_size_x, common_size_y, &req);
+	rb.vb_codec  = srcbuf->vb_codec;
+	rb.rb_stride = req.vbs_stride;
+	rb.rb_data   = (byte_t *)malloca(req.vbs_bufsize);
 	if unlikely(!rb.rb_data) {
 		/* Well... Nothing we can do about it... :( */
 		syslog(LOG_WARN, "[libvideo-gfx] Failed to allocate %" PRIuSIZ " bytes for temporary buffer\n",
-		       rb_total);
+		       req.vbs_bufsize);
 		return;
 	}
+
 	rb_gfx.vx_surf.vs_buffer = &rb;
 	rb_gfx.vx_surf.vs_pal    = video_gfx_getpalette(self->vbt_src);
 	rb_gfx.vx_surf.vs_flags  = video_gfx_getflags(self->vbt_src);
@@ -411,14 +413,19 @@ libvideo_swblitter_samebuf__stretch__with_temporary(struct video_blitter const *
 	/*(*self->vbt_src->vx_hdr.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
 
 	/* Blit source into temporary buffer... */
-	if (src_size_x == rb.vb_xdim && src_size_y == rb.vb_ydim) {
+	if (src_size_x == video_buffer_getxdim(&rb) &&
+	    src_size_y == video_buffer_getydim(&rb)) {
 		libvideo_swblitter_noblend_samefmt__blit(&blitter, 0, 0,
 		                                         src_x, src_y, src_size_x, src_size_y);
 	} else if (video_gfx_getflags(&rb_gfx) & VIDEO_GFX_F_LINEAR) {
-		libvideo_swblitter_noblend_samefmt__stretch_l(&blitter, 0, 0, rb.vb_xdim, rb.vb_ydim,
+		libvideo_swblitter_noblend_samefmt__stretch_l(&blitter, 0, 0,
+		                                              video_buffer_getxdim(&rb),
+		                                              video_buffer_getydim(&rb),
 		                                              src_x, src_y, src_size_x, src_size_y);
 	} else {
-		libvideo_swblitter_noblend_samefmt__stretch_n(&blitter, 0, 0, rb.vb_xdim, rb.vb_ydim,
+		libvideo_swblitter_noblend_samefmt__stretch_n(&blitter, 0, 0,
+		                                              video_buffer_getxdim(&rb),
+		                                              video_buffer_getydim(&rb),
 		                                              src_x, src_y, src_size_x, src_size_y);
 	}
 
@@ -426,15 +433,20 @@ libvideo_swblitter_samebuf__stretch__with_temporary(struct video_blitter const *
 	blitter.vbt_src = blitter.vbt_dst;
 	blitter.vbt_dst = self->vbt_dst;
 	/*(*rb_gfx.vx_hdr.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
-	if (dst_size_x == rb.vb_xdim && dst_size_y == rb.vb_ydim) {
+	if (dst_size_x == video_buffer_getxdim(&rb) &&
+	    dst_size_y == video_buffer_getydim(&rb)) {
 		libvideo_swblitter_noblend_samefmt__blit(&blitter, dst_x, dst_y,
 		                                         0, 0, dst_size_x, dst_size_y);
 	} else if (video_gfx_getflags(&rb_gfx) & VIDEO_GFX_F_LINEAR) {
-		libvideo_swblitter_noblend_samefmt__stretch_l(&blitter, dst_x, dst_y, dst_size_x, dst_size_y,
-		                                              0, 0, rb.vb_xdim, rb.vb_ydim);
+		libvideo_swblitter_noblend_samefmt__stretch_l(&blitter, dst_x, dst_y,
+		                                              dst_size_x, dst_size_y, 0, 0,
+		                                              video_buffer_getxdim(&rb),
+		                                              video_buffer_getydim(&rb));
 	} else {
-		libvideo_swblitter_noblend_samefmt__stretch_n(&blitter, dst_x, dst_y, dst_size_x, dst_size_y,
-		                                              0, 0, rb.vb_xdim, rb.vb_ydim);
+		libvideo_swblitter_noblend_samefmt__stretch_n(&blitter, dst_x, dst_y,
+		                                              dst_size_x, dst_size_y, 0, 0,
+		                                              video_buffer_getxdim(&rb),
+		                                              video_buffer_getydim(&rb));
 	}
 
 	/* Free temporary buffer... */

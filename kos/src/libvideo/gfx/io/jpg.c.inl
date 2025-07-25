@@ -430,8 +430,8 @@ err_wrong_fmt:
 	}
 	if unlikely(video_buffer_wlock(result, &vid_lock) != 0)
 		goto err_errno_r;
-	__builtin_assume(result_size_x == result->vb_xdim);
-	__builtin_assume(result_size_y == result->vb_ydim);
+	__builtin_assume(result_size_x == video_buffer_getxdim(result));
+	__builtin_assume(result_size_y == video_buffer_getydim(result));
 
 	/* Read scanlines... */
 	for (;;) {
@@ -547,8 +547,8 @@ do_convert:
 	(void)(*pdyn_jpeg_CreateCompress)(&comp, JPEGLIB_JPEG_LIB_VERSION,
 	                                  JPEGLIB_SIZEOF_jpeg_compress_struct);
 	(void)(*pdyn_jpeg_stdio_dest)(&comp, stream);
-	minimal_jpeg_compress_struct__set_image_width(&comp, buffer->vb_xdim);
-	minimal_jpeg_compress_struct__set_image_height(&comp, buffer->vb_ydim);
+	minimal_jpeg_compress_struct__set_image_width(&comp, video_buffer_getxdim(buffer));
+	minimal_jpeg_compress_struct__set_image_height(&comp, video_buffer_getydim(buffer));
 	minimal_jpeg_compress_struct__set_input_components(&comp, comp_input_components);
 	minimal_jpeg_compress_struct__set_in_color_space(&comp, comp_in_color_space);
 	(void)(*pdyn_jpeg_set_defaults)(&comp);

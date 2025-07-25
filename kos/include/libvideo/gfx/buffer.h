@@ -454,8 +454,8 @@ struct video_buffer_ops {
 	 * @assume(__lock->_vrl_rect.vcr_ydim > 0);
 	 * @assume((__lock->_vrl_rect.vcr_xmin + __lock->_vrl_rect.vcr_xdim) > __lock->_vrl_rect.vcr_xmin);
 	 * @assume((__lock->_vrl_rect.vcr_ymin + __lock->_vrl_rect.vcr_ydim) > __lock->_vrl_rect.vcr_ymin);
-	 * @assume((__lock->_vrl_rect.vcr_xmin + __lock->_vrl_rect.vcr_xdim) <= __self->vb_xdim);
-	 * @assume((__lock->_vrl_rect.vcr_ymin + __lock->_vrl_rect.vcr_ydim) <= __self->vb_ydim);
+	 * @assume((__lock->_vrl_rect.vcr_xmin + __lock->_vrl_rect.vcr_xdim) <= video_buffer_getxdim(__self));
+	 * @assume((__lock->_vrl_rect.vcr_ymin + __lock->_vrl_rect.vcr_ydim) <= video_buffer_getydim(__self));
 	 *
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
@@ -472,8 +472,8 @@ struct video_buffer_ops {
 	 * @assume(__lock->_vrl_rect.vcr_ydim > 0);
 	 * @assume((__lock->_vrl_rect.vcr_xmin + __lock->_vrl_rect.vcr_xdim) > __lock->_vrl_rect.vcr_xmin);
 	 * @assume((__lock->_vrl_rect.vcr_ymin + __lock->_vrl_rect.vcr_ydim) > __lock->_vrl_rect.vcr_ymin);
-	 * @assume((__lock->_vrl_rect.vcr_xmin + __lock->_vrl_rect.vcr_xdim) <= __self->vb_xdim);
-	 * @assume((__lock->_vrl_rect.vcr_ymin + __lock->_vrl_rect.vcr_ydim) <= __self->vb_ydim);
+	 * @assume((__lock->_vrl_rect.vcr_xmin + __lock->_vrl_rect.vcr_xdim) <= video_buffer_getxdim(__self));
+	 * @assume((__lock->_vrl_rect.vcr_ymin + __lock->_vrl_rect.vcr_ydim) <= video_buffer_getydim(__self));
 	 *
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
@@ -486,11 +486,11 @@ struct video_buffer_ops {
 	__NOTHROW_T(LIBVIDEO_GFX_FCC *vi_unlockregion)(struct video_buffer *__restrict __self,
 	                                               struct video_regionlock *__restrict __lock);
 
-	/* Create  a new hard subregion-proxy of `__self'.  The caller is responsible to ensure
-	 * that  the given `__rect' does not exceed `__self->vb_xdim' / `__self->vb_ydim'. Note
-	 * that this function behaves slightly different from `video_surface_region()', in that
-	 * the later accepts a signed  rect, while also allowing said  rect to be greater  than
-	 * the dimensions of the original buffer.
+	/* Create a new hard subregion-proxy of `__self'. The caller is responsible to ensure
+	 * that the given  `__rect' does not  exceed `video_buffer_get[xy]dim(__self)'.  Note
+	 * that this function  behaves slightly different  from `video_surface_region()',  in
+	 * that  the later accepts a signed rect, while also allowing said rect to be greater
+	 * than the dimensions of the original buffer.
 	 *
 	 * On the other hand, this function only works for creating **true** sub-rects, but
 	 * since this one is implemented by individual buffers, it is probably faster, too.
@@ -613,8 +613,8 @@ video_buffer_unlock(struct video_buffer *__self, struct video_lock *__lock);
  * @assume(__ydim > 0);
  * @assume((__xmin + __xdim) > __xmin);
  * @assume((__ymin + __ydim) > __ymin);
- * @assume((__xmin + __xdim) <= __self->vb_xdim);
- * @assume((__ymin + __ydim) <= __self->vb_ydim);
+ * @assume((__xmin + __xdim) <= video_buffer_getxdim(__self));
+ * @assume((__ymin + __ydim) <= video_buffer_getydim(__self));
  *
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -632,8 +632,8 @@ video_buffer_rlockregion(struct video_buffer *__self, struct video_regionlock *_
  * @assume(__ydim > 0);
  * @assume((__xmin + __xdim) > __xmin);
  * @assume((__ymin + __ydim) > __ymin);
- * @assume((__xmin + __xdim) <= __self->vb_xdim);
- * @assume((__ymin + __ydim) <= __self->vb_ydim);
+ * @assume((__xmin + __xdim) <= video_buffer_getxdim(__self));
+ * @assume((__ymin + __ydim) <= video_buffer_getydim(__self));
  *
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -755,16 +755,32 @@ struct video_buffer {
 
 /* Acquire/release references to sub-objects that any (initialized) buffer must hold */
 #ifdef LIBVIDEO_GFX_EXPOSE_INTERNALS
-#define __video_buffer_setsubregion(self, parent_surface, parent_buffer) \
-	(void)((self)->vb_surf.vs_pal      = (parent_surface)->vs_pal,       \
-	       (self)->vb_surf.vs_flags    = (parent_surface)->vs_flags,     \
-	       (self)->vb_surf.vs_colorkey = (parent_surface)->vs_colorkey,  \
-	       (self)->vb_codec            = (parent_buffer)->vb_codec)
-#define __video_buffer_setformat(self, format)                   \
-	(void)((self)->vb_surf.vs_pal      = (format)->vbf_pal,      \
-	       (self)->vb_surf.vs_flags    = (format)->vbf_flags,    \
-	       (self)->vb_surf.vs_colorkey = (format)->vbf_colorkey, \
-	       (self)->vb_codec            = (format)->vbf_codec)
+/* Initialize format of `self' from `format'
+ * @return: true:  Success
+ * @return: false: Error: missing palette */
+#define __video_buffer_init_format(self, format)                                           \
+	((self)->vb_surf.vs_pal      = (format)->vbf_pal,                                      \
+	 (self)->vb_surf.vs_flags    = (format)->vbf_flags,                                    \
+	 (self)->vb_surf.vs_colorkey = (format)->vbf_colorkey,                                 \
+	 (((self)->vb_codec = (format)->vbf_codec)->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) \
+	 ? ((self)->vb_surf.vs_pal != __NULLPTR)                                               \
+	 : ((self)->vb_surf.vs_pal = __NULLPTR, (self)->vb_surf.vs_flags &= ~VIDEO_GFX_F_PALOBJ, 1))
+#define __video_buffer_init_domain(self, domain) \
+	(void)((self)->vb_domain = (domain))
+/* Initialize dimensions of a buffer */
+#define __video_buffer_init_dim(self, xdim, ydim) \
+	(void)((self)->vb_xdim = (xdim), (self)->vb_ydim = (ydim))
+/* Initialize format+domain+dim for a subregion buffer */
+#define __video_buffer_init_subregion(self, parent_surface, parent_buffer, rect) \
+	(void)((self)->vb_surf.vs_pal      = (parent_surface)->vs_pal,               \
+	       (self)->vb_surf.vs_flags    = (parent_surface)->vs_flags,             \
+	       (self)->vb_surf.vs_colorkey = (parent_surface)->vs_colorkey,          \
+	       (self)->vb_codec            = (parent_buffer)->vb_codec,              \
+	       (self)->vb_domain           = (parent_buffer)->vb_domain,             \
+	       __video_buffer_init_dim(self, (rect)->vcr_xdim, (rect)->vcr_ydim))
+/* Initialize operators of a buffer */
+#define __video_buffer_init_ops(self, ops) \
+	(void)((self)->vb_ops = (ops))
 #ifdef __INTELLISENSE__
 #define __video_buffer_init_common(self) ((self)->vb_surf.vs_buffer = (self))
 #define __video_buffer_fini_common(self) (void)((self)->vb_surf.vs_buffer = (self))
@@ -772,7 +788,8 @@ struct video_buffer {
 #define __video_buffer_init_common(self)                 \
 	(!((self)->vb_surf.vs_flags & VIDEO_GFX_F_PALOBJ) || \
 	 (video_palette_incref((self)->vb_surf.vs_pal), 0),  \
-	 video_codec_incref((self)->vb_codec), (self)->vb_surf.vs_buffer = (self))
+	 video_codec_incref((self)->vb_codec),               \
+	 (self)->vb_refcnt = 1, (self)->vb_surf.vs_buffer = (self))
 #define __video_buffer_fini_common(self)                         \
 	(void)(__hybrid_assert((self)->vb_surf.vs_buffer == (self)), \
 	       video_codec_decref((self)->vb_codec),                 \

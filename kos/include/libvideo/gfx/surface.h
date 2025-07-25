@@ -210,11 +210,11 @@ video_surface_getgfx(struct video_surface const *__self,
                      struct video_gfx *__result,
                      gfx_blendmode_t __blendmode);
 
-/* Create  a new hard subregion-proxy of `__self'.  The caller is responsible to ensure
- * that  the given `__rect' does not exceed `__self->vb_xdim' / `__self->vb_ydim'. Note
- * that this function behaves slightly different from `video_surface_region()', in that
- * the later accepts a signed  rect, while also allowing said  rect to be greater  than
- * the dimensions of the original buffer.
+/* Create a new hard subregion-proxy of `__self'. The caller is responsible to ensure
+ * that the given `__rect'  does not exceed `video_surface_get[xy]dim(__self)'.  Note
+ * that this function  behaves slightly different  from `video_surface_region()',  in
+ * that  the later accepts a signed rect, while also allowing said rect to be greater
+ * than the dimensions of the original buffer.
  *
  * On the other hand, this function only works for creating **true** sub-rects, but
  * since this one is implemented by individual buffers, it is probably faster, too.

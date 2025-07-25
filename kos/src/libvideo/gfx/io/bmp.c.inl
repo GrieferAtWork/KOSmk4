@@ -184,30 +184,6 @@ done:
 #undef ceil_pixels_per_byte
 }
 
-PRIVATE void CC
-swap_rows(byte_t *a, byte_t *b,
-          size_t scanline) {
-	do {
-		byte_t temp = *a;
-		*a++ = *b;
-		*b++ = temp;
-	} while (--scanline);
-}
-
-PRIVATE void CC
-vflip_scanlines(byte_t *data,
-                size_t scanline,
-                size_t size_y) {
-	while (size_y >= 2) {
-		byte_t *row1 = data;
-		byte_t *row2 = data + (size_y - 1) * scanline;
-		swap_rows(row1, row2, scanline);
-		data += scanline;
-		size_y -= 2;
-	}
-}
-
-
 PRIVATE NONNULL((1)) void CC
 fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 	struct pixel {
@@ -223,10 +199,10 @@ fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 	       me->vb_ops == &rambuffer_formem_ops);
 	assert(me->vb_codec->vc_codec == VIDEO_CODEC_RGBA8888);
 	assert(me->vb_surf.vs_pal == NULL);
-	for (y = 0; y < me->vb_ydim; ++y) {
+	for (y = 0; y < video_buffer_getydim(me); ++y) {
 		struct pixel *iter, *end;
 		iter = (struct pixel *)(me->rb_data + y * me->rb_stride);
-		end  = iter + me->vb_xdim;
+		end  = iter + video_buffer_getxdim(me);
 		do {
 			if (iter->a != 0)
 				return; /* Got actual alpha values! */
@@ -344,7 +320,6 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	size_t szPixelDataSize;
 	size_t szPixelDataSizeGot;
 
-	bool out_vflipped = true;
 	bool out_hasalpha_if_nonzero = false;
 	struct video_codec_specs out_specs;
 	struct video_buffer_format format;
@@ -406,10 +381,12 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 		biClrUsed = (DWORD)1 << biBitCount;
 
 	/* Validate image width/height */
+	format.vbf_flags = VIDEO_GFX_F_YMIRROR;
 	if (biWidth <= 0)
 		Egoto(badfmt);
 	if (biHeight < 0) {
-		out_vflipped = false;
+		/* Image isn't flipped vertically */
+		format.vbf_flags = VIDEO_GFX_F_NORMAL;
 		biHeight = -biHeight;
 	} else if (biHeight == 0) {
 		Egoto(badfmt);
@@ -483,7 +460,6 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	}
 
 	/* Build output buffer codec specs. */
-	format.vbf_flags = VIDEO_GFX_F_NORMAL;
 	if (biClrUsed) {
 		struct video_palette *palette;
 		/* Palette-driven format */
@@ -524,7 +500,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 			}
 		}
 		format.vbf_pal = video_palette_optimize(palette);
-		format.vbf_flags = VIDEO_GFX_F_PALOBJ;
+		format.vbf_flags |= VIDEO_GFX_F_PALOBJ;
 	} else {
 		/* Color-mask-driven format */
 		out_specs.vcs_flags = VIDEO_CODEC_FLAG_NORMAL;
@@ -546,8 +522,6 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	    szPixelDataSize == szPixelDataSizeGot && domain_hint == &libvideo_ramdomain) {
 		void *mapfile_cookie;
 		REF struct video_buffer *result;
-		if (out_vflipped)
-			vflip_scanlines(bPixelData, dwPixelScanline, (size_t)(ULONG)biHeight);
 		mapfile_cookie = malloc(sizeof(struct mapfile));
 		if unlikely(!mapfile_cookie)
 			goto err_pal_codec;
@@ -590,7 +564,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 		if likely(result_lock.vl_stride == dwPixelScanline) {
 			dst = (byte_t *)mempcpy(dst, bPixelData, szPixelDataSizeGot);
 		} else {
-			video_dim_t iter_y = result->vb_ydim;
+			video_dim_t iter_y = video_buffer_getydim(result);
 			if (result_lock.vl_stride > dwPixelScanline) {
 				byte_t const *src = bPixelData;
 				size_t missing    = result_lock.vl_stride - dwPixelScanline;
@@ -615,7 +589,8 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 
 	case BI_RLE4:
 	case BI_RLE8:
-		rle_decode(result_lock.vl_data, result_lock.vl_stride, result->vb_ydim,
+		rle_decode(result_lock.vl_data, result_lock.vl_stride,
+		           video_buffer_getydim(result),
 		           bPixelData, blobEOF, biCompression == BI_RLE4);
 		break;
 
@@ -623,11 +598,6 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 		__builtin_unreachable();
 	}
 
-	if (out_vflipped) {
-		vflip_scanlines(result_lock.vl_data,
-		                result_lock.vl_stride,
-		                result->vb_ydim);
-	}
 	video_buffer_unlock(result, &result_lock);
 	if (out_hasalpha_if_nonzero)
 		fix_missing_alpha_channel(result);

@@ -45,14 +45,12 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/gfx.h>
-#include <libvideo/gfx/surface-defs.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
 #include "../buffer.h"
 #include "../ramdomain.h"
 #include "lockable.h"
-#include "region.h"
 #include "utils.h"
 
 DECL_BEGIN
@@ -88,7 +86,9 @@ lockable_getdata(struct lockable_buffer *__restrict self) {
 	byte_t *result = atomic_read(&self->lb_data);
 	if (!result) {
 		struct video_rambuffer_requirements req;
-		(*self->vb_codec->vc_rambuffer_requirements)(self->vb_xdim, self->vb_ydim, &req);
+		(*self->vb_codec->vc_rambuffer_requirements)(video_buffer_getxdim(self),
+		                                             video_buffer_getydim(self),
+		                                             &req);
 		result = (byte_t *)calloc(req.vbs_bufsize);
 		if unlikely(!result)
 			goto err;
@@ -140,17 +140,14 @@ lockable_buffer__subregion_impl(struct video_surface const *__restrict surface,
                                 video_coord_t base_xoff,
                                 video_coord_t base_yoff) {
 	REF struct lockable_buffer_subregion *result;
+	video_buffer_assert_rect(self, rect);
 	base_xoff += rect->vcr_xmin;
 	base_yoff += rect->vcr_ymin;
 	result = (REF struct lockable_buffer_subregion *)malloc(sizeof(struct lockable_buffer_subregion));
 	if unlikely(!result)
 		goto err;
-	__video_buffer_setsubregion(result, surface, self);
-	result->vb_domain = _libvideo_ramdomain();
+	__video_buffer_init_subregion(result, surface, self, rect);
 	result->lb_data   = NULL;
-	result->vb_xdim   = rect->vcr_xdim;
-	result->vb_ydim   = rect->vcr_ydim;
-	result->vb_refcnt = 1;
 	result->lb_stride = self->lb_stride;
 	result->lb_data += base_yoff * result->lb_stride;
 	result->lb_data += base_yoff * result->lb_stride;
@@ -161,8 +158,8 @@ lockable_buffer__subregion_impl(struct video_surface const *__restrict surface,
 	result->lbsb_yoff     = base_yoff;
 	result->lbsb_lockable = self;
 	video_buffer_incref(self);
-	result->vb_ops = result->lbsb_bxrem ? _lockable_buffer_subregion_ops()
-	                                    : _lockable_buffer_subregion_norem_ops();
+	__video_buffer_init_ops(result, result->lbsb_bxrem ? _lockable_buffer_subregion_ops()
+	                                                   : _lockable_buffer_subregion_norem_ops());
 	__video_buffer_init_common(result);
 	return result;
 err:
@@ -199,9 +196,8 @@ lockable_asram(struct video_rambuffer *__restrict rb,
 	video_surface_copyattrib(&rb->vb_surf, &self->vb_surf);
 	rb->vb_surf.vs_buffer = rb;
 	rb->vb_codec = video_buffer_getcodec(self);
-	rb->vb_ops   = _rambuffer_ops();
-	rb->vb_xdim  = self->vb_xdim;
-	rb->vb_ydim  = self->vb_ydim;
+	__video_buffer_init_ops(rb, _rambuffer_ops());
+	__video_buffer_init_dim(rb, video_buffer_getxdim(self), video_buffer_getydim(self));
 #ifndef NDEBUG
 	rb->vb_refcnt = 0; /* So someone incref'ing will fault */
 #endif /* !NDEBUG */
@@ -429,9 +425,10 @@ lockable_subregion_asram(struct video_rambuffer *__restrict rb,
 	video_surface_copyattrib(&rb->vb_surf, &self->vb_surf);
 	rb->vb_surf.vs_buffer = rb;
 	rb->vb_codec = video_buffer_getcodec(self);
-	rb->vb_ops   = _rambuffer_ops();
-	rb->vb_xdim  = self->vb_xdim + self->lbsb_bxrem;
-	rb->vb_ydim  = self->vb_ydim;
+	__video_buffer_init_ops(rb, _rambuffer_ops());
+	__video_buffer_init_dim(rb,
+	                        video_buffer_getxdim(self) + self->lbsb_bxrem,
+	                        video_buffer_getydim(self));
 #ifndef NDEBUG
 	rb->vb_refcnt = 0; /* So someone incref'ing will fault */
 #endif /* !NDEBUG */
@@ -650,8 +647,12 @@ lockable_buffer_subregion__rlockregion(struct video_buffer *__restrict self,
 	int ok;
 	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)self;
 	video_regionlock_assert(me, lock);
+	lock->_vrl_rect.vcr_xmin += me->lbsb_xoff;
+	lock->_vrl_rect.vcr_ymin += me->lbsb_yoff;
 	ok = (me->lb_base->vb_ops->vi_rlockregion)(me->lb_base, lock);
 	if (ok != 0 && (errno != ENOMEM || me->lbsb_lockable->lb_data)) {
+		lock->_vrl_rect.vcr_xmin -= me->lbsb_xoff;
+		lock->_vrl_rect.vcr_ymin -= me->lbsb_yoff;
 		ok = lockable_subregion_lockregion_fallback(me, lock);
 		lock->vrl_lock._vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE] = (void *)0;
 	}
@@ -664,8 +665,12 @@ lockable_buffer_subregion__wlockregion(struct video_buffer *__restrict self,
 	int ok;
 	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)self;
 	video_regionlock_assert(me, lock);
+	lock->_vrl_rect.vcr_xmin += me->lbsb_xoff;
+	lock->_vrl_rect.vcr_ymin += me->lbsb_yoff;
 	ok = (me->lb_base->vb_ops->vi_wlockregion)(me->lb_base, lock);
 	if (ok != 0 && (errno != ENOMEM || me->lbsb_lockable->lb_data)) {
+		lock->_vrl_rect.vcr_xmin -= me->lbsb_xoff;
+		lock->_vrl_rect.vcr_ymin -= me->lbsb_yoff;
 		ok = lockable_subregion_lockregion_fallback(me, lock);
 		lock->vrl_lock._vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE] = (void *)1;
 	}
@@ -676,16 +681,19 @@ INTERN ATTR_INOUT(1) ATTR_IN(2) void
 NOTHROW(FCC lockable_buffer_subregion__unlockregion)(struct video_buffer *__restrict self,
                                                      struct video_regionlock *__restrict lock) {
 	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)self;
-	video_regionlock_assert(me, lock);
 
 	/* Check for special case: lock was created by underlying buffer */
 	if (lock->vrl_lock.vl_data < me->lb_data ||
 	    lock->vrl_lock.vl_data >= me->lb_edata) {
+		lock->_vrl_rect.vcr_xmin -= me->lbsb_xoff;
+		lock->_vrl_rect.vcr_ymin -= me->lbsb_yoff;
+		video_regionlock_assert(me, lock);
 		video_buffer_unlockregion(me->lb_base, lock);
 		return;
 	}
 
 	/* Lock was created by **us** -- if it's a write-lock, write back pixel data */
+	video_regionlock_assert(me, lock);
 	if (lock->vrl_lock._vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE])
 		lockable_subregion_writepixels_region(me, lock);
 }
@@ -704,8 +712,19 @@ lockable_buffer__initgfx(struct video_gfx *__restrict self) {
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 lockable_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
 	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)video_gfx_getbuffer(self);
+	video_dim_t xdim, ydim;
 	self = (*(self->vx_surf.vs_buffer = me->lb_base)->vb_ops->vi_initgfx)(self);
-	return video_gfx_clip(self, me->lbsb_xoff, me->lbsb_yoff, me->vb_xdim, me->vb_ydim);
+	xdim = video_buffer_getxdim(me);
+	ydim = video_buffer_getydim(me);
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP) {
+		video_dim_t temp = xdim;
+		xdim = ydim;
+		ydim = temp;
+	}
+	return video_gfx_clip(self,
+	                      me->lbsb_xoff,
+	                      me->lbsb_yoff,
+	                      xdim, ydim);
 }
 
 
@@ -739,9 +758,8 @@ lockable_buffer_init(struct lockable_buffer *self,
 	video_surface_copyattrib(&self->vb_surf, surface);
 	self->vb_surf.vs_buffer = self;
 	self->vb_codec = video_buffer_getcodec(base);
-	self->vb_ops   = _lockable_buffer_ops();
-	self->vb_xdim  = video_buffer_getxdim(base);
-	self->vb_ydim  = video_buffer_getydim(base);
+	__video_buffer_init_ops(self, _lockable_buffer_ops());
+	__video_buffer_init_dim(self, video_buffer_getxdim(base), video_buffer_getydim(base));
 #ifndef NDEBUG
 	self->vb_refcnt = 0;
 #endif /* !NDEBUG */
@@ -794,13 +812,11 @@ libvideo_surface_lockable_distinct(struct video_surface const *__restrict self) 
 	result = (REF struct lockable_buffer *)malloc(sizeof(struct lockable_buffer));
 	if unlikely(!result)
 		goto err;
-	result->vb_ops    = _lockable_buffer_ops();
-	result->vb_domain = _libvideo_ramdomain();
 	video_surface_copyattrib(&result->vb_surf, self);
 	result->vb_codec  = video_buffer_getcodec(buffer);
-	result->vb_xdim   = video_buffer_getxdim(buffer);
-	result->vb_ydim   = video_buffer_getydim(buffer);
-	result->vb_refcnt = 1;
+	result->vb_domain = _libvideo_ramdomain();
+	__video_buffer_init_ops(result, _lockable_buffer_ops());
+	__video_buffer_init_dim(result, video_buffer_getxdim(buffer), video_buffer_getydim(buffer));
 	video_buffer_incref(buffer);
 	result->lb_base  = buffer;
 	result->lb_data  = NULL;

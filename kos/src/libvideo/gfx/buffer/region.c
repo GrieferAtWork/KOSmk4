@@ -29,32 +29,27 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/overflow.h>
-#include <hybrid/sched/atomic-lock.h>
-#include <hybrid/sequence/list.h>
 
 #include <kos/anno.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>
-#include <sched.h>
 #include <stdbool.h>
 #include <stddef.h>
 
-#include <libvideo/color.h>
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
-#include <libvideo/gfx/surface-defs.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/rect.h>
 #include <libvideo/types.h>
 
 #include "../buffer.h"
 #include "../gfx-empty.h"
-#include "../gfx.h"
 #include "../ramdomain.h"
 #include "region.h"
+#include "../gfx-debug.h"
 
 DECL_BEGIN
 
@@ -92,13 +87,6 @@ NOTHROW(FCC region_buffer__revoke)(struct video_buffer *__restrict self) {
 	return me;
 }
 
-#define ASSERT_SUBREGION_RECT(self, rect)                                         \
-	(assert(((rect)->vcr_xmin + (rect)->vcr_xdim) > (rect)->vcr_xmin),            \
-	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) > (rect)->vcr_ymin),            \
-	 assert(((rect)->vcr_xmin + (rect)->vcr_xdim) <= video_buffer_getxdim(self)), \
-	 assert(((rect)->vcr_ymin + (rect)->vcr_ydim) <= video_buffer_getydim(self)))
-
-
 INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
 region_buffer__subregion(struct video_surface const *__restrict self,
                          struct video_crect const *__restrict rect) {
@@ -106,11 +94,11 @@ region_buffer__subregion(struct video_surface const *__restrict self,
 	REF struct region_buffer *result;
 	struct region_buffer *me = (struct region_buffer *)video_surface_getbuffer(self);
 	struct video_buffer *base = me->rbf_base;
-	ASSERT_SUBREGION_RECT(me, rect);
+	video_buffer_assert_rect(me, rect);
 	old_rect.vr_xmin = me->rbf_cxoff;
 	old_rect.vr_ymin = me->rbf_cyoff;
-	old_rect.vr_xdim = me->vb_xdim;
-	old_rect.vr_ydim = me->vb_ydim;
+	old_rect.vr_xdim = video_buffer_getxdim(me);
+	old_rect.vr_ydim = video_buffer_getydim(me);
 	if (OVERFLOW_SADD(me->rbf_cxoff, rect->vcr_xmin, &new_rect.vr_xmin))
 		goto do_return_empty_buffer;
 	if (OVERFLOW_SADD(me->rbf_cyoff, rect->vcr_ymin, &new_rect.vr_ymin))
@@ -122,8 +110,8 @@ region_buffer__subregion(struct video_surface const *__restrict self,
 	assert(!video_rect_isempty(&result_rect));
 	base_iorect.vr_xmin = 0;
 	base_iorect.vr_ymin = 0;
-	base_iorect.vr_xdim = base->vb_xdim;
-	base_iorect.vr_ydim = base->vb_ydim;
+	base_iorect.vr_xdim = video_buffer_getxdim(base);
+	base_iorect.vr_ydim = video_buffer_getydim(base);
 	if (!video_rect_intersect_overflow(&base_iorect, &result_rect, &base_iorect))
 		goto do_return_empty_buffer;
 
@@ -137,8 +125,8 @@ region_buffer__subregion(struct video_surface const *__restrict self,
 	/* Check if we need to use a sub-region of "base" for the  result
 	 * This essentially clamps the buffer I/O Rect if it got smaller. */
 	if (base_iorect.vr_xmin > 0 || base_iorect.vr_ymin > 0 ||
-	    base_iorect.vr_xdim < base->vb_xdim ||
-	    base_iorect.vr_ydim < base->vb_ydim) {
+	    base_iorect.vr_xdim < video_buffer_getxdim(base) ||
+	    base_iorect.vr_ydim < video_buffer_getydim(base)) {
 		base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect);
 		if unlikely(!base)
 			goto err;
@@ -152,12 +140,8 @@ region_buffer__subregion(struct video_surface const *__restrict self,
 	result = (REF struct region_buffer *)malloc(sizeof(struct region_buffer));
 	if unlikely(!result)
 		goto err_base;
-	__video_buffer_setsubregion(result, self, base);
+	__video_buffer_init_subregion(result, self, me, rect);
 	result->vb_ops    = _region_buffer_ops();
-	result->vb_domain = me->vb_domain;
-	result->vb_xdim   = result_rect.vr_xdim;
-	result->vb_ydim   = result_rect.vr_ydim;
-	result->vb_refcnt = 1;
 	result->rbf_cxoff = result_rect.vr_xmin;
 	result->rbf_cyoff = result_rect.vr_ymin;
 	result->rbf_base  = base; /* Inherit reference */
@@ -180,23 +164,14 @@ region_buffer__rlockregion(struct video_buffer *__restrict self,
 	struct region_buffer *me = (struct region_buffer *)self;
 	struct video_buffer *base = me->rbf_base;
 	video_coord_t xend, yend;
-	assert((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) > lock->_vrl_rect.vcr_xmin);
-	assert((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) > lock->_vrl_rect.vcr_ymin);
-	assertf((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) <= me->vb_xdim,
-	        "X[=%" PRIuCRD "]+SX[=%" PRIuDIM "][=%" PRIuCRD "] exceeds XDIM[=%" PRIuDIM "]",
-	        lock->_vrl_rect.vcr_xmin, lock->_vrl_rect.vcr_xdim,
-	        lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim, me->vb_xdim);
-	assertf((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) <= me->vb_ydim,
-	        "Y[=%" PRIuCRD "]+SY[=%" PRIuDIM "][=%" PRIuCRD "] eyceeds YDIM[=%" PRIuDIM "]",
-	        lock->_vrl_rect.vcr_ymin, lock->_vrl_rect.vcr_ydim,
-	        lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim, me->vb_ydim);
+	video_regionlock_assert(me, lock);
 
 	/* Make the region-rect relative to the base buffer. */
 	lock->_vrl_rect.vcr_xmin += me->rbf_cxoff;
 	lock->_vrl_rect.vcr_ymin += me->rbf_cyoff;
 	if (!OVERFLOW_UADD(lock->_vrl_rect.vcr_xmin, lock->_vrl_rect.vcr_xdim, &xend) &&
 	    !OVERFLOW_UADD(lock->_vrl_rect.vcr_ymin, lock->_vrl_rect.vcr_ydim, &yend) &&
-	    xend <= base->vb_xdim && yend <= base->vb_ydim)
+	    xend <= video_buffer_getxdim(base) && yend <= video_buffer_getydim(base))
 		return (*base->vb_ops->vi_rlockregion)(base, lock);
 	errno = ERANGE;
 	return -1;
@@ -208,23 +183,14 @@ region_buffer__wlockregion(struct video_buffer *__restrict self,
 	struct region_buffer *me = (struct region_buffer *)self;
 	struct video_buffer *base = me->rbf_base;
 	video_coord_t xend, yend;
-	assert((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) > lock->_vrl_rect.vcr_xmin);
-	assert((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) > lock->_vrl_rect.vcr_ymin);
-	assertf((lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim) <= me->vb_xdim,
-	        "X[=%" PRIuCRD "]+SX[=%" PRIuDIM "][=%" PRIuCRD "] exceeds XDIM[=%" PRIuDIM "]",
-	        lock->_vrl_rect.vcr_xmin, lock->_vrl_rect.vcr_xdim,
-	        lock->_vrl_rect.vcr_xmin + lock->_vrl_rect.vcr_xdim, me->vb_xdim);
-	assertf((lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim) <= me->vb_ydim,
-	        "Y[=%" PRIuCRD "]+SY[=%" PRIuDIM "][=%" PRIuCRD "] eyceeds YDIM[=%" PRIuDIM "]",
-	        lock->_vrl_rect.vcr_ymin, lock->_vrl_rect.vcr_ydim,
-	        lock->_vrl_rect.vcr_ymin + lock->_vrl_rect.vcr_ydim, me->vb_ydim);
+	video_regionlock_assert(me, lock);
 
 	/* Make the region-rect relative to the base buffer. */
 	lock->_vrl_rect.vcr_xmin += me->rbf_cxoff;
 	lock->_vrl_rect.vcr_ymin += me->rbf_cyoff;
 	if (!OVERFLOW_UADD(lock->_vrl_rect.vcr_xmin, lock->_vrl_rect.vcr_xdim, &xend) &&
 	    !OVERFLOW_UADD(lock->_vrl_rect.vcr_ymin, lock->_vrl_rect.vcr_ydim, &yend) &&
-	    xend <= base->vb_xdim && yend <= base->vb_ydim)
+	    xend <= video_buffer_getxdim(base) && yend <= video_buffer_getydim(base))
 		return (*base->vb_ops->vi_wlockregion)(base, lock);
 	errno = ERANGE;
 	return -1;
@@ -239,6 +205,7 @@ NOTHROW(FCC region_buffer__unlockregion)(struct video_buffer *__restrict self,
 	/* Restore original lock rect (in case of further nesting, and caller needs it) */
 	lock->_vrl_rect.vcr_ymin -= me->rbf_cyoff;
 	lock->_vrl_rect.vcr_xmin -= me->rbf_cxoff;
+	video_regionlock_assert(me, lock);
 }
 
 
@@ -249,7 +216,7 @@ region_buffer__initgfx(struct video_gfx *__restrict self) {
 	struct region_buffer *me = (struct region_buffer *)video_gfx_getbuffer(self);
 	self = (*(self->vx_surf.vs_buffer = me->rbf_base)->vb_ops->vi_initgfx)(self);
 	return (*self->vx_hdr.vxh_ops->vgfo_clip)(self, me->rbf_cxoff, me->rbf_cyoff,
-	                                          me->vb_xdim, me->vb_ydim);
+	                                          video_buffer_getxdim(me), video_buffer_getydim(me));
 }
 
 
@@ -360,9 +327,7 @@ _libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 	video_surface_copyattrib(&result->vb_surf, self);
 	result->vb_codec  = video_buffer_getcodec(buffer);
 	result->vb_domain = _libvideo_ramdomain();
-	result->vb_xdim   = buffer_rect->vr_xdim;
-	result->vb_ydim   = buffer_rect->vr_ydim;
-	result->vb_refcnt = 1;
+	__video_buffer_init_dim(result, buffer_rect->vr_xdim, buffer_rect->vr_ydim);
 	result->rbf_cxoff = buffer_rect->vr_xmin;
 	result->rbf_cyoff = buffer_rect->vr_ymin;
 	if (buffer->vb_ops == &region_buffer_ops) {
@@ -372,9 +337,9 @@ _libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 		struct video_rect base_iorect;
 
 		/* Calculate intersection of 3 rects:
-		 * - {{0,0},                           {base->vb_xdim,base->vb_ydim}}
-		 * - {{me->rbf_cxoff,me->rbf_cyoff},   {me->vb_xdim,me->vb_ydim}}
-		 * - {{me->rbf_cxoff+result->rbf_cxoff,me->rbf_cyoff+result->rbf_cyoff}, {result->vb_xdim,result->vb_ydim}}
+		 * - {{0,0},                           {video_buffer_getXYdim(base)}}
+		 * - {{me->rbf_cxoff,me->rbf_cyoff},   {video_buffer_getXYdim(me)}}
+		 * - {{me->rbf_cxoff+result->rbf_cxoff,me->rbf_cyoff+result->rbf_cyoff}, {video_buffer_getXYdim(result)}}
 		 *
 		 * The  result represents the sub-region (and I/O Rect) of "base" that
 		 * needs to be applied for that buffer to correctly usable in "result"
@@ -387,16 +352,16 @@ _libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 		 * buffer instead. */
 		base_crect.vr_xmin = 0;
 		base_crect.vr_ymin = 0;
-		base_crect.vr_xdim = base->vb_xdim;
-		base_crect.vr_ydim = base->vb_ydim;
+		base_crect.vr_xdim = video_buffer_getxdim(base);
+		base_crect.vr_ydim = video_buffer_getydim(base);
 		me_crect.vr_xmin   = me->rbf_cxoff;
 		me_crect.vr_ymin   = me->rbf_cyoff;
-		me_crect.vr_xdim   = me->vb_xdim;
-		me_crect.vr_ydim   = me->vb_ydim;
+		me_crect.vr_xdim   = video_buffer_getxdim(me);
+		me_crect.vr_ydim   = video_buffer_getydim(me);
 		ret_crect.vr_xmin  = me_crect.vr_xmin + result->rbf_cxoff;
 		ret_crect.vr_ymin  = me_crect.vr_ymin + result->rbf_cyoff;
-		ret_crect.vr_xdim  = result->vb_xdim;
-		ret_crect.vr_ydim  = result->vb_ydim;
+		ret_crect.vr_xdim  = video_buffer_getxdim(result);
+		ret_crect.vr_ydim  = video_buffer_getydim(result);
 
 		if (!video_rect_intersect_overflow(&me_crect, &ret_crect, &base_iorect))
 			goto do_return_empty_buffer_r;
@@ -405,8 +370,8 @@ _libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 		assert(!video_rect_isempty(&base_iorect));
 		assert(base_iorect.vr_xmin >= 0);
 		assert(base_iorect.vr_ymin >= 0);
-		assert((base_iorect.vr_xmin + base_iorect.vr_xdim) <= base->vb_xdim);
-		assert((base_iorect.vr_ymin + base_iorect.vr_ydim) <= base->vb_ydim);
+		assert((base_iorect.vr_xmin + base_iorect.vr_xdim) <= video_buffer_getxdim(base));
+		assert((base_iorect.vr_ymin + base_iorect.vr_ydim) <= video_buffer_getydim(base));
 
 		/* Populate "result" based on rect offsets */
 		result->rbf_cxoff = ret_crect.vr_xmin;
@@ -414,8 +379,8 @@ _libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 
 		/* Check if we need to create a new sub-region buffer to enforce an I/O Rect */
 		if (base_iorect.vr_xmin > 0 || base_iorect.vr_ymin > 0 ||
-		    base_iorect.vr_xdim < base->vb_xdim ||
-		    base_iorect.vr_xdim < base->vb_ydim) {
+		    base_iorect.vr_xdim < video_buffer_getxdim(base) ||
+		    base_iorect.vr_xdim < video_buffer_getydim(base)) {
 			REF struct video_buffer *used_base;
 			static_assert(offsetof(struct video_rect, vr_xmin) == offsetof(struct video_crect, vcr_xmin));
 			static_assert(offsetof(struct video_rect, vr_ymin) == offsetof(struct video_crect, vcr_ymin));

@@ -639,7 +639,8 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		assert(format.vbf_codec->vc_specs.vcs_pxsz == 3 ||
 		       format.vbf_codec->vc_specs.vcs_pxsz == 4);
 		dcol_buffer = _video_domain_newbuffer(anim->va_domain, &format,
-		                                      frame->vb_xdim, frame->vb_ydim,
+		                                      video_buffer_getxdim(frame),
+		                                      video_buffer_getydim(frame),
 		                                      VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!dcol_buffer) /* TODO: What if the domain doesn't support the format? */
 			goto err;
@@ -656,10 +657,10 @@ err_dcol_buffer:
 		/* Convert pixel data */
 		pal_line  = pal_lock.vl_data;
 		dcol_line = frame_lock.vl_data;
-		iter_y    = frame->vb_ydim;
+		iter_y    = video_buffer_getydim(frame);
 		if (format.vbf_codec->vc_specs.vcs_pxsz == 3) {
 			do {
-				video_coord_t iter_x = frame->vb_xdim;
+				video_coord_t iter_x = video_buffer_getxdim(frame);
 				byte_t *dcol_iter = dcol_line;
 				byte_t *pal_iter = pal_line;
 				do {
@@ -674,7 +675,7 @@ err_dcol_buffer:
 			} while (--iter_y);
 		} else {
 			do {
-				video_coord_t iter_x = frame->vb_xdim;
+				video_coord_t iter_x = video_buffer_getxdim(frame);
 				byte_t *dcol_iter = dcol_line;
 				byte_t *pal_iter = pal_line;
 				do {
@@ -721,7 +722,9 @@ err_dcol_buffer:
 			if (!self->gb_restore) {
 				byte_t *backup;
 				struct video_rambuffer_requirements req;
-				(*frame->vb_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
+				(*frame->vb_codec->vc_rambuffer_requirements)(video_buffer_getxdim(frame),
+				                                              video_buffer_getydim(frame),
+				                                              &req);
 				backup = (byte_t *)malloc(req.vbs_bufsize);
 				if unlikely(!backup)
 					goto err_frame_lock;
@@ -730,10 +733,12 @@ err_dcol_buffer:
 			}
 			(*codec->vc_rectcopy)(self->gb_restore, 0, self->gb_restore_stride,
 			                      frame_lock.vl_data, 0, frame_lock.vl_stride,
-			                      frame->vb_xdim, frame->vb_ydim);
+			                      video_buffer_getxdim(frame), video_buffer_getydim(frame));
 		}
 		(*codec->vc_rectfill)(frame_lock.vl_data, 0, frame_lock.vl_stride,
-		                      anim->ga_cfg.gc_trans, frame->vb_xdim, frame->vb_ydim);
+		                      anim->ga_cfg.gc_trans,
+		                      video_buffer_getxdim(frame),
+		                      video_buffer_getydim(frame));
 	}	break;
 
 	case GIF_DISPOSE_RESTORE_PREVIOUS:
@@ -742,7 +747,8 @@ err_dcol_buffer:
 		if (self->gb_restore) {
 			(*codec->vc_rectcopy)(frame_lock.vl_data, 0, frame_lock.vl_stride,
 			                      self->gb_restore, 0, self->gb_restore_stride,
-			                      frame->vb_xdim, frame->vb_ydim);
+			                      video_buffer_getxdim(frame),
+			                      video_buffer_getydim(frame));
 		}
 		break;
 
@@ -754,7 +760,9 @@ err_dcol_buffer:
 		if (!self->gb_restore) {
 			byte_t *backup;
 			struct video_rambuffer_requirements req;
-			(*frame->vb_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
+			(*frame->vb_codec->vc_rambuffer_requirements)(video_buffer_getxdim(frame),
+			                                              video_buffer_getydim(frame),
+			                                              &req);
 			backup = (byte_t *)malloc(req.vbs_bufsize);
 			if unlikely(!backup)
 				goto err_frame_lock;
@@ -763,7 +771,8 @@ err_dcol_buffer:
 		}
 		(*codec->vc_rectcopy)(self->gb_restore, 0, self->gb_restore_stride,
 		                      frame_lock.vl_data, 0, frame_lock.vl_stride,
-		                      frame->vb_xdim, frame->vb_ydim);
+		                      video_buffer_getxdim(frame),
+		                      video_buffer_getydim(frame));
 	}	break;
 
 	}
@@ -774,7 +783,8 @@ err_dcol_buffer:
 	/* Check if we can directly render into the frame buffer, or if we have
 	 * to  go through the  extra work of using  a temporary scratch buffer. */
 	if ((codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) &&
-	    likely(frame_endx <= frame->vb_xdim && frame_endy <= frame->vb_ydim)) {
+	    likely(frame_endx <= video_buffer_getxdim(frame) &&
+	           frame_endy <= video_buffer_getydim(frame))) {
 		/* Can render directly into the frame buffer (no scratch buffer needed) */
 		byte_t *dst;
 		dst    = frame_lock.vl_data + frame_x + frame_y * frame_lock.vl_stride;
@@ -789,7 +799,9 @@ check_for_global_transparency:
 			/* When  the background (all-transparent) was restored, there is
 			 * always some transparency if the frame doesn't cover the whole
 			 * canvas. */
-			if (frame_x > 0 || frame_y > 0 || frame_w < frame->vb_xdim || frame_h < frame->vb_ydim) {
+			if (frame_x > 0 || frame_y > 0 ||
+			    frame_w < video_buffer_getxdim(frame) ||
+			    frame_h < video_buffer_getydim(frame)) {
 set_has_global_transparency:
 				video_buffer_enablecolorkey(frame, anim->ga_cfg.gc_trans);
 				break;
@@ -798,9 +810,10 @@ set_has_global_transparency:
 		case GIF_DISPOSE_RESTORE_PREVIOUS: {
 			/* Check if pixel data contains transparent pixels */
 			byte_t *line_iter = frame_lock.vl_data;
-			video_coord_t y_iter = frame->vb_ydim;
+			video_coord_t y_iter = video_buffer_getydim(frame);
 			do {
-				if (memchr(line_iter, anim->ga_cfg.gc_trans, frame->vb_xdim))
+				if (memchr(line_iter, anim->ga_cfg.gc_trans,
+				           video_buffer_getxdim(frame)))
 					goto set_has_global_transparency;
 				line_iter += frame_lock.vl_stride;
 			} while (--y_iter);
@@ -835,15 +848,15 @@ set_has_global_transparency:
 
 		/* Force-clamp frame coords to valid coords.
 		 * These should never point out-of-bounds, but better be safe than sorry. */
-		if unlikely(frame_endx > frame->vb_xdim) {
-			if (frame_w > frame->vb_xdim)
-				frame_w = frame->vb_xdim;
-			frame_x = frame->vb_xdim - frame_w;
+		if unlikely(frame_endx > video_buffer_getxdim(frame)) {
+			if (frame_w > video_buffer_getxdim(frame))
+				frame_w = video_buffer_getxdim(frame);
+			frame_x = video_buffer_getxdim(frame) - frame_w;
 		}
-		if unlikely(frame_endy > frame->vb_ydim) {
-			if (frame_h > frame->vb_ydim)
-				frame_h = frame->vb_ydim;
-			frame_y = frame->vb_ydim - frame_h;
+		if unlikely(frame_endy > video_buffer_getydim(frame)) {
+			if (frame_h > video_buffer_getydim(frame))
+				frame_h = video_buffer_getydim(frame);
+			frame_y = video_buffer_getydim(frame) - frame_h;
 		}
 
 		/* Render scratch buffer onto frame and translate palette indices. */
@@ -1017,22 +1030,24 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	/* Fill with global transparency, or "0" if not defined */
 	if (me->ga_cfg.gc_trans <= 0xff && me->ga_cfg.gc_trans != 0) {
 		(*format.vbf_codec->vc_rectfill)(result_lock.vl_data, 0, result_lock.vl_stride,
-		                                me->ga_cfg.gc_trans, result->vb_xdim, result->vb_ydim);
+		                                 me->ga_cfg.gc_trans,
+		                                 video_buffer_getxdim(result),
+		                                 video_buffer_getydim(result));
 	}
 
 	/* Force-clamp frame coords to valid coords.
 	 * These should never point out-of-bounds, but better be safe than sorry. */
 	frame_endx = (video_coord_t)frame_x + frame_w;
 	frame_endy = (video_coord_t)frame_y + frame_h;
-	if unlikely(frame_endx > result->vb_xdim) {
-		if (frame_w > result->vb_xdim)
-			frame_w = result->vb_xdim;
-		frame_x = result->vb_xdim - frame_w;
+	if unlikely(frame_endx > video_buffer_getxdim(result)) {
+		if (frame_w > video_buffer_getxdim(result))
+			frame_w = video_buffer_getxdim(result);
+		frame_x = video_buffer_getxdim(result) - frame_w;
 	}
-	if unlikely(frame_endy > result->vb_ydim) {
-		if (frame_h > result->vb_ydim)
-			frame_h = result->vb_ydim;
-		frame_y = result->vb_ydim - frame_h;
+	if unlikely(frame_endy > video_buffer_getydim(result)) {
+		if (frame_h > video_buffer_getydim(result))
+			frame_h = video_buffer_getydim(result);
+		frame_y = video_buffer_getydim(result) - frame_h;
 	}
 
 	/* Read frame into buffer */
@@ -1052,15 +1067,18 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 		 * - If pixel data contains a "transparent" pixel, then frame1 also needs global transparency */
 		byte_t *line_iter;
 		video_coord_t y_iter;
-		if (frame_x > 0 || frame_y > 0 || frame_w < result->vb_xdim || frame_h < result->vb_ydim) {
+		if (frame_x > 0 || frame_y > 0 ||
+		    frame_w < video_buffer_getxdim(result) ||
+		    frame_h < video_buffer_getydim(result)) {
 set_have_global_trans:
 			me->ga_frame1_global_trans = GIF_ANIM_FRAME1_GLOBAL_TRANS__YES;
 			goto have_global_trans;
 		}
 		line_iter = result_lock.vl_data;
-		y_iter    = result->vb_ydim;
+		y_iter    = video_buffer_getydim(result);
 		do {
-			if (memchr(line_iter, me->ga_cfg.gc_trans, result->vb_xdim))
+			if (memchr(line_iter, me->ga_cfg.gc_trans,
+			           video_buffer_getxdim(result)))
 				goto set_have_global_trans;
 			line_iter += result_lock.vl_stride;
 		} while (--y_iter);
