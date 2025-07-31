@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_APPS_SHOWPIC_MAIN_C
 #define GUARD_APPS_SHOWPIC_MAIN_C 1
+#define LIBVIDEO_DRIVER_WANT_PROTOTYPES
 #define LIBVIDEO_GFX_WANT_PROTOTYPES
 #define LIBVIDEO_COMPOSITOR_WANT_PROTOTYPES
 #define _KOS_SOURCE 1
@@ -49,6 +50,8 @@
 
 #include <libvideo/color.h>
 #include <libvideo/compositor/compositor.h>
+#include <libvideo/driver/adapter.h>
+#include <libvideo/driver/monitor.h>
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
@@ -56,13 +59,11 @@
 #include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
-#include <libvideo/gfx/screen.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
 DECL_BEGIN
 
-static struct video_crect const CRECT_FULL = VIDEO_CRECT_INIT_FULL;
 static struct video_rect const RECT_FULL = VIDEO_RECT_INIT_FULL;
 
 static void
@@ -540,9 +541,9 @@ do_showpic(struct video_buffer *screen,
 
 int main(int argc, char *argv[]) {
 	REF struct video_font *font;
-	REF struct screen_buffer *screen;
-	REF struct video_display *display = NULL;
-	REF struct video_buffer *bscreen;
+	REF struct video_adapter *adapter;
+	REF struct video_monitor *monitor;
+	REF struct video_display *display;
 	REF struct video_anim *anim;
 	struct video_anim_frame *frame;
 	struct timeval frame_start, frame_end;
@@ -553,53 +554,46 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Bind the screen buffer. */
-	screen = screen_buffer_create(NULL);
-	if (!screen)
-		err(EXIT_FAILURE, "Failed to load screen buffer");
-
-#if 0
-	{
-		struct video_rect rect;
-		rect.vr_xmin = 100;
-		rect.vr_ymin = 100;
-		rect.vr_xdim = video_buffer_getxdim(screen_buffer_asvideo(screen)) - 200;
-		rect.vr_ydim = video_buffer_getydim(screen_buffer_asvideo(screen)) - 200;
-		bscreen = video_buffer_region(screen_buffer_asvideo(screen), &rect);
-		if (!bscreen)
-			err(EXIT_FAILURE, "Failed to load screen buffer");
-//		video_buffer_revoke(bscreen);
-	}
-#else
-	bscreen = screen_buffer_asvideo(screen);
-#endif
+	adapter = video_adapter_open(NULL);
+	if (!adapter)
+		err(EXIT_FAILURE, "Failed to open video adapter");
+	monitor = video_adapter_getmonitor(adapter, 0);
+	if (!monitor)
+		err(EXIT_FAILURE, "Failed to access monitor with id=0");
+	display = video_monitor_asdisplay(monitor);
 
 	/* Load default system font */
-	font = video_font_lookup(video_buffer_getdomain(bscreen),
+	font = video_font_lookup(video_display_getdomain(display),
 	                         VIDEO_FONT_DEFAULT);
 
 #if 1
 	{
 		struct video_window_position position;
-		REF struct video_display *temp_display;
 		REF struct video_buffer *buffer;
 		REF struct video_compositor *compositor;
 		REF struct video_window *window1;
 		REF struct video_window *window2;
-		/* TODO: This is the wrong way around -- "screen_buffer" shouldn't exist, and
-		 *       should actually be  "video_monitor", which extends  "video_display". */
-		temp_display = video_display_forbuffer(bscreen);
-		if unlikely(!temp_display)
-			err(EXIT_FAILURE, "Failed to wrap screen in display");
-		compositor = video_compositor_create(temp_display, VIDEO_COMPOSITOR_FEAT_ALL, VIDEO_COLOR_AQUA);
+		video_dim_t xres, yres;
+		compositor = video_compositor_create(display, VIDEO_COMPOSITOR_FEAT_ALL, VIDEO_COLOR_AQUA);
 		if unlikely(!compositor)
 			err(EXIT_FAILURE, "Failed to allocate compositor");
+
+		{
+			REF struct video_buffer *screen;
+			screen = video_display_getbuffer(display);
+			if (!screen)
+				err(EXIT_FAILURE, "Failed to get screen buffer");
+			xres = video_surface_getxdim(video_buffer_assurface(screen));
+			yres = video_surface_getydim(video_buffer_assurface(screen));
+			video_buffer_decref(screen);
+		}
 
 		position.vwp_over = VIDEO_WINDOW_MOVE_OVER__FOREGROUND;
 		position.vwp_attr.vwa_flags = VIDEO_WINDOW_F_PASSTHRU;
 		position.vwp_attr.vwa_rect.vr_xmin = 80;
 		position.vwp_attr.vwa_rect.vr_ymin = 80;
-		position.vwp_attr.vwa_rect.vr_xdim = video_surface_getxdim(video_buffer_assurface(bscreen)) - 160;
-		position.vwp_attr.vwa_rect.vr_ydim = video_surface_getydim(video_buffer_assurface(bscreen)) - 160;
+		position.vwp_attr.vwa_rect.vr_xdim = xres - 160;
+		position.vwp_attr.vwa_rect.vr_ydim = yres - 160;
 		window1 = video_compositor_newwindow(compositor, &position, NULL);
 		if unlikely(!window1)
 			err(EXIT_FAILURE, "Failed to allocate window1");
@@ -636,14 +630,11 @@ int main(int argc, char *argv[]) {
 
 		/* Use the first window as output for the main program below... */
 		display = video_window_asdisplay(window1);
-		bscreen = video_window_getbuffer(window1);
-		if unlikely(!bscreen)
-			err(EXIT_FAILURE, "Failed to get screen from window1");
 	}
 #endif
 
 	/* Load the named file as a video buffer. */
-	anim = video_anim_open(video_buffer_getdomain(bscreen), argv[1]);
+	anim = video_anim_open(video_display_getdomain(display), argv[1]);
 	if unlikely(!anim)
 		err(EXIT_FAILURE, "Failed to open image");
 
@@ -655,9 +646,14 @@ int main(int argc, char *argv[]) {
 	anim = video_anim_cached(anim, NULL, NULL);
 #elif 0
 	{
+		REF struct video_buffer *screen;
 		struct video_buffer_format format;
-		video_buffer_getformat(bscreen, &format);
-		anim = video_anim_cached(anim, video_buffer_getdomain(bscreen), &format);
+		screen = video_display_getbuffer(display);
+		if (!screen)
+			err(EXIT_FAILURE, "Failed to get screen buffer");
+		video_buffer_getformat(screen, &format);
+		anim = video_anim_cached(anim, video_display_getdomain(display), &format);
+		video_buffer_decref(screen);
 	}
 #endif
 
@@ -674,8 +670,13 @@ int main(int argc, char *argv[]) {
 	/* Clear screen */
 	{
 		struct video_gfx screen_gfx;
-		video_buffer_getgfx(bscreen, &screen_gfx, GFX_BLENDMODE_OVERRIDE);
+		REF struct video_buffer *screen;
+		screen = video_display_getbuffer(display);
+		if (!screen)
+			err(EXIT_FAILURE, "Failed to get screen buffer");
+		video_buffer_getgfx(screen, &screen_gfx, GFX_BLENDMODE_OVERRIDE);
 		video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
+		video_buffer_decref(screen);
 	}
 
 	/* Render loop */
@@ -683,16 +684,19 @@ int main(int argc, char *argv[]) {
 	for (;;) {
 		struct timeval tv_delay, tv_spent, tv_showfor;
 		struct timespec ts_delay;
+		REF struct video_buffer *screen;
 
 		/* Render frame */
-		do_showpic(bscreen, video_buffer_assurface(frame->vaf_frame),
+		screen = video_display_getbuffer(display);
+		if (!screen)
+			err(EXIT_FAILURE, "Failed to get screen buffer");
+		do_showpic(screen, video_buffer_assurface(frame->vaf_frame),
 		           font, argv[1], frame);
-		if (display) {
-			syslog(LOG_DEBUG, "BEGIN: video_display_updaterect()\n");
-			video_display_updaterect(display, &RECT_FULL);
-			syslog(LOG_DEBUG, "END: video_display_updaterect()\n");
-		}
-		screen_buffer_updaterect(screen, &CRECT_FULL);
+		video_buffer_decref(screen);
+
+		syslog(LOG_DEBUG, "BEGIN: video_display_updaterect()\n");
+		video_display_updaterect(display, &RECT_FULL);
+		syslog(LOG_DEBUG, "END: video_display_updaterect()\n");
 
 		/* Load next frame as part of render delay */
 		tv_showfor = frame->vaf_showfor;

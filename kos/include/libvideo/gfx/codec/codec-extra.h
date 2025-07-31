@@ -45,7 +45,18 @@
  * >> B3 = (B3 & 0xdf) | (((v >> 3) & 1) << 5); // Bit#3 */
 #define VIDEO_CODEC_X_VBE16  0x3001
 
- /* TODO: 4-bit-per-pixel, 8-pixels-per-byte, planar */
+/* Tile-based video codec, where each "pixel" is actually a descriptor for a tile:
+ * >> TTTTTTTTBBBBFFFF
+ * T: Tile index        (== R)
+ * B: Background color  (== G)
+ * F: Foreground color  (== B)
+ *
+ * When it comes to pixel<=>color conversion, we encode TBG as RGB
+ *
+ * As such, this format could also be called "RGB844" */
+#define VIDEO_CODEC_X_TILE16 0x3002
+
+/* TODO: 4-bit-per-pixel, 8-pixels-per-byte, planar */
 
 
 #endif /* !_LIBVIDEO_GFX_CODEC_CODEC_EXTRA_H */

@@ -52,6 +52,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/color.h>
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/codec-extra.h>
 #include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/surface-defs.h>
 #include <libvideo/gfx/surface.h>
@@ -3083,6 +3084,14 @@ DEFINE_FORMAT_CONVERTER_RGBX(xbgr2222, uint8_t, 2, 2, 2, (
 	__HYBRID_BITFIELD8_T r : 2
 ));
 
+#ifdef VIDEO_CODEC_X_TILE16
+DEFINE_FORMAT_CONVERTER_RGB(rgb844, uint16_t, 8, 4, 4, (
+	__HYBRID_BITFIELD16_T r : 8,
+	__HYBRID_BITFIELD16_T g : 4,
+	__HYBRID_BITFIELD16_T b : 4
+));
+#endif /* VIDEO_CODEC_X_TILE16 */
+
 
 
 
@@ -4894,6 +4903,25 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               ap88_pixel2color, ap88_color2pixel, initconv_from_pa);
+
+#ifdef VIDEO_CODEC_X_TILE16
+	CASE_CODEC_ALn(VIDEO_CODEC_X_TILE16,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2_LE(0x00ff),
+	                /* vcs_gmask */ MASK2_LE(0x0f00),
+	                /* vcs_bmask */ MASK2_LE(0xf000),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               rectcopy16, rectmove16, linecopy16,
+	               linefill16, vertfill16, rectfill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
+	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
+	               rgb844_pixel2color, rgb844_color2pixel, initconv_from_rgb);
+#endif /* VIDEO_CODEC_X_TILE16 */
 
 	default:
 		result = libvideo_codec_lookup_extra(codec);

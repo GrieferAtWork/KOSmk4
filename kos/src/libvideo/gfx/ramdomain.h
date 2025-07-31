@@ -25,13 +25,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/__atomic.h>
-#include <hybrid/sched/atomic-lock.h>
-#include <hybrid/sequence/list.h>
-#include <hybrid/typecore.h>
-
 #include <kos/anno.h>
-#include <kos/types.h>
 #include <sys/types.h>
 
 #include <stdbool.h>
@@ -40,6 +34,7 @@
 #include <libvideo/color.h>
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/buffer/rambuffer.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
@@ -58,26 +53,6 @@ DECL_BEGIN
 /************************************************************************/
 /* RAM DOMAIN                                                           */
 /************************************************************************/
-struct video_rambuffer: video_buffer {
-	/* This type is sufficient for doing simple GFX */
-	byte_t *rb_data;   /* [1..1][owned][const] Buffer data */
-	size_t  rb_stride; /* [const] Buffer stride */
-};
-
-struct video_rambuffer_formem: video_rambuffer { /* vb_ops == &rambuffer_formem_ops */
-	void (CC *rbfm_release_mem)(void *cookie, void *mem);  /* [1..1][const] Callback invoked the first time `rbrv_dummy' is written to `rbrv_data' */
-	void     *rbfm_release_mem_cookie;                     /* [?..?][const] Cookie for `rbfm_release_mem' */
-};
-
-struct video_rambuffer_subregion: video_rambuffer { /* vb_ops == &rambuffer_subregion_ops || vb_ops == &rambuffer_subregion_norem_ops */
-	REF struct video_rambuffer *rbs_base;  /* [0..1][lock(ATOMIC && CLEAR_ONCE)] Underlying base buffer */
-	video_coord_t               rbs_bxrem; /* [const] Extra X-offset added to all pixel coords */
-	video_coord_t               rbs_xoff;  /* [const] GFX X-offset */
-	video_coord_t               rbs_yoff;  /* [const] GFX Y-offset */
-	video_coord_t               rbs_xend;  /* [const] GFX X-end-offset */
-	video_coord_t               rbs_yend;  /* [const] GFX Y-end-offset */
-};
-
 
 /* Video buffer types used to represent ram buffers.
  * NOTE: None of these ever look at `video_buffer::vb_domain',

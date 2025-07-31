@@ -165,6 +165,7 @@ BEGIN
 		USELIB("libvideo-gfx")
 		SOURCE({
 			"libvideo/driver/*.c",
+			"libvideo/driver/adapter/*.c",
 		})
 	END
 END

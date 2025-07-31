@@ -62,6 +62,8 @@ struct video_display_ops {
 	__ATTR_WUNUSED_T __ATTR_INOUT_T((1)) __REF struct video_buffer *
 	(LIBVIDEO_GFX_CC *vdo_getbuffer)(struct video_display *__restrict __self);
 
+	/* TODO: Operator for changing/updating the palette used by `vdo_getbuffer' */
+
 	/* Indicate  that the contents of a given physical rect have changed.
 	 * Chipset drivers might need this  to propagate changes to  actually
 	 * appear on-screen, and a compositor might need this to do its thing
@@ -97,26 +99,31 @@ struct video_display_ops {
  *
  * @return: * :   The currently active video buffer
  * @return: NULL: Video I/O access failed (s.a. `errno') */
-extern __ATTR_WUNUSED __ATTR_INOUT((1)) __REF struct video_buffer *LIBVIDEO_GFX_CC
+extern __ATTR_WUNUSED __ATTR_INOUT((1)) __REF struct video_buffer *
 video_display_getbuffer(struct video_display *__restrict __self);
 
 /* Indicate  that the contents of a given physical rect have changed.
  * Chipset drivers might need this  to propagate changes to  actually
  * appear on-screen, and a compositor might need this to do its thing
  * and composite the specified rects and make them visible. */
-extern __ATTR_INOUT(1) __ATTR_IN(2) void LIBVIDEO_GFX_CC
+extern __ATTR_INOUT(1) __ATTR_IN(2) void
 video_display_updaterect(struct video_display *__restrict __self,
                          struct video_rect const *__restrict __rect);
 
 /* Same as `video_display_updaterect()', but update multiple rects at once. */
-extern __ATTR_INOUT(1) __ATTR_INS(2, 3) void LIBVIDEO_GFX_CC
+extern __ATTR_INOUT(1) __ATTR_INS(2, 3) void
 video_display_updaterects(struct video_display *__restrict __self,
                           struct video_rect const *__restrict __rects,
                           __size_t __n_rects);
+
+/* Return the domain associated with `__self' */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) struct video_domain const *
+video_display_getdomain(struct video_display const *__restrict __self);
 #else /* __INTELLISENSE__ */
 #define video_display_getbuffer(self)                   (*(self)->vd_ops->vdo_getbuffer)(self)
 #define video_display_updaterect(self, rect)            (*(self)->vd_ops->vdo_updaterect)(self, rect)
 #define video_display_updaterects(self, rects, n_rects) (*(self)->vd_ops->vdo_updaterects)(self, rects, n_rects)
+#define video_display_getdomain(self)                   (self)->vd_domain
 #endif /* !__INTELLISENSE__ */
 
 

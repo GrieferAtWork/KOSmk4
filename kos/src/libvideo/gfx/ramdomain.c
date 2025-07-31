@@ -41,6 +41,7 @@
 
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/buffer/rambuffer.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
@@ -56,6 +57,10 @@ DECL_BEGIN
 /************************************************************************/
 /* RAM DOMAIN OPERATORS                                                 */
 /************************************************************************/
+DEFINE_PUBLIC_ALIAS(video_rambuffer_ops, _rambuffer_ops);
+DEFINE_PUBLIC_ALIAS(video_rambuffer_formem_ops, _rambuffer_formem_ops);
+DEFINE_PUBLIC_ALIAS(video_rambuffer_subregion_ops, _rambuffer_subregion_ops);
+DEFINE_PUBLIC_ALIAS(video_rambuffer_subregion_norem_ops, _rambuffer_subregion_norem_ops);
 
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_ops, rambuffer__destroy,
                          rambuffer__initgfx, rambuffer__updategfx,

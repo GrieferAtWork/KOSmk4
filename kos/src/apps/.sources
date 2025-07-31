@@ -43,6 +43,7 @@ DEFINE_SIMPLE_C_APPLICATION("snake")
 DEFINE_SIMPLE_C_APPLICATION("vconf")
 DEFINE_SIMPLE_CXX_APPLICATION("gfx", USELIB("libvideo-gfx"))
 DEFINE_SIMPLE_C_APPLICATION("showpic",
+		USELIB("libvideo-driver")
 		USELIB("libvideo-gfx")
 		USELIB("libvideo-compositor") // TODO: Remove this dependency
 )

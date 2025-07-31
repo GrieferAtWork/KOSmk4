@@ -83,7 +83,7 @@ video_adapter_close(struct video_adapter *__restrict __self);
  * @return: NULL: [errno=*] Some other error */
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __REF struct video_monitor *
 video_adapter_getmonitor(struct video_adapter *__restrict __self,
-                        __size_t __index);
+                         __size_t __index);
 #else /* __INTELLISENSE__ */
 #define video_adapter_close(self)             (*(self)->vad_ops->vdro_close)(self)
 #define video_adapter_getmonitor(self, index) (*(self)->vad_ops->vdro_getmonitor)(self, index)

@@ -17,18 +17,36 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_DRIVER_DRIVER_H
-#define GUARD_LIBVIDEO_DRIVER_DRIVER_H 1
+#ifndef GUARD_LIBVIDEO_DRIVER_ADAPTER_H
+#define GUARD_LIBVIDEO_DRIVER_ADAPTER_H 1
 
 #include "api.h"
 /**/
 
 #include <hybrid/compiler.h>
 
-#include <libvideo/driver/monitor.h>
+#include <libvideo/driver/adapter.h>
 
 DECL_BEGIN
 
+/* Open  the  video adapter  indicated by  `name'  (the filename  of a
+ * device file; e.g. `/dev/svga'), or the system default video adapter
+ * when `NULL'
+ *
+ * Note that the kernel enforcing that the same video device can only
+ * ever be opened once, by a single process (iow: this function  will
+ * block if you, or another process has already opened a device).
+ *
+ * Also note that this function generally can only be called by root.
+ *
+ * @return: * : Success (the newly allocated)
+ * @return: NULL: [errno=ENOENT] Specified device file doesn't exist
+ * @return: NULL: [errno=ENODEV] Specified device file isn't supported, or not a device
+ * @return: NULL: [errno=ENOMEM] Insufficient memory
+ * @return: NULL: [errno=*] Failed to open adapter for some other reason */
+INTDEF WUNUSED struct video_adapter *CC
+libvideo_adapter_open(char const *name);
+
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_DRIVER_DRIVER_H */
+#endif /* !GUARD_LIBVIDEO_DRIVER_ADAPTER_H */

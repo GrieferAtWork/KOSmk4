@@ -20,6 +20,15 @@
 #ifndef GUARD_LIBVIDEO_DRIVER_API_H
 #define GUARD_LIBVIDEO_DRIVER_API_H 1
 
+/* Expose "libvideo-gfx" internals */
+#define LIBVIDEO_GFX_EXPOSE_INTERNALS
+
+ /* Our library is linked against libvideo-gfx.so */
+#define LIBVIDEO_GFX_WANT_PROTOTYPES
+
+/* Configure supported adapters */
+#define HAVE_SVGA_ADAPTER
+
 #include <__stdinc.h>
 
 #include <kos/config/config.h> /* Pull in config-specific macro overrides */
@@ -27,8 +36,5 @@
 #include <libvideo/driver/api.h>
 
 #define CC LIBVIDEO_DRIVER_CC
-
- /* Our library is linked against libvideo-gfx.so */
-#define LIBVIDEO_GFX_WANT_PROTOTYPES
 
 #endif /* !GUARD_LIBVIDEO_DRIVER_API_H */

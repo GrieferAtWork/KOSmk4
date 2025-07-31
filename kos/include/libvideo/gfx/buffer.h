@@ -816,7 +816,7 @@ struct video_buffer {
 	(void)((self)->vb_ops = (ops))
 #ifdef __INTELLISENSE__
 #define __video_buffer_init_common(self) ((self)->vb_surf.vs_buffer = (self))
-#define __video_buffer_fini_common(self) (void)((self)->vb_surf.vs_buffer = (self))
+#define __video_buffer_fini_common(self) (void)(++(self)->vb_surf.vs_buffer)
 #else /* __INTELLISENSE__ */
 #define __video_buffer_init_common(self)                 \
 	(!((self)->vb_surf.vs_flags & VIDEO_GFX_F_PALOBJ) || \

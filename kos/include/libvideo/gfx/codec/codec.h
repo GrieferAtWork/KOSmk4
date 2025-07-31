@@ -487,6 +487,8 @@ video_codec_getpalcolors(struct video_codec const *__restrict self);
 #define video_codec_decref(self)                                       \
 	(void)(__hybrid_atomic_decfetch(&(self)->vc_refcnt, __ATOMIC_SEQ_CST) || \
 	       (video_codec_destroy(self), 0))
+#define video_codec_xincref(self) (void)(!(self) || (video_codec_incref(self), 0))
+#define video_codec_xdecref(self) (void)(!(self) || (video_codec_decref(self), 0))
 __DEFINE_REFCNT_FUNCTIONS(struct video_codec, vc_refcnt, video_codec_destroy)
 
 
