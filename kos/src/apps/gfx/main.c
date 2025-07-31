@@ -22,6 +22,7 @@
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 #define LIBVIDEO_GFX_WANT_PROTOTYPES
+#define LIBVIDEO_DRIVER_WANT_PROTOTYPES
 
 #include <hybrid/compiler.h>
 
@@ -42,13 +43,18 @@
 #include <unistd.h>
 
 #include <libvideo/color.h>
+#include <libvideo/driver/adapter.h>
+#include <libvideo/driver/monitor.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/screen.h>
 #include <libvideo/gfx/surface.h>
+#include <libvideo/rect.h>
 
 DECL_BEGIN
+
+static struct video_rect const RECT_FULL = VIDEO_RECT_INIT_FULL;
 
 #if 1
 #define rand_color() \
@@ -82,7 +88,9 @@ PRIVATE void enable_rawtty_mode(void) {
 
 int main(int argc, char *argv[]) {
 	bool is_blocking = false;
-	REF struct screen_buffer *screen;
+	REF struct video_adapter *adapter;
+	REF struct video_monitor *monitor;
+	REF struct video_buffer *screen;
 	REF struct video_font *font;
 	struct video_fontprinter_data fontprinter_data;
 	struct video_gfx gfx;
@@ -92,10 +100,17 @@ int main(int argc, char *argv[]) {
 
 	enable_rawtty_mode();
 
-	/* Bind the screen buffer. */
-	screen = screen_buffer_create(NULL);
+	/* Load default video adapter and monitor */
+	adapter = video_adapter_open(NULL);
+	if (!adapter)
+		err(EXIT_FAILURE, "Failed to open video adapter");
+	monitor = video_adapter_getmonitor(adapter, 0);
+	if (!monitor)
+		err(EXIT_FAILURE, "Failed to access monitor with id=0");
+	screen = video_monitor_getbuffer(monitor);
 	if (!screen)
-		err(EXIT_FAILURE, "Failed to load screen buffer");
+		err(EXIT_FAILURE, "Failed to get screen buffer");
+
 	video_buffer_getgfx(screen, &gfx, GFX_BLENDMODE_ALPHA);
 
 	/* Load the video-mode font. */
@@ -164,7 +179,7 @@ again_font:
 
 	for (;;) {
 		char buf[1];
-		screen->updaterect();
+		video_monitor_updaterect(monitor, &RECT_FULL);
 		if (read(STDIN_FILENO, buf, 1) < 1)
 			break;
 		if (buf[0] == '+') {
@@ -199,7 +214,7 @@ again_font:
 		ssize_t error;
 		char buf[1];
 		video_color_t color;
-		screen->updaterect();
+		video_monitor_updaterect(monitor, &RECT_FULL);
 		error = read(STDIN_FILENO, buf, 1);
 		if (error == 1) {
 			switch (buf[0]) {

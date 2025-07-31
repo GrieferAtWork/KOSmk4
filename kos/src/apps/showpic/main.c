@@ -553,7 +553,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	/* Bind the screen buffer. */
+	/* Load default video adapter and monitor */
 	adapter = video_adapter_open(NULL);
 	if (!adapter)
 		err(EXIT_FAILURE, "Failed to open video adapter");
