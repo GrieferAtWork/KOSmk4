@@ -536,6 +536,10 @@ DEFINE_PUBLIC_ALIAS(video_gfx_rlockio, libvideo_gfx_rlockio);
 INTERN WUNUSED ATTR_IN(1) ATTR_OUT(2) int FCC
 libvideo_gfx_rlockio(struct video_gfx const *__restrict self,
                      /*out*/ struct video_regionlock *__restrict lock) {
+	if unlikely(video_gfx_isioempty(self)) {
+		errno = EINVAL;
+		return -1;
+	}
 	video_gfx_getiorect(self, &lock->_vrl_rect);
 	return _video_buffer_rlockregion(video_gfx_getbuffer(self), lock);
 }
@@ -544,6 +548,10 @@ DEFINE_PUBLIC_ALIAS(video_gfx_wlockio, libvideo_gfx_wlockio);
 INTERN WUNUSED ATTR_IN(1) ATTR_OUT(2) int FCC
 libvideo_gfx_wlockio(struct video_gfx const *__restrict self,
                      /*out*/ struct video_regionlock *__restrict lock) {
+	if unlikely(video_gfx_isioempty(self)) {
+		errno = EINVAL;
+		return -1;
+	}
 	video_gfx_getiorect(self, &lock->_vrl_rect);
 	return _video_buffer_wlockregion(video_gfx_getbuffer(self), lock);
 }

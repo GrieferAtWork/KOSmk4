@@ -661,7 +661,7 @@ extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getsurfxdim
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getsurfydim(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) void video_gfx_getsurfrect(struct video_gfx const *__restrict __self, struct video_crect *__restrict __result);
 
-/* RAWxxx: Same as xxx, but the `VIDEO_GFX_F_XYSWAP' flag is NOT applied */
+/* RAWfoo: Same as "foo" above, but the `VIDEO_GFX_F_XYSWAP' flag is NOT applied */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawclipxmin(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawclipymin(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_gfx_getrawclipxend(struct video_gfx const *__restrict __self);
@@ -703,6 +703,13 @@ extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_gfx_getrawydim(
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_isioclip(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_issurfio(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_issurfclip(struct video_gfx const *__restrict __self);
+
+/* Check if different rects of `__self' are empty. Note the following implications:
+ * - `video_gfx_issurfempty()' implies `video_gfx_isioempty()'
+ * - `video_gfx_isclipempty()' implies `video_gfx_isioempty()' */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_isioempty(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_isclipempty(struct video_gfx const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_issurfempty(struct video_gfx const *__restrict __self);
 
 /* Return the API-visible Clip Rect size in X or Y.
  * These are simply aliases for `video_gfx_getclipxdim()' and `video_gfx_getclipydim()' */
@@ -964,7 +971,9 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 	((self)->vg_clip.vgc_bxmin == 0 && (self)->vg_clip.vgc_bymin == 0 && \
 	 (self)->vg_clip.vgc_bxend == video_gfx_getsurfxdim(self) &&        \
 	 (self)->vg_clip.vgc_byend == video_gfx_getsurfydim(self))
-
+#define video_gfx_isioempty(self)   (!video_gfx_getioxdim(self) || !video_gfx_getioydim(self))
+#define video_gfx_isclipempty(self) (!video_gfx_getclipxdim(self) || !video_gfx_getclipydim(self))
+#define video_gfx_issurfempty(self) (!video_gfx_getrawsurfxdim(self) || !video_gfx_getrawsurfydim(self))
 #define __video_gfx_getcliprect_xyswap(self, result)        \
 	(void)((result)->vr_xmin = video_gfx_getclipymin(self), \
 	       (result)->vr_ymin = video_gfx_getclipxmin(self), \
