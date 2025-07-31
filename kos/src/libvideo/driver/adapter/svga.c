@@ -541,7 +541,7 @@ svga_setmode(struct video_monitor *__restrict self,
 	if (old_modeinfo)
 		video_monitor_mode_fini(&me->sva_mode);
 	memcpy(&me->sva_mode, mode, sizeof(struct video_monitor_mode));
-	axref_clear(&me->sva_buffer);
+	axref_clear(&me->sva_buffer); /* Discard old display buffer to force creation of a new one */
 	svga_adapter_cs_release(me);
 	free(old_modeinfo);
 	return 0;

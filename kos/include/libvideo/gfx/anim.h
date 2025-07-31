@@ -83,16 +83,16 @@ struct video_anim_ops {
 	 * >> struct timeval frame_start, frame_end;
 	 * >> struct timeval tv_delay, tv_spent, showfor;
 	 * >> struct timespec ts_delay;
-	 * >> REF struct video_screen *screen;
+	 * >> REF struct video_buffer *screen;
 	 * >> REF struct video_anim *anim;
 	 * >> struct video_anim_frame *data;
 	 * >>
-	 * >> screen = screen_buffer_create(NULL);
+	 * >> screen = ...;
 	 * >> anim = video_anim_open("/var/anim.gif");
 	 * >> data = (struct video_anim_frame *)malloca(video_anim_sizeof_frame(anim));
 	 * >>
 	 * >> video_anim_firstframe(anim, data);
-	 * >> video_buffer_getgfx((struct video_buffer *)screen, &screen_gfx, GFX_BLENDMODE_OVERRIDE);
+	 * >> video_buffer_getgfx(screen, &screen_gfx, GFX_BLENDMODE_OVERRIDE);
 	 * >> gettimeofday(&frame_start, NULL);
 	 * >> for (;;) {
 	 * >>
@@ -100,8 +100,7 @@ struct video_anim_ops {
 	 * >>     video_buffer_getgfx(data->vaf_frame, &frame_gfx, GFX_BLENDMODE_OVERRIDE);
 	 * >>     video_gfx_stretch(&screen_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX,
 	 * >>                       &frame_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
-	 * >>     struct video_crect update_rect = VIDEO_CRECT_INIT_FULL;
-	 * >>     screen_buffer_updaterect(screen, &update_rect);
+	 * >>     video_display_updaterect(...);
 	 * >>
 	 * >>     // Load next frame as part of render delay
 	 * >>     showfor = data->vaf_showfor;

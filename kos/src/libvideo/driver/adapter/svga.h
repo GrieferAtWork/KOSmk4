@@ -75,7 +75,7 @@ struct svga_adapter: video_adapter {
 	void                             *sva_libsvgadrv;    /* [1..1][const] Handle for libsvgadrv */
 	struct svga_chipset_driver const *sva_drv;           /* [1..1][const] SVGA driver */
 #define svga_adapter_modeset(self) ((self)->sva_modeinfo != NULL)
-	struct svga_modeinfo             *sva_modeinfo;      /* [0..1][lock(sva_cslock)] Descriptor for currently active video mode */
+	struct svga_modeinfo             *sva_modeinfo;      /* [0..1][lock(sva_cslock)] Descriptor for currently active video mode ("NULL" means that no mode has been set, yet) */
 	struct video_monitor_mode         sva_mode;          /* [valid_if(sva_modeinfo != NULL)][lock(sva_cslock)] Currently active video mode */
 	struct svga_buffer_axref          sva_buffer;        /* [0..1][lock(READ(ATOMIC), WRITE(ATOMIC && sva_cslock))] Display buffer (or "NULL" if not allocated or display mode was just set) */
 	struct shared_lock                sva_cslock;        /* Lock for interfacing with `sva_cs' */

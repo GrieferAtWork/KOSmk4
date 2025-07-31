@@ -1213,6 +1213,7 @@ incdir("");
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/blendcolors.h>
+#include <libvideo/gfx/buffer/rambuffer.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec-extra.h>
 #include <libvideo/gfx/codec/codec.h>
@@ -1223,7 +1224,6 @@ incdir("");
 #include <libvideo/gfx/fonts/tlft.h>
 #include <libvideo/gfx/gfx-flags.h>
 #include <libvideo/gfx/gfx.h>
-#include <libvideo/gfx/screen.h>
 #include <libvideo/gfx/surface-defs.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/rect.h>

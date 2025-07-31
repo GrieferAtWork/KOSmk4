@@ -48,7 +48,6 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
-#include <libvideo/gfx/screen.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/rect.h>
 

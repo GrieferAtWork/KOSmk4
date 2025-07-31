@@ -63,6 +63,8 @@ struct video_display_ops {
 	(LIBVIDEO_GFX_CC *vdo_getbuffer)(struct video_display *__restrict __self);
 
 	/* TODO: Operator for changing/updating the palette used by `vdo_getbuffer' */
+	/* TODO: Operator to test if display is in V-blank right now (non-monitor-buffers always return "true" here)
+	 *       Using  this operator, code can then wait for  V-blank to happen in order to prevent screen-tearing. */
 
 	/* Indicate  that the contents of a given physical rect have changed.
 	 * Chipset drivers might need this  to propagate changes to  actually
