@@ -30,6 +30,13 @@
 
 #include "types.h"
 
+#define __OFFSET_VIDEO_RECT_XMIN 0
+#define __OFFSET_VIDEO_RECT_YMIN __SIZEOF_VIDEO_OFFSET_T__
+#define __OFFSET_VIDEO_RECT_XDIM (2 * __SIZEOF_VIDEO_OFFSET_T__)
+#define __OFFSET_VIDEO_RECT_YDIM (2 * __SIZEOF_VIDEO_OFFSET_T__ + __SIZEOF_VIDEO_DIM_T__)
+#define __SIZEOF_VIDEO_RECT      (2 * __SIZEOF_VIDEO_OFFSET_T__ + 2 * __SIZEOF_VIDEO_DIM_T__)
+#define __ALIGNOF_VIDEO_RECT     (__ALIGNOF_VIDEO_OFFSET_T__ > __ALIGNOF_VIDEO_DIM_T__ ? __ALIGNOF_VIDEO_OFFSET_T__ : __ALIGNOF_VIDEO_DIM_T__)
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -42,38 +49,63 @@ struct video_rect {
 #define VIDEO_RECT_INIT(xmin, xmax, xdim, ydim) { xmin, xmax, xdim, ydim }
 #define VIDEO_RECT_INIT_FULL VIDEO_RECT_INIT(0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX)
 
+#ifdef __INTELLISENSE__
 /* Getters for properties of `struct video_rect' */
-#define video_rect_getxmin(self) (self)->vr_xmin
-#define video_rect_getymin(self) (self)->vr_ymin
-#define video_rect_getxdim(self) (self)->vr_xdim
-#define video_rect_getydim(self) (self)->vr_ydim
-#define video_rect_getxend(self) ((self)->vr_xmin + (self)->vr_xdim)
-#define video_rect_getyend(self) ((self)->vr_ymin + (self)->vr_ydim)
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_rect_getxmin(struct video_rect const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_rect_getymin(struct video_rect const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_rect_getxdim(struct video_rect const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_rect_getydim(struct video_rect const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_rect_getxend(struct video_rect const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_rect_getyend(struct video_rect const *__restrict __self);
 
 /* Setters for properties of `struct video_rect' */
+extern __ATTR_INOUT(1) void video_rect_setxmin(struct video_rect *__restrict __self, video_offset_t __v);
+extern __ATTR_INOUT(1) void video_rect_setymin(struct video_rect *__restrict __self, video_offset_t __v);
+extern __ATTR_INOUT(1) void video_rect_setxdim(struct video_rect *__restrict __self, video_dim_t __v);
+extern __ATTR_INOUT(1) void video_rect_setydim(struct video_rect *__restrict __self, video_dim_t __v);
+extern __ATTR_INOUT(1) void video_rect_setxend(struct video_rect *__restrict __self, video_offset_t __v);
+extern __ATTR_INOUT(1) void video_rect_setyend(struct video_rect *__restrict __self, video_offset_t __v);
+
+/* Add an X or Y delta offset of `__self' */
+extern __ATTR_INOUT(1) void video_rect_addx(struct video_rect *__restrict __self, video_offset_t __v);
+extern __ATTR_INOUT(1) void video_rect_addy(struct video_rect *__restrict __self, video_offset_t __v);
+
+/* Check if `__self' is an empty rect */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_rect_isempty(struct video_rect const *__restrict __self);
+
+/* Check if {__x,__y} is contained within "__self" */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL
+video_rect_contains(struct video_rect const *__restrict __self,
+                    video_offset_t __x, video_offset_t __y);
+
+/* Check if 2 rects overlap (`video_rect_intersect()' would return true) */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __BOOL
+video_rect_intersects(struct video_rect const *__a,
+                      struct video_rect const *__b);
+#else /* __INTELLISENSE__ */
+#define video_rect_getxmin(self)    (self)->vr_xmin
+#define video_rect_getymin(self)    (self)->vr_ymin
+#define video_rect_getxdim(self)    (self)->vr_xdim
+#define video_rect_getydim(self)    (self)->vr_ydim
+#define video_rect_getxend(self)    ((self)->vr_xmin + (self)->vr_xdim)
+#define video_rect_getyend(self)    ((self)->vr_ymin + (self)->vr_ydim)
 #define video_rect_setxmin(self, v) (void)((self)->vr_xmin = (v))
 #define video_rect_setymin(self, v) (void)((self)->vr_ymin = (v))
 #define video_rect_setxdim(self, v) (void)((self)->vr_xdim = (v))
 #define video_rect_setydim(self, v) (void)((self)->vr_ydim = (v))
 #define video_rect_setxend(self, v) (void)((self)->vr_xdim = (video_dim_t)((v) - (self)->vr_xmin))
 #define video_rect_setyend(self, v) (void)((self)->vr_ydim = (video_dim_t)((v) - (self)->vr_ymin))
-
-/* Add an X or Y delta offset of `self' */
-#define video_rect_addx(self, v) (void)((self)->vr_xmin += (v))
-#define video_rect_addy(self, v) (void)((self)->vr_ymin += (v))
-
-/* Check if `self' is an empty rect */
-#define video_rect_isempty(self) ((self)->vr_xdim == 0 || (self)->vr_ydim == 0)
-
-/* Check if {x,y} is contained within "self" */
+#define video_rect_addx(self, v)    (void)((self)->vr_xmin += (v))
+#define video_rect_addy(self, v)    (void)((self)->vr_ymin += (v))
+#define video_rect_isempty(self)    ((self)->vr_xdim == 0 || (self)->vr_ydim == 0)
 #define video_rect_contains(self, x, y)                                   \
 	((x) >= video_rect_getxmin(self) && (x) < video_rect_getxend(self) && \
 	 (y) >= video_rect_getymin(self) && (y) < video_rect_getyend(self))
-
-/* Check if 2 rects overlap (`video_rect_intersect()' would return true) */
 #define video_rect_intersects(a, b)                                                                    \
 	(video_rect_getxmin(a) < video_rect_getxend(b) && video_rect_getxend(a) > video_rect_getxmin(b) && \
 	 video_rect_getymin(a) < video_rect_getyend(b) && video_rect_getyend(a) > video_rect_getymin(b))
+#endif /* !__INTELLISENSE__ */
+
 
 /* Check if "a" and "b" intersect, and if so: store that intersection and return true */
 __LOCAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) __BOOL
