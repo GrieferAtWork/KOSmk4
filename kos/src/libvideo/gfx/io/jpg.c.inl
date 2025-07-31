@@ -441,7 +441,7 @@ err_wrong_fmt:
 		scanline_y = minimal_jpeg_decompress_struct__get_output_scanline(&decomp);
 		if (scanline_y >= result_size_y)
 			break;
-		scanline = vid_lock.vl_data + scanline_y * vid_lock.vl_stride;
+		scanline = video_lock_getline(&vid_lock, scanline_y);
 		scanlines = &scanline;
 		(void)(*pdyn_jpeg_read_scanlines)(&decomp, scanlines, 1);
 	}
@@ -577,7 +577,7 @@ do_convert:
 		want_y = minimal_jpeg_compress_struct__get_next_scanline(&comp);
 		if (want_y >= minimal_jpeg_compress_struct__get_image_height(&comp))
 			break;
-		scanline = vid_lock.vl_data + want_y * vid_lock.vl_stride;
+		scanline = video_lock_getline(&vid_lock, want_y);
 		scanlines = &scanline;
 		(void)(*pdyn_jpeg_write_scanlines)(&comp, scanlines, 1);
 	}

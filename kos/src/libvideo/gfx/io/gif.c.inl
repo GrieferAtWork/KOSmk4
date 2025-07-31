@@ -655,8 +655,8 @@ err_dcol_buffer:
 		}
 
 		/* Convert pixel data */
-		pal_line  = pal_lock.vl_data;
-		dcol_line = frame_lock.vl_data;
+		pal_line  = video_lock_getdata(&pal_lock);
+		dcol_line = video_lock_getdata(&frame_lock);
 		iter_y    = video_buffer_getydim(frame);
 		if (format.vbf_codec->vc_specs.vcs_pxsz == 3) {
 			do {
@@ -670,8 +670,8 @@ err_dcol_buffer:
 					*dcol_iter++ = VIDEO_COLOR_GET_GREEN(color);
 					*dcol_iter++ = VIDEO_COLOR_GET_BLUE(color);
 				} while (--iter_x);
-				dcol_line += frame_lock.vl_stride;
-				pal_line += pal_lock.vl_stride;
+				dcol_line += video_lock_getstride(&frame_lock);
+				pal_line += video_lock_getstride(&pal_lock);
 			} while (--iter_y);
 		} else {
 			do {
@@ -689,8 +689,8 @@ err_dcol_buffer:
 					*(uint32_t *)dcol_iter = color;
 					dcol_iter += 4;
 				} while (--iter_x);
-				dcol_line += frame_lock.vl_stride;
-				pal_line += pal_lock.vl_stride;
+				dcol_line += video_lock_getstride(&frame_lock);
+				pal_line += video_lock_getstride(&pal_lock);
 			} while (--iter_y);
 		}
 		video_buffer_unlock(frame, &pal_lock);
@@ -732,10 +732,13 @@ err_dcol_buffer:
 				self->gb_restore_stride = req.vbs_stride;
 			}
 			(*codec->vc_rectcopy)(self->gb_restore, 0, self->gb_restore_stride,
-			                      frame_lock.vl_data, 0, frame_lock.vl_stride,
-			                      video_buffer_getxdim(frame), video_buffer_getydim(frame));
+			                      video_lock_getdata(&frame_lock), 0,
+			                      video_lock_getstride(&frame_lock),
+			                      video_buffer_getxdim(frame),
+			                      video_buffer_getydim(frame));
 		}
-		(*codec->vc_rectfill)(frame_lock.vl_data, 0, frame_lock.vl_stride,
+		(*codec->vc_rectfill)(video_lock_getdata(&frame_lock), 0,
+		                      video_lock_getstride(&frame_lock),
 		                      anim->ga_cfg.gc_trans,
 		                      video_buffer_getxdim(frame),
 		                      video_buffer_getydim(frame));
@@ -745,7 +748,8 @@ err_dcol_buffer:
 		self->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS = true;
 		/* Restore previous frame */
 		if (self->gb_restore) {
-			(*codec->vc_rectcopy)(frame_lock.vl_data, 0, frame_lock.vl_stride,
+			(*codec->vc_rectcopy)(video_lock_getdata(&frame_lock), 0,
+			                      video_lock_getstride(&frame_lock),
 			                      self->gb_restore, 0, self->gb_restore_stride,
 			                      video_buffer_getxdim(frame),
 			                      video_buffer_getydim(frame));
@@ -770,7 +774,8 @@ err_dcol_buffer:
 			self->gb_restore_stride = req.vbs_stride;
 		}
 		(*codec->vc_rectcopy)(self->gb_restore, 0, self->gb_restore_stride,
-		                      frame_lock.vl_data, 0, frame_lock.vl_stride,
+		                      video_lock_getdata(&frame_lock), 0,
+		                      video_lock_getstride(&frame_lock),
 		                      video_buffer_getxdim(frame),
 		                      video_buffer_getydim(frame));
 	}	break;
@@ -787,8 +792,8 @@ err_dcol_buffer:
 	           frame_endy <= video_buffer_getydim(frame))) {
 		/* Can render directly into the frame buffer (no scratch buffer needed) */
 		byte_t *dst;
-		dst    = frame_lock.vl_data + frame_x + frame_y * frame_lock.vl_stride;
-		reader = gif_read_frame(self, dst, frame_lock.vl_stride, frame_w, frame_h,
+		dst    = video_lock_getline(&frame_lock, frame_y) + frame_x;
+		reader = gif_read_frame(self, dst, video_lock_getstride(&frame_lock), frame_w, frame_h,
 		                        reader, eof, ctrl, self->gb_cfg.gc_trans);
 		if unlikely(!reader)
 			goto err_frame_lock;
@@ -809,13 +814,13 @@ set_has_global_transparency:
 			ATTR_FALLTHROUGH
 		case GIF_DISPOSE_RESTORE_PREVIOUS: {
 			/* Check if pixel data contains transparent pixels */
-			byte_t *line_iter = frame_lock.vl_data;
+			byte_t *line_iter = video_lock_getdata(&frame_lock);
 			video_coord_t y_iter = video_buffer_getydim(frame);
 			do {
 				if (memchr(line_iter, anim->ga_cfg.gc_trans,
 				           video_buffer_getxdim(frame)))
 					goto set_has_global_transparency;
-				line_iter += frame_lock.vl_stride;
+				line_iter += video_lock_getstride(&frame_lock);
 			} while (--y_iter);
 			video_buffer_disablecolorkey(frame);
 		}	break;
@@ -864,7 +869,8 @@ set_has_global_transparency:
 		       codec->vc_specs.vcs_pxsz == 3 || /* RGB888 */
 		       codec->vc_specs.vcs_pxsz == 4);  /* RGBA8888 */
 		src = self->gb_scratch;
-		dst = frame_lock.vl_data + (frame_x * codec->vc_specs.vcs_pxsz) + (frame_y * frame_lock.vl_stride);
+		dst = video_lock_getline(&frame_lock, frame_y) +
+		      (frame_x * codec->vc_specs.vcs_pxsz);
 		switch (codec->vc_specs.vcs_pxsz) {
 		case 1:
 			for (y = 0; y < frame_h; ++y) {
@@ -875,7 +881,7 @@ set_has_global_transparency:
 						*line = pixel;
 					++line;
 				}
-				dst += frame_lock.vl_stride;
+				dst += video_lock_getstride(&frame_lock);
 			}
 			goto check_for_global_transparency;
 		case 3:
@@ -898,7 +904,7 @@ set_has_global_transparency:
 					}
 					line += 3;
 				}
-				dst += frame_lock.vl_stride;
+				dst += video_lock_getstride(&frame_lock);
 			}
 			break;
 		case 4:
@@ -920,7 +926,7 @@ set_has_global_transparency:
 					}
 					line += 4;
 				}
-				dst += frame_lock.vl_stride;
+				dst += video_lock_getstride(&frame_lock);
 			}
 			break;
 		default: __builtin_unreachable();
@@ -1029,7 +1035,7 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 
 	/* Fill with global transparency, or "0" if not defined */
 	if (me->ga_cfg.gc_trans <= 0xff && me->ga_cfg.gc_trans != 0) {
-		(*format.vbf_codec->vc_rectfill)(result_lock.vl_data, 0, result_lock.vl_stride,
+		(*format.vbf_codec->vc_rectfill)(video_lock_getdata(&result_lock), 0, video_lock_getstride(&result_lock),
 		                                 me->ga_cfg.gc_trans,
 		                                 video_buffer_getxdim(result),
 		                                 video_buffer_getydim(result));
@@ -1052,8 +1058,9 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 
 	/* Read frame into buffer */
 	reader = gif_read_frame(frame,
-	                        result_lock.vl_data + frame_x + frame_y * result_lock.vl_stride,
-	                        result_lock.vl_stride, frame_w, frame_h, reader, eof, ctrl,
+	                        video_lock_getline(&result_lock, frame_y) + frame_x,
+	                        video_lock_getstride(&result_lock),
+	                        frame_w, frame_h, reader, eof, ctrl,
 	                        (video_pixel_t)-1);
 	if unlikely(!reader)
 		goto err_r_lock;
@@ -1074,13 +1081,13 @@ set_have_global_trans:
 			me->ga_frame1_global_trans = GIF_ANIM_FRAME1_GLOBAL_TRANS__YES;
 			goto have_global_trans;
 		}
-		line_iter = result_lock.vl_data;
+		line_iter = video_lock_getdata(&result_lock);
 		y_iter    = video_buffer_getydim(result);
 		do {
 			if (memchr(line_iter, me->ga_cfg.gc_trans,
 			           video_buffer_getxdim(result)))
 				goto set_have_global_trans;
-			line_iter += result_lock.vl_stride;
+			line_iter += video_lock_getstride(&result_lock);
 		} while (--y_iter);
 		me->ga_frame1_global_trans = GIF_ANIM_FRAME1_GLOBAL_TRANS__NO;
 	}	break;

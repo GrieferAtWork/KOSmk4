@@ -205,10 +205,10 @@ video_lock_convert_stride(struct video_lock *__restrict self,
 	byte_t *result = (byte_t *)malloc(new_stride, h);
 	if likely(result) {
 		unsigned int y;
-		byte_t const *src = self->vl_data;
+		byte_t const *src = video_lock_getdata(self);
 		byte_t *dst = result;
-		size_t common = MIN(new_stride, self->vl_stride);
-		for (y = 0; y < h; ++y, src += self->vl_stride, dst += new_stride)
+		size_t common = MIN(new_stride, video_lock_getstride(self));
+		for (y = 0; y < h; ++y, src += video_lock_getstride(self), dst += new_stride)
 			memcpy(dst, src, common);
 	}
 	return result;
@@ -281,9 +281,9 @@ convert_surface:
 		return result;
 	lodepng_stride = get_lodepng_stride(video_buffer_getxdim(buffer),
 	                                    colortype, bitdepth);
-	if likely(lodepng_stride == lock.vl_stride) {
+	if likely(lodepng_stride == video_lock_getstride(&lock)) {
 		error = my_lodepng_encode_memory(&out, &out_size,
-		                                 (unsigned char const *)lock.vl_data,
+		                                 (unsigned char const *)video_lock_getdata(&lock),
 		                                 video_buffer_getxdim(buffer),
 		                                 video_buffer_getydim(buffer),
 		                                 colortype, bitdepth, options);

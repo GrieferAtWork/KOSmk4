@@ -560,24 +560,24 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	switch (biCompression) {
 	case BI_BITFIELDS: {
 		/* In this case, pixel data bounds were already asserted */
-		byte_t *dst = result_lock.vl_data;
-		if likely(result_lock.vl_stride == dwPixelScanline) {
+		byte_t *dst = video_lock_getdata(&result_lock);
+		if likely(video_lock_getstride(&result_lock) == dwPixelScanline) {
 			dst = (byte_t *)mempcpy(dst, bPixelData, szPixelDataSizeGot);
 		} else {
 			video_dim_t iter_y = video_buffer_getydim(result);
-			if (result_lock.vl_stride > dwPixelScanline) {
+			if (video_lock_getstride(&result_lock) > dwPixelScanline) {
 				byte_t const *src = bPixelData;
-				size_t missing    = result_lock.vl_stride - dwPixelScanline;
+				size_t missing    = video_lock_getstride(&result_lock) - dwPixelScanline;
 				do {
 					memcpy(dst, src, dwPixelScanline);
 					bzero(dst + dwPixelScanline, dwPixelScanline, missing);
-					dst += result_lock.vl_stride;
+					dst += video_lock_getstride(&result_lock);
 					src += dwPixelScanline;
 				} while (--iter_y);
 			} else {
 				byte_t const *src = bPixelData;
 				do {
-					dst = (byte_t *)mempcpy(dst, src, result_lock.vl_stride);
+					dst = (byte_t *)mempcpy(dst, src, video_lock_getstride(&result_lock));
 					src += szPixelDataSizeGot;
 				} while (--iter_y);
 			}
@@ -589,7 +589,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 
 	case BI_RLE4:
 	case BI_RLE8:
-		rle_decode(result_lock.vl_data, result_lock.vl_stride,
+		rle_decode(result_lock.vl_data, video_lock_getstride(&result_lock),
 		           video_buffer_getydim(result),
 		           bPixelData, blobEOF, biCompression == BI_RLE4);
 		break;
@@ -778,23 +778,23 @@ libvideo_surface_save_bmp(struct video_surface const *__restrict self,
 		goto err_unlock;
 
 	/* Write pixel data */
-	if likely(vid_lock.vl_stride == dwPixelScanline) {
+	if likely(video_lock_getstride(&vid_lock) == dwPixelScanline) {
 		/* Can write data without any need for padding or-the-like */
-		size_t n_bytes = vid_lock.vl_stride * video_buffer_getydim(buffer);
+		size_t n_bytes = video_lock_getstride(&vid_lock) * video_buffer_getydim(buffer);
 		if (!fwrite(vid_lock.vl_data, n_bytes, 1, stream))
 			goto err_unlock;
-	} else if (vid_lock.vl_stride > dwPixelScanline) {
+	} else if (video_lock_getstride(&vid_lock) > dwPixelScanline) {
 		video_coord_t y;
 		for (y = 0; y < video_buffer_getydim(buffer); ++y) {
-			byte_t const *src = vid_lock.vl_data + y * vid_lock.vl_stride;
+			byte_t const *src = video_lock_getline(&vid_lock, y);
 			if (!fwrite(src, dwPixelScanline, 1, stream))
 				goto err_unlock;
 		}
 	} else {
-		size_t n_skip = dwPixelScanline - vid_lock.vl_stride;
+		size_t n_skip = dwPixelScanline - video_lock_getstride(&vid_lock);
 		video_coord_t y;
 		for (y = 0; y < video_buffer_getydim(buffer); ++y) {
-			byte_t const *src = vid_lock.vl_data + y * vid_lock.vl_stride;
+			byte_t const *src = video_lock_getline(&vid_lock, y);
 			if (!fwrite(src, dwPixelScanline, 1, stream))
 				goto err_unlock;
 			if (fseek(stream, n_skip, SEEK_CUR))

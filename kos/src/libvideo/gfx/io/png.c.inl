@@ -387,14 +387,14 @@ do_rgb_format:
 		/* Don't go below whatever scanline requirements libpng has */
 		size_t libpng_scanline = (*pdyn_png_get_rowbytes)(png_ptr, info_ptr);
 		int passes = (*pdyn_png_set_interlace_handling)(png_ptr);
-		if likely(result_lock.vl_stride >= libpng_scanline) {
+		if likely(video_lock_getstride(&result_lock) >= libpng_scanline) {
 			int pass;
 			for (pass = 0; pass < passes; ++pass) {
-				byte_t *dst = result_lock.vl_data;
+				byte_t *dst = video_lock_getdata(&result_lock);
 				libpng_uint_32 y;
 				for (y = 0; y < height; ++y) {
 					(*pdyn_png_read_row)(png_ptr, dst, NULL);
-					dst += result_lock.vl_stride;
+					dst += video_lock_getstride(&result_lock);
 				}
 			}
 		} else {
@@ -403,11 +403,11 @@ do_rgb_format:
 			if unlikely(!temp_line)
 				goto err_png_ptr_info_ptr_pal_r_lock;
 			for (pass = 0; pass < passes; ++pass) {
-				byte_t *dst = result_lock.vl_data;
+				byte_t *dst = video_lock_getdata(&result_lock);
 				libpng_uint_32 y;
 				for (y = 0; y < height; ++y) {
 					(*pdyn_png_read_row)(png_ptr, temp_line, NULL);
-					dst = (byte_t *)mempcpy(dst, temp_line, result_lock.vl_stride);
+					dst = (byte_t *)mempcpy(dst, temp_line, video_lock_getstride(&result_lock));
 				}
 			}
 			free(temp_line);

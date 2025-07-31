@@ -429,7 +429,7 @@ NOTHROW(FCC custom_buffer__unlockregion)(struct video_buffer *__restrict self,
 		video_codec_xcoord_to_offset(video_buffer_getcodec(self),
 		                             lock->_vrl_rect.vcr_xmin,
 		                             &xoff, &xrem);
-		assert(xrem == lock->vrl_xbas);
+		assert(xrem == video_regionlock_getxbase(lock));
 		lock->vrl_lock.vl_data -= lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data -= xoff;
 		(*me->cbc_unlock)(me->cbc_cookie, &lock->vrl_lock);

@@ -497,7 +497,7 @@ median_cut_start(struct video_gfx const *__restrict self,
 	    video_gfx_getcodec(self)->vc_codec == VIDEO_CODEC_RGBA8888) {
 		struct video_lock lock;
 		if (video_buffer_rlock(video_gfx_getbuffer(self), &lock) == 0) {
-			if (lock.vl_stride == (self->vg_clip.vgc_byend * 4)) {
+			if (video_lock_getstride(&lock) == (video_gfx_getioxdim(self) * 4)) {
 				io.mio_cookie = lock.vl_data;
 				io.mio_getcolor = &median_io_buf;
 				median_cut_start_impl(&io, gfx_indices, io_pixels,

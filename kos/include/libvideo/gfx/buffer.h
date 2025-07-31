@@ -390,6 +390,35 @@ struct video_regionlock {
 	struct video_crect _vrl_rect; /* [in][const] Region */
 };
 
+#ifdef __INTELLISENSE__
+/* Helpers for getting the raw pointers/offsets into video memory associated with a video lock */
+extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __byte_t *
+video_lock_getdata(struct video_lock const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __size_t
+video_lock_getstride(struct video_lock const *__restrict __self);
+extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __byte_t *
+video_lock_getline(struct video_lock const *__restrict __self, video_coord_t __y);
+
+/* Same as above, but for `video_regionlock' */
+extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __byte_t *
+video_regionlock_getdata(struct video_regionlock const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __size_t
+video_regionlock_getstride(struct video_regionlock const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t
+video_regionlock_getxbase(struct video_regionlock const *__restrict __self);
+extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __byte_t *
+video_regionlock_getline(struct video_regionlock const *__restrict __self, video_coord_t __y);
+#else /* __INTELLISENSE__ */
+#define video_lock_getdata(self)          ((__byte_t *)(self)->vl_data)
+#define video_lock_getstride(self)        ((__size_t)(self)->vl_stride)
+#define video_lock_getline(self, y)       ((self)->vl_data + (y) * (self)->vl_stride)
+#define video_regionlock_getdata(self)    ((__byte_t *)(self)->vrl_lock.vl_data)
+#define video_regionlock_getstride(self)  ((__size_t)(self)->vrl_lock.vl_stride)
+#define video_regionlock_getxbase(self)   ((video_coord_t)(self)->vrl_xbas)
+#define video_regionlock_getline(self, y) ((self)->vrl_lock.vl_data + (y) * (self)->vrl_lock.vl_stride)
+#endif /* !__INTELLISENSE__ */
+
+
 struct video_buffer_ops {
 	/* NOTE: _ALL_ Callbacks are always [1..1] */
 

@@ -323,12 +323,12 @@ LOCAL_libvideo_swblitter3__blit__mask1msb(struct video_blitter3 const *__restric
 			struct video_regionlock src_lock;
 			if (LL_rlockregion(video_gfx_getbuffer(src), &src_lock, src_x, src_y, size_x, size_y)) {
 				/* Use video locks */
-				video_coord_t used_src_x = src_lock.vrl_xbas;
-				video_coord_t used_dst_x = dst_lock.vrl_xbas;
-				video_coord_t used_out_x = out_lock.vrl_xbas;
-				byte_t const *src_line = src_lock.vrl_lock.vl_data;
-				byte_t const *dst_line = dst_lock.vrl_lock.vl_data;
-				byte_t *out_line = out_lock.vrl_lock.vl_data;
+				video_coord_t used_src_x = video_regionlock_getxbase(&src_lock);
+				video_coord_t used_dst_x = video_regionlock_getxbase(&dst_lock);
+				video_coord_t used_out_x = video_regionlock_getxbase(&out_lock);
+				byte_t const *src_line   = video_regionlock_getdata(&src_lock);
+				byte_t const *dst_line   = video_regionlock_getdata(&dst_lock);
+				byte_t *out_line         = video_regionlock_getdata(&out_lock);
 #ifdef LOCAL_IS_SAMEFMT
 				video_codec_linecopy_t vc_linecopy = video_gfx_getcodec(out)->vc_linecopy;
 #else  /* LOCAL_IS_SAMEFMT */
@@ -354,9 +354,9 @@ LOCAL_libvideo_swblitter3__blit__mask1msb(struct video_blitter3 const *__restric
 						leading_mask = (((byte_t)1 << leading_unaligned) - 1)
 						               << (8 - (used_dst_x + leading_unaligned));
 						LOCAL_libvideo_swblitter3__blit__mask1msb__vline(self,
-						                                                 out_line, out_lock.vrl_lock.vl_stride, used_out_x,
-						                                                 src_line, src_lock.vrl_lock.vl_stride, used_src_x,
-						                                                 dst_line, dst_lock.vrl_lock.vl_stride, leading_mask, size_y);
+						                                                 out_line, video_regionlock_getstride(&out_lock), used_out_x,
+						                                                 src_line, video_regionlock_getstride(&src_lock), used_src_x,
+						                                                 dst_line, video_regionlock_getstride(&dst_lock), leading_mask, size_y);
 						if unlikely(leading_unaligned >= size_x)
 							goto done_lock; /* Blit consisted of **only** unaligned bits. */
 						used_out_x += leading_unaligned;
@@ -372,9 +372,9 @@ LOCAL_libvideo_swblitter3__blit__mask1msb(struct video_blitter3 const *__restric
 					shift_t trailing_unaligned = (shift_t)(size_x & 7);
 					byte_t trailing_mask = ~(0xff >> trailing_unaligned);
 					LOCAL_libvideo_swblitter3__blit__mask1msb__vline(self,
-					                                                 out_line, out_lock.vrl_lock.vl_stride, used_out_x + (size_x & ~7),
-					                                                 src_line, src_lock.vrl_lock.vl_stride, used_src_x + (size_x & ~7),
-					                                                 dst_line + (size_x >> 3), dst_lock.vrl_lock.vl_stride, trailing_mask, size_y);
+					                                                 out_line, video_regionlock_getstride(&out_lock), used_out_x + (size_x & ~7),
+					                                                 src_line, video_regionlock_getstride(&src_lock), used_src_x + (size_x & ~7),
+					                                                 dst_line + (size_x >> 3), video_regionlock_getstride(&dst_lock), trailing_mask, size_y);
 					size_x &= ~7;
 					if unlikely(!size_x)
 						return;
@@ -450,9 +450,9 @@ LOCAL_libvideo_swblitter3__blit__mask1msb(struct video_blitter3 const *__restric
 							}
 						}
 					} while (iter_x_byte < size_x);
-					out_line += out_lock.vrl_lock.vl_stride;
-					src_line += src_lock.vrl_lock.vl_stride;
-					dst_line += dst_lock.vrl_lock.vl_stride;
+					out_line += video_regionlock_getstride(&out_lock);
+					src_line += video_regionlock_getstride(&src_lock);
+					dst_line += video_regionlock_getstride(&dst_lock);
 				} while (--size_y);
 done_lock:
 				LL_unlockregion(video_gfx_getbuffer(src), &src_lock);
