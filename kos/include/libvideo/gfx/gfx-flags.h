@@ -39,7 +39,49 @@
 #define VIDEO_GFX_F_YWRAP    0x0020 /* OOB Y coords wrap to the other side of the Clip Rect (else: coords are clamped) */
 #define VIDEO_GFX_F_NEAREST  0x0000 /* Use nearest interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
 #define VIDEO_GFX_F_LINEAR   0x0040 /* Use linear interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
-#define VIDEO_GFX_F_PALOBJ   0x0080 /* The palette being used is non-NULL, object-based, and was allocated by the same domain as the `video_buffer' */
+#define VIDEO_GFX_F_PALOBJ   0x0080 /* The palette being used is non-NULL and object-based */
+
+
+
+#define _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT 1
+#define _VIDEO_GFX_FLAGS_Y_TO_X_RSHIFT _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT
+
+#define _VIDEO_GFX_F_XFLAGS   (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_XMIRROR)
+#define _VIDEO_GFX_F_YFLAGS   (VIDEO_GFX_F_YWRAP | VIDEO_GFX_F_YMIRROR)
+#define _VIDEO_GFX_F_ANDFLAGS (0)
+#define _VIDEO_GFX_F_ORFLAGS  (VIDEO_GFX_F_LINEAR | VIDEO_GFX_F_PALOBJ)
+#define _VIDEO_GFX_F_XORFLAGS (~(_VIDEO_GFX_F_ANDFLAGS | _VIDEO_GFX_F_ORFLAGS))
+
+#if ((_VIDEO_GFX_F_XFLAGS << _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT) != _VIDEO_GFX_F_YFLAGS || \
+     (_VIDEO_GFX_F_YFLAGS >> _VIDEO_GFX_FLAGS_Y_TO_X_RSHIFT) != _VIDEO_GFX_F_XFLAGS)
+#error "Bad values for flags (X/Y-swap isn't configured properly)"
+#endif /* ... */
+
+/* Swap X/Y-specific flags in `f' with their counterpart */
+#define _VIDEO_GFX_F_XYSWAP_FLAGS(f)                                   \
+	(((f) & ~(_VIDEO_GFX_F_XFLAGS | _VIDEO_GFX_F_YFLAGS)) |            \
+	 (((f) & _VIDEO_GFX_F_XFLAGS) << _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT) | \
+	 (((f) & _VIDEO_GFX_F_YFLAGS) >> _VIDEO_GFX_FLAGS_Y_TO_X_RSHIFT))
+
+
+/* High-level helper macros to apply transformations to `VIDEO_GFX_F_*'
+ * These should only be used to set the flags of `video_surface'.  When
+ * doing  these transformation operations on `video_gfx', the dedicated
+ * methods of the same names (but lowercase) should be used.
+ *
+ * >> struct video_gfx gfx;
+ * >> struct video_surface surf = *video_buffer_assurface(buffer);
+ * >> video_surface_setflags(&surf, VIDEO_GFX_LROT90(video_surface_getflags(&surf)));
+ * >> video_surface_getgfx(&surf, &gfx); // "gfx" comes pre-LROT90-tated relative to "buffer" */
+#define VIDEO_GFX_XYSWAP(f)     (_VIDEO_GFX_F_XYSWAP_FLAGS(f) ^ VIDEO_GFX_F_XYSWAP)
+#define VIDEO_GFX_LROT90(f)     (_VIDEO_GFX_F_XYSWAP_FLAGS(f) ^ (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR))
+#define VIDEO_GFX_RROT90(f)     (_VIDEO_GFX_F_XYSWAP_FLAGS(f) ^ (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR))
+#define VIDEO_GFX_ROT180(f)     ((f) ^ (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR))
+#define VIDEO_GFX_HMIRROR(f)    ((f) ^ VIDEO_GFX_F_XMIRROR)
+#define VIDEO_GFX_VMIRROR(f)    ((f) ^ VIDEO_GFX_F_YMIRROR)
+#define VIDEO_GFX_LROT90n(f, n) (((n) & 3) == 3 ? VIDEO_GFX_RROT90(f) : (((n) & 3) == 2 ? VIDEO_GFX_ROT180(f) : (((n) & 3) == 1 ? VIDEO_GFX_LROT90(f) : (f))))
+#define VIDEO_GFX_RROT90n(f, n) (((n) & 3) == 3 ? VIDEO_GFX_LROT90(f) : (((n) & 3) == 2 ? VIDEO_GFX_ROT180(f) : (((n) & 3) == 1 ? VIDEO_GFX_RROT90(f) : (f))))
+
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -47,33 +89,30 @@ __DECL_BEGIN
 /* Set of `VIDEO_GFX_F*' */
 typedef __UINT32_TYPE__ video_gfx_flag_t;
 
-#define _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT 1
-#define _VIDEO_GFX_FLAGS_Y_TO_X_RSHIFT _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT
-
-#define _VIDEO_GFX_XFLAGS    (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_XMIRROR)
-#define _VIDEO_GFX_YFLAGS    (VIDEO_GFX_F_YWRAP | VIDEO_GFX_F_YMIRROR)
-#define _VIDEO_GFX_AND_FLAGS (0)
-#define _VIDEO_GFX_OR_FLAGS  (VIDEO_GFX_F_LINEAR | VIDEO_GFX_F_PALOBJ)
-#define _VIDEO_GFX_XOR_FLAGS (~(_VIDEO_GFX_AND_FLAGS | _VIDEO_GFX_OR_FLAGS))
-
 /* Combine pre-existing GFX flags `__old_flags' with `__more_flags' */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED video_gfx_flag_t
 video_gfx_flag_combine(video_gfx_flag_t __old_flags, video_gfx_flag_t __more_flags) {
 	if (__old_flags & VIDEO_GFX_F_XYSWAP) {
-		__more_flags = (__more_flags & ~(_VIDEO_GFX_XFLAGS | _VIDEO_GFX_YFLAGS)) |
-		               ((__more_flags & _VIDEO_GFX_XFLAGS) << _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT) |
-		               ((__more_flags & _VIDEO_GFX_YFLAGS) >> _VIDEO_GFX_FLAGS_Y_TO_X_RSHIFT);
+		/* If `__old_flags' indicate that X/Y  should be swapped, then the  initial
+		 * set of X/Y-flags of `__more_flags' must still be applied in the  context
+		 * of coordinate  transformations happening  **after** any  transformations
+		 * currently done by `__old_flags'. Since those coords are already swapped,
+		 * anything fed into `__more_flags' comes pre-swapped.
+		 *
+		 * Since we want to flatten these transformations, we must apply this pre-
+		 * swapping by inverting X/Y-flags  in `__more_flags' prior to  combining. */
+		__more_flags = _VIDEO_GFX_F_XYSWAP_FLAGS(__more_flags);
 	}
 	return 0 |
-#if _VIDEO_GFX_XOR_FLAGS != 0
-	       ((__old_flags ^ __more_flags) & _VIDEO_GFX_XOR_FLAGS) |
-#endif /* _VIDEO_GFX_XOR_FLAGS != 0 */
-#if _VIDEO_GFX_OR_FLAGS != 0
-	       ((__old_flags | __more_flags) & _VIDEO_GFX_OR_FLAGS) |
-#endif /* _VIDEO_GFX_OR_FLAGS != 0 */
-#if _VIDEO_GFX_AND_FLAGS != 0
-	       ((__old_flags & __more_flags) & _VIDEO_GFX_AND_FLAGS) |
-#endif /* _VIDEO_GFX_AND_FLAGS != 0 */
+#if _VIDEO_GFX_F_XORFLAGS != 0
+	       ((__old_flags ^ __more_flags) & _VIDEO_GFX_F_XORFLAGS) |
+#endif /* _VIDEO_GFX_F_XORFLAGS != 0 */
+#if _VIDEO_GFX_F_ORFLAGS != 0
+	       ((__old_flags | __more_flags) & _VIDEO_GFX_F_ORFLAGS) |
+#endif /* _VIDEO_GFX_F_ORFLAGS != 0 */
+#if _VIDEO_GFX_F_ANDFLAGS != 0
+	       ((__old_flags & __more_flags) & _VIDEO_GFX_F_ANDFLAGS) |
+#endif /* _VIDEO_GFX_F_ANDFLAGS != 0 */
 	       0;
 }
 

@@ -622,6 +622,8 @@ extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
 video_buffer_rlockregion(struct video_buffer *__self, struct video_regionlock *__lock,
                          video_coord_t __xmin, video_coord_t __ymin,
                          video_dim_t __xdim, video_dim_t __ydim);
+extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) int
+_video_buffer_rlockregion(struct video_buffer *__self, struct video_regionlock *__lock);
 
 /* Same as  `video_buffer_wlock', but  possibly more  efficient, as  only  a
  * specific sub-region is being locked, rather than the entire video buffer.
@@ -641,6 +643,8 @@ extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
 video_buffer_wlockregion(struct video_buffer *__self, struct video_regionlock *__lock,
                          video_coord_t __xmin, video_coord_t __ymin,
                          video_dim_t __xdim, video_dim_t __ydim);
+extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) int
+_video_buffer_wlockregion(struct video_buffer *__self, struct video_regionlock *__lock);
 
 /* Release a video  region lock that  had previously been  acquired
  * by `video_buffer_rlockregion()' or `video_buffer_wlockregion()'. */
@@ -717,6 +721,8 @@ __NOTHROW(video_buffer_revoke)(struct video_buffer *__restrict __self);
 	((lock)->_vrl_rect.vcr_xmin = (xmin), (lock)->_vrl_rect.vcr_ymin = (ymin), \
 	 (lock)->_vrl_rect.vcr_xdim = (xdim), (lock)->_vrl_rect.vcr_ydim = (ydim), \
 	 (*(self)->vb_ops->vi_wlockregion)(self, lock))
+#define _video_buffer_rlockregion(self, lock) (*(self)->vb_ops->vi_rlockregion)(self, lock)
+#define _video_buffer_wlockregion(self, lock) (*(self)->vb_ops->vi_wlockregion)(self, lock)
 #define video_buffer_unlockregion(self, lock) \
 	(*(self)->vb_ops->vi_unlockregion)(self, lock)
 #define video_buffer_revoke(self) (*(self)->vb_ops->vi_revoke)(self)

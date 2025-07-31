@@ -71,6 +71,7 @@ struct video_rect;
 struct video_crect;
 struct video_blitter;
 struct video_blitter3;
+struct video_regionlock;
 
 struct video_blitter_ops {
 	/* Blit the contents of another video buffer into this one. */
@@ -384,6 +385,44 @@ video_gfx_save(struct video_gfx const *__self, char const *__filename,
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
+/* Acquire read/write-locks to the Clip-  or I/O Rects of  `__self'.
+ * Note that these functions simply wrap `video_buffer_*lockregion',
+ * meaning that rotation/mirroring flags of `__self' are ignored.
+ *
+ * The locks created by these functions must be released via:
+ * >> video_gfx_unlock(__self, __lock);
+ * @return: 0 : Success
+ * @return: -1: [errno=ERANGE] video_gfx_*lockclip: Clip rect does not cleanly map to buffer
+ * @return: -1: [errno=*] Video lock cannot be acquired */
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(2) int
+(LIBVIDEO_GFX_FCC *PVIDEO_GFX_RLOCKCLIP)(struct video_gfx const *__restrict __self,
+                                         /*out*/ struct video_regionlock *__restrict __lock);
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(2) int
+(LIBVIDEO_GFX_FCC *PVIDEO_GFX_WLOCKCLIP)(struct video_gfx const *__restrict __self,
+                                         /*out*/ struct video_regionlock *__restrict __lock);
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(2) int
+(LIBVIDEO_GFX_FCC *PVIDEO_GFX_RLOCKIO)(struct video_gfx const *__restrict __self,
+                                       /*out*/ struct video_regionlock *__restrict __lock);
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(2) int
+(LIBVIDEO_GFX_FCC *PVIDEO_GFX_WLOCKIO)(struct video_gfx const *__restrict __self,
+                                       /*out*/ struct video_regionlock *__restrict __lock);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) int LIBVIDEO_GFX_FCC
+video_gfx_rlockclip(struct video_gfx const *__restrict __self,
+                    /*out*/ struct video_regionlock *__restrict __lock);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) int LIBVIDEO_GFX_FCC
+video_gfx_wlockclip(struct video_gfx const *__restrict __self,
+                    /*out*/ struct video_regionlock *__restrict __lock);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) int LIBVIDEO_GFX_FCC
+video_gfx_rlockio(struct video_gfx const *__restrict __self,
+                  /*out*/ struct video_regionlock *__restrict __lock);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) int LIBVIDEO_GFX_FCC
+video_gfx_wlockio(struct video_gfx const *__restrict __self,
+                  /*out*/ struct video_regionlock *__restrict __lock);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+
 
 /* Possible values for `video_gfx_palettize()'s `__method' argument.
  * - "n": # of pixels in clip region
@@ -513,10 +552,10 @@ extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_co
 extern __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct video_buffer *video_gfx_getbuffer(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_hasobjpalette(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) struct video_palette *video_gfx_getpalette(struct video_gfx const *__restrict __self);
-extern __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) struct video_gfx *video_gfx_setpalette(struct video_gfx *__restrict __self, struct video_palette *__palette, __BOOL __isobj);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_NONNULL((2)) struct video_gfx *video_gfx_setpalette(struct video_gfx *__restrict __self, struct video_palette *__palette, __BOOL __isobj);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_gfx_hascolorkey(struct video_gfx const *__restrict __self);
-extern __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct video_gfx *video_gfx_enablecolorkey(struct video_gfx *__restrict __self, video_pixel_t __colorkey);
-extern __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct video_gfx *video_gfx_disablecolorkey(struct video_gfx *__restrict __self);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_enablecolorkey(struct video_gfx *__restrict __self, video_pixel_t __colorkey);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_disablecolorkey(struct video_gfx *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) struct video_palette *video_gfx_getdefaultpalette(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_gfx_flag_t video_gfx_getdefaultflags(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_pixel_t video_gfx_getdefaultcolorkey(struct video_gfx const *__restrict __self);
@@ -537,7 +576,7 @@ video_gfx_getpalcolorcount(struct video_gfx const *__restrict __self);
  * CAUTION: By assigning a non-object-based color palette, GFX operations will be drastically
  *          slower, since the palette will have to be re-transmitted to the GPU or the window
  *          manager with every GFX operation. */
-extern __ATTR_INOUT(1) __ATTR_NONNULL((2)) struct video_gfx *
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_NONNULL((2)) struct video_gfx *
 video_gfx_setpalcolors(struct video_gfx *__restrict __self,
                        video_color_t const __colors[]);
 
@@ -545,6 +584,24 @@ video_gfx_setpalcolors(struct video_gfx *__restrict __self,
 extern __ATTR_WUNUSED __ATTR_IN(1) video_color_t const *
 video_gfx_getpalcolors(struct video_gfx const *__restrict __self);
 
+
+/* Same as above, but don't automatically call `video_gfx_update()' (the caller is responsible for doing so) */
+extern __ATTR_INOUT(1) void _video_gfx_setblend(struct video_gfx *__restrict __self, gfx_blendmode_t __mode);
+extern __ATTR_INOUT(1) void _video_gfx_setflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
+extern __ATTR_INOUT(1) void _video_gfx_toggleflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
+extern __ATTR_INOUT(1) void _video_gfx_enableflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
+extern __ATTR_INOUT(1) void _video_gfx_disableflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
+extern __ATTR_INOUT(1) void _video_gfx_setcolorkey(struct video_gfx *__restrict __self, video_pixel_t __colorkey);
+extern __ATTR_INOUT(1) __ATTR_NONNULL((2)) struct video_gfx *_video_gfx_setpalette(struct video_gfx *__restrict __self, struct video_palette *__palette, __BOOL __isobj);
+extern __ATTR_INOUT(1) struct video_gfx *_video_gfx_enablecolorkey(struct video_gfx *__restrict __self, video_pixel_t __colorkey);
+extern __ATTR_INOUT(1) struct video_gfx *_video_gfx_disablecolorkey(struct video_gfx *__restrict __self);
+extern __ATTR_INOUT(1) __ATTR_NONNULL((2)) struct video_gfx *_video_gfx_setpalcolors(struct video_gfx *__restrict __self, video_color_t const __colors[]);
+
+
+/* Release video locks previously acquired by `video_gfx_(r|w)lock(clip|io)' */
+extern __ATTR_IN(1) __ATTR_NONNULL((2)) void
+video_gfx_unlock(struct video_gfx const *__restrict __self,
+                 struct video_regionlock *__restrict __lock);
 
 
 /* Helpers for reading the coords of the GFX's Clip- / I/O-Rect, relative to the
@@ -970,19 +1027,36 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 	(*(self)->vx_hdr.vxh_ops->vgfo_offset2coord)(self, x, y, coords)
 #define video_gfx_coord2offset(self, x, y, offsets) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_coord2offset)(self, x, y, offsets)
-#define video_gfx_getcolorkey(self)           ((self)->vx_surf.vs_colorkey)
-#define video_gfx_setblend(self, mode)        ((self)->vx_blend = (mode), video_gfx_update(self, VIDEO_GFX_UPDATE_BLEND))
-#define video_gfx_setflags(self, flags)       ((self)->vx_surf.vs_flags = (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
-#define video_gfx_toggleflags(self, flags)    ((self)->vx_surf.vs_flags ^= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
-#define video_gfx_enableflags(self, flags)    ((self)->vx_surf.vs_flags |= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
-#define video_gfx_disableflags(self, flags)   ((self)->vx_surf.vs_flags &= ~(flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
-#define video_gfx_setcolorkey(self, colorkey) ((self)->vx_surf.vs_colorkey = (colorkey), video_gfx_update(self, VIDEO_GFX_UPDATE_COLORKEY))
-#define video_gfx_assurface(self)            (&(self)->vx_surf)
-#define video_gfx_getdomain(self)             video_buffer_getdomain(video_gfx_getbuffer(self))
-#define video_gfx_getcodec(self)              video_buffer_getcodec(video_gfx_getbuffer(self))
-#define video_gfx_getbuffer(self)             (self)->vx_surf.vs_buffer
-#define video_gfx_hasobjpalette(self)         (((self)->vx_surf.vs_flags & VIDEO_GFX_F_PALOBJ) != 0)
-#define video_gfx_getpalette(self)            (self)->vx_surf.vs_pal
+#define video_gfx_getcolorkey(self)            ((self)->vx_surf.vs_colorkey)
+#define video_gfx_setblend(self, mode)         ((self)->vx_blend = (mode), video_gfx_update(self, VIDEO_GFX_UPDATE_BLEND))
+#define video_gfx_setflags(self, flags)        ((self)->vx_surf.vs_flags = (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_toggleflags(self, flags)     ((self)->vx_surf.vs_flags ^= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_enableflags(self, flags)     ((self)->vx_surf.vs_flags |= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_disableflags(self, flags)    ((self)->vx_surf.vs_flags &= ~(flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_setcolorkey(self, colorkey)  ((self)->vx_surf.vs_colorkey = (colorkey), video_gfx_update(self, VIDEO_GFX_UPDATE_COLORKEY))
+#define _video_gfx_setblend(self, mode)        (void)((self)->vx_blend = (mode))
+#define _video_gfx_setflags(self, flags)       (void)((self)->vx_surf.vs_flags = (flags))
+#define _video_gfx_toggleflags(self, flags)    (void)((self)->vx_surf.vs_flags ^= (flags))
+#define _video_gfx_enableflags(self, flags)    (void)((self)->vx_surf.vs_flags |= (flags))
+#define _video_gfx_disableflags(self, flags)   (void)((self)->vx_surf.vs_flags &= ~(flags))
+#define _video_gfx_setcolorkey(self, colorkey) (void)((self)->vx_surf.vs_colorkey = (colorkey))
+#define _video_gfx_setpalette(self, palette, isobj)                                      \
+	(void)((self)->vx_surf.vs_pal   = (palette),                                         \
+	       (self)->vx_surf.vs_flags = ((self)->vx_surf.vs_flags & ~VIDEO_GFX_F_PALOBJ) | \
+	                                  ((isobj) ? VIDEO_GFX_F_PALOBJ : 0))
+#define _video_gfx_enablecolorkey(self, colorkey)            \
+	(void)((self)->vx_surf.vs_flags |= VIDEO_GFX_F_COLORKEY, \
+	       (self)->vx_surf.vs_colorkey = (colorkey))
+#define _video_gfx_disablecolorkey(self) _video_gfx_disableflags(self, VIDEO_GFX_UPDATE_COLORKEY)
+#define _video_gfx_setpalcolors(self, colors)                         \
+	(void)((self)->vx_surf.vs_pal = video_palette_fromcolors(colors), \
+	       (self)->vx_surf.vs_flags &= ~VIDEO_GFX_F_PALOBJ)
+#define video_gfx_assurface(self)     (&(self)->vx_surf)
+#define video_gfx_getdomain(self)     video_buffer_getdomain(video_gfx_getbuffer(self))
+#define video_gfx_getcodec(self)      video_buffer_getcodec(video_gfx_getbuffer(self))
+#define video_gfx_getbuffer(self)     (self)->vx_surf.vs_buffer
+#define video_gfx_hasobjpalette(self) (((self)->vx_surf.vs_flags & VIDEO_GFX_F_PALOBJ) != 0)
+#define video_gfx_getpalette(self)    (self)->vx_surf.vs_pal
 #define video_gfx_setpalette(self, palette, isobj)                                 \
 	((self)->vx_surf.vs_pal   = (palette),                                         \
 	 (self)->vx_surf.vs_flags = ((self)->vx_surf.vs_flags & ~VIDEO_GFX_F_PALOBJ) | \
@@ -993,8 +1067,7 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 	((self)->vx_surf.vs_flags |= VIDEO_GFX_F_COLORKEY, \
 	 (self)->vx_surf.vs_colorkey = (colorkey),         \
 	 video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_COLORKEY))
-#define video_gfx_disablecolorkey(self) video_gfx_disableflags(self, VIDEO_GFX_UPDATE_COLORKEY)
-
+#define video_gfx_disablecolorkey(self)    video_gfx_disableflags(self, VIDEO_GFX_UPDATE_COLORKEY)
 #define video_gfx_getdefaultpalette(self)  ((self)->vx_surf.vs_buffer->vb_surf.vs_pal)
 #define video_gfx_getdefaultflags(self)    ((self)->vx_surf.vs_buffer->vb_surf.vs_flags)
 #define video_gfx_getdefaultcolorkey(self) ((self)->vx_surf.vs_buffer->vb_surf.vs_colorkey)
@@ -1005,6 +1078,7 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 	 (self)->vx_surf.vs_flags &= ~VIDEO_GFX_F_PALOBJ,           \
 	 video_gfx_update(self, VIDEO_GFX_UPDATE_PALETTE))
 #define video_gfx_getpalcolors(self) video_palette_getcolors(video_gfx_getpalette(self))
+#define video_gfx_unlock(self, lock) video_buffer_unlockregion(video_gfx_getbuffer(self), lock)
 #define video_gfx_getcolor(self, x, y) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_getcolor)(self, x, y)
 #define video_gfx_putcolor(self, x, y, color) \

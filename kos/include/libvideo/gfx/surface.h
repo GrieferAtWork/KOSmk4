@@ -141,6 +141,18 @@ extern __ATTR_INOUT(1) __ATTR_IN(2) void
 video_surface_copyattrib(struct video_surface *__restrict __self,
                          struct video_surface const *__restrict __src);
 
+/* Helpers for applying transformations to video_surface flags. When the surface
+ * is that of a `struct video_gfx', these methods must **NOT** be used. Instead,
+ * the equivalently named `video_gfx_*' methods must be used. */
+extern __ATTR_INOUT(1) void video_surface_xyswap(struct video_surface *__restrict __self);
+extern __ATTR_INOUT(1) void video_surface_hmirror(struct video_surface *__restrict __self);
+extern __ATTR_INOUT(1) void video_surface_vmirror(struct video_surface *__restrict __self);
+extern __ATTR_INOUT(1) void video_surface_lrot90(struct video_surface *__restrict __self);
+extern __ATTR_INOUT(1) void video_surface_rrot90(struct video_surface *__restrict __self);
+extern __ATTR_INOUT(1) void video_surface_rot180(struct video_surface *__restrict __self);
+extern __ATTR_INOUT(1) void video_surface_lrot90n(struct video_surface *__restrict __self, int __n);
+extern __ATTR_INOUT(1) void video_surface_rrot90n(struct video_surface *__restrict __self, int __n);
+
 /* Same as  `video_surface_getxdim()' /  `video_surface_getydim()',
  * but `VIDEO_GFX_F_XYSWAP' doesn't cause dimensions to be swapped. */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_surface_getbufferxdim(struct video_surface const *__restrict __self);
@@ -352,11 +364,19 @@ video_buffer_convert_distinct(struct video_buffer *__restrict __self,
 	(void)((self)->vs_pal      = video_surface_getpalette(src), \
 	       (self)->vs_flags    = video_surface_getflags(src),   \
 	       (self)->vs_colorkey = video_surface_getcolorkey(src))
-#define video_surface_getdomain(self)                  video_buffer_getdomain(video_surface_getbuffer(self))
-#define video_surface_getcodec(self)                   video_buffer_getcodec(video_surface_getbuffer(self))
-#define video_surface_getbuffer(self)                  (self)->vs_buffer
-#define video_surface_getbufferxdim(self)              video_buffer_getxdim(video_surface_getbuffer(self))
-#define video_surface_getbufferydim(self)              video_buffer_getydim(video_surface_getbuffer(self))
+#define video_surface_xyswap(self)        video_surface_setflags(self, VIDEO_GFX_XYSWAP(video_surface_getflags(self)))
+#define video_surface_hmirror(self)       video_surface_setflags(self, VIDEO_GFX_HMIRROR(video_surface_getflags(self)))
+#define video_surface_vmirror(self)       video_surface_setflags(self, VIDEO_GFX_VMIRROR(video_surface_getflags(self)))
+#define video_surface_lrot90(self)        video_surface_setflags(self, VIDEO_GFX_LROT90(video_surface_getflags(self)))
+#define video_surface_rrot90(self)        video_surface_setflags(self, VIDEO_GFX_RROT90(video_surface_getflags(self)))
+#define video_surface_rot180(self)        video_surface_setflags(self, VIDEO_GFX_ROT180(video_surface_getflags(self)))
+#define video_surface_lrot90n(self, n)    video_surface_setflags(self, VIDEO_GFX_LROT90n(video_surface_getflags(self), n))
+#define video_surface_rrot90n(self, n)    video_surface_setflags(self, VIDEO_GFX_RROT90n(video_surface_getflags(self), n))
+#define video_surface_getdomain(self)     video_buffer_getdomain(video_surface_getbuffer(self))
+#define video_surface_getcodec(self)      video_buffer_getcodec(video_surface_getbuffer(self))
+#define video_surface_getbuffer(self)     (self)->vs_buffer
+#define video_surface_getbufferxdim(self) video_buffer_getxdim(video_surface_getbuffer(self))
+#define video_surface_getbufferydim(self) video_buffer_getydim(video_surface_getbuffer(self))
 #if VIDEO_GFX_F_XYSWAP == 1
 #define __video_surface_getxbit(self) (video_surface_getflags(self) & VIDEO_GFX_F_XYSWAP)
 #elif VIDEO_GFX_F_XYSWAP == 2

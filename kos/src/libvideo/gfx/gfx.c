@@ -31,6 +31,8 @@
 #include <kos/anno.h>
 #include <sys/param.h>
 
+#include <errno.h>
+
 #include <libvideo/crect.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
@@ -307,27 +309,14 @@ fail:
 
 LOCAL ATTR_INOUT(1) void FCC
 _libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
-#define GFX_FLAGS_X_TO_Y_LSHIFT 1
-#define GFX_FLAGS_Y_TO_X_RSHIFT GFX_FLAGS_X_TO_Y_LSHIFT
-#define GFX_XFLAGS (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_XMIRROR)
-#define GFX_YFLAGS (VIDEO_GFX_F_YWRAP | VIDEO_GFX_F_YMIRROR)
-	static_assert((GFX_XFLAGS << GFX_FLAGS_X_TO_Y_LSHIFT) == GFX_YFLAGS);
-	static_assert((GFX_YFLAGS >> GFX_FLAGS_Y_TO_X_RSHIFT) == GFX_XFLAGS);
 #define Tswap(T, a, b) { T _temp = (a); (a) = (b); (b) = _temp; }
 	Tswap(video_offset_t, self->vx_hdr.vxh_cxoff, self->vx_hdr.vxh_cyoff);
 	Tswap(video_dim_t, self->vx_hdr.vxh_cxdim, self->vx_hdr.vxh_cydim);
 	Tswap(video_coord_t, self->vx_hdr.vxh_bxmin, self->vx_hdr.vxh_bymin);
 	Tswap(video_coord_t, self->vx_hdr.vxh_bxend, self->vx_hdr.vxh_byend);
 #undef Tswap
-
 	/* Swap axis-specific flags */
-	self->vx_surf.vs_flags = (video_gfx_getflags(self) & ~(GFX_XFLAGS | GFX_YFLAGS)) |
-	                         ((video_gfx_getflags(self) & GFX_XFLAGS) << GFX_FLAGS_X_TO_Y_LSHIFT) |
-	                         ((video_gfx_getflags(self) & GFX_YFLAGS) >> GFX_FLAGS_Y_TO_X_RSHIFT);
-#undef GFX_YFLAGS
-#undef GFX_XFLAGS
-#undef GFX_FLAGS_Y_TO_X_RSHIFT
-#undef GFX_FLAGS_X_TO_Y_LSHIFT
+	self->vx_surf.vs_flags = _VIDEO_GFX_F_XYSWAP_FLAGS(video_gfx_getflags(self));
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_xyswap, libvideo_gfx_xyswap);
@@ -510,6 +499,54 @@ err_surface_buffer:
 	return NULL;
 }
 
+
+
+
+
+/* Acquire  read/write-locks to  the Clip-  or I/O  Rects of `self'.
+ * Note that these functions simply wrap `video_buffer_*lockregion',
+ * meaning that rotation/mirroring flags of `self' are ignored.
+ *
+ * The locks created by these functions must be released via:
+ * >> video_gfx_unlock(self, lock);
+ * @return: 0 : Success
+ * @return: -1: [errno=ERANGE] video_gfx_*lockclip: Clip rect does not cleanly map to buffer
+ * @return: -1: [errno=*] Video lock cannot be acquired */
+DEFINE_PUBLIC_ALIAS(video_gfx_rlockclip, libvideo_gfx_rlockclip);
+INTERN WUNUSED ATTR_IN(1) ATTR_OUT(2) int FCC
+libvideo_gfx_rlockclip(struct video_gfx const *__restrict self,
+                       /*out*/ struct video_regionlock *__restrict lock) {
+	if unlikely(video_gfx_isioclip(self))
+		return libvideo_gfx_rlockio(self, lock);
+	errno = ERANGE;
+	return -1;
+}
+
+DEFINE_PUBLIC_ALIAS(video_gfx_wlockclip, libvideo_gfx_wlockclip);
+INTERN WUNUSED ATTR_IN(1) ATTR_OUT(2) int FCC
+libvideo_gfx_wlockclip(struct video_gfx const *__restrict self,
+                       /*out*/ struct video_regionlock *__restrict lock) {
+	if unlikely(video_gfx_isioclip(self))
+		return libvideo_gfx_wlockio(self, lock);
+	errno = ERANGE;
+	return -1;
+}
+
+DEFINE_PUBLIC_ALIAS(video_gfx_rlockio, libvideo_gfx_rlockio);
+INTERN WUNUSED ATTR_IN(1) ATTR_OUT(2) int FCC
+libvideo_gfx_rlockio(struct video_gfx const *__restrict self,
+                     /*out*/ struct video_regionlock *__restrict lock) {
+	video_gfx_getiorect(self, &lock->_vrl_rect);
+	return _video_buffer_rlockregion(video_gfx_getbuffer(self), lock);
+}
+
+DEFINE_PUBLIC_ALIAS(video_gfx_wlockio, libvideo_gfx_wlockio);
+INTERN WUNUSED ATTR_IN(1) ATTR_OUT(2) int FCC
+libvideo_gfx_wlockio(struct video_gfx const *__restrict self,
+                     /*out*/ struct video_regionlock *__restrict lock) {
+	video_gfx_getiorect(self, &lock->_vrl_rect);
+	return _video_buffer_wlockregion(video_gfx_getbuffer(self), lock);
+}
 
 DECL_END
 

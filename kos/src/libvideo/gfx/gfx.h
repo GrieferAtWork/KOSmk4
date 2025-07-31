@@ -84,6 +84,30 @@ libvideo_gfx_asbuffer(struct video_gfx const *__restrict self);
 
 
 
+/* Acquire  read/write-locks to  the Clip-  or I/O  Rects of `self'.
+ * Note that these functions simply wrap `video_buffer_*lockregion',
+ * meaning that rotation/mirroring flags of `self' are ignored.
+ *
+ * The locks created by these functions must be released via:
+ * >> video_gfx_unlock(self, lock);
+ * @return: 0 : Success
+ * @return: -1: [errno=ERANGE] video_gfx_*lockclip: Clip rect does not cleanly map to buffer
+ * @return: -1: [errno=*] Video lock cannot be acquired */
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) int FCC
+libvideo_gfx_rlockclip(struct video_gfx const *__restrict self,
+                       /*out*/ struct video_regionlock *__restrict lock);
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) int FCC
+libvideo_gfx_wlockclip(struct video_gfx const *__restrict self,
+                       /*out*/ struct video_regionlock *__restrict lock);
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) int FCC
+libvideo_gfx_rlockio(struct video_gfx const *__restrict self,
+                     /*out*/ struct video_regionlock *__restrict lock);
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) int FCC
+libvideo_gfx_wlockio(struct video_gfx const *__restrict self,
+                     /*out*/ struct video_regionlock *__restrict lock);
+
+
+
 
 
 /* Initialize the clip / I/O rects of `self' to fully represent the underlying buffer fully. */
