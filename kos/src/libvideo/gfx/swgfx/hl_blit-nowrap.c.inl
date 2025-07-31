@@ -17,9 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define _KOS_SOURCE 1
-
 #ifdef __INTELLISENSE__
+#define _KOS_SOURCE 1
 //#define            DEFINE_libvideo_swblitter_blit
 //#define         DEFINE_libvideo_swblitter_stretch
 //#define    DEFINE_libvideo_swblitter_blit_imatrix

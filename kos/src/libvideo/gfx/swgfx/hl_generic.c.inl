@@ -17,9 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define _KOS_SOURCE 1
-
 #ifdef __INTELLISENSE__
+#define _KOS_SOURCE 1
 //#define DEFINE_libvideo_swgfx_XXX
 #define DEFINE_libvideo_swgfx_XXX_xyswap
 #endif /* __INTELLISENSE__ */
@@ -39,7 +38,9 @@
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
+#include "../gfx-debug.h"
 #include "../gfx-utils.h"
+#include "../gfx.h"
 #include "../swgfx.h"
 
 #if (defined(DEFINE_libvideo_swgfx_XXX_xyswap) + \

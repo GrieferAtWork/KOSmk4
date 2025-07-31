@@ -32,7 +32,14 @@
 
 #include <hybrid/bit.h>
 
+#include <kos/types.h>
+
+#include <stddef.h>
+
 #include <libvideo/color.h>
+#include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/converter.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 

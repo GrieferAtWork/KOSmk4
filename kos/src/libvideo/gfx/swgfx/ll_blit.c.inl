@@ -27,15 +27,12 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/align.h>
-
 #include <kos/types.h>
 #include <sys/syslog.h>
 
 #include <inttypes.h>
 #include <malloca.h>
 #include <minmax.h>
-#include <stddef.h>
 
 #include <libvideo/color.h>
 #include <libvideo/gfx/blend.h>

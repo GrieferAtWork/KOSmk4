@@ -26,15 +26,9 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/bit.h>
-#include <hybrid/typecore.h>
-#include <hybrid/unaligned.h>
-
 #include <kos/types.h>
-#include <sys/param.h>
 
 #include <inttypes.h>
-#include <stddef.h>
 #include <stdint.h>
 
 #include <libvideo/color.h>

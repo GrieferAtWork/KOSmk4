@@ -26,13 +26,18 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/types.h>
+
 #include <libvideo/color.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/blendcolors.h>
+#include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
+#include "../gfx-debug.h"
 #include "../gfx-utils.h"
 #include "../swgfx.h"
 #include "ll.h"

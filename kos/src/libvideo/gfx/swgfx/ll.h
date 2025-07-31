@@ -20,6 +20,13 @@
 #ifndef GUARD_LIBVIDEO_GFX_SWGFX_LL_H
 #define GUARD_LIBVIDEO_GFX_SWGFX_LL_H 1
 
+#include "../api.h"
+/**/
+
+#include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/gfx.h>
+
+#include "../gfx-debug.h"
 #include "../swgfx.h"
 
 /* When  low-level  GFX  functions want  to  call other
