@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_MEMORY_MEMINFO_C
 #define GUARD_KERNEL_SRC_MEMORY_MEMINFO_C 1
 #define DISABLE_BRANCH_PROFILING /* Don't profile this file */
+#define __WANT_MPART_INIT
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -28,10 +29,13 @@
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <kernel/driver-param.h>
+#include <kernel/fs/devfs.h>
+#include <kernel/fs/null.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/mpartmeta.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
@@ -40,6 +44,7 @@
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
 
+#include <asm/defsym.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 
@@ -441,6 +446,97 @@ again:
 }
 
 
+/* A large, general-purpose region of "void" memory.
+ *
+ * This  region may not actually correspond to physical memory that is
+ * mapped to anything, or  it may simply map  to some random piece  of
+ * otherwise unused RAM. In any case, this is the memory that's mapped
+ * by /dev/void and `MNODE_F_VOIDMEM'-mnode-s.
+ *
+ * You may assume that `page_voidsize >= 1' */
+PUBLIC struct mpart devvoid_dmapart = {
+	MPART_INIT_mp_refcnt(1),
+	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
+	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |
+	                    MPART_F_STATICPART | MPART_F_NOFREE),
+	MPART_INIT_mp_state(MPART_ST_MEM),
+	MPART_INIT_mp_file(&dev_void),
+	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(devvoid_dmapart.mp_copy)),
+	MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(devvoid_dmapart.mp_share)),
+	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(devvoid_dmapart.mp_lockops)),
+	MPART_INIT_mp_allparts(TAILQ_ENTRY_UNBOUND_INITIALIZER),
+	MPART_INIT_mp_changed({}),
+	MPART_INIT_mp_minaddr(0),
+	MPART_INIT_mp_maxaddr(PAGEMASK),
+	MPART_INIT_mp_filent({}),
+	MPART_INIT_mp_blkst_ptr(NULL),
+	MPART_INIT_mp_mem(0, 1),
+	MPART_INIT_mp_meta(&devvoid_dmapart_meta)
+};
+
+PUBLIC struct mpartmeta devvoid_dmapart_meta = {
+	.mpm_ftxlock  = ATOMIC_RWLOCK_INIT,
+	.mpm_ftxlops  = SLIST_HEAD_INITIALIZER(devvoid_dmapart_meta.mpm_ftxlops),
+	.mpm_ftx      = NULL,
+	.mpm_dmalocks = 999,
+	.mpm_dma_done = SIG_INIT,
+#ifdef ARCH_HAVE_RTM
+	.mpm_rtm_vers = 0,
+#endif /* ARCH_HAVE_RTM */
+};
+
+#define DEFINE_FIELD_SYMBOL(name, BASE, OFFSET, SIZEOF, T, field) \
+	static_assert(offsetof(T, field) == (OFFSET));                \
+	static_assert(sizeof_field(T, field) == (SIZEOF));             \
+	DEFINE_PUBLIC_SYMBOL(name, (BASE) + (OFFSET), SIZEOF)
+DEFINE_FIELD_SYMBOL(devvoid_page, devvoid_dmapart, OFFSET_MPART_MEM + OFFSET_MCHUNK_START,
+                    __SIZEOF_PHYSPAGE_T__, struct mpart, mp_mem.mc_start);
+DEFINE_FIELD_SYMBOL(devvoid_pagecount, devvoid_dmapart, OFFSET_MPART_MEM + OFFSET_MCHUNK_SIZE,
+                    __SIZEOF_PHYSPAGE_T__, struct mpart, mp_mem.mc_size);
+#undef DEFINE_FIELD_SYMBOL
+DATDEF physpage_t _devvoid_page ASMNAME("devvoid_page");
+DATDEF physpagecnt_t _devvoid_pagecount ASMNAME("devvoid_pagecount");
+PUBLIC physaddr_t _devvoid_addr ASMNAME("devvoid_addr")   = 0;
+PUBLIC physaddr_t _devvoid_size2 ASMNAME("devvoid_size2") = 0;
+PUBLIC size_t _devvoid_size ASMNAME("devvoid_size")       = 0;
+
+
+PRIVATE ATTR_FREETEXT void
+NOTHROW(KCALL kernel_initialize_voidmem)(void) {
+	/* Find the largest bank of  "PMEMBANK_TYPE_UNDEF" and use it for  "page_void*"
+	 * If no such bank exists (wtf? how?) just allocate 1 page of RAM for this use. */
+	size_t i;
+	struct pmembank *largest_void_bank = NULL;
+	for (i = 0; i < minfo.mb_bankc; ++i) {
+		if (minfo.mb_banks[i].mb_type == PMEMBANK_TYPE_UNDEF /*||
+		    minfo.mb_banks[i].mb_type == PMEMBANK_TYPE_BADRAM*/) {
+			if ((largest_void_bank == NULL) ||
+			    (PMEMBANK_SIZE(*largest_void_bank) < PMEMBANK_SIZE(minfo.mb_banks[i])))
+				largest_void_bank = &minfo.mb_banks[i];
+		}
+	}
+	if likely(largest_void_bank) {
+		_devvoid_page      = PMEMBANK_STARTPAGE(*largest_void_bank);
+		_devvoid_pagecount = PMEMBANK_NUMPAGES(*largest_void_bank);
+		/* TODO: Ask cpuid for max # of physical address bits
+		 *       and clamp "_devvoid_pagecount"  accordingly. */
+	} else {
+		_devvoid_page = page_mallocone();
+		if unlikely(_devvoid_page == PHYSPAGE_INVALID)
+			kernel_panic(FREESTR("Failed to allocate fallback page for /dev/void"));
+		_devvoid_pagecount = 1;
+	}
+	_devvoid_addr  = physpage2addr(_devvoid_page);
+	_devvoid_size2 = (physaddr_t)_devvoid_pagecount * PAGESIZE;
+	_devvoid_size  = FLOOR_ALIGN(SIZE_MAX, PAGESIZE);
+	if ((physaddr_t)_devvoid_size > _devvoid_size2)
+		_devvoid_size = (size_t)_devvoid_size2;
+	devvoid_dmapart.mp_maxaddr = (pos_t)_devvoid_size2 - 1;
+	printk(FREESTR(KERN_INFO "[devvoid] using %" PRIpN(__SIZEOF_PHYSADDR_T__) "-%" PRIpN(__SIZEOF_PHYSADDR_T__) " (>=%#" PRIxSIZ " bytes) for /dev/void\n"),
+	       _devvoid_addr, _devvoid_addr + _devvoid_size2 - 1, _devvoid_size);
+}
+
+
 /* Construct memory zones from memory info. */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
@@ -732,6 +828,9 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	mzones.pm_last->mz_next     = NULL;
 #undef REL
 	assert(minfo.mb_banks[minfo.mb_bankc].mb_start == 0);
+
+	/* Initialize `page_void*' */
+	kernel_initialize_voidmem();
 }
 
 

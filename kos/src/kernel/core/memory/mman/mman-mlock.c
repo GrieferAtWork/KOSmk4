@@ -360,9 +360,9 @@ again_prefault:
 		for (node = rl.mrl_nodes.mm_min;;) {
 			if (!(node->mn_flags & MNODE_F_MLOCK)) {
 				struct mpart *part;
-				/* Set the MLOCK flag. */
-				atomic_or(&node->mn_flags, MNODE_F_MLOCK);
 				if ((part = node->mn_part) != NULL) {
+					/* Set the MLOCK flag (but only if there is a mpart) */
+					atomic_or(&node->mn_flags, MNODE_F_MLOCK);
 					assert(mpart_lock_acquired(part));
 					/* If the mem-part isn't marked as MLOCK'd, and the MLOCK
 					 * flag isn't frozen, then set it now, since the part now
@@ -439,8 +439,8 @@ again:
 		for (node = rl.mrl_nodes.mm_min;;) {
 			if (node->mn_flags & MNODE_F_MLOCK) {
 				struct mpart *part;
-				atomic_and(&node->mn_flags, ~MNODE_F_MLOCK);
 				if ((part = node->mn_part) != NULL) {
+					atomic_and(&node->mn_flags, ~MNODE_F_MLOCK);
 					assert(mpart_lock_acquired(part));
 					/* If  the mem-part is marked as MLOCK'd, and that flag isn't
 					 * frozen, then try to unset it if none of its mem-nodes have

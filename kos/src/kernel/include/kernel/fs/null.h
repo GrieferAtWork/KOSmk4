@@ -24,6 +24,8 @@
 
 #include <kernel/types.h>
 
+#include <kos/kernel/memory.h>
+
 #ifdef __CC__
 DECL_BEGIN
 

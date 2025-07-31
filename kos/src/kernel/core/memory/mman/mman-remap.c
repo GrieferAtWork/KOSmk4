@@ -417,9 +417,9 @@ get_mappinginfo_or_unlock(struct mman *__restrict self,
 	result->mi_nodeflags = node->mn_flags & MREMAP_KEPT_MNODE_FLAGS;
 	if ((part = node->mn_part) == NULL) {
 		/* Simple case: reserved mapping. */
-		result->mi_file   = 0;
-		result->mi_fspath = 0;
-		result->mi_fsname = 0;
+		result->mi_file   = NULL;
+		result->mi_fspath = NULL;
+		result->mi_fsname = NULL;
 		result->mi_fpos   = 0;
 		return true;
 	}

@@ -33,6 +33,7 @@
 #include <kernel/fs/fs.h>
 #include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/notify.h>
+#include <kernel/fs/null.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/super.h>
 #include <kernel/handle.h>
@@ -810,6 +811,8 @@ again:
 			file         = incref(node.mn_part->mp_file);
 			part_minaddr = mpart_getminaddr(node.mn_part);
 			mpart_lock_release(node.mn_part);
+		} else if (node.mn_flags & MNODE_F_VOIDMEM) {
+			file = incref((struct mfile *)&dev_void);
 		}
 		FINALLY_XDECREF_UNLIKELY(node.mn_fsname);
 		FINALLY_XDECREF_UNLIKELY(node.mn_fspath);

@@ -29,6 +29,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/fault.h>
+#include <kernel/mman/flags.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/module.h>
@@ -294,17 +295,31 @@ again:
 			if unlikely(!mf.mfl_node)
 				goto err_unmapped;
 
-			/* Load the associated part. */
-			mf.mfl_part = mf.mfl_node->mn_part;
-			if unlikely(!mf.mfl_part)
-				goto err_unmapped;
-
 			/* Verify write-access if requested. */
 			if unlikely((flags & MMAN_FAULT_F_WRITE) &&
 			            !(mf.mfl_node->mn_flags & MNODE_F_PWRITE)) {
 				mman_lock_release(mf.mfl_mman);
 				THROW(E_SEGFAULT_READONLY, addr,
 				      E_SEGFAULT_CONTEXT_WRITING);
+			}
+
+			/* Load the associated part. */
+			mf.mfl_part = mf.mfl_node->mn_part;
+			if unlikely(!mf.mfl_part) {
+				if (mf.mfl_node->mn_flags & MNODE_F_VOIDMEM) {
+					pagedir_prot_t prot;
+					/* Prepare our page directory of mapping memory. */
+					if (!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
+						mman_lock_release(mf.mfl_mman);
+						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+					}
+					prot = prot_from_mnodeflags(mf.mfl_node->mn_flags);
+					pagedir_mapvoid(mf.mfl_addr, mf.mfl_size, prot);
+					pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
+					pagedir_sync(mf.mfl_addr, mf.mfl_size);
+					goto continue_after_mmap;
+				}
+				goto err_unmapped;
 			}
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -354,6 +369,7 @@ again:
 			if ((prot & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 				LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 		}
+continue_after_mmap:
 		mman_lock_release(mf.mfl_mman);
 
 		addend = (size_t)(((byte_t *)pagealigned_addr + mf.mfl_size) - (byte_t *)addr);

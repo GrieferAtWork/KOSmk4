@@ -218,18 +218,13 @@ handle_vio_or_not_faulted:
 		/* Check if this is a VIO segment (or maybe not mapped at all) */
 		struct mman *effective_mman;
 		struct mnode *node;
-#ifdef LIBVIO_CONFIG_ENABLED
-		void *node_minaddr;
-		pos_t part_minaddr;
-		REF struct mpart *part;
-#endif /* LIBVIO_CONFIG_ENABLED */
 		effective_mman = &mman_kernel;
 		if (ADDR_ISUSER(addr))
 			effective_mman = THIS_MMAN;
 		mman_lock_read(effective_mman);
 		node = mman_mappings_locate(effective_mman, addr);
 		/* Check for an unmapped memory location. */
-		if (!node || !node->mn_part) {
+		if (!node) {
 			uintptr_t context;
 			mman_lock_endread(effective_mman);
 			context = 0;
@@ -261,14 +256,15 @@ handle_vio_or_not_faulted:
 			}
 		}
 #ifdef LIBVIO_CONFIG_ENABLED
-		node_minaddr = mnode_getminaddr(node);
-		part         = incref(node->mn_part);
-		part_minaddr = mpart_getminaddr(part);
-#endif /* LIBVIO_CONFIG_ENABLED */
-		mman_lock_endread(effective_mman);
-#ifdef LIBVIO_CONFIG_ENABLED
-		{
+		if (node->mn_part) {
+			void *node_minaddr;
+			pos_t part_minaddr;
+			REF struct mpart *part;
 			REF struct mfile *file;
+			node_minaddr = mnode_getminaddr(node);
+			part         = incref(node->mn_part);
+			part_minaddr = mpart_getminaddr(part);
+			mman_lock_endread(effective_mman);
 			FINALLY_DECREF_UNLIKELY(part);
 			mpart_lock_acquire(part);
 			file = incref(part->mp_file);
@@ -337,8 +333,12 @@ handle_vio_or_not_faulted:
 				*pstate = args.va_state;
 				return;
 			}
-		}
+		} else
 #endif /* LIBVIO_CONFIG_ENABLED */
+		{
+			mman_lock_endread(effective_mman);
+		}
+
 		/* We can get here if the given address hasn't been pre-faulted, yet. */
 		mman_forcefault(effective_mman, addr, num_bytes,
 		                MMAN_FAULT_F_WRITE);

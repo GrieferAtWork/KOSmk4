@@ -90,10 +90,11 @@ DECL_BEGIN
  * sure that this flag has the same state for both nodes, it  will
  * be sufficient to  only ensure  that 1  of the  2 nodes  doesn't
  * have said flag set! (!a && (a == b) --> !b) */
-#define MNODE_F_MERGEMASK                                \
-	(MNODE_F_PMASK | MNODE_F_SHARED | MNODE_F_UNMAPPED | \
-	 MNODE_F_KERNPART | MNODE_F_MHINT | MNODE_F_MLOCK |  \
-	 MNODE_F_NOSPLIT | MNODE_F_NOMERGE | MNODE_F_NOCORE)
+#define MNODE_F_MERGEMASK                                  \
+	(MNODE_F_PMASK | MNODE_F_SHARED | MNODE_F_UNMAPPED |   \
+	 MNODE_F_KERNPART | MNODE_F_MHINT | MNODE_F_MLOCK |    \
+	 MNODE_F_VOIDMEM | MNODE_F_NOSPLIT | MNODE_F_NOMERGE | \
+	 MNODE_F_NOCORE)
 
 /* Like `MNODE_F_MERGEMASK', but for `struct mpart::mp_flags' */
 #define MPART_F_MERGEMASK \

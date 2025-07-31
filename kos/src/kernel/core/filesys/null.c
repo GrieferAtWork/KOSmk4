@@ -357,33 +357,6 @@ PRIVATE struct mfile_stream_ops const devzero_stream_ops = {
 /* KOS-specific: writes are no-ops, reads return undefined data         */
 /************************************************************************/
 
-#ifndef CONFIG_DEVVOID_PAGE_COUNT
-#define CONFIG_DEVVOID_PAGE_COUNT 16
-#endif /* !CONFIG_DEVVOID_PAGE_COUNT */
-
-PRIVATE physpage_t devvoid_page_addr = PHYSPAGE_INVALID;
-PRIVATE physpage_t KCALL get_devvoid_page_addr(void) {
-	physpage_t result = atomic_read(&devvoid_page_addr);
-	if (result == PHYSPAGE_INVALID) {
-		physpage_t old;
-		/* XXX: Why actually allocate memory  here? Instead of doing  that,
-		 *      we could also just find some large range of physical memory
-		 *      that doesn't map to anything...
-		 * (but then we'd run  the risk of  some of the  CPU pins not  being
-		 * connected and the seemingly unused memory range actually aliasing
-		 * some other **used** range) */
-		result = page_malloc(CONFIG_DEVVOID_PAGE_COUNT);
-		if unlikely(result == PHYSPAGE_INVALID)
-			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, CONFIG_DEVVOID_PAGE_COUNT * PAGESIZE);
-		old = atomic_cmpxch_val(&devvoid_page_addr, PHYSPAGE_INVALID, result);
-		if unlikely(old != PHYSPAGE_INVALID) {
-			page_ccfree(result, CONFIG_DEVVOID_PAGE_COUNT);
-			result = old;
-		}
-	}
-	return result;
-}
-
 /* Construct a new mmap-able mem-part for /dev/void */
 PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *KCALL
 devvoid_v_newpart(struct mfile *__restrict UNUSED(self),
@@ -401,12 +374,11 @@ devvoid_v_newpart(struct mfile *__restrict UNUSED(self),
 	/* Have all chunks of the mem-part map to the same portion of physical
 	 * memory, which gets used as a system-wide void scratch-memory  area. */
 	TRY {
-		physpage_t page = get_devvoid_page_addr();
-		size_t chunks   = CEILDIV(pages, CONFIG_DEVVOID_PAGE_COUNT);
+		size_t chunks = CEILDIV(pages, devvoid_pagecount);
 		assert(chunks >= 1);
-		if (chunks == 1) {
+		if likely(chunks == 1) {
 			result->mp_state = MPART_ST_MEM;
-			result->mp_mem.mc_start = page;
+			result->mp_mem.mc_start = devvoid_page;
 			result->mp_mem.mc_size  = pages;
 		} else {
 			size_t i;
@@ -414,10 +386,10 @@ devvoid_v_newpart(struct mfile *__restrict UNUSED(self),
 			vec = (struct mchunk *)kmalloc(chunks * sizeof(struct mchunk),
 			                               GFP_LOCKED | GFP_PREFLT);
 			for (i = 0; i < chunks; ++i) {
-				vec[i].mc_start = page;
-				vec[i].mc_size  = CONFIG_DEVVOID_PAGE_COUNT;
+				vec[i].mc_start = devvoid_page;
+				vec[i].mc_size  = devvoid_pagecount;
 			}
-			vec[chunks - 1].mc_size = pages - ((chunks - 1) * CONFIG_DEVVOID_PAGE_COUNT);
+			vec[chunks - 1].mc_size = pages - ((chunks - 1) * devvoid_pagecount);
 			result->mp_state = MPART_ST_MEM_SC;
 			result->mp_mem_sc.ms_v = vec;
 			result->mp_mem_sc.ms_c = chunks;

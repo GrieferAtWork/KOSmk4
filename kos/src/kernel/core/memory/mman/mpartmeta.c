@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/malloc.h>
+#include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
@@ -559,6 +560,17 @@ done:
 	return result;
 }
 
+
+/* Futex for mem-nodes without a mpart and "MNODE_F_VOIDMEM" set. */
+PRIVATE struct mfutex void_futex = {
+	.mfu_refcnt     = 999,
+	.mfu_weakrefcnt = 999,
+	.mfu_part       = AWREF_INIT(&devvoid_dmapart),
+	.mfu_addr       = 0,
+	.mfu_mtaent     = {},
+	{ { SIG_INIT, NULL } }
+};
+
 /* Return the futex object that is associated with the given virtual memory address.
  * In  the event that  `addr' isn't mapped to  anything (or is  mapped to a reserved
  * node), then throw an `E_SEGFAULT' exception.
@@ -576,11 +588,20 @@ again:
 
 	/* Lookup the accessed node. */
 	node = mnode_tree_locate(self->mm_mappings, addr);
-	if unlikely(node == NULL || (part = node->mn_part) == NULL) {
+	if unlikely(node == NULL) {
+unlock_and_throw_segfault:
 		mman_lock_endread(self);
 		THROW(E_SEGFAULT_UNMAPPED, addr,
 		      E_SEGFAULT_CONTEXT_FAULT |
 		      E_SEGFAULT_CONTEXT_FUTEX);
+	}
+	part = node->mn_part;
+	if unlikely(part == NULL) {
+		if (node->mn_flags & MNODE_F_VOIDMEM) {
+			mman_lock_endread(self);
+			return incref(&void_futex);
+		}
+		goto unlock_and_throw_segfault;
 	}
 	assert(!wasdestroyed(part));
 	incref(part);
@@ -623,8 +644,13 @@ unlock_mman_and_return_null:
 		return NULL;
 	}
 	part = node->mn_part;
-	if unlikely(!part)
+	if unlikely(!part) {
+		if (node->mn_flags & MNODE_F_VOIDMEM) {
+			mman_lock_endread(self);
+			return incref(&void_futex);
+		}
 		goto unlock_mman_and_return_null;
+	}
 	assert(!wasdestroyed(part));
 	meta = part->mp_meta;
 	if (!meta)

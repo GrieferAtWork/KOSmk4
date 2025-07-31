@@ -35,6 +35,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/fault.h>
+#include <kernel/mman/flags.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
@@ -778,6 +779,33 @@ got_node_and_lock:
 		if unlikely(mf.mfl_part == NULL) {
 			/* Deal with reserved memory nodes. */
 			struct cpu *me;
+
+			/* Special handling for WHITEOUT mappings (these just map to /dev/void) */
+			if (mf.mfl_node->mn_flags & MNODE_F_VOIDMEM) {
+				if (mf.mfl_flags & MMAN_FAULT_F_WRITE) {
+					if unlikely(!(mf.mfl_node->mn_flags & MNODE_F_PWRITE)) {
+						/* Read-only memory */
+						PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_READONLY));
+						goto decref_part_and_pop_connections_and_set_exception_pointers;
+					}
+				} else {
+					if unlikely(!(mf.mfl_node->mn_flags & MNODE_F_PREAD)) {
+						/* Write-only memory */
+						PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_NOTREADABLE));
+						goto decref_part_and_pop_connections_and_set_exception_pointers;
+					}
+				}
+				if unlikely(!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
+					mman_lock_release(mf.mfl_mman);
+					task_popconnections();
+					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+				}
+				pagedir_mapvoidone(mf.mfl_addr, prot_from_mnodeflags(mf.mfl_node->mn_flags));
+				pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
+				mman_lock_release(mf.mfl_mman);
+				goto pop_connections_and_return;
+			}
+
 			mman_lock_release(mf.mfl_mman);
 			{
 				struct mnode *node;

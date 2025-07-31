@@ -98,7 +98,8 @@
                                        * Afterwards, you may  clear this  flag. But also  note that  before then,  you
                                        * must also be aware of the fact that requirements imposed by `MNODE_F_NOSPLIT'
                                        * and `MNODE_F_NOMERGE' also apply to nodes that are hinted! */
-#define MNODE_F_MLOCK      0x00002000 /* [lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
+#define MNODE_F_MLOCK      0x00002000 /* [valid_if(mn_part != NULL)][lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
+#define MNODE_F_VOIDMEM    0x00002000 /* [valid_if(mn_part == NULL)][lock(WRITE_ONCE)] Address range is a white-out region (maps to /dev/void) */
 #define MNODE_F__RBRED     0x00004000 /* [lock(mn_mman->mm_lock)] Internal flag: This node is red in the mman-mappings R/B tree. */
 #define MBNODE_F_POPULATE  0x00008000 /* Used internally by `struct mbnode' */
 #define MBNODE_F_NONBLOCK  0x00010000 /* Used internally by `struct mbnode' */
@@ -120,6 +121,87 @@
 /*efine MNODE_F_           0x20000000  * ... */
 /*efine MNODE_F_           0x40000000  * ... */
 #define MNODE_F__REACH     0x80000000 /* Used internally by the memory leak detector. */
+
+
+/* TODO: Have a special "mfile" that allows for creation of arbitrary sub-regions of other mfile-s,
+ *       while also having the ability to NOTHROW void-out all memory mappings made using that same
+ *       mfile:
+ * - Only possible to create sub-regions of mfile-s with "mfile_hasrawio()" (or other sub-region mfile-s)
+ * - Override  "mo_stream->mso_mmap" to re-direct to underlying file, while also applying region
+ *   offset. Additionally, inject special values for "hmi_fspath" / "hmi_fsname" that are unique
+ *   to the sub-region mfile (meaning mnode-s created  can later be identified by these  special
+ *   path / name values)
+ *   Also: briefly lock "subregion_file" and assert that it hasn't been void'ed, yet.
+ *         if it has been voided, simply  re-direct the mmap request to  `/dev/void'.
+ * - Provide an IOCTL to void out any memory mapping created from the sub-region, implemented as:
+ *   >> struct mfile *base = subregion_file->srf_base;
+ *   >> // Acquire locks to mparts and mmans that were created
+ *   >> // using the sub-region (rather than the original file)
+ *   >> //
+ *   >> // Since all locks here are atomic, the ioctl is NOTHROW for user-space.
+ *   >> //
+ *   >> // By acquiring write-locks to all components that are able to reach the
+ *   >> // mnode in some way, we can gauranty that no-one might possibly still be
+ *   >> // reading the fields of the mnode, also meaning that we're allowed to
+ *   >> // write to the (normally) [const] "mn_part" field.
+ *   >> //
+ *   >> // Note that this acquires:
+ *   >> // - mfile: mf_lock                    (of "subregion_file", to prevent creation or more mappings)
+ *   >> // - mfile: mf_lock                    (of "base")
+ *   >> // - mpart: tryincref+MPART_F_LOCKBIT  (of any non-destroyed mpart with nodes referencing the path+name of "subregion_file")
+ *   >> // - mnode: tryincref+mn_mman->mm_lock (of any non-destroyed mnode->mman referencing the path+name of "subregion_file")
+ *   >> INCREF_AND_LOCK_ALL_MPARTS_AND_MMANS_OF_MPARTS_REFERENCING(base,
+ *   >>         mnode_path: subregion_file->srf_path,
+ *   >>         mnode_name: subregion_file->srf_name);
+ *   >> struct mpart *part;
+ *   >> FOREACH_MPART_SAFE (part, base) {
+ *   >>     struct mnode *node;
+ *   >>     if (wasdestroyed(part))
+ *   >>         continue;
+ *   >>     if (!HAS_MNODES_WITH_PATH_AND_NAME(part, subregion_file->srf_path, subregion_file->srf_name))
+ *   >>         continue;
+ *   >>     FOREACH_MNODE_SAFE (node, part) {
+ *   >>         struct mman *mm = node->mn_mman;
+ *   >>         assert(node->mn_part == part);
+ *   >>         if (wasdestroyed(mm))
+ *   >>             continue;
+ *   >>         if (node->mn_fspath != subregion_file->srf_path)
+ *   >>             continue;
+ *   >>         if (node->mn_fsname != subregion_file->srf_name)
+ *   >>             continue;
+ *   >>
+ *   >>         // Remove "node" from "part" and mark as "MNODE_F_VOIDMEM"
+ *   >>         atomic_or(&node->mn_flags, MNODE_F_VOIDMEM);
+ *   >>         atomic_write(&node->mn_part, NULL);
+ *   >>         decref_nokill(part);
+ *   >>         LIST_REMOVE(node, mn_link);
+ *   >>
+ *   >>         // Not valid if "mn_part == NULL"
+ *   >>         if (LIST_ISBOUND(node, mn_writable))
+ *   >>             LIST_REMOVE(node, mn_writable);
+ *   >>
+ *   >>         // Hard-replace live memory mapping with /dev/void
+ *   >>         if (mnode_pagedir_prepare_p(mm->mm_pagedir_p, node)) {
+ *   >>             mnode_pagedir_mapvoid_p(mm->mm_pagedir_p, node, prot_from_mnodeflags(node->mn_flags));
+ *   >>             mnode_pagedir_unprepare_p(mm->mm_pagedir_p, node);
+ *   >>         } else {
+ *   >>             pagedir_unmap_userspace_p(mm->mm_pagedir_p);
+ *   >>         }
+ *   >>         mnode_pagedir_sync_smp_p(mm->mm_pagedir_p, node);
+ *   >>
+ *   >>         // Release lock/reference to mman not referenced again
+ *   >>         if (!IS_MMAN_REFERENCED_AGAIN_LATER(mm)) {
+ *   >>             mman_lock_endwrite(mm);
+ *   >>             decref(mm);
+ *   >>         }
+ *   >>     }
+ *   >>     mpart_lock_release(part);
+ *   >>     decref(part);
+ *   >> }
+ *   >> mfile_lock_endwrite(base);
+ *   >> MARK_AS_VOID(subregion_file); // Cause future mmap-s to go to /dev/void
+ *   >> mfile_lock_endwrite(subregion_file);
+ */
 
 
 /* Expand to `MNODE_F_MPREPARED' if kernel-space is automatically prepared.
@@ -229,8 +311,11 @@ struct mnode {
 	VIRT/*PAGEDIR_PAGEALIGNED */byte_t *mn_minaddr;  /* [const] Lowest address mapped by this node. */
 	VIRT byte_t                        *mn_maxaddr;  /* [const] Greatest address mapped by this node. (+1, and it's `PAGEDIR_PAGEALIGNED') */
 	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
-	/*REF*/ struct mpart               *mn_part;     /* [0..1][const][valid_if(!MNODE_F_UNMAPPED && !wasdestroyed(mn_mman))]
-	                                                  * The bound mem-part. When set to NULL, then this node represents a reserved node. */
+	/*REF*/ struct mpart               *mn_part;     /* [0..1][lock(READ(mn_mman->mm_lock || mn_part->MPART_F_LOCKBIT),
+	                                                  *             WRITE(mn_mman->mm_lock && mn_part->MPART_F_LOCKBIT && CLEAR_ONCE))]
+	                                                  * [valid_if(!MNODE_F_UNMAPPED && !wasdestroyed(mn_mman))]
+	                                                  * The bound mem-part.  When set to  NULL, then this  node represents a  reserved
+	                                                  * node, or one that is a fallback mapping of /dev/void (s.a. `MNODE_F_VOIDMEM'). */
 	/*REF*/ struct path                *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	/*REF*/ struct fdirent             *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 #ifdef __WANT_MNODE__mn_alloc
@@ -682,6 +767,7 @@ DATDEF WEAK unsigned int mman_kernel_hintinit_inuse;
 #define mnode_pagedir_unprepare(self)                  pagedir_unprepare(mnode_getaddr(self), mnode_getsize(self))
 #define mnode_pagedir_maphint(self, hint)              pagedir_maphint(mnode_getaddr(self), mnode_getsize(self), hint)
 #define mnode_pagedir_map(self, phys, perm)            pagedir_map(mnode_getaddr(self), mnode_getsize(self), phys, perm)
+#define mnode_pagedir_mapvoid(self, perm)              pagedir_mapvoid(mnode_getaddr(self), mnode_getsize(self), perm)
 #define mnode_pagedir_unmap(self)                      pagedir_unmap(mnode_getaddr(self), mnode_getsize(self))
 #define mnode_pagedir_denywrite(self)                  pagedir_denywrite(mnode_getaddr(self), mnode_getsize(self))
 #define mnode_pagedir_sync(self)                       pagedir_sync(mnode_getaddr(self), mnode_getsize(self))
@@ -690,6 +776,7 @@ DATDEF WEAK unsigned int mman_kernel_hintinit_inuse;
 #define mnode_pagedir_unprepare_p(pagedir, self)       pagedir_unprepare_p(pagedir, mnode_getaddr(self), mnode_getsize(self))
 #define mnode_pagedir_maphint_p(pagedir, self, hint)   pagedir_maphint_p(pagedir, mnode_getaddr(self), mnode_getsize(self), hint)
 #define mnode_pagedir_map_p(pagedir, self, phys, perm) pagedir_map_p(pagedir, mnode_getaddr(self), mnode_getsize(self), phys, perm)
+#define mnode_pagedir_mapvoid_p(pagedir, self, perm)   pagedir_mapvoid_p(pagedir, mnode_getaddr(self), mnode_getsize(self), perm)
 #define mnode_pagedir_unmap_p(pagedir, self)           pagedir_unmap_p(pagedir, mnode_getaddr(self), mnode_getsize(self))
 #define mnode_pagedir_denywrite_p(pagedir, self)       pagedir_denywrite_p(pagedir, mnode_getaddr(self), mnode_getsize(self))
 #define mnode_pagedir_sync_smp_p(pagedir, self)        pagedir_sync_smp_p(pagedir, mnode_getaddr(self), mnode_getsize(self))

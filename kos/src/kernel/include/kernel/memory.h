@@ -28,6 +28,7 @@
 #include <kernel/types.h>
 
 #include <hybrid/__assert.h>
+#include <hybrid/byteorder.h>
 
 #include <kos/kernel/memory.h>
 
@@ -487,6 +488,27 @@ NOTHROW(FCALL page_resetzeroone)(physpage_t page);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL page_ismapped)(physpage_t page, physpagecnt_t num_pages);
 
+
+
+/* A large, general-purpose region of "void" memory.
+ *
+ * This  region may not actually correspond to physical memory that is
+ * mapped to anything, or  it may simply map  to some random piece  of
+ * otherwise unused RAM. In any case, this is the memory that's mapped
+ * by /dev/void and `MNODE_F_VOIDMEM'-mnode-s.
+ *
+ * You may assume that `devvoid_pagecount >= 1' and `devvoid_size >= PAGESIZE' */
+DATDEF physpage_t const devvoid_page;                        /* First page suitable for /dev/void */
+DATDEF physpagecnt_t const devvoid_pagecount;                /* # of pages of consecutive void-memory at "devvoid_page" */
+DATDEF PAGEDIR_PAGEALIGNED physaddr_t const devvoid_addr;    /* Physical base address of `devvoid_page' */
+DATDEF PAGEDIR_PAGEALIGNED __physaddr_t const devvoid_size2; /* # of bytes of consecutive void-memory at "devvoid_addr" */
+DATDEF PAGEDIR_PAGEALIGNED size_t const devvoid_size;        /* # of bytes of consecutive void-memory at "devvoid_addr" */
+DATDEF struct mpart devvoid_dmapart;                         /* Mem-part suitable for doing void-DMA */
+DATDEF struct mpartmeta devvoid_dmapart_meta;                /* Meta-data for `devvoid_dmapart' */
+#define devvoid_dmalock()                                                       \
+	(__hybrid_atomic_inc(&devvoid_dmapart_meta.mpm_dmalocks, __ATOMIC_SEQ_CST), \
+	 __hybrid_atomic_inc(&devvoid_dmapart.mp_refcnt, __ATOMIC_SEQ_CST),         \
+	 &devvoid_dmapart)
 
 
 #ifndef CONFIG_NO_PAGE_USAGE

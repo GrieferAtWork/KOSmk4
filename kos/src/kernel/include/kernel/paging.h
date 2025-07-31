@@ -820,6 +820,51 @@ NOTHROW(KCALL pagedir_denywrite_p)(pagedir_phys_t self,
 #endif /* ARCH_PAGEDIR_HAVE_DENYWRITE */
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
 
+
+
+/* Helpers for mapping /dev/void memory */
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_mapvoidone)(PAGEDIR_PAGEALIGNED VIRT void *addr, pagedir_prot_t prot);
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_mapvoidone_p)(pagedir_phys_t self, PAGEDIR_PAGEALIGNED VIRT void *addr, pagedir_prot_t prot);
+#ifdef __OMIT_PAGING_CONSTANT_P_WRAPPERS
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_mapvoid)(PAGEDIR_PAGEALIGNED VIRT void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes, pagedir_prot_t prot);
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_mapvoid_p)(pagedir_phys_t self, PAGEDIR_PAGEALIGNED VIRT void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes, pagedir_prot_t prot);
+#else /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
+FUNDEF NOBLOCK void NOTHROW(FCALL __private_pagedir_mapvoid)(PAGEDIR_PAGEALIGNED VIRT void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes, pagedir_prot_t prot) ASMNAME("pagedir_mapvoid");
+FUNDEF NOBLOCK void NOTHROW(FCALL __private_pagedir_mapvoid_p)(pagedir_phys_t self, PAGEDIR_PAGEALIGNED VIRT void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes, pagedir_prot_t prot) ASMNAME("pagedir_mapvoid_p");
+
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
+NOTHROW(FCALL pagedir_mapvoid)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                               PAGEDIR_PAGEALIGNED size_t num_bytes,
+                               pagedir_prot_t prot) {
+	if (__builtin_constant_p(num_bytes)) {
+		if (num_bytes == 0)
+			return;
+		if (num_bytes <= PAGESIZE) {
+			pagedir_mapvoidone(addr, prot);
+			return;
+		}
+	}
+	__private_pagedir_mapvoid(addr, num_bytes, prot);
+}
+
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
+NOTHROW(FCALL pagedir_mapvoid_p)(pagedir_phys_t self,
+                                 PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                 PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                 pagedir_prot_t prot) {
+	if (__builtin_constant_p(num_bytes)) {
+		if (num_bytes == 0)
+			return;
+		if (num_bytes <= PAGESIZE) {
+			pagedir_mapvoidone_p(self, addr, prot);
+			return;
+		}
+	}
+	__private_pagedir_mapvoid_p(self, addr, num_bytes, prot);
+}
+#endif /* !__OMIT_PAGING_CONSTANT_P_WRAPPERS */
+
+
 #endif /* __CC__ */
 
 DECL_END

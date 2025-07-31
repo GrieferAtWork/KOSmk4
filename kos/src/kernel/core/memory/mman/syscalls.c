@@ -482,8 +482,10 @@ again:
 	/* Load the node's part and do special handling for reserved mappings. */
 	part = node->mn_part;
 	if unlikely(!part) {
+		status = (node->mn_flags & MNODE_F_VOIDMEM)
+		         ? 0x01  /* Void memory is always considered to be in-core */
+		         : 0x00; /* Reserved memory mapping (not in-core) */
 		mman_lock_endread(mm);
-		status = 0x00;
 		goto do_continue;
 	}
 

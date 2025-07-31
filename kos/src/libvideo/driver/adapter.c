@@ -77,6 +77,7 @@ libvideo_adapter_open(char const *name) {
 	}
 #endif /* HAVE_SVGA_ADAPTER */
 
+	/* Unsupported device, or not a device-file */
 	(void)close(devfd);
 	errno = ENODEV;
 err:

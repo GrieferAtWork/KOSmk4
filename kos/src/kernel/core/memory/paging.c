@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
 #include <sched/task.h>
@@ -266,6 +267,45 @@ NOTHROW(KCALL pagedir_translate_p)(pagedir_phys_t self,
 	return result;
 }
 
+
+/* Helpers for mapping /dev/void memory */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pagedir_mapvoidone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                  pagedir_prot_t prot) {
+	pagedir_mapone(addr, devvoid_addr, prot);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pagedir_mapvoidone_p)(pagedir_phys_t self,
+                                    PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                    pagedir_prot_t prot) {
+	pagedir_mapone_p(self, addr, devvoid_addr, prot);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pagedir_mapvoid)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                               PAGEDIR_PAGEALIGNED size_t num_bytes,
+                               pagedir_prot_t prot) {
+	while unlikely(num_bytes > devvoid_size) {
+		pagedir_map(addr, devvoid_size, devvoid_addr, prot);
+		addr = (PAGEDIR_PAGEALIGNED byte_t *)addr + devvoid_size;
+		num_bytes -= devvoid_size;
+	}
+	pagedir_map(addr, num_bytes, devvoid_addr, prot);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pagedir_mapvoid_p)(pagedir_phys_t self,
+                                 PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                 PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                 pagedir_prot_t prot) {
+	while unlikely(num_bytes > devvoid_size) {
+		pagedir_map_p(self, addr, devvoid_size, devvoid_addr, prot);
+		addr = (PAGEDIR_PAGEALIGNED byte_t *)addr + devvoid_size;
+		num_bytes -= devvoid_size;
+	}
+	pagedir_map_p(self, addr, num_bytes, devvoid_addr, prot);
+}
 
 DECL_END
 

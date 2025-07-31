@@ -55,6 +55,27 @@ DECL_BEGIN
 #define DBG_memset(p, c, n) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+PRIVATE BLOCKING NONNULL((1)) ssize_t KCALL
+dma_void(mdma_range_callback_t prange, void *cookie, size_t num_bytes)
+		THROWS(...) {
+	ssize_t result = 0;
+	do {
+		ssize_t temp;
+		size_t iter_bytes = devvoid_size;
+		REF struct mpart *voidlock;
+		if (iter_bytes > num_bytes)
+			iter_bytes = num_bytes;
+		voidlock = devvoid_dmalock();
+		temp = (*prange)(cookie, devvoid_addr, iter_bytes, voidlock);
+		if (temp < 0)
+			return temp;
+		result += temp;
+		num_bytes -= iter_bytes;
+	} while (num_bytes);
+	return result;
+}
+
+
 /* Start DMAing on  memory within the  specified address  range.
  * This function is used to lock physical memory for the purpose
  * of use with `mfile_direct_[read|write]()'.
@@ -105,12 +126,31 @@ again_lock_mman:
 			mman_lock_read(mf.mfl_mman);
 
 			/* Lookup mem-node that should be faulted. */
-			if unlikely((mf.mfl_node = mnode_tree_locate(mf.mfl_mman->mm_mappings, addr)) == NULL ||
-			            (mf.mfl_part = mf.mfl_node->mn_part) == NULL) {
+			if unlikely((mf.mfl_node = mnode_tree_locate(mf.mfl_mman->mm_mappings, addr)) == NULL) {
+unlock_and_throw_unmapped_segfault:
 				mman_lock_endread(mf.mfl_mman);
 				THROW(E_SEGFAULT_UNMAPPED, addr,
 				      ((flags & MMAN_FAULT_F_WRITE) ? E_SEGFAULT_CONTEXT_WRITING : 0) |
 				      ((mf.mfl_node != NULL) ? 0 : E_SEGFAULT_CONTEXT_FAULT));
+			}
+
+			if unlikely((mf.mfl_part = mf.mfl_node->mn_part) == NULL) {
+				/* Check for special case: VOID memory */
+				if (mf.mfl_node->mn_flags & MNODE_F_VOIDMEM) {
+					ssize_t temp;
+					size_t node_bytes = (byte_t *)mnode_getendaddr(mf.mfl_node) - (byte_t *)mf.mfl_addr;
+					mman_lock_endread(mf.mfl_mman);
+					if (node_bytes > num_bytes)
+						node_bytes = num_bytes;
+					addr = (UNCHECKED void *)((UNCHECKED byte_t *)addr + node_bytes);
+					num_bytes -= node_bytes;
+					temp = dma_void(prange, cookie, node_bytes);
+					if unlikely(temp < 0)
+						return temp;
+					result += temp;
+					goto continue_with_next_node;
+				}
+				goto unlock_and_throw_unmapped_segfault;
 			}
 
 			/* DMA doesn't work for VIO */
@@ -212,6 +252,7 @@ again_lock_mman:
 			}
 			result += temp;
 		}
+continue_with_next_node:;
 	}
 	return result;
 }
