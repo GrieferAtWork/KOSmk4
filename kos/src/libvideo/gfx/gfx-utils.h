@@ -190,11 +190,11 @@ wrap(video_offset_t offset, video_dim_t dim) {
  * done, then this is done prior to `true' being returned
  *
  * iow: Returns true iff:
- * >> ∀ c ∈ video_color_t: gfx_blendcolors(c, IN(*p_color), self->vx_blend) == OUT(*p_color) */
+ * >> ∀ c ∈ video_color_t: gfx_blendcolors(c, IN(*p_color), self->vg_blend) == OUT(*p_color) */
 LOCAL WUNUSED ATTR_IN(1) ATTR_INOUT(2) bool CC
 libvideo_gfx_allow_noblend(struct video_gfx const *__restrict self,
                            video_color_t *__restrict p_color) {
-	gfx_blendmode_t mode = self->vx_blend;
+	gfx_blendmode_t mode = self->vg_blend;
 	switch (GFX_BLENDMODE_GET_MODE(mode)) {
 	case GFX_BLENDMODE_ALPHA:
 		return gfx_preblend_alpha_maynblend(mode, *p_color);
@@ -211,11 +211,11 @@ libvideo_gfx_allow_noblend(struct video_gfx const *__restrict self,
  * (e.g. for ALPHA-blending, "color" is transparent)
  *
  * iow: Returns true iff:
- * >> ∀ c ∈ video_color_t: gfx_blendcolors(c, color, self->vx_blend) == c */
+ * >> ∀ c ∈ video_color_t: gfx_blendcolors(c, color, self->vg_blend) == c */
 LOCAL ATTR_PURE WUNUSED ATTR_IN(1) bool CC
 libvideo_gfx_allow_ignore(struct video_gfx const *__restrict self,
                           video_color_t color) {
-	gfx_blendmode_t mode = self->vx_blend;
+	gfx_blendmode_t mode = self->vg_blend;
 	switch (GFX_BLENDMODE_GET_MODE(mode)) {
 	case GFX_BLENDMODE_ALPHA:
 		return gfx_preblend_alpha_mayignore(mode, color);
@@ -233,7 +233,7 @@ libvideo_gfx_allow_ignore(struct video_gfx const *__restrict self,
 LOCAL ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) bool CC
 libvideo_gfx_allow_noblend_blit(struct video_gfx const *dst,
                                 struct video_gfx const *src) {
-	gfx_blendmode_t mode = dst->vx_blend;
+	gfx_blendmode_t mode = dst->vg_blend;
 	switch (GFX_BLENDMODE_GET_MODE(mode)) {
 	case GFX_BLENDMODE_OVERRIDE:
 		return true;
@@ -255,7 +255,7 @@ LOCAL ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) bool CC
 libvideo_gfx_allow_noblend_blit3(struct video_gfx const *wrdst,
                                  struct video_gfx const *rddst,
                                  struct video_gfx const *src) {
-	gfx_blendmode_t mode = wrdst->vx_blend;
+	gfx_blendmode_t mode = wrdst->vg_blend;
 	switch (GFX_BLENDMODE_GET_MODE(mode)) {
 	case GFX_BLENDMODE_OVERRIDE:
 		return true;
@@ -264,7 +264,7 @@ libvideo_gfx_allow_noblend_blit3(struct video_gfx const *wrdst,
 			break;
 		ATTR_FALLTHROUGH
 	case GFX_BLENDMODE_ALPHA:
-		mode = GFX_BLENDMODE_GET_MODE(rddst->vx_blend);
+		mode = GFX_BLENDMODE_GET_MODE(rddst->vg_blend);
 		switch (mode) {
 		case GFX_BLENDMODE_ALPHA_FACTOR(0):
 			if (!VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode)))
@@ -1001,12 +1001,12 @@ bitmask2d_getbit_channel(byte_t const *__restrict bitmask, size_t bitscan,
 
 /* Helpers for I/O Area limits */
 #define _GFX_SELF self
-#define GFX_BXMIN _GFX_SELF->vx_hdr.vxh_bxmin
-#define GFX_BYMIN _GFX_SELF->vx_hdr.vxh_bymin
-#define GFX_BXEND _GFX_SELF->vx_hdr.vxh_bxend
-#define GFX_BYEND _GFX_SELF->vx_hdr.vxh_byend
-#define GFX_BXMAX (_GFX_SELF->vx_hdr.vxh_bxend - 1)
-#define GFX_BYMAX (_GFX_SELF->vx_hdr.vxh_byend - 1)
+#define GFX_BXMIN _GFX_SELF->vg_clip.vgc_bxmin
+#define GFX_BYMIN _GFX_SELF->vg_clip.vgc_bymin
+#define GFX_BXEND _GFX_SELF->vg_clip.vgc_bxend
+#define GFX_BYEND _GFX_SELF->vg_clip.vgc_byend
+#define GFX_BXMAX (_GFX_SELF->vg_clip.vgc_bxend - 1)
+#define GFX_BYMAX (_GFX_SELF->vg_clip.vgc_byend - 1)
 
 DECL_END
 

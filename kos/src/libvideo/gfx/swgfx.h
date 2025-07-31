@@ -42,7 +42,7 @@
 
 DECL_BEGIN
 
-/* This is the layout of `video_gfx::_vx_driver' expected by generic SW-based GFX */
+/* This is the layout of `video_gfx::_vg_driver' expected by generic SW-based GFX */
 struct gfx_swdrv {
 	/* All of the following callbacks are [1..1][const]
 	 * NOTES:
@@ -150,9 +150,9 @@ struct gfx_swdrv {
 };
 
 #define video_swgfx_getdrv(self) \
-	((struct gfx_swdrv *)(self)->_vx_driver)
+	((struct gfx_swdrv *)(self)->_vg_driver)
 #define video_swgfx_getcdrv(self) \
-	((struct gfx_swdrv const *)(self)->_vx_driver)
+	((struct gfx_swdrv const *)(self)->_vg_driver)
 
 /* Video GFX internal API wrappers */
 #define _video_swgfx_x_getcolor(self, x, y) \
@@ -228,10 +228,10 @@ struct gfx_swdrv {
 	(gfx_assert_absbounds_sx(self, x, size_x),                                            \
 	 gfx_assert_absbounds_ymin(self, y),                                                  \
 	 gfx_assert(size_y),                                                                  \
-	 gfx_assertf(((y) - (self)->vx_hdr.vxh_bymin) >= (size_y) - 1,                        \
+	 gfx_assertf(((y) - (self)->vg_clip.vgc_bymin) >= (size_y) - 1,                        \
 	             "Line escapes to the top (start-y: %" PRIuCRD ", size-y: %" PRIuDIM ", " \
 	             "min-y: %" PRIuCRD ")",                                                  \
-	             (y), size_y, (self)->vx_hdr.vxh_bymin),                                  \
+	             (y), size_y, (self)->vg_clip.vgc_bymin),                                  \
 	 _video_swgfx_x_absline_lhhl(self, x, y, size_x, size_y, color))
 #define video_swgfx_x_absline_h(self, x, y, length, color)                      \
 	(gfx_assert_absbounds_y(self, y), gfx_assert_absbounds_sx(self, x, length), \
@@ -269,10 +269,10 @@ struct gfx_swdrv {
 	(gfx_assert_absbounds_sx(self, x, size_x),                                            \
 	 gfx_assert_absbounds_ymin(self, y),                                                  \
 	 gfx_assert(size_y),                                                                  \
-	 gfx_assertf(((y) - (self)->vx_hdr.vxh_bymin) >= (size_y) - 1,                        \
+	 gfx_assertf(((y) - (self)->vg_clip.vgc_bymin) >= (size_y) - 1,                        \
 	             "Line escapes to the top (start-y: %" PRIuCRD ", size-y: %" PRIuDIM ", " \
 	             "min-y: %" PRIuCRD ")",                                                  \
-	             (y), size_y, (self)->vx_hdr.vxh_bymin),                                  \
+	             (y), size_y, (self)->vg_clip.vgc_bymin),                                  \
 	 _video_swgfx_x_absline_lhhl_xyswap(self, x, y, size_x, size_y, color))
 #define video_swgfx_x_absline_h_xyswap(self, x, y, length, color)               \
 	(gfx_assert_absbounds_y(self, y), gfx_assert_absbounds_sx(self, x, length), \
@@ -500,7 +500,7 @@ struct blt3_swdrv {
 	 * - Don't use these operators; only use `struct video_gfx_ops'
 	 * - All these operators take pre-clamped/rotated/mirrored/etc. coords */
 
-	/* [== :vbt3_rddst->vx_blend] */
+	/* [== :vbt3_rddst->vg_blend] */
 	gfx_blendmode_t bsw3_blendmode;
 
 	/* Blend "dst" and "src" colors together and return the result.
@@ -954,10 +954,10 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 	struct gfx_swdrv *drv = video_swgfx_getdrv(self);
 
 	/* Update:
-	 * - vx_hdr.vxh_ops */
+	 * - vg_clip.vgc_ops */
 	if (what & VIDEO_GFX_UPDATE_FLAGS) {
 		/* Select generic operators based on wrapping rules */
-		self->vx_hdr.vxh_ops = libvideo_swgfx_ops_of(video_gfx_getflags(self));
+		self->vg_clip.vgc_ops = libvideo_swgfx_ops_of(video_gfx_getflags(self));
 	}
 
 	/* Update:
@@ -973,7 +973,7 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 	}
 
 	/* Update:
-	 * - vx_hdr.vxh_blitfrom
+	 * - vg_clip.vxh_blitfrom
 	 * - drv->xsw_putcolor
 	 * - drv->xsw_absline_h
 	 * - drv->xsw_absline_v
@@ -982,23 +982,23 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 	 * - drv->xsw_absgradient_h
 	 * - drv->xsw_absgradient_v */
 	if (what & VIDEO_GFX_UPDATE_BLEND) {
-		(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vx_blend), GFX_BLENDMODE_OVERRIDE);
-		(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vx_blend), GFX_BLENDMODE_ALPHA);
+		(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vg_blend), GFX_BLENDMODE_OVERRIDE);
+		(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vg_blend), GFX_BLENDMODE_ALPHA);
 
 		/* Detect special blend modes. */
-		switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
+		switch (GFX_BLENDMODE_GET_MODE(self->vg_blend)) {
 		default:
-			if (!(GFX_BLENDMODE_GET_SRCRGB(self->vx_blend) == GFX_BLENDDATA_ONE &&
-			      GFX_BLENDMODE_GET_SRCA(self->vx_blend) == GFX_BLENDDATA_ONE &&
-			      GFX_BLENDMODE_GET_DSTRGB(self->vx_blend) == GFX_BLENDDATA_ZERO &&
-			      GFX_BLENDMODE_GET_DSTA(self->vx_blend) == GFX_BLENDDATA_ZERO &&
-			      _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNRGB(self->vx_blend)) &&
-			      _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNA(self->vx_blend)))) {
+			if (!(GFX_BLENDMODE_GET_SRCRGB(self->vg_blend) == GFX_BLENDDATA_ONE &&
+			      GFX_BLENDMODE_GET_SRCA(self->vg_blend) == GFX_BLENDDATA_ONE &&
+			      GFX_BLENDMODE_GET_DSTRGB(self->vg_blend) == GFX_BLENDDATA_ZERO &&
+			      GFX_BLENDMODE_GET_DSTA(self->vg_blend) == GFX_BLENDDATA_ZERO &&
+			      _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNRGB(self->vg_blend)) &&
+			      _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNA(self->vg_blend)))) {
 				/* Actual, custom blending */
 				drv->xsw_putcolor = &libvideo_swgfx_generic__putcolor;
 				break;
 			}
-			self->vx_blend = GFX_BLENDMODE_OVERRIDE; /* It essentially behaves the same, so... */
+			self->vg_blend = GFX_BLENDMODE_OVERRIDE; /* It essentially behaves the same, so... */
 			ATTR_FALLTHROUGH
 		case GFX_BLENDMODE_OVERRIDE:
 			/* No blending is being done -> link operators that try to make use of direct memory access. */
@@ -1034,7 +1034,7 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 		}
 
 		/* Generic GFX operators that **do** have support for blending */
-		switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
+		switch (GFX_BLENDMODE_GET_MODE(self->vg_blend)) {
 #define LINK_libvideo_swgfx_generic__render_preblend_FOO(name, mode, preblend_name, preblend) \
 		case mode:                                                                            \
 			drv->xsw_putcolor_p    = &libvideo_swgfx_generic__putcolor_##preblend_name;       \
@@ -1065,7 +1065,7 @@ after_blend:;
 	 * - drv->xsw_absline_lhhl */
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_BLEND)) {
 		/* Select based on linear vs. Nearest interpolation, and blending */
-		switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
+		switch (GFX_BLENDMODE_GET_MODE(self->vg_blend)) {
 		case GFX_BLENDMODE_OVERRIDE:
 			if (video_gfx_getflags(self) & VIDEO_GFX_F_LINEAR)
 				goto set_generic_linear_blend_operators;
@@ -1100,8 +1100,8 @@ set_generic_linear_blend_operators:
  * The caller must have already initialized:
  * - video_swgfx_getdrv(self)->xsw_getpixel
  * - video_swgfx_getdrv(self)->xsw_setpixel
- * - self->vx_surf     (if in "vi_initgfx", already done by *your* caller)
- * - self->vx_blend    (if in "vi_initgfx", already done by *your* caller) */
+ * - self->vg_surf     (if in "vi_initgfx", already done by *your* caller)
+ * - self->vg_blend    (if in "vi_initgfx", already done by *your* caller) */
 LOCAL ATTR_INOUT(1) void CC
 libvideo_swgfx_populate(struct video_gfx *__restrict self) {
 	libvideo_swgfx_update(self, VIDEO_GFX_UPDATE_ALL);
@@ -1112,12 +1112,12 @@ libvideo_swgfx_populate(struct video_gfx *__restrict self) {
 LOCAL ATTR_INOUT(1) void CC
 video_swblitter_setops(struct video_blitter *__restrict ctx) {
 	/* Select operators based on wrapping flags of src/dst */
-	video_gfx_flag_t flags = ctx->vbt_dst->vx_surf.vs_flags | ctx->vbt_src->vx_surf.vs_flags;
-	if (ctx->vbt_dst->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	video_gfx_flag_t flags = ctx->vbt_dst->vg_surf.vs_flags | ctx->vbt_src->vg_surf.vs_flags;
+	if (ctx->vbt_dst->vg_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		               ? &libvideo_swblitter_ops_wrap_imatrix
 		               : &libvideo_swblitter_ops_wrap;
-	} else if (ctx->vbt_src->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	} else if (ctx->vbt_src->vg_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		               ? &libvideo_swblitter_ops_rdwrap_imatrix
 		               : &libvideo_swblitter_ops_rdwrap;
@@ -1131,11 +1131,11 @@ video_swblitter_setops(struct video_blitter *__restrict ctx) {
 LOCAL ATTR_INOUT(1) void CC
 video_swblitter3_setops(struct video_blitter3 *__restrict ctx) {
 	/* Select operators based on wrapping flags of src/dst */
-	video_gfx_flag_t flags = ctx->vbt3_rddst->vx_surf.vs_flags |
-	                         ctx->vbt3_wrdst->vx_surf.vs_flags |
-	                         ctx->vbt3_src->vx_surf.vs_flags;
-	if (ctx->vbt3_rddst->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
-		if (ctx->vbt3_wrdst->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	video_gfx_flag_t flags = ctx->vbt3_rddst->vg_surf.vs_flags |
+	                         ctx->vbt3_wrdst->vg_surf.vs_flags |
+	                         ctx->vbt3_src->vg_surf.vs_flags;
+	if (ctx->vbt3_rddst->vg_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+		if (ctx->vbt3_wrdst->vg_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 			ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 			                ? &libvideo_swblitter3_ops_wrap1_imatrix
 			                : &libvideo_swblitter3_ops_wrap1;
@@ -1144,11 +1144,11 @@ video_swblitter3_setops(struct video_blitter3 *__restrict ctx) {
 			                ? &libvideo_swblitter3_ops_rdwrap1_imatrix
 			                : &libvideo_swblitter3_ops_rdwrap1;
 		}
-	} else if (ctx->vbt3_wrdst->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	} else if (ctx->vbt3_wrdst->vg_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		                ? &libvideo_swblitter3_ops_wrap_imatrix
 		                : &libvideo_swblitter3_ops_wrap;
-	} else if (ctx->vbt3_src->vx_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	} else if (ctx->vbt3_src->vg_surf.vs_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		                ? &libvideo_swblitter3_ops_rdwrap_imatrix
 		                : &libvideo_swblitter3_ops_rdwrap;

@@ -77,21 +77,21 @@ DECL_BEGIN
 #endif /* !GFX_DEBUG */
 
 #define gfx_assert_absbounds_xmin(self, x) \
-	gfx_assertf((x) >= (self)->vx_hdr.vxh_bxmin, "X coord escapes to the left (%" PRIuCRD " < %" PRIuCRD ")", (x), (self)->vx_hdr.vxh_bxmin)
+	gfx_assertf((x) >= (self)->vg_clip.vgc_bxmin, "X coord escapes to the left (%" PRIuCRD " < %" PRIuCRD ")", (x), (self)->vg_clip.vgc_bxmin)
 #define gfx_assert_absbounds_xend(self, x) \
-	gfx_assertf((x) < (self)->vx_hdr.vxh_bxend, "X coord escapes to the right (%" PRIuCRD " >= %" PRIuCRD ")", (x), (self)->vx_hdr.vxh_bxend)
+	gfx_assertf((x) < (self)->vg_clip.vgc_bxend, "X coord escapes to the right (%" PRIuCRD " >= %" PRIuCRD ")", (x), (self)->vg_clip.vgc_bxend)
 #define gfx_assert_absbounds_ymin(self, y) \
-	gfx_assertf((y) >= (self)->vx_hdr.vxh_bymin, "Y coord escapes to the left (%" PRIuCRD " < %" PRIuCRD ")", (y), (self)->vx_hdr.vxh_bymin)
+	gfx_assertf((y) >= (self)->vg_clip.vgc_bymin, "Y coord escapes to the left (%" PRIuCRD " < %" PRIuCRD ")", (y), (self)->vg_clip.vgc_bymin)
 #define gfx_assert_absbounds_yend(self, y) \
-	gfx_assertf((y) < (self)->vx_hdr.vxh_byend, "Y coord escapes to the right (%" PRIuCRD " >= %" PRIuCRD ")", (y), (self)->vx_hdr.vxh_byend)
+	gfx_assertf((y) < (self)->vg_clip.vgc_byend, "Y coord escapes to the right (%" PRIuCRD " >= %" PRIuCRD ")", (y), (self)->vg_clip.vgc_byend)
 #define gfx_assert_absbounds_sxend(self, x, sx)                                          \
 	(gfx_assert(sx),                                                                     \
 	 gfx_assertf((x) + (sx) > (x), "X+SX overflows (%" PRIuCRD "+%" PRIuDIM ")", x, sx), \
-	 gfx_assertf((x) + (sx) <= (self)->vx_hdr.vxh_bxend, "X+SX coord escapes to the right (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", x, sx, (x) + (sx), (self)->vx_hdr.vxh_bxend))
+	 gfx_assertf((x) + (sx) <= (self)->vg_clip.vgc_bxend, "X+SX coord escapes to the right (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", x, sx, (x) + (sx), (self)->vg_clip.vgc_bxend))
 #define gfx_assert_absbounds_syend(self, y, sy)                                          \
 	(gfx_assert(sy),                                                                     \
 	 gfx_assertf((y) + (sy) > (y), "Y+SY overflows (%" PRIuCRD "+%" PRIuDIM ")", y, sy), \
-	 gfx_assertf((y) + (sy) <= (self)->vx_hdr.vxh_byend, "Y+SY coord escapes to the right (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", y, sy, (y) + (sy), (self)->vx_hdr.vxh_byend))
+	 gfx_assertf((y) + (sy) <= (self)->vg_clip.vgc_byend, "Y+SY coord escapes to the right (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", y, sy, (y) + (sy), (self)->vg_clip.vgc_byend))
 #define gfx_assert_absbounds_x(self, x)      (gfx_assert_absbounds_xmin(self, x), gfx_assert_absbounds_xend(self, x))
 #define gfx_assert_absbounds_y(self, y)      (gfx_assert_absbounds_ymin(self, y), gfx_assert_absbounds_yend(self, y))
 #define gfx_assert_absbounds_xy(self, x, y)  (gfx_assert_absbounds_x(self, x), gfx_assert_absbounds_y(self, y))

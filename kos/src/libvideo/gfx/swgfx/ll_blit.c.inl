@@ -403,14 +403,14 @@ libvideo_swblitter_samebuf__stretch__with_temporary(struct video_blitter const *
 		return;
 	}
 
-	rb_gfx.vx_surf.vs_buffer = &rb;
-	rb_gfx.vx_surf.vs_pal    = video_gfx_getpalette(self->vbt_src);
-	rb_gfx.vx_surf.vs_flags  = video_gfx_getflags(self->vbt_src);
-	/*rb_gfx.vx_surf.vs_colorkey = self->vbt_src->vx_surf.vs_colorkey;*/
-	rb_gfx.vx_blend = GFX_BLENDMODE_OVERRIDE;
+	rb_gfx.vg_surf.vs_buffer = &rb;
+	rb_gfx.vg_surf.vs_pal    = video_gfx_getpalette(self->vbt_src);
+	rb_gfx.vg_surf.vs_flags  = video_gfx_getflags(self->vbt_src);
+	/*rb_gfx.vg_surf.vs_colorkey = self->vbt_src->vg_surf.vs_colorkey;*/
+	rb_gfx.vg_blend = GFX_BLENDMODE_OVERRIDE;
 	blitter.vbt_src = self->vbt_src;
 	blitter.vbt_dst = rambuffer__initgfx(&rb_gfx);
-	/*(*self->vbt_src->vx_hdr.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
+	/*(*self->vbt_src->vg_clip.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
 
 	/* Blit source into temporary buffer... */
 	if (src_size_x == video_buffer_getxdim(&rb) &&
@@ -432,7 +432,7 @@ libvideo_swblitter_samebuf__stretch__with_temporary(struct video_blitter const *
 	/* Blit temporary buffer into target... */
 	blitter.vbt_src = blitter.vbt_dst;
 	blitter.vbt_dst = self->vbt_dst;
-	/*(*rb_gfx.vx_hdr.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
+	/*(*rb_gfx.vg_clip.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
 	if (dst_size_x == video_buffer_getxdim(&rb) &&
 	    dst_size_y == video_buffer_getydim(&rb)) {
 		libvideo_swblitter_noblend_samefmt__blit(&blitter, dst_x, dst_y,

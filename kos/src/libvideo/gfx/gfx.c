@@ -118,7 +118,7 @@ libvideo_gfx_bitblit3__with_blitter3(struct video_gfx const *wrdst, video_offset
 	blitter.vbt3_wrdst = wrdst;
 	blitter.vbt3_rddst = rddst;
 	blitter.vbt3_src   = src;
-	p_blitter = (*wrdst->vx_hdr.vxh_ops->vgfo_blitfrom3)(&blitter);
+	p_blitter = (*wrdst->vg_clip.vgc_ops->vgfo_blitfrom3)(&blitter);
 	video_blitter3_bitblit(p_blitter,
 	                       wrdst_x, wrdst_y, rddst_x, rddst_y,
 	                       src_x, src_y, size_x, size_y);
@@ -134,7 +134,7 @@ libvideo_gfx_stretch3__with_blitter3(struct video_gfx const *wrdst, video_offset
 	blitter.vbt3_wrdst = wrdst;
 	blitter.vbt3_rddst = rddst;
 	blitter.vbt3_src   = src;
-	p_blitter = (*wrdst->vx_hdr.vxh_ops->vgfo_blitfrom3)(&blitter);
+	p_blitter = (*wrdst->vg_clip.vgc_ops->vgfo_blitfrom3)(&blitter);
 	video_blitter3_stretch(p_blitter, wrdst_x, wrdst_y,
 	                       rddst_x, rddst_y, dst_size_x, dst_size_y,
 	                       src_x, src_y, src_size_x, src_size_y);
@@ -169,42 +169,42 @@ libvideo_gfx_clip__generic(struct video_gfx *__restrict self,
 		goto empty_clip;
 
 	/* Adjust clip rect */
-	self->vx_hdr.vxh_cxoff += clip_x;
-	self->vx_hdr.vxh_cyoff += clip_y;
+	self->vg_clip.vgc_cxoff += clip_x;
+	self->vg_clip.vgc_cyoff += clip_y;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		self->vx_hdr.vxh_cxoff -= 2 * clip_x;
+		self->vg_clip.vgc_cxoff -= 2 * clip_x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		self->vx_hdr.vxh_cyoff -= 2 * clip_y;
-	self->vx_hdr.vxh_cxdim = size_x;
-	self->vx_hdr.vxh_cydim = size_y;
+		self->vg_clip.vgc_cyoff -= 2 * clip_y;
+	self->vg_clip.vgc_cxdim = size_x;
+	self->vg_clip.vgc_cydim = size_y;
 
 	/* Clamp I/O Rect according to new Clip Rect */
-	if ((video_offset_t)self->vx_hdr.vxh_bxmin < self->vx_hdr.vxh_cxoff) {
-		self->vx_hdr.vxh_bxmin = (video_coord_t)self->vx_hdr.vxh_cxoff;
-		if (self->vx_hdr.vxh_bxend <= self->vx_hdr.vxh_bxmin)
+	if ((video_offset_t)self->vg_clip.vgc_bxmin < self->vg_clip.vgc_cxoff) {
+		self->vg_clip.vgc_bxmin = (video_coord_t)self->vg_clip.vgc_cxoff;
+		if (self->vg_clip.vgc_bxend <= self->vg_clip.vgc_bxmin)
 			goto empty_clip;
 	}
-	if ((video_offset_t)self->vx_hdr.vxh_bymin < self->vx_hdr.vxh_cyoff) {
-		self->vx_hdr.vxh_bymin = (video_coord_t)self->vx_hdr.vxh_cyoff;
-		if (self->vx_hdr.vxh_byend <= self->vx_hdr.vxh_bymin)
+	if ((video_offset_t)self->vg_clip.vgc_bymin < self->vg_clip.vgc_cyoff) {
+		self->vg_clip.vgc_bymin = (video_coord_t)self->vg_clip.vgc_cyoff;
+		if (self->vg_clip.vgc_byend <= self->vg_clip.vgc_bymin)
 			goto empty_clip;
 	}
 
-	if (!OVERFLOW_SADD(self->vx_hdr.vxh_cxoff, size_x, &cxend) &&
-	    self->vx_hdr.vxh_bxend > (video_coord_t)cxend && cxend > 0) {
-		self->vx_hdr.vxh_bxend = (video_coord_t)cxend;
-		if (self->vx_hdr.vxh_bxend <= self->vx_hdr.vxh_bxmin)
+	if (!OVERFLOW_SADD(self->vg_clip.vgc_cxoff, size_x, &cxend) &&
+	    self->vg_clip.vgc_bxend > (video_coord_t)cxend && cxend > 0) {
+		self->vg_clip.vgc_bxend = (video_coord_t)cxend;
+		if (self->vg_clip.vgc_bxend <= self->vg_clip.vgc_bxmin)
 			goto empty_clip;
 	}
-	if (!OVERFLOW_SADD(self->vx_hdr.vxh_cyoff, size_y, &cyend) &&
-	    self->vx_hdr.vxh_byend > (video_coord_t)cyend && cyend > 0) {
-		self->vx_hdr.vxh_byend = (video_coord_t)cyend;
-		if (self->vx_hdr.vxh_byend <= self->vx_hdr.vxh_bymin)
+	if (!OVERFLOW_SADD(self->vg_clip.vgc_cyoff, size_y, &cyend) &&
+	    self->vg_clip.vgc_byend > (video_coord_t)cyend && cyend > 0) {
+		self->vg_clip.vgc_byend = (video_coord_t)cyend;
+		if (self->vg_clip.vgc_byend <= self->vg_clip.vgc_bymin)
 			goto empty_clip;
 	}
 	return self;
 empty_clip:
-	self->vx_hdr.vxh_ops = &libvideo_emptygfx_ops;
+	self->vg_clip.vgc_ops = &libvideo_emptygfx_ops;
 	return self;
 }
 
@@ -310,34 +310,34 @@ fail:
 LOCAL ATTR_INOUT(1) void FCC
 _libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
 #define Tswap(T, a, b) { T _temp = (a); (a) = (b); (b) = _temp; }
-	Tswap(video_offset_t, self->vx_hdr.vxh_cxoff, self->vx_hdr.vxh_cyoff);
-	Tswap(video_dim_t, self->vx_hdr.vxh_cxdim, self->vx_hdr.vxh_cydim);
-	Tswap(video_coord_t, self->vx_hdr.vxh_bxmin, self->vx_hdr.vxh_bymin);
-	Tswap(video_coord_t, self->vx_hdr.vxh_bxend, self->vx_hdr.vxh_byend);
+	Tswap(video_offset_t, self->vg_clip.vgc_cxoff, self->vg_clip.vgc_cyoff);
+	Tswap(video_dim_t, self->vg_clip.vgc_cxdim, self->vg_clip.vgc_cydim);
+	Tswap(video_coord_t, self->vg_clip.vgc_bxmin, self->vg_clip.vgc_bymin);
+	Tswap(video_coord_t, self->vg_clip.vgc_bxend, self->vg_clip.vgc_byend);
 #undef Tswap
 	/* Swap axis-specific flags */
-	self->vx_surf.vs_flags = _VIDEO_GFX_F_XYSWAP_FLAGS(video_gfx_getflags(self));
+	self->vg_surf.vs_flags = _VIDEO_GFX_F_XYSWAP_FLAGS(video_gfx_getflags(self));
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_xyswap, libvideo_gfx_xyswap);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
 	_libvideo_gfx_xyswap(self);
-	self->vx_surf.vs_flags ^= VIDEO_GFX_F_XYSWAP;
+	self->vg_surf.vs_flags ^= VIDEO_GFX_F_XYSWAP;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_hmirror, libvideo_gfx_hmirror);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_hmirror(struct video_gfx *__restrict self) {
-	self->vx_surf.vs_flags ^= VIDEO_GFX_F_XMIRROR;
+	self->vg_surf.vs_flags ^= VIDEO_GFX_F_XMIRROR;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_vmirror, libvideo_gfx_vmirror);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_vmirror(struct video_gfx *__restrict self) {
-	self->vx_surf.vs_flags ^= VIDEO_GFX_F_YMIRROR;
+	self->vg_surf.vs_flags ^= VIDEO_GFX_F_YMIRROR;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
@@ -345,7 +345,7 @@ DEFINE_PUBLIC_ALIAS(video_gfx_lrot90, libvideo_gfx_lrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_lrot90(struct video_gfx *__restrict self) {
 	_libvideo_gfx_xyswap(self);
-	self->vx_surf.vs_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
+	self->vg_surf.vs_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
@@ -362,7 +362,7 @@ libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
 	 *
 	 * Since mirroring always happens before X/Y-swap, and
 	 * since  `_libvideo_gfx_xyswap'  already made  it so:
-	 * >> `self->vx_hdr.vxh_cxdim = video_buffer_getydim(video_gfx_getbuffer(self))-1'
+	 * >> `self->vg_clip.vgc_cxdim = video_buffer_getydim(video_gfx_getbuffer(self))-1'
 	 * (assuming no custom clip rect), we have to toggle the
 	 * XMIRROR flag here (since mirror happens before X/Y swapping)
 	 *
@@ -389,14 +389,14 @@ libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
 	 *      the BOTTOM LEFT (even though your old origin is now in
 	 *      the top left). */
 	_libvideo_gfx_xyswap(self);
-	self->vx_surf.vs_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
+	self->vg_surf.vs_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_rot180, libvideo_gfx_rot180);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_rot180(struct video_gfx *__restrict self) {
-	self->vx_surf.vs_flags ^= (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR);
+	self->vg_surf.vs_flags ^= (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 

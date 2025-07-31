@@ -116,8 +116,8 @@ INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
 libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	struct video_gfx const *src_gfx = ctx->vbt_src;
 	struct video_gfx const *dst_gfx = ctx->vbt_dst;
-	struct video_buffer const *src_buffer = src_gfx->vx_surf.vs_buffer;
-	struct video_buffer const *dst_buffer = dst_gfx->vx_surf.vs_buffer;
+	struct video_buffer const *src_buffer = src_gfx->vg_surf.vs_buffer;
+	struct video_buffer const *dst_buffer = dst_gfx->vg_surf.vs_buffer;
 	struct blt_swdrv *drv = video_swblitter_getdrv(ctx);
 	video_swblitter_setops(ctx);
 
@@ -226,8 +226,8 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 	    video_gfx_getxdim(rddst_gfx) == 0 || video_gfx_getydim(rddst_gfx) == 0) {
 		ctx->vbt3_ops = &libvideo_emptyblitter3_ops;
 	} else {
-		drv->bsw3_blendmode = rddst_gfx->vx_blend;
-		switch (__builtin_expect(GFX_BLENDMODE_GET_MODE(rddst_gfx->vx_blend),
+		drv->bsw3_blendmode = rddst_gfx->vg_blend;
+		switch (__builtin_expect(GFX_BLENDMODE_GET_MODE(rddst_gfx->vg_blend),
 		                         GFX_BLENDMODE_ALPHA)) {
 #define LINK_libvideo_swblt_generic__blend_FOO(name, mode)        \
 		case mode:                                                \
@@ -263,8 +263,8 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 				drv->bsw3_stretch         = &libvideo_swblitter3__stretch__blend1_n;
 				drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__blend1_n;
 			}
-		} else if (GFX_BLENDMODE_GET_MODE(wrdst_gfx->vx_blend) == GFX_BLENDMODE_ALPHA &&
-		           GFX_BLENDMODE_GET_MODE(rddst_gfx->vx_blend) == GFX_BLENDMODE_ALPHAMASK &&
+		} else if (GFX_BLENDMODE_GET_MODE(wrdst_gfx->vg_blend) == GFX_BLENDMODE_ALPHA &&
+		           GFX_BLENDMODE_GET_MODE(rddst_gfx->vg_blend) == GFX_BLENDMODE_ALPHAMASK &&
 		           video_gfx_getcodec(rddst_gfx)->vc_codec == VIDEO_CODEC_A1_MSB) {
 			/* Special optimization for bitmasked alpha-blending.
 			 * In this mode, only pixels masked by the given bitmask get blended

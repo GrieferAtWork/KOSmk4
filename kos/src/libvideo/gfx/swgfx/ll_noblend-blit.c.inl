@@ -145,7 +145,7 @@ libvideo_swblitter_noblend_samefmt__blit(struct video_blitter const *__restrict 
                                          video_coord_t src_x, video_coord_t src_y,
                                          video_dim_t size_x, video_dim_t size_y) {
 	struct video_regionlock dst_lock;
-	struct video_buffer *dst_buffer = self->vbt_dst->vx_surf.vs_buffer;
+	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("noblend_samefmt__blit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -153,7 +153,7 @@ libvideo_swblitter_noblend_samefmt__blit(struct video_blitter const *__restrict 
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x, dst_y, size_x, size_y)) {
 		struct video_regionlock src_lock;
-		struct video_buffer *src_buffer = self->vbt_src->vx_surf.vs_buffer;
+		struct video_buffer *src_buffer = self->vbt_src->vg_surf.vs_buffer;
 		if likely(LL_rlockregion(src_buffer, &src_lock, src_x, src_y, size_x, size_y)) {
 			video_codec_rectcopy_t vc_rectcopy = video_buffer_getcodec(dst_buffer)->vc_rectcopy;
 			(*vc_rectcopy)(dst_lock.vrl_lock.vl_data, dst_lock.vrl_xbas, dst_lock.vrl_lock.vl_stride,
@@ -232,7 +232,7 @@ libvideo_swblitter_noblend_samefmt__stretch_n(struct video_blitter const *__rest
                                               video_coord_t src_x_, video_coord_t src_y_,
                                               video_dim_t src_size_x_, video_dim_t src_size_y_) {
 	struct video_regionlock dst_lock;
-	struct video_buffer *dst_buffer = self->vbt_dst->vx_surf.vs_buffer;
+	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_samefmt__stretch_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
@@ -240,7 +240,7 @@ libvideo_swblitter_noblend_samefmt__stretch_n(struct video_blitter const *__rest
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
 		struct video_regionlock src_lock;
-		struct video_buffer *src_buffer = self->vbt_src->vx_surf.vs_buffer;
+		struct video_buffer *src_buffer = self->vbt_src->vg_surf.vs_buffer;
 		if likely(LL_rlockregion(src_buffer, &src_lock, src_x_, src_y_, src_size_x_, src_size_y_)) {
 			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
 			video_codec_getpixel_t vc_getpixel = video_buffer_getcodec(src_buffer)->vc_getpixel;
@@ -281,7 +281,7 @@ libvideo_swblitter_noblend_samefmt__stretch_imatrix_n(struct video_blitter const
                                                       video_dim_t src_size_x_, video_dim_t src_size_y_,
                                                       video_imatrix2d_t src_matrix) {
 	struct video_regionlock dst_lock;
-	struct video_buffer *dst_buffer = self->vbt_dst->vx_surf.vs_buffer;
+	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_samefmt__stretch_imatrix_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
@@ -289,7 +289,7 @@ libvideo_swblitter_noblend_samefmt__stretch_imatrix_n(struct video_blitter const
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
 		struct video_regionlock src_lock;
-		struct video_buffer *src_buffer = self->vbt_src->vx_surf.vs_buffer;
+		struct video_buffer *src_buffer = self->vbt_src->vg_surf.vs_buffer;
 		// FIXME: THIS IS BROKEN
 		if likely(LL_rlockregion(src_buffer, &src_lock, src_x_, src_y_, src_size_x_, src_size_y_)) {
 			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
@@ -399,7 +399,7 @@ libvideo_swblitter_noblend_samebuf__blit(struct video_blitter const *__restrict 
                                          video_coord_t src_x, video_coord_t src_y,
                                          video_dim_t size_x, video_dim_t size_y) {
 	struct video_regionlock lock;
-	struct video_buffer *dst_buffer = self->vbt_dst->vx_surf.vs_buffer;
+	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	video_coord_t lox = dst_x;
 	video_coord_t loy = dst_y;
 	video_dim_t lox_size = size_x;
@@ -532,7 +532,7 @@ libvideo_swblitter_noblend_difffmt__blit(struct video_blitter const *__restrict 
                                          video_coord_t src_x, video_coord_t src_y,
                                          video_dim_t size_x, video_dim_t size_y) {
 	struct video_regionlock dst_lock;
-	struct video_buffer *dst_buffer = self->vbt_dst->vx_surf.vs_buffer;
+	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("noblend_difffmt__blit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -541,7 +541,7 @@ libvideo_swblitter_noblend_difffmt__blit(struct video_blitter const *__restrict 
 
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x, dst_y, size_x, size_y)) {
 		struct video_regionlock src_lock;
-		struct video_buffer *src_buffer = self->vbt_src->vx_surf.vs_buffer;
+		struct video_buffer *src_buffer = self->vbt_src->vg_surf.vs_buffer;
 		if likely(LL_rlockregion(src_buffer, &src_lock, src_x, src_y, size_x, size_y)) {
 			struct video_converter const *conv = libvideo_swblitter_generic__cconv(self);
 			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
@@ -636,7 +636,7 @@ libvideo_swblitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__r
                                                  video_dim_t size_x_, video_dim_t size_y_,
                                                  video_imatrix2d_t src_matrix) {
 	struct video_regionlock dst_lock;
-	struct video_buffer *dst_buffer = self->vbt_dst->vx_surf.vs_buffer;
+	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	gfx_assert_imatrix2d(&src_matrix);
 
 	/* Fast-pass for known matrices */
@@ -657,7 +657,7 @@ libvideo_swblitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__r
 	            (int)video_imatrix2d_get(&src_matrix, 1, 1));
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, size_x_, size_y_)) {
 		struct video_regionlock src_lock;
-		struct video_buffer *src_buffer = self->vbt_src->vx_surf.vs_buffer;
+		struct video_buffer *src_buffer = self->vbt_src->vg_surf.vs_buffer;
 		video_coord_t base_src_x = gfx_region_imatrix_getxmin(src_x_, src_y_, size_x_, size_y_, src_matrix);
 		video_coord_t base_src_y = gfx_region_imatrix_getymin(src_x_, src_y_, size_x_, size_y_, src_matrix);
 		video_coord_t base_src_x_size = gfx_region_imatrix_getxdim(size_x_, size_y_, src_matrix);
@@ -707,7 +707,7 @@ libvideo_swblitter_noblend_difffmt__stretch_n(struct video_blitter const *__rest
                                               video_coord_t src_x_, video_coord_t src_y_,
                                               video_dim_t src_size_x_, video_dim_t src_size_y_) {
 	struct video_regionlock dst_lock;
-	struct video_buffer *dst_buffer = self->vbt_dst->vx_surf.vs_buffer;
+	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_difffmt__stretch_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
@@ -715,7 +715,7 @@ libvideo_swblitter_noblend_difffmt__stretch_n(struct video_blitter const *__rest
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
 		struct video_regionlock src_lock;
-		struct video_buffer *src_buffer = self->vbt_src->vx_surf.vs_buffer;
+		struct video_buffer *src_buffer = self->vbt_src->vg_surf.vs_buffer;
 		if likely(LL_rlockregion(src_buffer, &src_lock, src_x_, src_y_, src_size_x_, src_size_y_)) {
 			struct video_converter const *conv = libvideo_swblitter_generic__cconv(self);
 			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
@@ -758,7 +758,7 @@ libvideo_swblitter_noblend_difffmt__stretch_imatrix_n(struct video_blitter const
                                                       video_dim_t src_size_x_, video_dim_t src_size_y_,
                                                       video_imatrix2d_t src_matrix) {
 	struct video_regionlock dst_lock;
-	struct video_buffer *dst_buffer = self->vbt_dst->vx_surf.vs_buffer;
+	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_difffmt__stretch_imatrix_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
@@ -766,7 +766,7 @@ libvideo_swblitter_noblend_difffmt__stretch_imatrix_n(struct video_blitter const
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
 		struct video_regionlock src_lock;
-		struct video_buffer *src_buffer = self->vbt_src->vx_surf.vs_buffer;
+		struct video_buffer *src_buffer = self->vbt_src->vg_surf.vs_buffer;
 		video_coord_t base_src_x = gfx_region_imatrix_getxmin(src_x_, src_y_, src_size_x_, src_size_y_, src_matrix);
 		video_coord_t base_src_y = gfx_region_imatrix_getymin(src_x_, src_y_, src_size_x_, src_size_y_, src_matrix);
 		video_coord_t base_src_x_size = gfx_region_imatrix_getxdim(src_size_x_, src_size_y_, src_matrix);

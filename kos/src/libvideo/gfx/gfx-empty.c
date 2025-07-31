@@ -67,14 +67,14 @@ INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
 libvideo_emptygfx_clip(struct video_gfx *__restrict self,
                        video_offset_t clip_x, video_offset_t clip_y,
                        video_dim_t size_x, video_dim_t size_y) {
-	self->vx_hdr.vxh_cxoff += clip_x;
-	self->vx_hdr.vxh_cyoff += clip_y;
+	self->vg_clip.vgc_cxoff += clip_x;
+	self->vg_clip.vgc_cyoff += clip_y;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
-		self->vx_hdr.vxh_cxoff -= 2 * clip_x;
+		self->vg_clip.vgc_cxoff -= 2 * clip_x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
-		self->vx_hdr.vxh_cyoff -= 2 * clip_y;
-	self->vx_hdr.vxh_cxdim = size_x;
-	self->vx_hdr.vxh_cydim = size_y;
+		self->vg_clip.vgc_cyoff -= 2 * clip_y;
+	self->vg_clip.vgc_cxdim = size_x;
+	self->vg_clip.vgc_cydim = size_y;
 	return self;
 }
 
@@ -291,7 +291,7 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_emp
 /* Empty video buffer. */
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_emptybuffer_initgfx(struct video_gfx *__restrict self) {
-	self->vx_hdr.vxh_ops = &libvideo_emptygfx_ops;
+	self->vg_clip.vgc_ops = &libvideo_emptygfx_ops;
 	return self;
 }
 

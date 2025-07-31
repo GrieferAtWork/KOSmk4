@@ -705,14 +705,14 @@ NOTHROW(FCC lockable_buffer_subregion__unlockregion)(struct video_buffer *__rest
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 lockable_buffer__initgfx(struct video_gfx *__restrict self) {
 	struct lockable_buffer *me = (struct lockable_buffer *)video_gfx_getbuffer(self);
-	return (*(self->vx_surf.vs_buffer = me->lb_base)->vb_ops->vi_initgfx)(self);
+	return (*(self->vg_surf.vs_buffer = me->lb_base)->vb_ops->vi_initgfx)(self);
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 lockable_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
 	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)video_gfx_getbuffer(self);
 	video_dim_t xdim, ydim;
-	self = (*(self->vx_surf.vs_buffer = me->lb_base)->vb_ops->vi_initgfx)(self);
+	self = (*(self->vg_surf.vs_buffer = me->lb_base)->vb_ops->vi_initgfx)(self);
 	xdim = video_buffer_getxdim(me);
 	ydim = video_buffer_getydim(me);
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP) {

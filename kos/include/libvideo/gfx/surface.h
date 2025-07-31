@@ -451,8 +451,8 @@ video_buffer_convert_distinct(struct video_buffer *__restrict __self,
 #endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 
 #define video_surface_getgfx(self, result, blendmode) \
-	((result)->vx_blend = (blendmode),                \
-	 (*((result)->vx_surf = *(self)).vs_buffer->vb_ops->vi_initgfx)(result))
+	((result)->vg_blend = (blendmode),                \
+	 (*((result)->vg_surf = *(self)).vs_buffer->vb_ops->vi_initgfx)(result))
 #define _video_surface_subregion_distinct(self, buffer_rect) \
 	(*video_surface_getbuffer(self)->vb_ops->vi_subregion)(self, buffer_rect)
 #define _video_surface_subregion(self, buffer_rect)                   \

@@ -98,9 +98,9 @@ rambuffer__initgfx_common(struct video_gfx *__restrict self) {
 	drv->xsw_getcolor = &ramgfx__getcolor;
 
 	/* Detect special blend modes. */
-	(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vx_blend), GFX_BLENDMODE_OVERRIDE);
-	(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vx_blend), GFX_BLENDMODE_ALPHA);
-	switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
+	(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vg_blend), GFX_BLENDMODE_OVERRIDE);
+	(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vg_blend), GFX_BLENDMODE_ALPHA);
+	switch (GFX_BLENDMODE_GET_MODE(self->vg_blend)) {
 	case GFX_BLENDMODE_OVERRIDE:
 		drv->xsw_putcolor = &ramgfx__putcolor_noblend;
 		break;
@@ -108,7 +108,7 @@ rambuffer__initgfx_common(struct video_gfx *__restrict self) {
 	GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(LINK_LOCAL_ramgfx__putcolor_FOO)
 	default: drv->xsw_putcolor = &ramgfx__putcolor; break;
 	}
-	switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
+	switch (GFX_BLENDMODE_GET_MODE(self->vg_blend)) {
 	GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_LOCAL_ramgfx__putcolor_preblend_FOO)
 	default: drv->xsw_putcolor_p = drv->xsw_putcolor; break;
 	}
@@ -152,9 +152,9 @@ rambuffer__updategfx(struct video_gfx *__restrict self, unsigned int what) {
 
 	/* Detect special blend modes. */
 	if (what & VIDEO_GFX_UPDATE_BLEND) {
-		(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vx_blend), GFX_BLENDMODE_OVERRIDE);
-		(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vx_blend), GFX_BLENDMODE_ALPHA);
-		switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
+		(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vg_blend), GFX_BLENDMODE_OVERRIDE);
+		(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vg_blend), GFX_BLENDMODE_ALPHA);
+		switch (GFX_BLENDMODE_GET_MODE(self->vg_blend)) {
 		case GFX_BLENDMODE_OVERRIDE:
 			drv->xsw_putcolor = &ramgfx__putcolor_noblend;
 			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
@@ -165,7 +165,7 @@ rambuffer__updategfx(struct video_gfx *__restrict self, unsigned int what) {
 		GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(LINK_LOCAL_ramgfx__putcolor_FOO)
 		default: drv->xsw_putcolor = &ramgfx__putcolor; break;
 		}
-		switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
+		switch (GFX_BLENDMODE_GET_MODE(self->vg_blend)) {
 		GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_LOCAL_ramgfx__putcolor_preblend_FOO)
 		default: drv->xsw_putcolor_p = drv->xsw_putcolor; break;
 		}
@@ -179,25 +179,25 @@ rambuffer__updategfx(struct video_gfx *__restrict self, unsigned int what) {
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 rambuffer_subregion__initgfx(struct video_gfx *__restrict self) {
 	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)video_gfx_getbuffer(self);
-	self->vx_surf.vs_buffer = me->rbs_base;
+	self->vg_surf.vs_buffer = me->rbs_base;
 	if unlikely(video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP) {
-		self->vx_hdr.vxh_cxoff = me->rbs_yoff;
-		self->vx_hdr.vxh_cyoff = me->rbs_xoff;
-		self->vx_hdr.vxh_cxdim = video_buffer_getydim(me);
-		self->vx_hdr.vxh_cydim = video_buffer_getxdim(me);
-		self->vx_hdr.vxh_bxmin = me->rbs_yoff;
-		self->vx_hdr.vxh_bymin = me->rbs_xoff;
-		self->vx_hdr.vxh_bxend = me->rbs_yend;
-		self->vx_hdr.vxh_byend = me->rbs_xend;
+		self->vg_clip.vgc_cxoff = me->rbs_yoff;
+		self->vg_clip.vgc_cyoff = me->rbs_xoff;
+		self->vg_clip.vgc_cxdim = video_buffer_getydim(me);
+		self->vg_clip.vgc_cydim = video_buffer_getxdim(me);
+		self->vg_clip.vgc_bxmin = me->rbs_yoff;
+		self->vg_clip.vgc_bymin = me->rbs_xoff;
+		self->vg_clip.vgc_bxend = me->rbs_yend;
+		self->vg_clip.vgc_byend = me->rbs_xend;
 	} else {
-		self->vx_hdr.vxh_cxoff = me->rbs_xoff;
-		self->vx_hdr.vxh_cyoff = me->rbs_yoff;
-		self->vx_hdr.vxh_cxdim = video_buffer_getxdim(me);
-		self->vx_hdr.vxh_cydim = video_buffer_getydim(me);
-		self->vx_hdr.vxh_bxmin = me->rbs_xoff;
-		self->vx_hdr.vxh_bymin = me->rbs_yoff;
-		self->vx_hdr.vxh_bxend = me->rbs_xend;
-		self->vx_hdr.vxh_byend = me->rbs_yend;
+		self->vg_clip.vgc_cxoff = me->rbs_xoff;
+		self->vg_clip.vgc_cyoff = me->rbs_yoff;
+		self->vg_clip.vgc_cxdim = video_buffer_getxdim(me);
+		self->vg_clip.vgc_cydim = video_buffer_getydim(me);
+		self->vg_clip.vgc_bxmin = me->rbs_xoff;
+		self->vg_clip.vgc_bymin = me->rbs_yoff;
+		self->vg_clip.vgc_bxend = me->rbs_xend;
+		self->vg_clip.vgc_byend = me->rbs_yend;
 	}
 	return rambuffer__initgfx_common(self);
 }
@@ -223,7 +223,7 @@ ramgfx__putcolor(struct video_gfx const *__restrict self,
 	byte_t *line = RAMGFX_LINE(y);
 	video_pixel_t op = (*RAMGFX_CODEC->vc_getpixel)(line, x);
 	video_color_t oc = (*RAMGFX_CODEC->vc_pixel2color)(video_gfx_assurface(self), op);
-	video_color_t nc = gfx_blendcolors(oc, color, self->vx_blend);
+	video_color_t nc = gfx_blendcolors(oc, color, self->vg_blend);
 	video_pixel_t np = (*RAMGFX_CODEC->vc_color2pixel)(video_gfx_assurface(self), nc);
 	(*RAMGFX_CODEC->vc_setpixel)(line, x, np);
 }
@@ -256,7 +256,7 @@ GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_ramgfx__putcolor_FOO)
 		byte_t *line     = RAMGFX_LINE(y);                                                 \
 		video_pixel_t op = (*RAMGFX_CODEC->vc_getpixel)(line, x);                          \
 		video_color_t oc = (*RAMGFX_CODEC->vc_pixel2color)(video_gfx_assurface(self), op); \
-		video_color_t cc = GFX_BLENDMODE_GET_COLOR(self->vx_blend);                        \
+		video_color_t cc = GFX_BLENDMODE_GET_COLOR(self->vg_blend);                        \
 		video_color_t nc = gfx_blendcolors_constant(oc, color, mode, cc);                  \
 		video_pixel_t np = (*RAMGFX_CODEC->vc_color2pixel)(video_gfx_assurface(self), nc); \
 		(*RAMGFX_CODEC->vc_setpixel)(line, x, np);                                         \

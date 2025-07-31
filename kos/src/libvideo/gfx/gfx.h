@@ -114,14 +114,14 @@ libvideo_gfx_wlockio(struct video_gfx const *__restrict self,
 LOCAL ATTR_INOUT(1) void CC
 libvideo_gfx_init_fullclip(struct video_gfx *__restrict self) {
 	struct video_buffer const *buffer = video_gfx_getbuffer(self);
-	self->vx_hdr.vxh_bxmin = self->vx_hdr.vxh_cxoff = 0;
-	self->vx_hdr.vxh_bymin = self->vx_hdr.vxh_cyoff = 0;
+	self->vg_clip.vgc_bxmin = self->vg_clip.vgc_cxoff = 0;
+	self->vg_clip.vgc_bymin = self->vg_clip.vgc_cyoff = 0;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XYSWAP) {
-		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxdim = video_buffer_getydim(buffer);
-		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cydim = video_buffer_getxdim(buffer);
+		self->vg_clip.vgc_bxend = self->vg_clip.vgc_cxdim = video_buffer_getydim(buffer);
+		self->vg_clip.vgc_byend = self->vg_clip.vgc_cydim = video_buffer_getxdim(buffer);
 	} else {
-		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxdim = video_buffer_getxdim(buffer);
-		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cydim = video_buffer_getydim(buffer);
+		self->vg_clip.vgc_bxend = self->vg_clip.vgc_cxdim = video_buffer_getxdim(buffer);
+		self->vg_clip.vgc_byend = self->vg_clip.vgc_cydim = video_buffer_getydim(buffer);
 	}
 }
 

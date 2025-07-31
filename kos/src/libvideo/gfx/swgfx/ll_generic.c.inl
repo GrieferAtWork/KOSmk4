@@ -74,7 +74,7 @@ libvideo_swgfx_generic__putcolor(struct video_gfx const *__restrict self,
 	struct video_surface const *surface = video_gfx_assurface(self);
 	video_pixel_t op = LL_getpixel(self, x, y);
 	video_color_t oc = video_surface_pixel2color(surface, op);
-	video_color_t nc = gfx_blendcolors(oc, color, self->vx_blend);
+	video_color_t nc = gfx_blendcolors(oc, color, self->vg_blend);
 	video_pixel_t np = video_surface_color2pixel(surface, nc);
 	LL_setpixel(self, x, y, np);
 }
@@ -112,7 +112,7 @@ GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_swgfx_generic__putcolor_FOO)
 		struct video_surface const *surface = video_gfx_assurface(self);            \
 		video_pixel_t op = LL_getpixel(self, x, y);                                  \
 		video_color_t oc = video_surface_pixel2color(surface, op);                   \
-		video_color_t cc = GFX_BLENDMODE_GET_COLOR(self->vx_blend);                  \
+		video_color_t cc = GFX_BLENDMODE_GET_COLOR(self->vg_blend);                  \
 		video_color_t nc = gfx_blendcolors_constant(oc, color, mode, cc);            \
 		video_pixel_t np = video_surface_color2pixel(surface, nc);                   \
 		LL_setpixel(self, x, y, np);                                                 \
@@ -557,10 +557,10 @@ libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 	                                              video_coord_t dst_x, video_coord_t dst_y,              \
 	                                              video_dim_t size_x, video_dim_t size_y,                \
 	                                              video_color_t color) {                                 \
-		color = preblend(self->vx_blend, color);                                                         \
-		if (preblend##_mayignore(self->vx_blend, color))                                                 \
+		color = preblend(self->vg_blend, color);                                                         \
+		if (preblend##_mayignore(self->vg_blend, color))                                                 \
 			return;                                                                                      \
-		if (preblend##_maynblend(self->vx_blend, color)) {                                               \
+		if (preblend##_maynblend(self->vg_blend, color)) {                                               \
 			libvideo_swgfx_noblend__absline_llhh(self, dst_x, dst_y, size_x, size_y, color);             \
 		} else {                                                                                         \
 			libvideo_swgfx_generic__absline_llhh(self, dst_x, dst_y, size_x, size_y, color);             \
@@ -571,10 +571,10 @@ libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 	                                              video_coord_t dst_x, video_coord_t dst_y,              \
 	                                              video_dim_t size_x, video_dim_t size_y,                \
 	                                              video_color_t color) {                                 \
-		color = preblend(self->vx_blend, color);                                                         \
-		if (preblend##_mayignore(self->vx_blend, color))                                                 \
+		color = preblend(self->vg_blend, color);                                                         \
+		if (preblend##_mayignore(self->vg_blend, color))                                                 \
 			return;                                                                                      \
-		if (preblend##_maynblend(self->vx_blend, color)) {                                               \
+		if (preblend##_maynblend(self->vg_blend, color)) {                                               \
 			libvideo_swgfx_noblend__absline_lhhl(self, dst_x, dst_y, size_x, size_y, color);             \
 		} else {                                                                                         \
 			libvideo_swgfx_generic__absline_lhhl(self, dst_x, dst_y, size_x, size_y, color);             \
@@ -585,8 +585,8 @@ libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 	                                                video_coord_t dst_x, video_coord_t dst_y,            \
 	                                                video_dim_t size_x, video_dim_t size_y,              \
 	                                                video_color_t color) {                               \
-		color = preblend(self->vx_blend, color);                                                         \
-		if (preblend##_mayignore(self->vx_blend, color))                                                 \
+		color = preblend(self->vg_blend, color);                                                         \
+		if (preblend##_mayignore(self->vg_blend, color))                                                 \
 			return;                                                                                      \
 		libvideo_swgfx_generic__absline_llhh_l(self, dst_x, dst_y, size_x, size_y, color);               \
 	}                                                                                                    \
@@ -595,8 +595,8 @@ libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 	                                                video_coord_t dst_x, video_coord_t dst_y,            \
 	                                                video_dim_t size_x, video_dim_t size_y,              \
 	                                                video_color_t color) {                               \
-		color = preblend(self->vx_blend, color);                                                         \
-		if (preblend##_mayignore(self->vx_blend, color))                                                 \
+		color = preblend(self->vg_blend, color);                                                         \
+		if (preblend##_mayignore(self->vg_blend, color))                                                 \
 			return;                                                                                      \
 		libvideo_swgfx_generic__absline_lhhl_l(self, dst_x, dst_y, size_x, size_y, color);               \
 	}                                                                                                    \
@@ -604,10 +604,10 @@ libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 	libvideo_swgfx_preblend__absline_h__##name(struct video_gfx const *__restrict self,                  \
 	                                           video_coord_t dst_x, video_coord_t dst_y,                 \
 	                                           video_dim_t length, video_color_t color) {                \
-		color = preblend(self->vx_blend, color);                                                         \
-		if (preblend##_mayignore(self->vx_blend, color))                                                 \
+		color = preblend(self->vg_blend, color);                                                         \
+		if (preblend##_mayignore(self->vg_blend, color))                                                 \
 			return;                                                                                      \
-		if (preblend##_maynblend(self->vx_blend, color)) {                                               \
+		if (preblend##_maynblend(self->vg_blend, color)) {                                               \
 			libvideo_swgfx_noblend__absline_h(self, dst_x, dst_y, length, color);                        \
 		} else {                                                                                         \
 			libvideo_swgfx_generic__absline_h(self, dst_x, dst_y, length, color);                        \
@@ -617,10 +617,10 @@ libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 	libvideo_swgfx_preblend__absline_v__##name(struct video_gfx const *__restrict self,                  \
 	                                           video_coord_t dst_x, video_coord_t dst_y,                 \
 	                                           video_dim_t length, video_color_t color) {                \
-		color = preblend(self->vx_blend, color);                                                         \
-		if (preblend##_mayignore(self->vx_blend, color))                                                 \
+		color = preblend(self->vg_blend, color);                                                         \
+		if (preblend##_mayignore(self->vg_blend, color))                                                 \
 			return;                                                                                      \
-		if (preblend##_maynblend(self->vx_blend, color)) {                                               \
+		if (preblend##_maynblend(self->vg_blend, color)) {                                               \
 			libvideo_swgfx_noblend__absline_v(self, dst_x, dst_y, length, color);                        \
 		} else {                                                                                         \
 			libvideo_swgfx_generic__absline_v(self, dst_x, dst_y, length, color);                        \
@@ -631,10 +631,10 @@ libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 	                                         video_coord_t dst_x, video_coord_t dst_y,                   \
 	                                         video_dim_t size_x, video_dim_t size_y,                     \
 	                                         video_color_t color) {                                      \
-		color = preblend(self->vx_blend, color);                                                         \
-		if (preblend##_mayignore(self->vx_blend, color))                                                 \
+		color = preblend(self->vg_blend, color);                                                         \
+		if (preblend##_mayignore(self->vg_blend, color))                                                 \
 			return;                                                                                      \
-		if (preblend##_maynblend(self->vx_blend, color)) {                                               \
+		if (preblend##_maynblend(self->vg_blend, color)) {                                               \
 			libvideo_swgfx_noblend__absfill(self, dst_x, dst_y, size_x, size_y, color);                  \
 		} else {                                                                                         \
 			libvideo_swgfx_generic__absfill(self, dst_x, dst_y, size_x, size_y, color);                  \
@@ -646,20 +646,20 @@ libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 	                                             video_dim_t size_x, video_dim_t size_y,                 \
 	                                             video_color_t const colors[2][2]) {                     \
 		video_color_t preblend_colors[2][2];                                                             \
-		preblend_colors[0][0] = preblend(self->vx_blend, colors[0][0]);                                  \
-		preblend_colors[0][1] = preblend(self->vx_blend, colors[0][1]);                                  \
-		preblend_colors[1][0] = preblend(self->vx_blend, colors[1][0]);                                  \
-		preblend_colors[1][1] = preblend(self->vx_blend, colors[1][1]);                                  \
-		if (preblend##_mayignore(self->vx_blend, preblend_colors[0][0]) &&                               \
-		    preblend##_mayignore(self->vx_blend, preblend_colors[0][1]) &&                               \
-		    preblend##_mayignore(self->vx_blend, preblend_colors[1][0]) &&                               \
-		    preblend##_mayignore(self->vx_blend, preblend_colors[1][1]))                                 \
+		preblend_colors[0][0] = preblend(self->vg_blend, colors[0][0]);                                  \
+		preblend_colors[0][1] = preblend(self->vg_blend, colors[0][1]);                                  \
+		preblend_colors[1][0] = preblend(self->vg_blend, colors[1][0]);                                  \
+		preblend_colors[1][1] = preblend(self->vg_blend, colors[1][1]);                                  \
+		if (preblend##_mayignore(self->vg_blend, preblend_colors[0][0]) &&                               \
+		    preblend##_mayignore(self->vg_blend, preblend_colors[0][1]) &&                               \
+		    preblend##_mayignore(self->vg_blend, preblend_colors[1][0]) &&                               \
+		    preblend##_mayignore(self->vg_blend, preblend_colors[1][1]))                                 \
 			return;                                                                                      \
 		if ((video_gfx_getcodec(self)->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) &&              \
-		    preblend##_maynblend(self->vx_blend, preblend_colors[0][0]) &&                               \
-		    preblend##_maynblend(self->vx_blend, preblend_colors[0][1]) &&                               \
-		    preblend##_maynblend(self->vx_blend, preblend_colors[1][0]) &&                               \
-		    preblend##_maynblend(self->vx_blend, preblend_colors[1][1])) {                               \
+		    preblend##_maynblend(self->vg_blend, preblend_colors[0][0]) &&                               \
+		    preblend##_maynblend(self->vg_blend, preblend_colors[0][1]) &&                               \
+		    preblend##_maynblend(self->vg_blend, preblend_colors[1][0]) &&                               \
+		    preblend##_maynblend(self->vg_blend, preblend_colors[1][1])) {                               \
 			libvideo_swgfx_noblend_interp8888__absgradient(self, dst_x, dst_y,                           \
 			                                               size_x, size_y, preblend_colors);             \
 			return;                                                                                      \
@@ -671,14 +671,14 @@ libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 	                                               video_coord_t dst_x, video_coord_t dst_y,             \
 	                                               video_dim_t size_x, video_dim_t size_y,               \
 	                                               video_color_t locolor, video_color_t hicolor) {       \
-		locolor = preblend(self->vx_blend, locolor);                                                     \
-		hicolor = preblend(self->vx_blend, hicolor);                                                     \
-		if (preblend##_mayignore(self->vx_blend, locolor) &&                                             \
-		    preblend##_mayignore(self->vx_blend, hicolor))                                               \
+		locolor = preblend(self->vg_blend, locolor);                                                     \
+		hicolor = preblend(self->vg_blend, hicolor);                                                     \
+		if (preblend##_mayignore(self->vg_blend, locolor) &&                                             \
+		    preblend##_mayignore(self->vg_blend, hicolor))                                               \
 			return;                                                                                      \
 		if ((video_gfx_getcodec(self)->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) &&              \
-		    preblend##_maynblend(self->vx_blend, locolor) &&                                             \
-		    preblend##_maynblend(self->vx_blend, hicolor)) {                                             \
+		    preblend##_maynblend(self->vg_blend, locolor) &&                                             \
+		    preblend##_maynblend(self->vg_blend, hicolor)) {                                             \
 			libvideo_swgfx_noblend_interp8888__absgradient_h(self, dst_x, dst_y, size_x, size_y,         \
 			                                                 locolor, hicolor);                          \
 			return;                                                                                      \
@@ -690,14 +690,14 @@ libvideo_swgfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 	                                               video_coord_t dst_x, video_coord_t dst_y,             \
 	                                               video_dim_t size_x, video_dim_t size_y,               \
 	                                               video_color_t locolor, video_color_t hicolor) {       \
-		locolor = preblend(self->vx_blend, locolor);                                                     \
-		hicolor = preblend(self->vx_blend, hicolor);                                                     \
-		if (preblend##_mayignore(self->vx_blend, locolor) &&                                             \
-		    preblend##_mayignore(self->vx_blend, hicolor))                                               \
+		locolor = preblend(self->vg_blend, locolor);                                                     \
+		hicolor = preblend(self->vg_blend, hicolor);                                                     \
+		if (preblend##_mayignore(self->vg_blend, locolor) &&                                             \
+		    preblend##_mayignore(self->vg_blend, hicolor))                                               \
 			return;                                                                                      \
 		if ((video_gfx_getcodec(self)->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) &&              \
-		    preblend##_maynblend(self->vx_blend, locolor) &&                                             \
-		    preblend##_maynblend(self->vx_blend, hicolor)) {                                             \
+		    preblend##_maynblend(self->vg_blend, locolor) &&                                             \
+		    preblend##_maynblend(self->vg_blend, hicolor)) {                                             \
 			libvideo_swgfx_noblend_interp8888__absgradient_v(self, dst_x, dst_y, size_x, size_y,         \
 			                                                 locolor, hicolor);                          \
 			return;                                                                                      \

@@ -214,7 +214,7 @@ NOTHROW(FCC region_buffer__unlockregion)(struct video_buffer *__restrict self,
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 region_buffer__initgfx(struct video_gfx *__restrict self) {
 	struct region_buffer *me = (struct region_buffer *)video_gfx_getbuffer(self);
-	self = (*(self->vx_surf.vs_buffer = me->rbf_base)->vb_ops->vi_initgfx)(self);
+	self = (*(self->vg_surf.vs_buffer = me->rbf_base)->vb_ops->vi_initgfx)(self);
 	return video_gfx_clip(self, me->rbf_cxoff, me->rbf_cyoff,
 	                      video_buffer_getxdim(me),
 	                      video_buffer_getydim(me));

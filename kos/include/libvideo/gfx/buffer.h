@@ -399,21 +399,21 @@ struct video_buffer_ops {
 
 	/* Initialize a graphics context for use with the linked buffer.
 	 * The caller  of this  operator must  have already  filled  in:
-	 * - __self->vx_surf.vs_buffer  (with the buffer on which this operator is then called)
-	 * - __self->vx_blend
-	 * - __self->vx_surf.vs_flags
-	 * - __self->vx_surf.vs_colorkey
+	 * - __self->vg_surf.vs_buffer  (with the buffer on which this operator is then called)
+	 * - __self->vg_blend
+	 * - __self->vg_surf.vs_flags
+	 * - __self->vg_surf.vs_colorkey
 	 * NOTE: This  operator  is  allowed  to  modify  any/all  of  the  above!
-	 *       e.g. `video_buffer_lockable()' will change `vx_surf.vs_buffer' to
+	 *       e.g. `video_buffer_lockable()' will change `vg_surf.vs_buffer' to
 	 *       the wrapped video buffer.
 	 * @return: * : Always re-returns `__self' */
 	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_gfx *
 	(LIBVIDEO_GFX_FCC *vi_initgfx)(struct video_gfx *__restrict __self);
 
 	/* Update operators of `__self' after certain behavioral flags were changed:
-	 * - VIDEO_GFX_UPDATE_BLEND:    `__self->vx_blend' may have changed
-	 * - VIDEO_GFX_UPDATE_FLAGS:    `__self->vx_surf.vs_flags' may have changed
-	 * - VIDEO_GFX_UPDATE_COLORKEY: `__self->vx_surf.vs_colorkey' may have changed
+	 * - VIDEO_GFX_UPDATE_BLEND:    `__self->vg_blend' may have changed
+	 * - VIDEO_GFX_UPDATE_FLAGS:    `__self->vg_surf.vs_flags' may have changed
+	 * - VIDEO_GFX_UPDATE_COLORKEY: `__self->vg_surf.vs_colorkey' may have changed
 	 * @param: __what: Set of `VIDEO_GFX_UPDATE_*'
 	 *
 	 * CAUTION: Do not use this operator when `__self' may be used by other threads! */
@@ -694,19 +694,19 @@ __NOTHROW(video_buffer_revoke)(struct video_buffer *__restrict __self);
 	       (format)->vbf_flags    = video_buffer_getflags(self),   \
 	       (format)->vbf_colorkey = video_buffer_getcolorkey(self))
 #define video_buffer_getgfx(self, result, blendmode)                 \
-	((result)->vx_surf.vs_pal      = video_buffer_getpalette(self),  \
-	 (result)->vx_surf.vs_buffer   = (self),                         \
-	 (result)->vx_surf.vs_flags    = video_buffer_getflags(self),    \
-	 (result)->vx_surf.vs_colorkey = video_buffer_getcolorkey(self), \
-	 (result)->vx_blend            = (blendmode),                    \
-	 (*((result)->vx_surf.vs_buffer = (self))->vb_ops->vi_initgfx)(result))
+	((result)->vg_surf.vs_pal      = video_buffer_getpalette(self),  \
+	 (result)->vg_surf.vs_buffer   = (self),                         \
+	 (result)->vg_surf.vs_flags    = video_buffer_getflags(self),    \
+	 (result)->vg_surf.vs_colorkey = video_buffer_getcolorkey(self), \
+	 (result)->vg_blend            = (blendmode),                    \
+	 (*((result)->vg_surf.vs_buffer = (self))->vb_ops->vi_initgfx)(result))
 #define video_buffer_getgfx_ex(self, result, blendmode, used_palette, used_flags, used_colorkey) \
-	((result)->vx_surf.vs_pal      = (used_palette),                                             \
-	 (result)->vx_surf.vs_buffer   = (self),                                                     \
-	 (result)->vx_surf.vs_flags    = (used_flags),                                               \
-	 (result)->vx_surf.vs_colorkey = (used_colorkey),                                            \
-	 (result)->vx_blend            = (blendmode),                                                \
-	 (*((result)->vx_surf.vs_buffer = (self))->vb_ops->vi_initgfx)(result))
+	((result)->vg_surf.vs_pal      = (used_palette),                                             \
+	 (result)->vg_surf.vs_buffer   = (self),                                                     \
+	 (result)->vg_surf.vs_flags    = (used_flags),                                               \
+	 (result)->vg_surf.vs_colorkey = (used_colorkey),                                            \
+	 (result)->vg_blend            = (blendmode),                                                \
+	 (*((result)->vg_surf.vs_buffer = (self))->vb_ops->vi_initgfx)(result))
 #define video_buffer_rlock(self, lock) \
 	(*(self)->vb_ops->vi_rlock)(self, lock)
 #define video_buffer_wlock(self, lock) \

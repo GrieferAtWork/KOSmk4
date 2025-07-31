@@ -143,8 +143,8 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_subregion__
 /************************************************************************/
 /* RAMBUFFER GFX OPERATORS                                              */
 /************************************************************************/
-#define video_ramgfx_getdrv(self)  ((struct gfx_ramdrv *)(self)->_vx_driver)
-#define video_ramgfx_getcdrv(self) ((struct gfx_ramdrv const *)(self)->_vx_driver)
+#define video_ramgfx_getdrv(self)  ((struct gfx_ramdrv *)(self)->_vg_driver)
+#define video_ramgfx_getcdrv(self) ((struct gfx_ramdrv const *)(self)->_vg_driver)
 struct gfx_ramdrv: gfx_swdrv {
 	struct video_codec const *grd_codec;  /* [const][== video_gfx_getcodec(:this)] */
 	byte_t                   *grd_data;   /* [const][== ((struct video_rambuffer *)video_gfx_getbuffer(:this))->rb_data] */

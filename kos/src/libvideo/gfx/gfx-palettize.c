@@ -173,9 +173,9 @@ hist_palettize(struct video_gfx const *__restrict self,
 	struct hist *h = (struct hist *)calloc(sizeof(struct hist));
 	if unlikely(!h)
 		return -1;
-	y = self->vx_hdr.vxh_bymin;
+	y = self->vg_clip.vgc_bymin;
 	do {
-		x = self->vx_hdr.vxh_bxmin;
+		x = self->vg_clip.vgc_bxmin;
 		do {
 			struct hist_bin *bin;
 			union color c;
@@ -188,8 +188,8 @@ hist_palettize(struct video_gfx const *__restrict self,
 			bin->hb_rsum += hist_remainder_r(c.r);
 			bin->hb_gsum += hist_remainder_r(c.g);
 			bin->hb_bsum += hist_remainder_r(c.b);
-		} while (++x < self->vx_hdr.vxh_bxend);
-	} while (++y < self->vx_hdr.vxh_byend);
+		} while (++x < self->vg_clip.vgc_bxend);
+	} while (++y < self->vg_clip.vgc_byend);
 
 	/* Finalize histogram (re-add lost color bits).
 	 *
@@ -472,8 +472,8 @@ median_io_gfx(void const *cookie, mc_index_t i) {
 	/* Fallback median-cut I/O callback using direct GFX color reads (slow) */
 	struct video_gfx const *self = (struct video_gfx const *)cookie;
 	video_dim_t io_sx = video_gfx_getioxdim(self);
-	video_coord_t y = self->vx_hdr.vxh_bymin + (i / io_sx);
-	video_coord_t x = self->vx_hdr.vxh_bxmin + (i % io_sx);
+	video_coord_t y = self->vg_clip.vgc_bymin + (i / io_sx);
+	video_coord_t x = self->vg_clip.vgc_bxmin + (i % io_sx);
 	/* TODO: Check that "self" is SW-based */
 	return (*video_swgfx_getcdrv(self)->xsw_getcolor)(self, x, y);
 }
@@ -497,7 +497,7 @@ median_cut_start(struct video_gfx const *__restrict self,
 	    video_gfx_getcodec(self)->vc_codec == VIDEO_CODEC_RGBA8888) {
 		struct video_lock lock;
 		if (video_buffer_rlock(video_gfx_getbuffer(self), &lock) == 0) {
-			if (lock.vl_stride == (self->vx_hdr.vxh_byend * 4)) {
+			if (lock.vl_stride == (self->vg_clip.vgc_byend * 4)) {
 				io.mio_cookie = lock.vl_data;
 				io.mio_getcolor = &median_io_buf;
 				median_cut_start_impl(&io, gfx_indices, io_pixels,
@@ -617,9 +617,9 @@ libvideo_gfx_palettize(struct video_gfx const *__restrict self,
 	/* Check for special case: empty palette / GFX I/O area */
 	if unlikely(!palsize)
 		goto empty_pal;
-	if unlikely(self->vx_hdr.vxh_bxmin >= self->vx_hdr.vxh_bxend)
+	if unlikely(self->vg_clip.vgc_bxmin >= self->vg_clip.vgc_bxend)
 		goto empty_io;
-	if unlikely(self->vx_hdr.vxh_bymin >= self->vx_hdr.vxh_byend)
+	if unlikely(self->vg_clip.vgc_bymin >= self->vg_clip.vgc_byend)
 		goto empty_io;
 
 	switch (method) {
