@@ -513,12 +513,15 @@ mfile_subregion(struct mfile *__restrict self,
 	/* Verify that "maxaddr" does not exceed the size of the underlying file.
 	 * Note how we allow mapping beyond the end by aligning "self" to the nearest page boundary. */
 	self_size = mfile_getsize(self);
-	self_size = CEIL_ALIGN(self_size, PAGESIZE);
-	if (maxaddr >= self_size) {
-		THROW(E_ILLEGAL_OPERATION,
-		      E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE,
-		      (uint32_t)maxaddr, (uint32_t)(maxaddr >> 32),
-		      (uint32_t)self_size, (uint32_t)(self_size >> 32));
+	/* This overflow-check is here for 2^64 files like /dev/mem */
+	if (!OVERFLOW_UADD(self_size, PAGEMASK, &self_size)) {
+		self_size &= ~PAGEMASK;
+		if (maxaddr >= self_size) {
+			THROW(E_ILLEGAL_OPERATION,
+			      E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE,
+			      (uint32_t)maxaddr, (uint32_t)(maxaddr >> 32),
+			      (uint32_t)self_size, (uint32_t)(self_size >> 32));
+		}
 	}
 
 	/* Deal with the case where "self" is another sub-region file. */
