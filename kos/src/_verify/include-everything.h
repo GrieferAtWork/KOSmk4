@@ -1205,6 +1205,7 @@ incdir("");
 #include <libvideo/color.h>
 #include <libvideo/compositor/api.h>
 #include <libvideo/compositor/compositor.h>
+#include <libvideo/compositor/serial.h>
 #include <libvideo/crect.h>
 #include <libvideo/driver/adapter.h>
 #include <libvideo/driver/api.h>
@@ -1214,6 +1215,7 @@ incdir("");
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/blendcolors.h>
 #include <libvideo/gfx/buffer/rambuffer.h>
+#include <libvideo/gfx/buffer/ramfdbuffer.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec-extra.h>
 #include <libvideo/gfx/codec/codec.h>
@@ -1224,6 +1226,7 @@ incdir("");
 #include <libvideo/gfx/fonts/tlft.h>
 #include <libvideo/gfx/gfx-flags.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/serial.h>
 #include <libvideo/gfx/surface-defs.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/rect.h>

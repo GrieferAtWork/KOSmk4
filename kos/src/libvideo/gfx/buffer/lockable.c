@@ -27,9 +27,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/sched/atomic-lock.h>
-#include <hybrid/sequence/list.h>
-
 #include <kos/anno.h>
 #include <kos/types.h>
 
@@ -43,6 +40,7 @@
 #include <libvideo/crect.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/buffer/rambuffer.h>
 #include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/surface.h>
@@ -51,7 +49,6 @@
 #include "../buffer.h"
 #include "../ramdomain.h"
 #include "lockable.h"
-#include "utils.h"
 
 DECL_BEGIN
 
@@ -151,8 +148,8 @@ lockable_buffer__subregion_impl(struct video_surface const *__restrict surface,
 	result->lb_stride = self->lb_stride;
 	result->lb_data += base_yoff * result->lb_stride;
 	result->lb_data += base_yoff * result->lb_stride;
-	video_codec_xcoord_to_offset(video_buffer_getcodec(result), base_xoff,
-	                             &result->lbsb_bxoff, &result->lbsb_bxrem);
+	result->lbsb_bxrem = base_xoff;
+	result->lbsb_bxoff = (*video_buffer_getcodec(result)->vc_coord2bytes)(&result->lbsb_bxrem);
 	result->lbsb_xoff     = base_xoff;
 	result->lbsb_yoff     = base_yoff;
 	result->lbsb_lockable = self;

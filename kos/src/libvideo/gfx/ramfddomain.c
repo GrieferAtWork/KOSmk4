@@ -58,7 +58,6 @@
 #include <libvideo/types.h>
 
 #include "buffer.h"
-#include "buffer/utils.h"
 #include "codec/palette.h"
 #include "gfx-empty.h"
 #include "ramdomain.h"
@@ -192,8 +191,8 @@ ramfdbuffer__subregion(struct video_surface const *__restrict self,
 	size_t aligned_region_offset, aligned_region_size;
 	size_t aligned_region_boff;
 	video_buffer_assert_rect(me, rect);
-	video_codec_xcoord_to_offset(codec, video_crect_getxmin(rect),
-	                             &region_offset, &xrem);
+	xrem = video_crect_getxmin(rect);
+	region_offset = (*codec->vc_coord2bytes)(&xrem);
 	(*codec->vc_rambuffer_requirements)(video_crect_getxdim(rect) + xrem,
 	                                    video_crect_getydim(rect), &req);
 	region_offset += (uintptr_t)me->rb_data & pm;

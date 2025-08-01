@@ -46,10 +46,10 @@
 #include <libvideo/types.h>
 
 #include "../buffer.h"
+#include "../gfx-debug.h"
 #include "../gfx-empty.h"
 #include "../ramdomain.h"
 #include "region.h"
-#include "../gfx-debug.h"
 
 DECL_BEGIN
 

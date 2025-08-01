@@ -71,11 +71,18 @@ x_vbe16_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) 
 	line[3] = (line[3] & ~mask) | (mask * ((pixel >> 3) & 1));
 }
 
-PRIVATE NONNULL((3)) void FCC
-x_vbe16_requirements(video_dim_t size_x, video_dim_t size_y,
-                     struct video_rambuffer_requirements *__restrict result) {
+PRIVATE NONNULL((3)) void
+NOTHROW(FCC x_vbe16_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                  struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = CEIL_ALIGN(size_x, 4) / 2;
 	result->vbs_bufsize = size_y * result->vbs_stride;
+}
+
+INTDEF WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC x_vbe16_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = ((*p_coord >> 3) << 2);
+	*p_coord = (*p_coord & 7);
+	return result;
 }
 
 DEFINE_GENERIC_linefill__with__setpixel(x_vbe16_linefill, x_vbe16_setpixel)
@@ -115,7 +122,7 @@ libvideo_codec_lookup_extra(video_codec_t codec) {
 		                   /* vcs_gmask */ 0,  /* ... */
 		                   /* vcs_bmask */ 0,  /* ... */
 		                   /* vcs_amask */ 0), /* ... */
-		                  x_vbe16_requirements,
+		                  x_vbe16_requirements, x_vbe16_coord2bytes,
 		                  x_vbe16_getpixel, x_vbe16_setpixel,
 		                  x_vbe16_rectcopy, x_vbe16_rectmove, x_vbe16_linecopy,
 		                  x_vbe16_linefill, x_vbe16_vertfill, x_vbe16_rectfill,

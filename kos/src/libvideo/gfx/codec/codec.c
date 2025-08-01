@@ -3314,92 +3314,144 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_PURE, pa88)
 
 
 
-INTERN ATTR_OUT(3) void FCC
-buffer32_requirements(video_dim_t size_x, video_dim_t size_y,
-                      struct video_rambuffer_requirements *__restrict result) {
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer32_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                   struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 4;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN ATTR_OUT(3) void FCC
-buffer24_requirements(video_dim_t size_x, video_dim_t size_y,
-                      struct video_rambuffer_requirements *__restrict result) {
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer24_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                   struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 3;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN ATTR_OUT(3) void FCC
-buffer16_requirements(video_dim_t size_x, video_dim_t size_y,
-                      struct video_rambuffer_requirements *__restrict result) {
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer16_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                   struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 2;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN ATTR_OUT(3) void FCC
-buffer8_requirements(video_dim_t size_x, video_dim_t size_y,
-                     struct video_rambuffer_requirements *__restrict result) {
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer8_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                  struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x;
 	result->vbs_bufsize = size_y * size_x;
 }
 
-INTERN ATTR_OUT(3) void FCC
-buffer4_requirements(video_dim_t size_x, video_dim_t size_y,
-                     struct video_rambuffer_requirements *__restrict result) {
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer4_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                  struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 1) / 2;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN ATTR_OUT(3) void FCC
-buffer2_requirements(video_dim_t size_x, video_dim_t size_y,
-                     struct video_rambuffer_requirements *__restrict result) {
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer2_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                  struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 3) / 4;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN ATTR_OUT(3) void FCC
-buffer1_requirements(video_dim_t size_x, video_dim_t size_y,
-                     struct video_rambuffer_requirements *__restrict result) {
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer1_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                  struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 7) / 8;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
+
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer1_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord >> 3;
+	*p_coord &= 7;
+	return result;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer2_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord >> 2;
+	*p_coord &= 3;
+	return result;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer4_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord >> 1;
+	*p_coord &= 1;
+	return result;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer8_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord;
+	*p_coord = 0;
+	return result;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer16_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord << 1;
+	*p_coord = 0;
+	return result;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer24_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord * 3;
+	*p_coord = 0;
+	return result;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer32_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord << 2;
+	*p_coord = 0;
+	return result;
+}
+
+
 
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported.
  * Don't declare as  ATTR_CONST; in  PIC-mode, needs  to do  one-time-init of  globals! */
 INTERN /*ATTR_CONST*/ WUNUSED struct video_codec *FCC
 libvideo_codec_lookup(video_codec_t codec) {
-#define CASE_CODEC_AL1(codec, specs, rambuffer_requirements,        \
-                       getpixel, setpixel, rectcopy, rectmove,      \
-                       linecopy, linefill, vertfill, rectfill,      \
-                       pixel2color, color2pixel, initconverter)     \
-	case codec: {                                                   \
-		_DEFINE_CODEC_AL1(_codec_##codec, codec,                    \
-		                  specs, rambuffer_requirements,            \
-		                  getpixel, setpixel, rectcopy, rectmove,   \
-		                  linecopy, linefill, vertfill, rectfill,   \
-		                  pixel2color, color2pixel, initconverter); \
-		result = &_codec_##codec;                                   \
+#define CASE_CODEC_AL1(codec, specs, rambuffer_requirements, coord2bytes, \
+                       getpixel, setpixel, rectcopy, rectmove,            \
+                       linecopy, linefill, vertfill, rectfill,            \
+                       pixel2color, color2pixel, initconverter)           \
+	case codec: {                                                         \
+		_DEFINE_CODEC_AL1(_codec_##codec, codec,                          \
+		                  specs, rambuffer_requirements, coord2bytes,     \
+		                  getpixel, setpixel, rectcopy, rectmove,         \
+		                  linecopy, linefill, vertfill, rectfill,         \
+		                  pixel2color, color2pixel, initconverter);       \
+		result = &_codec_##codec;                                         \
 	}	break
-#define CASE_CODEC_ALn(codec, specs,                                \
-                       align, rambuffer_requirements,               \
-                       getpixel, setpixel, rectcopy, rectmove,      \
-                       linecopy, linefill, vertfill, rectfill,      \
-                       unaligned_getpixel, unaligned_setpixel,      \
-                       unaligned_rectcopy, unaligned_rectmove,      \
-                       unaligned_linecopy, unaligned_linefill,      \
-                       unaligned_vertfill, unaligned_rectfill,      \
-                       pixel2color, color2pixel, initconverter)     \
-	case codec: {                                                   \
-		_DEFINE_CODEC_ALX(_codec_##codec, codec, specs,             \
-		                  align, rambuffer_requirements,            \
-		                  getpixel, setpixel, rectcopy, rectmove,   \
-		                  linecopy, linefill, vertfill, rectfill,   \
-		                  unaligned_getpixel, unaligned_setpixel,   \
-		                  unaligned_rectcopy, unaligned_rectmove,   \
-		                  unaligned_linecopy, unaligned_linefill,   \
-		                  unaligned_vertfill, unaligned_rectfill,   \
-		                  pixel2color, color2pixel, initconverter); \
-		result = &_codec_##codec;                                   \
+#define CASE_CODEC_ALn(codec, specs,                                  \
+                       align, rambuffer_requirements, coord2bytes,    \
+                       getpixel, setpixel, rectcopy, rectmove,        \
+                       linecopy, linefill, vertfill, rectfill,        \
+                       unaligned_getpixel, unaligned_setpixel,        \
+                       unaligned_rectcopy, unaligned_rectmove,        \
+                       unaligned_linecopy, unaligned_linefill,        \
+                       unaligned_vertfill, unaligned_rectfill,        \
+                       pixel2color, color2pixel, initconverter)       \
+	case codec: {                                                     \
+		_DEFINE_CODEC_ALX(_codec_##codec, codec, specs,               \
+		                  align, rambuffer_requirements, coord2bytes, \
+		                  getpixel, setpixel, rectcopy, rectmove,     \
+		                  linecopy, linefill, vertfill, rectfill,     \
+		                  unaligned_getpixel, unaligned_setpixel,     \
+		                  unaligned_rectcopy, unaligned_rectmove,     \
+		                  unaligned_linecopy, unaligned_linefill,     \
+		                  unaligned_vertfill, unaligned_rectfill,     \
+		                  pixel2color, color2pixel, initconverter);   \
+		result = &_codec_##codec;                                     \
 	}	break
 
 
@@ -3415,7 +3467,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x1,
 	                /* vcs_bmask */ 0x1,
 	                /* vcs_amask */ 0x0),
-	               buffer1_requirements,
+	               buffer1_requirements, buffer1_coord2bytes,
 	               getpixel1_lsb, setpixel1_lsb,
 	               rectcopy1_lsb, rectmove1_lsb, linecopy1_lsb,
 	               linefill1_lsb, vertfill1_lsb, rectfill1_lsb,
@@ -3429,7 +3481,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x1,
 	                /* vcs_bmask */ 0x1,
 	                /* vcs_amask */ 0x0),
-	               buffer1_requirements,
+	               buffer1_requirements, buffer1_coord2bytes,
 	               getpixel1_msb, setpixel1_msb,
 	               rectcopy1_msb, rectmove1_msb, linecopy1_msb,
 	               linefill1_msb, vertfill1_msb, rectfill1_msb,
@@ -3443,7 +3495,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x3,
 	                /* vcs_bmask */ 0x3,
 	                /* vcs_amask */ 0x0),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_lsb, setpixel2_lsb,
 	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
@@ -3457,7 +3509,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x3,
 	                /* vcs_bmask */ 0x3,
 	                /* vcs_amask */ 0x0),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_msb, setpixel2_msb,
 	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
@@ -3471,7 +3523,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xf,
 	                /* vcs_bmask */ 0xf,
 	                /* vcs_amask */ 0x0),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -3485,7 +3537,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xf,
 	                /* vcs_bmask */ 0xf,
 	                /* vcs_amask */ 0x0),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -3499,7 +3551,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xff,
 	                /* vcs_bmask */ 0xff,
 	                /* vcs_amask */ 0x0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -3513,7 +3565,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x1,
 	                /* vcs_bmask */ 0x1,
 	                /* vcs_amask */ 0x2),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_msb, setpixel2_msb,
 	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
@@ -3527,7 +3579,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x1,
 	                /* vcs_bmask */ 0x1,
 	                /* vcs_amask */ 0x2),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_lsb, setpixel2_lsb,
 	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
@@ -3541,7 +3593,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x2,
 	                /* vcs_bmask */ 0x2,
 	                /* vcs_amask */ 0x1),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_msb, setpixel2_msb,
 	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
@@ -3555,7 +3607,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x2,
 	                /* vcs_bmask */ 0x2,
 	                /* vcs_amask */ 0x1),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_lsb, setpixel2_lsb,
 	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
@@ -3569,7 +3621,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x3,
 	                /* vcs_bmask */ 0x3,
 	                /* vcs_amask */ 0xc),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -3583,7 +3635,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x3,
 	                /* vcs_bmask */ 0x3,
 	                /* vcs_amask */ 0xc),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -3597,7 +3649,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xc,
 	                /* vcs_bmask */ 0xc,
 	                /* vcs_amask */ 0x3),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -3611,7 +3663,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xc,
 	                /* vcs_bmask */ 0xc,
 	                /* vcs_amask */ 0x3),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -3625,7 +3677,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x7,
 	                /* vcs_bmask */ 0x7,
 	                /* vcs_amask */ 0x8),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -3639,7 +3691,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x7,
 	                /* vcs_bmask */ 0x7,
 	                /* vcs_amask */ 0x8),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -3653,7 +3705,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xe,
 	                /* vcs_bmask */ 0xe,
 	                /* vcs_amask */ 0x1),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -3667,7 +3719,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xe,
 	                /* vcs_bmask */ 0xe,
 	                /* vcs_amask */ 0x1),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -3681,7 +3733,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x0f,
 	                /* vcs_bmask */ 0x0f,
 	                /* vcs_amask */ 0xf0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -3695,7 +3747,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xf0,
 	                /* vcs_bmask */ 0xf0,
 	                /* vcs_amask */ 0x0f),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -3709,7 +3761,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x7f,
 	                /* vcs_bmask */ 0x7f,
 	                /* vcs_amask */ 0x80),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -3723,7 +3775,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xfe,
 	                /* vcs_bmask */ 0xfe,
 	                /* vcs_amask */ 0x01),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -3737,7 +3789,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00ff),
 	                /* vcs_bmask */ MASK2_LE(0x00ff),
 	                /* vcs_amask */ MASK2_LE(0xff00)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -3754,7 +3806,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0xff00),
 	                /* vcs_bmask */ MASK2_LE(0xff00),
 	                /* vcs_amask */ MASK2_LE(0x00ff)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -3771,7 +3823,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0,
 	                /* vcs_bmask */ 0,
 	                /* vcs_amask */ 0x1),
-	               buffer1_requirements,
+	               buffer1_requirements, buffer1_coord2bytes,
 	               getpixel1_lsb, setpixel1_lsb,
 	               rectcopy1_lsb, rectmove1_lsb, linecopy1_lsb,
 	               linefill1_lsb, vertfill1_lsb, rectfill1_lsb,
@@ -3785,7 +3837,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0,
 	                /* vcs_bmask */ 0,
 	                /* vcs_amask */ 0x1),
-	               buffer1_requirements,
+	               buffer1_requirements, buffer1_coord2bytes,
 	               getpixel1_msb, setpixel1_msb,
 	               rectcopy1_msb, rectmove1_msb, linecopy1_msb,
 	               linefill1_msb, vertfill1_msb, rectfill1_msb,
@@ -3799,7 +3851,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0,
 	                /* vcs_bmask */ 0,
 	                /* vcs_amask */ 0x3),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_lsb, setpixel2_lsb,
 	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
@@ -3813,7 +3865,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0,
 	                /* vcs_bmask */ 0,
 	                /* vcs_amask */ 0x3),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_msb, setpixel2_msb,
 	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
@@ -3827,7 +3879,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0,
 	                /* vcs_bmask */ 0,
 	                /* vcs_amask */ 0xf),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -3841,7 +3893,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0,
 	                /* vcs_bmask */ 0,
 	                /* vcs_amask */ 0xf),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -3855,7 +3907,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0,
 	                /* vcs_bmask */ 0,
 	                /* vcs_amask */ 0xff),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -3882,7 +3934,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_bmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_amask */ MASK4_LE(0xff000000)),
-	               4, buffer32_requirements,
+	               4, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -3899,7 +3951,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_bmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements,
+	               4, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -3916,7 +3968,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_bmask */ MASK4_LE(0xff000000),
 	                /* vcs_amask */ MASK4_LE(0x000000ff)),
-	               4, buffer32_requirements,
+	               4, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -3933,7 +3985,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_bmask */ MASK4_LE(0xff000000),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements,
+	               4, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -3950,7 +4002,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_bmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_amask */ MASK4_LE(0x000000ff)),
-	               4, buffer32_requirements,
+	               4, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -3967,7 +4019,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_bmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements,
+	               4, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -3984,7 +4036,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_bmask */ MASK4_LE(0x000000ff),
 	                /* vcs_amask */ MASK4_LE(0xff000000)),
-	               4, buffer32_requirements,
+	               4, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4001,7 +4053,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_bmask */ MASK4_LE(0x000000ff),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements,
+	               4, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4021,7 +4073,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00f0),
 	                /* vcs_bmask */ MASK2_LE(0x0f00),
 	                /* vcs_amask */ MASK2_LE(0xf000)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4038,7 +4090,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00f0),
 	                /* vcs_bmask */ MASK2_LE(0x0f00),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4055,7 +4107,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x0f00),
 	                /* vcs_bmask */ MASK2_LE(0xf000),
 	                /* vcs_amask */ MASK2_LE(0x000f)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4072,7 +4124,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x0f00),
 	                /* vcs_bmask */ MASK2_LE(0xf000),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4089,7 +4141,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x0f00),
 	                /* vcs_bmask */ MASK2_LE(0x00f0),
 	                /* vcs_amask */ MASK2_LE(0x000f)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4106,7 +4158,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x0f00),
 	                /* vcs_bmask */ MASK2_LE(0x00f0),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4123,7 +4175,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00f0),
 	                /* vcs_bmask */ MASK2_LE(0x000f),
 	                /* vcs_amask */ MASK2_LE(0xf000)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4140,7 +4192,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00f0),
 	                /* vcs_bmask */ MASK2_LE(0x000f),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4157,7 +4209,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x03e0),
 	                /* vcs_bmask */ MASK2_LE(0x7c00),
 	                /* vcs_amask */ MASK2_LE(0x8000)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4174,7 +4226,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x03e0),
 	                /* vcs_bmask */ MASK2_LE(0x7c00),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4191,7 +4243,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07c0),
 	                /* vcs_bmask */ MASK2_LE(0xf800),
 	                /* vcs_amask */ MASK2_LE(0x0001)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4208,7 +4260,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07c0),
 	                /* vcs_bmask */ MASK2_LE(0xf800),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4225,7 +4277,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07c0),
 	                /* vcs_bmask */ MASK2_LE(0x003e),
 	                /* vcs_amask */ MASK2_LE(0x0001)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4242,7 +4294,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07c0),
 	                /* vcs_bmask */ MASK2_LE(0x003e),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4259,7 +4311,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x03e0),
 	                /* vcs_bmask */ MASK2_LE(0x001f),
 	                /* vcs_amask */ MASK2_LE(0x8000)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4276,7 +4328,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x03e0),
 	                /* vcs_bmask */ MASK2_LE(0x001f),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4293,7 +4345,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07e0),
 	                /* vcs_bmask */ MASK2_LE(0xf800),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4310,7 +4362,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07e0),
 	                /* vcs_bmask */ MASK2_LE(0x001f),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4327,7 +4379,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x1c,
 	                /* vcs_bmask */ 0x03,
 	                /* vcs_amask */ 0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4341,7 +4393,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x18,
 	                /* vcs_bmask */ 0x07,
 	                /* vcs_amask */ 0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4355,7 +4407,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x38,
 	                /* vcs_bmask */ 0x07,
 	                /* vcs_amask */ 0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4369,7 +4421,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x1c,
 	                /* vcs_bmask */ 0xe0,
 	                /* vcs_amask */ 0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4383,7 +4435,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x18,
 	                /* vcs_bmask */ 0xe0,
 	                /* vcs_amask */ 0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4397,7 +4449,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x38,
 	                /* vcs_bmask */ 0xc0,
 	                /* vcs_amask */ 0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4411,7 +4463,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x30,
 	                /* vcs_bmask */ 0x0c,
 	                /* vcs_amask */ 0x03),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4425,7 +4477,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x30,
 	                /* vcs_bmask */ 0x0c,
 	                /* vcs_amask */ 0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4439,7 +4491,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x0c,
 	                /* vcs_bmask */ 0x03,
 	                /* vcs_amask */ 0xc0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4453,7 +4505,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x0c,
 	                /* vcs_bmask */ 0x03,
 	                /* vcs_amask */ 0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4467,7 +4519,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x30,
 	                /* vcs_bmask */ 0xc0,
 	                /* vcs_amask */ 0x03),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4481,7 +4533,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x30,
 	                /* vcs_bmask */ 0xc0,
 	                /* vcs_amask */ 0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4495,7 +4547,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x0c,
 	                /* vcs_bmask */ 0x30,
 	                /* vcs_amask */ 0xc0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4509,7 +4561,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x0c,
 	                /* vcs_bmask */ 0x30,
 	                /* vcs_amask */ 0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4525,7 +4577,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK3_LE(0x00ff00),
 	                /* vcs_bmask */ MASK3_LE(0xff0000),
 	                /* vcs_amask */ 0),
-	               buffer24_requirements,
+	               buffer24_requirements, buffer24_coord2bytes,
 	               getpixel24, setpixel24,
 	               rectcopy24, rectmove24, linecopy24,
 	               linefill24, vertfill24, rectfill24,
@@ -4539,7 +4591,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK3_LE(0x00ff00),
 	                /* vcs_bmask */ MASK3_LE(0x0000ff),
 	                /* vcs_amask */ 0),
-	               buffer24_requirements,
+	               buffer24_requirements, buffer24_coord2bytes,
 	               getpixel24, setpixel24,
 	               rectcopy24, rectmove24, linecopy24,
 	               linefill24, vertfill24, rectfill24,
@@ -4556,7 +4608,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x1,
 	                /* vcs_bmask */ 0x1,
 	                /* vcs_amask */ 0x0),
-	               buffer1_requirements,
+	               buffer1_requirements, buffer1_coord2bytes,
 	               getpixel1_lsb, setpixel1_lsb,
 	               rectcopy1_lsb, rectmove1_lsb, linecopy1_lsb,
 	               linefill1_lsb, vertfill1_lsb, rectfill1_lsb,
@@ -4570,7 +4622,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x1,
 	                /* vcs_bmask */ 0x1,
 	                /* vcs_amask */ 0x0),
-	               buffer1_requirements,
+	               buffer1_requirements, buffer1_coord2bytes,
 	               getpixel1_msb, setpixel1_msb,
 	               rectcopy1_msb, rectmove1_msb, linecopy1_msb,
 	               linefill1_msb, vertfill1_msb, rectfill1_msb,
@@ -4584,7 +4636,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x3,
 	                /* vcs_bmask */ 0x3,
 	                /* vcs_amask */ 0x0),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_lsb, setpixel2_lsb,
 	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
@@ -4598,7 +4650,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x3,
 	                /* vcs_bmask */ 0x3,
 	                /* vcs_amask */ 0x0),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_msb, setpixel2_msb,
 	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
@@ -4612,7 +4664,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xf,
 	                /* vcs_bmask */ 0xf,
 	                /* vcs_amask */ 0x0),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -4626,7 +4678,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xf,
 	                /* vcs_bmask */ 0xf,
 	                /* vcs_amask */ 0x0),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -4640,7 +4692,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xff,
 	                /* vcs_bmask */ 0xff,
 	                /* vcs_amask */ 0x0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4654,7 +4706,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x1,
 	                /* vcs_bmask */ 0x1,
 	                /* vcs_amask */ 0x2),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_msb, setpixel2_msb,
 	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
@@ -4668,7 +4720,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x1,
 	                /* vcs_bmask */ 0x1,
 	                /* vcs_amask */ 0x2),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_lsb, setpixel2_lsb,
 	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
@@ -4682,7 +4734,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x2,
 	                /* vcs_bmask */ 0x2,
 	                /* vcs_amask */ 0x1),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_msb, setpixel2_msb,
 	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
@@ -4696,7 +4748,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x2,
 	                /* vcs_bmask */ 0x2,
 	                /* vcs_amask */ 0x1),
-	               buffer2_requirements,
+	               buffer2_requirements, buffer2_coord2bytes,
 	               getpixel2_lsb, setpixel2_lsb,
 	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
@@ -4710,7 +4762,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x3,
 	                /* vcs_bmask */ 0x3,
 	                /* vcs_amask */ 0xc),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -4724,7 +4776,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x3,
 	                /* vcs_bmask */ 0x3,
 	                /* vcs_amask */ 0xc),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -4738,7 +4790,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xc,
 	                /* vcs_bmask */ 0xc,
 	                /* vcs_amask */ 0x3),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -4752,7 +4804,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xc,
 	                /* vcs_bmask */ 0xc,
 	                /* vcs_amask */ 0x3),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -4766,7 +4818,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x7,
 	                /* vcs_bmask */ 0x7,
 	                /* vcs_amask */ 0x8),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -4780,7 +4832,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x7,
 	                /* vcs_bmask */ 0x7,
 	                /* vcs_amask */ 0x8),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -4794,7 +4846,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xe,
 	                /* vcs_bmask */ 0xe,
 	                /* vcs_amask */ 0x1),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_msb, setpixel4_msb,
 	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
@@ -4808,7 +4860,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xe,
 	                /* vcs_bmask */ 0xe,
 	                /* vcs_amask */ 0x1),
-	               buffer4_requirements,
+	               buffer4_requirements, buffer4_coord2bytes,
 	               getpixel4_lsb, setpixel4_lsb,
 	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
@@ -4822,7 +4874,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x0f,
 	                /* vcs_bmask */ 0x0f,
 	                /* vcs_amask */ 0xf0),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4836,7 +4888,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xf0,
 	                /* vcs_bmask */ 0xf0,
 	                /* vcs_amask */ 0x0f),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4850,7 +4902,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0x7f,
 	                /* vcs_bmask */ 0x7f,
 	                /* vcs_amask */ 0x80),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4864,7 +4916,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xfe,
 	                /* vcs_bmask */ 0xfe,
 	                /* vcs_amask */ 0x01),
-	               buffer8_requirements,
+	               buffer8_requirements, buffer8_coord2bytes,
 	               getpixel8, setpixel8,
 	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
@@ -4878,7 +4930,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00ff),
 	                /* vcs_bmask */ MASK2_LE(0x00ff),
 	                /* vcs_amask */ MASK2_LE(0xff00)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4895,7 +4947,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0xff00),
 	                /* vcs_bmask */ MASK2_LE(0xff00),
 	                /* vcs_amask */ MASK2_LE(0x00ff)),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4913,7 +4965,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x0f00),
 	                /* vcs_bmask */ MASK2_LE(0xf000),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements,
+	               2, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,

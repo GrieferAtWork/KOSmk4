@@ -435,8 +435,18 @@ struct video_codec {
 	 * Note that in addition, a ram-buffer needs a minimal alignment of `vc_align' bytes,
 	 * though this restriction may be omitted by simply using `vc_nalgn' instead. */
 	__ATTR_OUT_T(3) void
-	(LIBVIDEO_GFX_FCC *__VIDEO_CODEC_const vc_rambuffer_requirements)(video_dim_t __size_x, video_dim_t __size_y,
-	                                                                  struct video_rambuffer_requirements *__restrict __result);
+	__NOTHROW_T(LIBVIDEO_GFX_FCC *__VIDEO_CODEC_const vc_rambuffer_requirements)(video_dim_t __size_x, video_dim_t __size_y,
+	                                                                             struct video_rambuffer_requirements *__restrict __result);
+
+	/* Modulate `*__p_coord' into the relevant sub-byte pixel offset,
+	 * and return the byte-offset that must be added to the start  of
+	 * some  pixel-line  to   account  for   the  pixel   adjustment:
+	 * >> pixel = (*vc_getpixel)(LINE, X);
+	 * Same as:
+	 * >> LINE += (*vc_coord2bytes)(&X);
+	 * >> pixel = (*vc_getpixel)(LINE, X); */
+	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __size_t
+	__NOTHROW_T(LIBVIDEO_GFX_FCC *__VIDEO_CODEC_const vc_coord2bytes)(video_coord_t *__restrict __p_coord);
 
 	video_codec_pixel2color_t   __VIDEO_CODEC_const vc_pixel2color;   /* Convert between color and pixel values. */
 	video_codec_color2pixel_t   __VIDEO_CODEC_const vc_color2pixel;   /* ... */

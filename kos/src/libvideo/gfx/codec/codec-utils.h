@@ -198,7 +198,8 @@ DECL_BEGIN
 	{ flags, CEILDIV(bpp, NBBY), bpp, cbits, rmask, gmask, bmask, amask }
 #endif /* !CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 #if defined(__KERNEL__) || !defined(__pic__)
-#define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,     \
+#define _DEFINE_CODEC_AL1(name, codec, specs,                             \
+                          rambuffer_requirements, coord2bytes,            \
                           getpixel, setpixel, rectcopy, rectmove,         \
                           linecopy, linefill, vertfill, rectfill,         \
                           pixel2color, color2pixel, initconverter)        \
@@ -210,6 +211,7 @@ DECL_BEGIN
 			/* .vc_align                  = */ 1,                         \
 			/* .vc_nalgn                  = */ &name,                     \
 			/* .vc_rambuffer_requirements = */ &rambuffer_requirements,   \
+			/* .vc_coord2bytes            = */ &coord2bytes,              \
 			/* .vc_pixel2color            = */ &pixel2color,              \
 			/* .vc_color2pixel            = */ &color2pixel,              \
 			/* .vc_initconverter          = */ &initconverter,            \
@@ -230,8 +232,8 @@ DECL_BEGIN
 			SET_vc_vertfill64_STATIC_INITIALIZER(&vertfill##_64)          \
 			SET_vc_rectfill64_STATIC_INITIALIZER(&rectfill##_64)          \
 		}
-#define _DEFINE_CODEC_ALX(name, codec, specs,                             \
-                          align, rambuffer_requirements,                  \
+#define _DEFINE_CODEC_ALX(name, codec, specs, align,                      \
+                          rambuffer_requirements, coord2bytes,            \
                           getpixel, setpixel, rectcopy, rectmove,         \
                           linecopy, linefill, vertfill, rectfill,         \
                           unaligned_getpixel, unaligned_setpixel,         \
@@ -247,6 +249,7 @@ DECL_BEGIN
 			/* .vc_align                  = */ 1,                         \
 			/* .vc_nalgn                  = */ &unaligned_##name,         \
 			/* .vc_rambuffer_requirements = */ &rambuffer_requirements,   \
+			/* .vc_coord2bytes            = */ &coord2bytes,              \
 			/* .vc_pixel2color            = */ &pixel2color,              \
 			/* .vc_color2pixel            = */ &color2pixel,              \
 			/* .vc_initconverter          = */ &initconverter,            \
@@ -275,6 +278,7 @@ DECL_BEGIN
 			/* .vc_align                  = */ align,                     \
 			/* .vc_nalgn                  = */ &unaligned_##name,         \
 			/* .vc_rambuffer_requirements = */ &rambuffer_requirements,   \
+			/* .vc_coord2bytes            = */ &coord2bytes,              \
 			/* .vc_pixel2color            = */ &pixel2color,              \
 			/* .vc_color2pixel            = */ &color2pixel,              \
 			/* .vc_initconverter          = */ &initconverter,            \
@@ -296,7 +300,8 @@ DECL_BEGIN
 			SET_vc_rectfill64_STATIC_INITIALIZER(&rectfill##_64)          \
 		}
 #else /* __KERNEL__ || !__pic__ */
-#define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,   \
+#define _DEFINE_CODEC_AL1(name, codec, specs,                           \
+                          rambuffer_requirements, coord2bytes,          \
                           getpixel, setpixel, rectcopy, rectmove,       \
                           linecopy, linefill, vertfill, rectfill,       \
                           pixel2color, color2pixel, initconverter)      \
@@ -328,12 +333,13 @@ DECL_BEGIN
 			SET_vc_linefill64_INITIALIZER(name, &linefill##_64)         \
 			SET_vc_vertfill64_INITIALIZER(name, &vertfill##_64)         \
 			SET_vc_rectfill64_INITIALIZER(name, &rectfill##_64)         \
+			name.vc_coord2bytes = &coord2bytes;                         \
 			COMPILER_WRITE_BARRIER();                                   \
 			name.vc_rambuffer_requirements = &rambuffer_requirements;   \
 			COMPILER_WRITE_BARRIER();                                   \
 		}
-#define _DEFINE_CODEC_ALX(name, codec, specs,                                     \
-                          align, rambuffer_requirements,                          \
+#define _DEFINE_CODEC_ALX(name, codec, specs, align,                              \
+                          rambuffer_requirements, coord2bytes,                    \
                           getpixel, setpixel, rectcopy, rectmove,                 \
                           linecopy, linefill, vertfill, rectfill,                 \
                           unaligned_getpixel, unaligned_setpixel,                 \
@@ -358,6 +364,7 @@ DECL_BEGIN
 		if (!name.vc_rambuffer_requirements) {                                    \
 			unaligned_##name.vc_nalgn                  = &unaligned_##name;       \
 			unaligned_##name.vc_rambuffer_requirements = &rambuffer_requirements; \
+			unaligned_##name.vc_coord2bytes            = &coord2bytes;            \
 			unaligned_##name.vc_pixel2color            = &pixel2color;            \
 			unaligned_##name.vc_color2pixel            = &color2pixel;            \
 			unaligned_##name.vc_initconverter          = &initconverter;          \
@@ -397,6 +404,7 @@ DECL_BEGIN
 			SET_vc_linefill64_INITIALIZER(name, &linefill##_64)                   \
 			SET_vc_vertfill64_INITIALIZER(name, &vertfill##_64)                   \
 			SET_vc_rectfill64_INITIALIZER(name, &rectfill##_64)                   \
+			name.vc_coord2bytes = &coord2bytes;                                   \
 			COMPILER_WRITE_BARRIER();                                             \
 			name.vc_rambuffer_requirements = &rambuffer_requirements;             \
 			COMPILER_WRITE_BARRIER();                                             \
@@ -581,13 +589,21 @@ INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC rgbx8888_pixel2color6
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 
-INTDEF ATTR_OUT(3) void FCC buffer1_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF ATTR_OUT(3) void FCC buffer2_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF ATTR_OUT(3) void FCC buffer4_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF ATTR_OUT(3) void FCC buffer8_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF ATTR_OUT(3) void FCC buffer16_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF ATTR_OUT(3) void FCC buffer24_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF ATTR_OUT(3) void FCC buffer32_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer1_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer2_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer4_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer8_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer16_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer24_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer32_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer1_coord2bytes)(video_coord_t *__restrict p_coord);
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer2_coord2bytes)(video_coord_t *__restrict p_coord);
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer4_coord2bytes)(video_coord_t *__restrict p_coord);
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer8_coord2bytes)(video_coord_t *__restrict p_coord);
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer16_coord2bytes)(video_coord_t *__restrict p_coord);
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer24_coord2bytes)(video_coord_t *__restrict p_coord);
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer32_coord2bytes)(video_coord_t *__restrict p_coord);
 
 DECL_END
 

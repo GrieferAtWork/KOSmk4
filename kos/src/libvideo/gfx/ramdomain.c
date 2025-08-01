@@ -48,7 +48,6 @@
 #include <libvideo/types.h>
 
 #include "buffer.h"
-#include "buffer/utils.h"
 #include "codec/palette.h"
 #include "gfx-empty.h"
 #include "ramdomain.h"
@@ -136,9 +135,8 @@ rambuffer__subregion__common(struct video_surface const *__restrict surface,
 	if unlikely(!result)
 		goto err;
 	__video_buffer_init_subregion(result, surface, self, rect);
-	video_codec_xcoord_to_offset(video_buffer_getcodec(result),
-	                             video_crect_getxmin(rect),
-	                             &x_byte_offset, &result->rbs_bxrem);
+	result->rbs_bxrem = video_crect_getxmin(rect);
+	x_byte_offset = (*video_buffer_getcodec(result)->vc_coord2bytes)(&result->rbs_bxrem);
 	__video_buffer_init_ops(result, result->rbs_bxrem ? _rambuffer_subregion_ops()
 	                                                  : _rambuffer_subregion_norem_ops());
 	result->rb_data   = self->rb_data + x_byte_offset + video_crect_getymin(rect) * self->rb_stride;
@@ -266,6 +264,7 @@ libvideo_ramdomain_formem(struct video_domain const *__restrict self,
                           video_dim_t xdim, video_dim_t ydim, void *mem, size_t stride,
                           void (CC *release_mem)(void *cookie, void *mem),
                           void *release_mem_cookie, unsigned int flags) {
+	struct video_codec *codec = format->vbf_codec;
 	REF struct video_rambuffer_formem *result;
 	struct video_rambuffer_requirements req;
 	assert(format);
@@ -274,7 +273,7 @@ libvideo_ramdomain_formem(struct video_domain const *__restrict self,
 		return_empty_buffer;
 
 	/* Ensure that the specified stride is great enough */
-	(*format->vbf_codec->vc_rambuffer_requirements)(xdim, ydim, &req);
+	(*codec->vc_rambuffer_requirements)(xdim, ydim, &req);
 	if (stride < req.vbs_stride) {
 		errno = EINVAL;
 		return NULL;
@@ -290,9 +289,10 @@ libvideo_ramdomain_formem(struct video_domain const *__restrict self,
 	}
 
 	/* Must use a different, fallback "codec" that can deal with bad alignment */
-	if (!IS_ALIGNED(stride, video_buffer_getcodec(result)->vc_align) ||
-	    !IS_ALIGNED((uintptr_t)mem, video_buffer_getcodec(result)->vc_align))
-		result->vb_codec = video_buffer_getcodec(result)->vc_nalgn;
+	assert(codec == format->vbf_codec);
+	if (!IS_ALIGNED(stride, codec->vc_align) ||
+	    !IS_ALIGNED((uintptr_t)mem, codec->vc_align))
+		result->vb_codec = codec->vc_nalgn;
 
 	/* Validate palette configuration */
 	__video_buffer_init_domain(result, self);

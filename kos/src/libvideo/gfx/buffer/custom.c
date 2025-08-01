@@ -54,7 +54,6 @@
 #include "../ramdomain.h"
 #include "../swgfx.h"
 #include "custom.h"
-#include "utils.h"
 
 DECL_BEGIN
 
@@ -195,10 +194,10 @@ custom_buffer__subregion_impl(struct video_surface const *__restrict surface,
 	if unlikely(!result)
 		goto err;
 	__video_buffer_init_subregion(result, surface, parent, rect);
-	result->cbsr_xoff = parent_xoff + rect->vcr_xmin;
-	result->cbsr_yoff = parent_yoff + rect->vcr_ymin;
-	video_codec_xcoord_to_offset(video_buffer_getcodec(result), result->cbsr_xoff,
-	                             &result->cbsr_bxoff, &result->cbsr_bxrem);
+	result->cbsr_xoff  = parent_xoff + rect->vcr_xmin;
+	result->cbsr_yoff  = parent_yoff + rect->vcr_ymin;
+	result->cbsr_bxrem = result->cbsr_xoff;
+	result->cbsr_bxoff = (*video_buffer_getcodec(result)->vc_coord2bytes)(&result->cbsr_bxrem);
 	result->vb_ops = !result->cbsr_xoff && !result->cbsr_yoff
 	                 ? _custom_buffer_subregion_nooff_ops()
 	                 : result->cbsr_bxrem == 0
@@ -364,9 +363,8 @@ custom_buffer__rlockregion(struct video_buffer *__restrict self,
 	if (rlock) {
 		int result;
 		size_t xoff;
-		video_codec_xcoord_to_offset(video_buffer_getcodec(me),
-		                             lock->_vrl_rect.vcr_xmin,
-		                             &xoff, &lock->vrl_xbas);
+		lock->vrl_xbas = lock->_vrl_rect.vcr_xmin;
+		xoff   = (*video_buffer_getcodec(me)->vc_coord2bytes)(&lock->vrl_xbas);
 		result = (*rlock)(me->cbc_cookie, &lock->vrl_lock);
 		if unlikely(result)
 			atomic_dec(&me->cbc_inuse);
@@ -400,9 +398,8 @@ custom_buffer__wlockregion(struct video_buffer *__restrict self,
 	if (wlock) {
 		int result;
 		size_t xoff;
-		video_codec_xcoord_to_offset(video_buffer_getcodec(me),
-		                             lock->_vrl_rect.vcr_xmin,
-		                             &xoff, &lock->vrl_xbas);
+		lock->vrl_xbas = lock->_vrl_rect.vcr_xmin;
+		xoff   = (*video_buffer_getcodec(me)->vc_coord2bytes)(&lock->vrl_xbas);
 		result = (*wlock)(me->cbc_cookie, &lock->vrl_lock);
 		if unlikely(result)
 			atomic_dec(&me->cbc_inuse);
@@ -424,11 +421,8 @@ NOTHROW(FCC custom_buffer__unlockregion)(struct video_buffer *__restrict self,
 	if (me->cbc_unlockregion) {
 		(*me->cbc_unlockregion)(me->cbc_cookie, lock);
 	} else if (me->cbc_unlock) {
-		size_t xoff;
-		video_coord_t xrem;
-		video_codec_xcoord_to_offset(video_buffer_getcodec(self),
-		                             lock->_vrl_rect.vcr_xmin,
-		                             &xoff, &xrem);
+		video_coord_t xrem = lock->_vrl_rect.vcr_xmin;
+		size_t xoff = (*video_buffer_getcodec(self)->vc_coord2bytes)(&xrem);
 		assert(xrem == video_regionlock_getxbase(lock));
 		lock->vrl_lock.vl_data -= lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data -= xoff;
