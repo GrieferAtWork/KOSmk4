@@ -43,6 +43,7 @@
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/buffer/rambuffer.h>
+#include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 
@@ -135,11 +136,12 @@ rambuffer__subregion__common(struct video_surface const *__restrict surface,
 	if unlikely(!result)
 		goto err;
 	__video_buffer_init_subregion(result, surface, self, rect);
-	video_codec_xcoord_to_offset(video_buffer_getcodec(result), rect->vcr_xmin,
+	video_codec_xcoord_to_offset(video_buffer_getcodec(result),
+	                             video_crect_getxmin(rect),
 	                             &x_byte_offset, &result->rbs_bxrem);
 	__video_buffer_init_ops(result, result->rbs_bxrem ? _rambuffer_subregion_ops()
 	                                                  : _rambuffer_subregion_norem_ops());
-	result->rb_data   = self->rb_data + x_byte_offset + rect->vcr_ymin * self->rb_stride;
+	result->rb_data   = self->rb_data + x_byte_offset + video_crect_getymin(rect) * self->rb_stride;
 	result->rb_stride = self->rb_stride;
 	result->rbs_base  = self;
 	video_buffer_incref(self);
@@ -165,8 +167,8 @@ rambuffer_subregion__subregion(struct video_surface const *__restrict self,
                                struct video_crect const *__restrict rect) {
 	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)video_surface_getbuffer(self);
 	struct video_crect abs_rect = *rect;
-	abs_rect.vcr_xmin += me->rbs_xoff;
-	abs_rect.vcr_ymin += me->rbs_yoff;
+	video_crect_addx(&abs_rect, me->rbs_xoff);
+	video_crect_addy(&abs_rect, me->rbs_yoff);
 	return rambuffer__subregion__common(self, me->rbs_base, &abs_rect);
 }
 
@@ -187,9 +189,9 @@ rambuffer__lockregion(struct video_buffer *__restrict self,
                       struct video_regionlock *__restrict lock) {
 	struct video_rambuffer *me = (struct video_rambuffer *)self;
 	video_regionlock_assert(me, lock);
-	lock->vrl_lock.vl_data   = me->rb_data + lock->_vrl_rect.vcr_ymin * me->rb_stride;
+	lock->vrl_lock.vl_data   = me->rb_data + video_crect_getymin(&lock->_vrl_rect) * me->rb_stride;
 	lock->vrl_lock.vl_stride = me->rb_stride;
-	lock->vrl_xbas = lock->_vrl_rect.vcr_xmin;
+	lock->vrl_xbas = video_crect_getxmin(&lock->_vrl_rect);
 	return 0;
 }
 
@@ -198,9 +200,9 @@ rambuffer_subregion__lockregion(struct video_buffer *__restrict self,
                                 struct video_regionlock *__restrict lock) {
 	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)self;
 	video_regionlock_assert(me, lock);
-	lock->vrl_lock.vl_data   = me->rb_data + lock->_vrl_rect.vcr_ymin * me->rb_stride;
+	lock->vrl_lock.vl_data   = me->rb_data + video_crect_getymin(&lock->_vrl_rect) * me->rb_stride;
 	lock->vrl_lock.vl_stride = me->rb_stride;
-	lock->vrl_xbas = lock->_vrl_rect.vcr_xmin + me->rbs_bxrem;
+	lock->vrl_xbas = video_crect_getxmin(&lock->_vrl_rect) + me->rbs_bxrem;
 	return 0;
 }
 

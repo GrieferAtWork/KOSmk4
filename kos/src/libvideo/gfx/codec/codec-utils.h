@@ -581,13 +581,13 @@ INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC rgbx8888_pixel2color6
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 
-INTDEF NONNULL((3)) void FCC buffer1_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void FCC buffer2_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void FCC buffer4_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void FCC buffer8_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void FCC buffer16_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void FCC buffer24_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void FCC buffer32_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void FCC buffer1_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void FCC buffer2_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void FCC buffer4_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void FCC buffer8_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void FCC buffer16_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void FCC buffer24_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void FCC buffer32_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
 
 DECL_END
 

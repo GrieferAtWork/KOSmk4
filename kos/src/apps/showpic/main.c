@@ -31,6 +31,7 @@
 #include <hybrid/align.h>
 
 #include <kos/anno.h>
+#include <sys/syslog.h>
 #include <sys/time.h>
 
 #include <err.h>
@@ -42,7 +43,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <syslog.h>
 #include <time.h>
 #include <timeval-utils.h>
 #include <uchar.h>
@@ -60,6 +60,7 @@
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/surface.h>
+#include <libvideo/rect.h>
 #include <libvideo/types.h>
 
 DECL_BEGIN

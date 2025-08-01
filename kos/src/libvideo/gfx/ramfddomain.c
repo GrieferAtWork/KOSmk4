@@ -33,23 +33,34 @@
 
 #include <hybrid/overflow.h>
 
+#include <kos/anno.h>
 #include <kos/io.h>
 #include <kos/ioctl/file.h>
+#include <kos/types.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <malloc.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 
+#include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/buffer/rambuffer.h>
 #include <libvideo/gfx/buffer/ramfdbuffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/surface.h>
+#include <libvideo/types.h>
 
+#include "buffer.h"
+#include "buffer/utils.h"
 #include "codec/palette.h"
 #include "gfx-empty.h"
-#include "buffer/utils.h"
 #include "ramdomain.h"
 #include "ramfddomain.h"
 #include "serial.h"
@@ -181,11 +192,13 @@ ramfdbuffer__subregion(struct video_surface const *__restrict self,
 	size_t aligned_region_offset, aligned_region_size;
 	size_t aligned_region_boff;
 	video_buffer_assert_rect(me, rect);
-	video_codec_xcoord_to_offset(codec, rect->vcr_xmin, &region_offset, &xrem);
-	(*codec->vc_rambuffer_requirements)(rect->vcr_xdim + xrem, rect->vcr_ydim, &req);
+	video_codec_xcoord_to_offset(codec, video_crect_getxmin(rect),
+	                             &region_offset, &xrem);
+	(*codec->vc_rambuffer_requirements)(video_crect_getxdim(rect) + xrem,
+	                                    video_crect_getydim(rect), &req);
 	region_offset += (uintptr_t)me->rb_data & pm;
-	region_offset += rect->vcr_ymin * me->rb_stride;
-	region_size = ((rect->vcr_ydim - 1) * me->rb_stride);
+	region_offset += video_crect_getymin(rect) * me->rb_stride;
+	region_size = ((video_crect_getydim(rect) - 1) * me->rb_stride);
 	assert(req.vbs_stride <= me->rb_stride);
 	region_size += req.vbs_stride; /* Last scanline doesn't need to be full-length */
 	/* region_offset: byte-offset from "me->rfdb_fd" to top-left corner of sub-region,

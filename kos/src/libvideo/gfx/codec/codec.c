@@ -3314,49 +3314,49 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_PURE, pa88)
 
 
 
-INTERN NONNULL((3)) void FCC
+INTERN ATTR_OUT(3) void FCC
 buffer32_requirements(video_dim_t size_x, video_dim_t size_y,
                       struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 4;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN NONNULL((3)) void FCC
+INTERN ATTR_OUT(3) void FCC
 buffer24_requirements(video_dim_t size_x, video_dim_t size_y,
                       struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 3;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN NONNULL((3)) void FCC
+INTERN ATTR_OUT(3) void FCC
 buffer16_requirements(video_dim_t size_x, video_dim_t size_y,
                       struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 2;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN NONNULL((3)) void FCC
+INTERN ATTR_OUT(3) void FCC
 buffer8_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x;
 	result->vbs_bufsize = size_y * size_x;
 }
 
-INTERN NONNULL((3)) void FCC
+INTERN ATTR_OUT(3) void FCC
 buffer4_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 1) / 2;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN NONNULL((3)) void FCC
+INTERN ATTR_OUT(3) void FCC
 buffer2_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 3) / 4;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN NONNULL((3)) void FCC
+INTERN ATTR_OUT(3) void FCC
 buffer1_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 7) / 8;

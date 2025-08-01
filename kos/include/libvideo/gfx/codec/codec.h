@@ -434,7 +434,7 @@ struct video_codec {
 	/* Calculate minimal ram-buffer requirements for a graphic with the given dimensions.
 	 * Note that in addition, a ram-buffer needs a minimal alignment of `vc_align' bytes,
 	 * though this restriction may be omitted by simply using `vc_nalgn' instead. */
-	__ATTR_NONNULL_T((3)) void
+	__ATTR_OUT_T(3) void
 	(LIBVIDEO_GFX_FCC *__VIDEO_CODEC_const vc_rambuffer_requirements)(video_dim_t __size_x, video_dim_t __size_y,
 	                                                                  struct video_rambuffer_requirements *__restrict __result);
 
