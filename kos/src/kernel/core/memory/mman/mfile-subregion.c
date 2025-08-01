@@ -229,11 +229,9 @@ subregion_mmap(struct mfile *__restrict self,
 	info->hmi_fspath = NULL;
 	info->hmi_fsname = incref(me->srf_nodename);
 	subregion_lock_acquire(me);
-	info->hmi_minaddr += me->srf_minaddr; /* TODO: Handle overflow */
-	info->hmi_maxaddr += me->srf_minaddr; /* TODO: Handle overflow */
-	if (info->hmi_maxaddr > me->srf_maxaddr)
-		info->hmi_maxaddr = me->srf_maxaddr;
-	info->hmi_file = me->srf_base;
+	info->hmi_minaddr = me->srf_minaddr;
+	info->hmi_maxaddr = me->srf_maxaddr;
+	info->hmi_file    = me->srf_base;
 	if (info->hmi_file == NULL) /* This happens when the subregion was deleted */
 		info->hmi_file = &dev_void;
 	incref(info->hmi_file);
