@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_SUBREGION_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_SUBREGION_C 1
+#define __WANT_MPART__mp_nodlsts
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -31,6 +32,8 @@
 #include <kernel/fs/path.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/mman.h>
+#include <kernel/mman/flags.h>
 #include <kernel/mman/mfile-subregion.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
@@ -54,13 +57,21 @@
 #include <sys/types.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 
 DECL_BEGIN
+
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset(p, c, n) memset(p, c, n)
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(p, c, n) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
 
 struct subregion_mfile;
 LIST_HEAD(subregion_mfile_list, subregion_mfile);
@@ -580,6 +591,11 @@ NOTHROW(KCALL mfile_subregion_tryincref_and_trylock_children)(struct subregion_m
 			/* Return reference to blocking child */
 			return child_iter;
 		}
+		assertf(child_iter->srf_base == self->srf_base,
+		        "Even when a child is deleted, it should immediately "
+		        "remove itself from the parent's list of children");
+		assert(child_iter->srf_minaddr >= self->srf_minaddr);
+		assert(child_iter->srf_maxaddr <= self->srf_maxaddr);
 	}
 	return NULL;
 }
@@ -636,6 +652,334 @@ NOTHROW(KCALL mfile_subregion_tryincref_and_trylock_children_r)(struct subregion
 }
 
 
+struct mfile_mman_lock_filter {
+	pos_t                         mfmlf_minaddr;    /* Min address of mpart-s to lock */
+	pos_t                         mfmlf_maxaddr;    /* Max address of mpart-s to lock */
+	struct subregion_mfile const *mfmlf_mnode_name; /* [?..?] Only lock mmans of mnode's featuring this, or one of it's children as "mn_fsname" */
+};
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL subregion_mfile_references_name)(struct subregion_mfile const *__restrict self,
+                                               struct fdirent const *__restrict name) {
+	struct subregion_mfile const *child;
+	if (self->srf_nodename == name)
+		return true;
+	LIST_FOREACH (child, &self->srf_children, srf_chain) {
+		if (subregion_mfile_references_name(child, name))
+			return true;
+	}
+	return false;
+}
+#define mfile_mman_lock_filter_references_name(self, name) \
+	subregion_mfile_references_name((self)->mfmlf_mnode_name, name)
+
+
+/* Check if "mm" is referenced by another mpart encountered before (not including) "stop_at" */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2, 3)) bool
+NOTHROW(KCALL _mfile_parts_contains_mman_before)(struct mpart_tree_minmax const *__restrict mima,
+                                                 struct mfile_mman_lock_filter const *__restrict filter,
+                                                 struct mman const *__restrict mm, struct mnode const *stop_at) {
+	struct mpart *iter = mima->mm_min;
+	assert(mima->mm_min);
+	assert(mima->mm_max);
+	for (;;) {
+		unsigned int i;
+		assert(!wasdestroyed(iter));
+		assert(mpart_lock_acquired(iter));
+		for (i = 0; i < lengthof(iter->_mp_nodlsts); ++i) {
+			struct mnode *node;
+			LIST_FOREACH (node, &iter->_mp_nodlsts[i], mn_link) {
+				assert(node->mn_part == iter);
+				if (node->mn_fspath != NULL)
+					continue;
+				if (node->mn_fsname == NULL)
+					continue;
+				if (!mfile_mman_lock_filter_references_name(filter, node->mn_fsname))
+					continue;
+				if (node == stop_at)
+					goto nope;
+				if (mm == node->mn_mman)
+					return true;
+			}
+		}
+		if (iter == mima->mm_max)
+			break;
+		iter = mpart_tree_nextnode(iter);
+	}
+nope:
+	return false;
+}
+
+/* Check if "mm" is referenced by another mpart encountered after (not including) "start_after_*" */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2, 3)) bool
+NOTHROW(KCALL _mfile_parts_contains_mman_after)(struct mpart_tree_minmax const *__restrict mima,
+                                                struct mfile_mman_lock_filter const *__restrict filter,
+                                                struct mman const *__restrict mm,
+                                                unsigned int start_after_list,
+                                                struct mnode *start_after_node) {
+	unsigned int i = start_after_list;
+	struct mpart *iter = mima->mm_min;
+	struct mnode *node = start_after_node;
+	assert(mima->mm_min);
+	assert(mima->mm_max);
+	goto start;
+	for (;;) {
+		assert(!wasdestroyed(iter));
+		assert(mpart_lock_acquired(iter));
+		for (i = 0; i < lengthof(iter->_mp_nodlsts); ++i) {
+			LIST_FOREACH (node, &iter->_mp_nodlsts[i], mn_link) {
+				assert(node->mn_part == iter);
+				if (node->mn_fspath != NULL)
+					continue;
+				if (node->mn_fsname == NULL)
+					continue;
+				if (!mfile_mman_lock_filter_references_name(filter, node->mn_fsname))
+					continue;
+				if (mm == node->mn_mman)
+					return true;
+start:;
+			}
+		}
+		if (iter == mima->mm_max)
+			break;
+		iter = mpart_tree_nextnode(iter);
+	}
+/*nope:*/
+	return false;
+}
+
+#define mfile_unlock_and_decref_mmans_of_parts(self, filter) \
+	mfile_unlock_and_decref_mmans_of_parts_before(self, filter, NULL)
+
+/* Do the inverse of `mfile_tryincref_and_trylock_mmans_of_parts()',
+ * but  stop  releasing   locks  when   "stop_at"  is   encountered. */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL mfile_unlock_and_decref_mmans_of_parts_before)(struct mfile *__restrict self,
+                                                             struct mfile_mman_lock_filter const *__restrict filter,
+                                                             struct mnode const *stop_at) {
+	struct mpart_tree_minmax mima;
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (mima.mm_min) {
+		struct mpart *iter = mima.mm_min;
+		for (;;) {
+			unsigned int i;
+			assert(!wasdestroyed(iter));
+			assert(mpart_lock_acquired(iter));
+			for (i = 0; i < lengthof(iter->_mp_nodlsts); ++i) {
+				struct mnode *node;
+				LIST_FOREACH (node, &iter->_mp_nodlsts[i], mn_link) {
+					REF struct mman *mm;
+					assert(node->mn_part == iter);
+					if (node == stop_at)
+						return;
+					if (node->mn_fspath != NULL)
+						continue;
+					if (node->mn_fsname == NULL)
+						continue;
+					if (!mfile_mman_lock_filter_references_name(filter, node->mn_fsname))
+						continue;
+					mm = node->mn_mman;
+					if (wasdestroyed(mm))
+						continue; /* Dead mman */
+					if (!mman_lock_writing(mm))
+						continue; /* Already unlock */
+
+					/* Make sure that the reason "mm" is locked isn't  because
+					 * someone else is holding that lock after we released it. */
+					if (_mfile_parts_contains_mman_before(&mima, filter, mm, node))
+						continue; /* Someone else is holding the lock */
+					mman_lock_endwrite(mm);
+					decref_unlikely(mm);
+				}
+			}
+			if (iter == mima.mm_max)
+				break;
+			iter = mpart_tree_nextnode(iter);
+		}
+	}
+}
+
+/* Incref + trylock every distinct mman that is mapping some part of  "self"
+ * On success (all locks +  references acquired), return "NULL". On  failure
+ * (a blocking mman was encountered), release all already-acquired locks and
+ * return a reference to the blocking mman.
+ *
+ * This is only done for parts/nodes matching "filter" */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) REF struct mman *
+NOTHROW(KCALL mfile_tryincref_and_trylock_mmans_of_parts)(struct mfile *__restrict self,
+                                                          struct mfile_mman_lock_filter const *__restrict filter) {
+	struct mpart_tree_minmax mima;
+	assert(mfile_lock_writing(self));
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	mpart_tree_minmaxlocate(self->mf_parts,
+	                        filter->mfmlf_minaddr,
+	                        filter->mfmlf_maxaddr,
+	                        &mima);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (mima.mm_min) {
+		struct mpart *iter = mima.mm_min;
+		for (;;) {
+			unsigned int i;
+			assert(!wasdestroyed(iter));
+			assert(mpart_lock_acquired(iter));
+			for (i = 0; i < lengthof(iter->_mp_nodlsts); ++i) {
+				struct mnode *node;
+				LIST_FOREACH (node, &iter->_mp_nodlsts[i], mn_link) {
+					REF struct mman *mm;
+					assert(node->mn_part == iter);
+					if (node->mn_fspath != NULL)
+						continue;
+					if (node->mn_fsname == NULL)
+						continue;
+					if (!mfile_mman_lock_filter_references_name(filter, node->mn_fsname))
+						continue;
+					mm = node->mn_mman;
+					if (!tryincref(mm))
+						continue; /* Dead mman */
+					if (!mman_lock_trywrite(mm)) {
+						/* Maybe we just already locked this one? */
+						bool already_locked;
+						already_locked = _mfile_parts_contains_mman_before(&mima, filter, mm, node);
+						if (already_locked) {
+							/* Already locked :) */
+							decref_nokill(mm);
+						} else {
+							/* Nope: we're not the ones holding this lock! */
+							mfile_unlock_and_decref_mmans_of_parts_before(self, filter, node);
+							return mm;
+						}
+					}
+				}
+			}
+			if (iter == mima.mm_max)
+				break;
+			iter = mpart_tree_nextnode(iter);
+		}
+	}
+	return NULL;
+}
+
+
+/* Mark  "self" as  having been  deleted. The  caller must be
+ * holding locks to both "self", and (if present) its parent.
+ * the caller must also be holding a reference to "srf_base",
+ * since this function assumes that decref'ing it won't cause
+ * the base-file to ever be destroyed. */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL subregion_mfile_maskdeleted)(struct subregion_mfile *__restrict self) {
+	assert(subregion_lock_acquired(self));
+	assertf(LIST_EMPTY(&self->srf_children), "Caller must delete+unbind children first");
+	decref_nokill(self->srf_base);
+	self->srf_base = NULL;
+	if (self->srf_parent) {
+		assert(subregion_lock_acquired(self->srf_parent));
+		assert(LIST_ISBOUND(self, srf_chain));
+		decref_nokill(self->srf_parent);
+		self->srf_parent = NULL;
+		LIST_UNBIND(self, srf_chain);
+	}
+}
+
+/* Same  as  `subregion_mfile_maskdeleted()', but  also  recursively mark
+ * all children as deleted, and afterwards, unlock+decref those children. */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL subregion_mfile_maskdeleted_and_unlock_and_decref_children_r)(struct subregion_mfile *__restrict self) {
+	struct subregion_mfile *child_iter;
+	LIST_FOREACH_SAFE (child_iter, &self->srf_children, srf_chain) {
+		assert(child_iter->srf_parent == self);
+		assert(LIST_ISBOUND(child_iter, srf_chain));
+		subregion_mfile_maskdeleted_and_unlock_and_decref_children_r(child_iter);
+		subregion_lock_release(child_iter);
+		decref(child_iter);
+	}
+	subregion_mfile_maskdeleted(self);
+}
+
+
+/* Mark all mnode-s  matching "filter" with  "MNODE_F_VOIDMEM"
+ * and override their memory mappings in their respective page
+ * directories.
+ *
+ * Dead mman-s are skipped  automatically, but the caller  is
+ * responsible to be holding references and locks to anything
+ * that may potentially be touched here.
+ *
+ * This function will also unlock+decref every distinct mman
+ * that had some of its mappings void'ed-out.
+ *
+ * !!! THIS FUNCTION CANNOT BE ROLLED BACK !!!
+ */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL mfile_replace_mappings_with_void_and_unlock_and_decref_mmans)(struct mfile *__restrict self,
+                                                                            struct mfile_mman_lock_filter const *__restrict filter) {
+	struct mpart_tree_minmax mima;
+	assert(mfile_lock_writing(self));
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	mpart_tree_minmaxlocate(self->mf_parts,
+	                        filter->mfmlf_minaddr,
+	                        filter->mfmlf_maxaddr,
+	                        &mima);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (mima.mm_min) {
+		for (;;) {
+			unsigned int i;
+			assert(!wasdestroyed(mima.mm_min));
+			assert(mpart_lock_acquired(mima.mm_min));
+			for (i = 0; i < lengthof(mima.mm_min->_mp_nodlsts); ++i) {
+				struct mnode *node;
+				LIST_FOREACH_SAFE (node, &mima.mm_min->_mp_nodlsts[i], mn_link) {
+					REF struct mman *mm;
+					assert(node->mn_part == mima.mm_min);
+					if (node->mn_fspath != NULL)
+						continue;
+					if (node->mn_fsname == NULL)
+						continue;
+					if (!mfile_mman_lock_filter_references_name(filter, node->mn_fsname))
+						continue;
+					mm = node->mn_mman;
+					if unlikely(wasdestroyed(mm))
+						continue; /* Dead mman */
+					assert(mman_lock_writing(mm));
+
+					/* Remove "node" from "part" and mark as "MNODE_F_VOIDMEM" */
+					atomic_or(&node->mn_flags, MNODE_F_VOIDMEM);
+					atomic_write(&node->mn_part, NULL);
+					decref_nokill(mima.mm_min); /* Reference stolen from "node->mn_part" */
+					LIST_REMOVE(node, mn_link);
+					DBG_memset(&node->mn_link, 0xcc, sizeof(node->mn_link));
+
+					/* Unlink from mman's list of writable nodes (in case it was  bound)
+					 * This list link isn't valid for mnode-s with NULL-parts, so we can
+					 * even DBG_memset the link entry. */
+					if (LIST_ISBOUND(node, mn_writable))
+						LIST_REMOVE(node, mn_writable);
+					DBG_memset(&node->mn_writable, 0xcc, sizeof(node->mn_writable));
+
+					/* Hard-replace live memory mapping with /dev/void. */
+					if (mnode_pagedir_prepare_p(mm->mm_pagedir_p, node)) {
+						mnode_pagedir_mapvoid_p(mm->mm_pagedir_p, node, prot_from_mnodeflags(node->mn_flags));
+						mnode_pagedir_unprepare_p(mm->mm_pagedir_p, node);
+					} else {
+						/* Just unmap userspace and let the #PF handler re-build it. */
+						pagedir_unmap_userspace_p(mm->mm_pagedir_p);
+					}
+					mnode_pagedir_sync_smp_p(mm->mm_pagedir_p, node);
+
+					/* decref+unlock the associated mman if it isn't referenced again. */
+					if (!_mfile_parts_contains_mman_after(&mima, filter, mm, i, node)) {
+						mman_lock_endwrite(mm);
+						decref_unlikely(mm);
+					}
+				}
+			}
+			if (mima.mm_min == mima.mm_max)
+				break;
+			mima.mm_min = mpart_tree_nextnode(mima.mm_min);
+		}
+	}
+}
+
 
 /* Delete all memory mappings created from a given sub-region mfile "self",
  * as well as recursively do the same for any further sub-regions that  may
@@ -646,10 +990,15 @@ NOTHROW(KCALL mfile_subregion_tryincref_and_trylock_children_r)(struct subregion
 PUBLIC NONNULL((1)) void KCALL
 mfile_subregion_delete(struct mfile *__restrict self)
 		THROWS(E_WOULDBLOCK_PREEMPTED) {
+	struct mfile_mman_lock_filter mman_filter;
 	struct subregion_mfile *me = mfile_assubregion(self);
+	struct subregion_mfile *parent;
 	struct mfile *base;
 	assert(me->mf_ops == &mfile_subregion_ops);
 	(void)me;
+	mman_filter.mfmlf_minaddr    = me->srf_minaddr;
+	mman_filter.mfmlf_maxaddr    = me->srf_maxaddr;
+	mman_filter.mfmlf_mnode_name = me;
 
 again:
 	subregion_lock_acquire(me);
@@ -662,6 +1011,22 @@ again:
 		return;
 	}
 
+	/* Acquire a lock to the parent of "me" (if there is one)
+	 * This lock will be needed to later remove "me" from the
+	 * parent's list of children. */
+	parent = me->srf_parent;
+	if (parent && !subregion_lock_tryacquire(parent)) {
+		incref(parent);
+		LOCAL_unlockall();
+		FINALLY_DECREF_UNLIKELY(parent);
+		subregion_lock_waitfor(parent);
+		goto again;
+	}
+#undef LOCAL_unlockall
+#define LOCAL_unlockall()                              \
+	(!(parent) || (subregion_lock_release(parent), 0), \
+	 subregion_lock_release(me))
+
 	/* Acquire lock to "base" (so we can then lock all the mpart-s) */
 	if (!mfile_lock_trywrite(base)) {
 		incref(base);
@@ -671,8 +1036,9 @@ again:
 		goto again;
 	}
 #undef LOCAL_unlockall
-#define LOCAL_unlockall()       \
-	(mfile_lock_endwrite(base), \
+#define LOCAL_unlockall()                              \
+	(mfile_lock_endwrite(base),                        \
+	 !(parent) || (subregion_lock_release(parent), 0), \
 	 subregion_lock_release(me))
 
 	/* Recursively incref + acquire locks to all children created from "me" */
@@ -690,6 +1056,7 @@ again:
 #define LOCAL_unlockall()                              \
 	(mfile_subregion_unlock_and_decref_children_r(me), \
 	 mfile_lock_endwrite(base),                        \
+	 !(parent) || (subregion_lock_release(parent), 0), \
 	 subregion_lock_release(me))
 
 	/* Check if "base" has been deleted.
@@ -698,112 +1065,92 @@ again:
 	 *      not altered, and as such, we also won't be able
 	 *      to replace those mappings with /dev/void... */
 	if likely(base->mf_parts != MFILE_PARTS_ANONYMOUS) {
-		/* Acquire locks to the mem-parts of "base" */
+		/* Acquire locks to the mem-parts of "base"
+		 *
+		 * Since all of our children are necessarily further sub-regions
+		 * of the address-range of "me", we can just
+		 */
+		REF struct mman *blocking_mman;
 		REF struct mpart *blocking_part;
-		blocking_part = mfile_tryincref_and_lock_parts_r(base, me->srf_minaddr, me->srf_maxaddr);
+		blocking_part = mfile_tryincref_and_lock_parts_r(base, mman_filter.mfmlf_minaddr, mman_filter.mfmlf_maxaddr);
 		if unlikely(blocking_part) {
 			LOCAL_unlockall();
 			FINALLY_DECREF_UNLIKELY(blocking_part);
 			mpart_lock_waitfor(blocking_part);
 			goto again;
 		}
+#undef LOCAL_unlockall
+#define LOCAL_unlockall()                                                                                  \
+		((base->mf_parts == MFILE_PARTS_ANONYMOUS) ||                                                      \
+		 (mfile_unlock_and_decref_parts_r(base, mman_filter.mfmlf_minaddr, mman_filter.mfmlf_maxaddr), 0), \
+		 mfile_subregion_unlock_and_decref_children_r(me),                                                 \
+		 mfile_lock_endwrite(base),                                                                        \
+		 !(parent) || (subregion_lock_release(parent), 0),                                                 \
+		 subregion_lock_release(me))
+
+		/* Acquire locks to all mman-s referenced by mnode-s  linked
+		 * to mpart-s of "base" within the subregion's address range */
+		blocking_mman = mfile_tryincref_and_trylock_mmans_of_parts(base, &mman_filter);
+		if unlikely(blocking_mman) {
+			LOCAL_unlockall();
+			FINALLY_DECREF_UNLIKELY(blocking_mman);
+			mman_lock_waitwrite(blocking_mman);
+			goto again;
+		}
+#undef LOCAL_unlockall
+#define LOCAL_unlockall()                                                                              \
+		((base->mf_parts == MFILE_PARTS_ANONYMOUS) ||                                                  \
+		 (mfile_unlock_and_decref_mmans_of_parts(base, &mman_filter),                                  \
+		  mfile_unlock_and_decref_parts_r(base, mman_filter.mfmlf_minaddr, mman_filter.mfmlf_maxaddr), \
+		  0),                                                                                          \
+		 mfile_subregion_unlock_and_decref_children_r(me),                                             \
+		 mfile_lock_endwrite(base),                                                                    \
+		 !(parent) || (subregion_lock_release(parent), 0),                                             \
+		 subregion_lock_release(me))
+
+		/* At this point, all relevant locks are acquired, and
+		 * we  can proceed to  replace mappings with /dev/void */
+		mfile_replace_mappings_with_void_and_unlock_and_decref_mmans(self, &mman_filter);
+
+		/* Release locks to mman-s and mpart-s here. This must be done before
+		 * the  actual tree of sub-regions is marked as deleted, because once
+		 * that has happened, said tree can no longer be walked, also meaning
+		 * we'd no longer know which mpart-s/mnode-s/mman-s we've locked. */
+//		mfile_unlock_and_decref_mmans_of_parts(base, &mman_filter); /* Already done by previous call */
+		mfile_unlock_and_decref_parts_r(base, mman_filter.mfmlf_minaddr, mman_filter.mfmlf_maxaddr);
 	}
 #undef LOCAL_unlockall
-#define LOCAL_unlockall()                                                          \
-	((base->mf_parts == MFILE_PARTS_ANONYMOUS) ||                                  \
-	 (mfile_unlock_and_decref_parts_r(base, me->srf_minaddr, me->srf_maxaddr), 0), \
-	 mfile_subregion_unlock_and_decref_children_r(me),                             \
-	 mfile_lock_endwrite(base),                                                    \
+#define LOCAL_unlockall()                              \
+	(mfile_subregion_unlock_and_decref_children_r(me), \
+	 mfile_lock_endwrite(base),                        \
+	 !(parent) || (subregion_lock_release(parent), 0), \
 	 subregion_lock_release(me))
 
-	/* Acquire locks to all mman-s referenced by mnode-s  linked
-	 * to mpart-s of "base" within the subregion's address range */
-	/* TODO */
+	/* Will be dropped later, but needed here so "base"
+	 * isn't destroyed  while  locks  are  still  held. */
+	incref(base);
 
+	/* With mappings  replaced  with  /dev/void,  we
+	 * can now mark "me" and all children as deleted
+	 *
+	 * Since this  destroys the  tree of  sub-regions
+	 * originating  from "me", it  must also decref +
+	 * release locks from our children at this point. */
+	subregion_mfile_maskdeleted_and_unlock_and_decref_children_r(me);
+	assert(LIST_EMPTY(&me->srf_children));
 
-	/* TODO: Have a special "mfile" that allows for creation of arbitrary sub-regions of other mfile-s,
-	 *       while also having the ability to NOTHROW void-out all memory mappings made using that same
-	 *       mfile:
-	 * - Only possible to create sub-regions of mfile-s with "mfile_hasrawio()" (or other sub-region mfile-s)
-	 * - Override  "mo_stream->mso_mmap" to re-direct to underlying file, while also applying region
-	 *   offset. Additionally, inject special values for "hmi_fspath" / "hmi_fsname" that are unique
-	 *   to the sub-region mfile (meaning mnode-s created  can later be identified by these  special
-	 *   path / name values)
-	 *   Also: briefly lock "subregion_file" and assert that it hasn't been void'ed, yet.
-	 *         if it has been voided, simply  re-direct the mmap request to  `/dev/void'.
-	 * - Provide an IOCTL to void out any memory mapping created from the sub-region, implemented as:
-	 *   >> struct mfile *base = subregion_file->srf_base;
-	 *   >> // Acquire locks to mparts and mmans that were created
-	 *   >> // using the sub-region (rather than the original file)
-	 *   >> //
-	 *   >> // Since all locks here are atomic, the ioctl is NOTHROW for user-space.
-	 *   >> //
-	 *   >> // By acquiring write-locks to all components that are able to reach the
-	 *   >> // mnode in some way, we can gauranty that no-one might possibly still be
-	 *   >> // reading the fields of the mnode, also meaning that we're allowed to
-	 *   >> // write to the (normally) [const] "mn_part" field.
-	 *   >> //
-	 *   >> // Note that this acquires:
-	 *   >> // - mfile: mf_lock                    (of "subregion_file", to prevent creation or more mappings)
-	 *   >> // - mfile: mf_lock                    (of "base")
-	 *   >> // - mpart: tryincref+MPART_F_LOCKBIT  (of any non-destroyed mpart with nodes referencing the path+name of "subregion_file")
-	 *   >> // - mnode: tryincref+mn_mman->mm_lock (of any non-destroyed mnode->mman referencing the path+name of "subregion_file")
-	 *   >> INCREF_AND_LOCK_ALL_MPARTS_AND_MMANS_OF_MPARTS_REFERENCING(base,
-	 *   >>         mnode_path: subregion_file->srf_path,
-	 *   >>         mnode_name: subregion_file->srf_name);
-	 *   >> struct mpart *part;
-	 *   >> FOREACH_MPART_SAFE (part, base) {
-	 *   >>     struct mnode *node;
-	 *   >>     if (wasdestroyed(part))
-	 *   >>         continue;
-	 *   >>     if (!HAS_MNODES_WITH_PATH_AND_NAME(part, subregion_file->srf_path, subregion_file->srf_name))
-	 *   >>         continue;
-	 *   >>     FOREACH_MNODE_SAFE (node, part) {
-	 *   >>         struct mman *mm = node->mn_mman;
-	 *   >>         assert(node->mn_part == part);
-	 *   >>         if (wasdestroyed(mm))
-	 *   >>             continue;
-	 *   >>         if (node->mn_fspath != subregion_file->srf_path)
-	 *   >>             continue;
-	 *   >>         if (node->mn_fsname != subregion_file->srf_name)
-	 *   >>             continue;
-	 *   >>
-	 *   >>         // Remove "node" from "part" and mark as "MNODE_F_VOIDMEM"
-	 *   >>         atomic_or(&node->mn_flags, MNODE_F_VOIDMEM);
-	 *   >>         atomic_write(&node->mn_part, NULL);
-	 *   >>         decref_nokill(part);
-	 *   >>         LIST_REMOVE(node, mn_link);
-	 *   >>
-	 *   >>         // Not valid if "mn_part == NULL"
-	 *   >>         if (LIST_ISBOUND(node, mn_writable))
-	 *   >>             LIST_REMOVE(node, mn_writable);
-	 *   >>
-	 *   >>         // Hard-replace live memory mapping with /dev/void
-	 *   >>         if (mnode_pagedir_prepare_p(mm->mm_pagedir_p, node)) {
-	 *   >>             mnode_pagedir_mapvoid_p(mm->mm_pagedir_p, node, prot_from_mnodeflags(node->mn_flags));
-	 *   >>             mnode_pagedir_unprepare_p(mm->mm_pagedir_p, node);
-	 *   >>         } else {
-	 *   >>             pagedir_unmap_userspace_p(mm->mm_pagedir_p);
-	 *   >>         }
-	 *   >>         mnode_pagedir_sync_smp_p(mm->mm_pagedir_p, node);
-	 *   >>
-	 *   >>         // Release lock/reference to mman not referenced again
-	 *   >>         if (!IS_MMAN_REFERENCED_AGAIN_LATER(mm)) {
-	 *   >>             mman_lock_endwrite(mm);
-	 *   >>             decref(mm);
-	 *   >>         }
-	 *   >>     }
-	 *   >>     mpart_lock_release(part);
-	 *   >>     decref(part);
-	 *   >> }
-	 *   >> mfile_lock_endwrite(base);
-	 *   >> MARK_AS_VOID(subregion_file); // Cause future mmap-s to go to /dev/void
-	 *   >> mfile_lock_endwrite(subregion_file);
-	 */
+#undef LOCAL_unlockall
+#define LOCAL_unlockall()                              \
+	(/*mfile_subregion_unlock_and_decref_children_r(me),*/ \
+	 mfile_lock_endwrite(base),                        \
+	 !(parent) || (subregion_lock_release(parent), 0), \
+	 subregion_lock_release(me))
 
-	/* TODO */
+	/* Release all (remaining) locks */
 	LOCAL_unlockall();
-	THROW(E_NOT_IMPLEMENTED_TODO);
+
+	/* Drop manual reference from above. */
+	decref(base);
 #undef LOCAL_unlockall
 }
 
