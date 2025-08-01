@@ -221,14 +221,10 @@ struct video_domain {
 	void (*_vd_pad1[1])(void); /* ... */
 #endif /* !CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
 
-	void (*_vd_pad2[11])(void); /* Reserved for future expansion */
-
 	/* TODO: Function for getting memory usage (for the ram-domain,
 	 *       just return regular ram usage info as per `sysinfo(2)) */
 
-	/* TODO: Function  for creating video palettes also need  to go here (so translation data
-	 *       can be stored server-side in case of a window server, or in V-RAM so-as to speed
-	 *       up palette conversion blits) */
+	void (*_vd_pad2[11])(void); /* Reserved for future expansion */
 };
 
 

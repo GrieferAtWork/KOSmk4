@@ -87,9 +87,15 @@ NOTHROW(FCC libvideo_buffer_noop__revoke)(struct video_buffer *__restrict self);
 	       (self)->vi_wlockregion  = &libvideo_buffer_notsup__wlockregion, \
 	       (self)->vi_unlockregion = &libvideo_buffer_noop__unlockregion)
 
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+#define __video_buffer_ops_set_fdinfo(self, cb) (void)((self)->vi_fdinfo = (cb))
+#else /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+#define __video_buffer_ops_set_fdinfo(self, cb) (void)0
+#endif /* !CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+
 #define DEFINE_VIDEO_BUFFER_TYPE(name, vi_destroy_, vi_initgfx_, vi_updategfx_, vi_rlock_, vi_wlock_, \
                                  vi_unlock_, vi_rlockregion_, vi_wlockregion_, vi_unlockregion_,      \
-                                 vi_revoke_, vi_subregion_)                                           \
+                                 vi_fdinfo_, vi_revoke_, vi_subregion_)                               \
 	INTERN struct video_buffer_ops name = {};                                                         \
 	INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _##name(void) {                  \
 		if unlikely(!name.vi_destroy) {                                                               \
@@ -103,8 +109,9 @@ NOTHROW(FCC libvideo_buffer_noop__revoke)(struct video_buffer *__restrict self);
 			name.vi_unlockregion = vi_unlockregion_;                                                  \
 			name.vi_revoke       = vi_revoke_;                                                        \
 			name.vi_subregion    = vi_subregion_;                                                     \
+			__video_buffer_ops_set_fdinfo(&name, vi_fdinfo_);                                         \
 			COMPILER_WRITE_BARRIER();                                                                 \
-			name.vi_destroy = &vi_destroy_;                                                           \
+			name.vi_destroy = vi_destroy_;                                                            \
 			COMPILER_WRITE_BARRIER();                                                                 \
 		}                                                                                             \
 		return &name;                                                                                 \

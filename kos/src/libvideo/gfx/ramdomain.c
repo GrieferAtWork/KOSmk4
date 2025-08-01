@@ -64,26 +64,26 @@ DEFINE_PUBLIC_ALIAS(video_rambuffer_formem_ops, _rambuffer_formem_ops);
 DEFINE_PUBLIC_ALIAS(video_rambuffer_subregion_ops, _rambuffer_subregion_ops);
 DEFINE_PUBLIC_ALIAS(video_rambuffer_subregion_norem_ops, _rambuffer_subregion_norem_ops);
 
-DEFINE_VIDEO_BUFFER_TYPE(rambuffer_ops, rambuffer__destroy,
-                         rambuffer__initgfx, rambuffer__updategfx,
-                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop__unlock,
-                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop__unlockregion,
-                         libvideo_buffer_noop__revoke, rambuffer__subregion);
-DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_ops, rambuffer_formem__destroy,
-                         rambuffer__initgfx, rambuffer__updategfx,
-                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop__unlock,
-                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop__unlockregion,
-                         libvideo_buffer_noop__revoke, rambuffer__subregion);
-DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_ops, rambuffer_subregion__destroy,
-                         rambuffer_subregion__initgfx, rambuffer_subregion__updategfx,
-                         libvideo_buffer_notsup__rlock, libvideo_buffer_notsup__wlock, libvideo_buffer_noop__unlock,
-                         rambuffer_subregion__lockregion, rambuffer_subregion__lockregion, libvideo_buffer_noop__unlockregion,
-                         libvideo_buffer_noop__revoke, rambuffer_subregion__subregion);
-DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_norem_ops, rambuffer_subregion__destroy,
-                         rambuffer_subregion__initgfx, rambuffer_subregion__updategfx,
-                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop__unlock,
-                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop__unlockregion,
-                         libvideo_buffer_noop__revoke, rambuffer_subregion__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_ops, &rambuffer__destroy,
+                         &rambuffer__initgfx, &rambuffer__updategfx,
+                         &rambuffer__lock, &rambuffer__lock, &libvideo_buffer_noop__unlock,
+                         &rambuffer__lockregion, &rambuffer__lockregion, &libvideo_buffer_noop__unlockregion,
+                         NULL, &libvideo_buffer_noop__revoke, &rambuffer__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_ops, &rambuffer_formem__destroy,
+                         &rambuffer__initgfx, &rambuffer__updategfx,
+                         &rambuffer__lock, &rambuffer__lock, &libvideo_buffer_noop__unlock,
+                         &rambuffer__lockregion, &rambuffer__lockregion, &libvideo_buffer_noop__unlockregion,
+                         NULL, &libvideo_buffer_noop__revoke, &rambuffer__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_ops, &rambuffer_subregion__destroy,
+                         &rambuffer_subregion__initgfx, &rambuffer_subregion__updategfx,
+                         &libvideo_buffer_notsup__rlock, &libvideo_buffer_notsup__wlock, &libvideo_buffer_noop__unlock,
+                         &rambuffer_subregion__lockregion, &rambuffer_subregion__lockregion, &libvideo_buffer_noop__unlockregion,
+                         NULL, &libvideo_buffer_noop__revoke, &rambuffer_subregion__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_norem_ops, &rambuffer_subregion__destroy,
+                         &rambuffer_subregion__initgfx, &rambuffer_subregion__updategfx,
+                         &rambuffer__lock, &rambuffer__lock, &libvideo_buffer_noop__unlock,
+                         &rambuffer__lockregion, &rambuffer__lockregion, &libvideo_buffer_noop__unlockregion,
+                         NULL, &libvideo_buffer_noop__revoke, &rambuffer_subregion__subregion);
 
 
 /* Video buffer types used to represent ram buffers.

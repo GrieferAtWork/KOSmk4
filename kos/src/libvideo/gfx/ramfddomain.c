@@ -95,21 +95,21 @@ DEFINE_PUBLIC_ALIAS(video_ramfdbuffer_ops, _ramfdbuffer_ops);
 DEFINE_PUBLIC_ALIAS(video_ramfdbuffer_subregion_ops, _ramfdbuffer_subregion_ops);
 DEFINE_PUBLIC_ALIAS(video_ramfdbuffer_subregion_rem_ops, _ramfdbuffer_subregion_rem_ops);
 
-DEFINE_VIDEO_BUFFER_TYPE(ramfdbuffer_ops, ramfdbuffer__destroy,
-                         rambuffer__initgfx, rambuffer__updategfx,
-                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop__unlock,
-                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop__unlockregion,
-                         libvideo_buffer_noop__revoke, ramfdbuffer__subregion);
-DEFINE_VIDEO_BUFFER_TYPE(ramfdbuffer_subregion_ops, ramfdbuffer__destroy,
-                         rambuffer__initgfx, rambuffer__updategfx,
-                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop__unlock,
-                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop__unlockregion,
-                         ramfdbuffer_subregion__revoke, ramfdbuffer__subregion);
-DEFINE_VIDEO_BUFFER_TYPE(ramfdbuffer_subregion_rem_ops, ramfdbuffer_subregion_rem__destroy,
-                         ramfdbuffer_subregion_rem__initgfx, ramfdbuffer_subregion_rem__updategfx,
-                         libvideo_buffer_notsup__rlock, libvideo_buffer_notsup__wlock, libvideo_buffer_noop__unlock,
-                         ramfdbuffer_subregion_rem__lockregion, ramfdbuffer_subregion_rem__lockregion, libvideo_buffer_noop__unlockregion,
-                         ramfdbuffer_subregion_rem__revoke, ramfdbuffer_subregion_rem__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(ramfdbuffer_ops, &ramfdbuffer__destroy,
+                         &rambuffer__initgfx, &rambuffer__updategfx,
+                         &rambuffer__lock, &rambuffer__lock, &libvideo_buffer_noop__unlock,
+                         &rambuffer__lockregion, &rambuffer__lockregion, &libvideo_buffer_noop__unlockregion,
+                         &ramfdbuffer__fdinfo, &libvideo_buffer_noop__revoke, &ramfdbuffer__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(ramfdbuffer_subregion_ops, &ramfdbuffer__destroy,
+                         &rambuffer__initgfx, &rambuffer__updategfx,
+                         &rambuffer__lock, &rambuffer__lock, &libvideo_buffer_noop__unlock,
+                         &rambuffer__lockregion, &rambuffer__lockregion, &libvideo_buffer_noop__unlockregion,
+                         &ramfdbuffer__fdinfo, &ramfdbuffer_subregion__revoke, &ramfdbuffer__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(ramfdbuffer_subregion_rem_ops, &ramfdbuffer_subregion_rem__destroy,
+                         &ramfdbuffer_subregion_rem__initgfx, &ramfdbuffer_subregion_rem__updategfx,
+                         &libvideo_buffer_notsup__rlock, &libvideo_buffer_notsup__wlock, &libvideo_buffer_noop__unlock,
+                         &ramfdbuffer_subregion_rem__lockregion, &ramfdbuffer_subregion_rem__lockregion, &libvideo_buffer_noop__unlockregion,
+                         &ramfdbuffer_subregion_rem__fdinfo, &ramfdbuffer_subregion_rem__revoke, &ramfdbuffer_subregion_rem__subregion);
 
 
 
@@ -235,6 +235,7 @@ ramfdbuffer__subregion(struct video_surface const *__restrict self,
 	                                 aligned_region_boff);
 	if unlikely(result->rb_data == (byte_t *)MAP_FAILED)
 		goto err_r_fd;
+	assert(((uintptr_t)result->rb_data & pm) == aligned_region_boff);
 	result->rfdb_total = region_size;
 	result->rb_stride  = me->rb_stride;
 
@@ -298,6 +299,38 @@ ramfdbuffer_subregion_rem__initgfx(struct video_gfx *__restrict self) {
 	                      video_gfx_getydim(self));
 	return self;
 }
+
+
+/* FDINFO */
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+INTERN ATTR_INOUT(1) ATTR_OUT(2) void FCC
+ramfdbuffer__fdinfo(struct video_buffer *__restrict self,
+                    struct video_buffer_fdinfo *__restrict info) {
+	size_t ps = getpagesize(), pm = ps - 1;
+	struct video_ramfdbuffer *me = (struct video_ramfdbuffer *)self;
+	/* Fill in file descriptor information */
+	info->vbfdi_total  = me->rfdb_total;
+	info->vbfdi_stride = me->rb_stride;
+	info->vbfdi_bxoff  = (uintptr_t)me->rb_data & pm;
+	info->vbfdi_bxrem  = 0;
+	info->vbfdi_fd     = me->rfdb_fd;
+	info->vbfdi_hwops  = 0;
+	info->vbfdi_xdim   = video_buffer_getxdim(me);
+	info->vbfdi_ydim   = video_buffer_getydim(me);
+	info->vbfdi_cxoff  = 0;
+	info->vbfdi_cyoff  = 0;
+}
+
+INTERN ATTR_INOUT(1) ATTR_OUT(2) void FCC
+ramfdbuffer_subregion_rem__fdinfo(struct video_buffer *__restrict self,
+                                  struct video_buffer_fdinfo *__restrict info) {
+	struct video_ramfdbuffer_subregion_rem *me;
+	me = (struct video_ramfdbuffer_subregion_rem *)self;
+	ramfdbuffer__fdinfo(me->rfdbsr_base, info);
+	info->vbfdi_bxrem += me->rfdbsr_bxrem;
+}
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+
 
 #define return_empty_buffer                                      \
 	do {                                                         \

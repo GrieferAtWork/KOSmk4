@@ -59,25 +59,25 @@ DECL_BEGIN
 
 /* Custom buffer operator types */
 DEFINE_VIDEO_BUFFER_TYPE(custom_buffer_ops,
-                         custom_buffer__destroy, custom_buffer__initgfx, libvideo_buffer_swgfx_updategfx,
-                         custom_buffer__rlock, custom_buffer__wlock, custom_buffer__unlock,
-                         custom_buffer__rlockregion, custom_buffer__wlockregion, custom_buffer__unlockregion,
-                         custom_buffer__revoke, custom_buffer__subregion);
+                         &custom_buffer__destroy, &custom_buffer__initgfx, &libvideo_buffer_swgfx_updategfx,
+                         &custom_buffer__rlock, &custom_buffer__wlock, &custom_buffer__unlock,
+                         &custom_buffer__rlockregion, &custom_buffer__wlockregion, &custom_buffer__unlockregion,
+                         NULL, &custom_buffer__revoke, &custom_buffer__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(custom_buffer_subregion_ops,
-                         custom_buffer_subregion__destroy, custom_buffer_subregion__initgfx, libvideo_buffer_swgfx_updategfx,
-                         libvideo_buffer_notsup__rlock, libvideo_buffer_notsup__wlock, libvideo_buffer_noop__unlock,
-                         custom_buffer_subregion__rlockregion, custom_buffer_subregion__wlockregion, custom_buffer_subregion__unlockregion,
-                         custom_buffer_subregion__revoke, custom_buffer_subregion__subregion);
+                         &custom_buffer_subregion__destroy, &custom_buffer_subregion__initgfx, &libvideo_buffer_swgfx_updategfx,
+                         &libvideo_buffer_notsup__rlock, &libvideo_buffer_notsup__wlock, &libvideo_buffer_noop__unlock,
+                         &custom_buffer_subregion__rlockregion, &custom_buffer_subregion__wlockregion, &custom_buffer_subregion__unlockregion,
+                         NULL, &custom_buffer_subregion__revoke, &custom_buffer_subregion__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(custom_buffer_subregion_norem_ops,
-                         custom_buffer_subregion__destroy, custom_buffer_subregion__initgfx, libvideo_buffer_swgfx_updategfx,
-                         custom_buffer_subregion__rlock, custom_buffer_subregion__wlock, custom_buffer_subregion__unlock,
-                         custom_buffer_subregion__rlockregion, custom_buffer_subregion__wlockregion, custom_buffer_subregion__unlockregion,
-                         custom_buffer_subregion__revoke, custom_buffer_subregion__subregion);
+                         &custom_buffer_subregion__destroy, &custom_buffer_subregion__initgfx, &libvideo_buffer_swgfx_updategfx,
+                         &custom_buffer_subregion__rlock, &custom_buffer_subregion__wlock, &custom_buffer_subregion__unlock,
+                         &custom_buffer_subregion__rlockregion, &custom_buffer_subregion__wlockregion, &custom_buffer_subregion__unlockregion,
+                         NULL, &custom_buffer_subregion__revoke, &custom_buffer_subregion__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(custom_buffer_subregion_nooff_ops,
-                         custom_buffer_subregion__destroy, custom_buffer__initgfx, libvideo_buffer_swgfx_updategfx,
-                         custom_buffer__rlock, custom_buffer__wlock, custom_buffer__unlock,
-                         custom_buffer__rlockregion, custom_buffer__wlockregion, custom_buffer__unlockregion,
-                         custom_buffer_subregion__revoke, custom_buffer_subregion__subregion);
+                         &custom_buffer_subregion__destroy, &custom_buffer__initgfx, &libvideo_buffer_swgfx_updategfx,
+                         &custom_buffer__rlock, &custom_buffer__wlock, &custom_buffer__unlock,
+                         &custom_buffer__rlockregion, &custom_buffer__wlockregion, &custom_buffer__unlockregion,
+                         NULL, &custom_buffer_subregion__revoke, &custom_buffer_subregion__subregion);
 
 
 /* Operators for custom buffers, as seen above */

@@ -37,7 +37,9 @@ DECL_BEGIN
 struct video_rect;
 struct region_buffer;
 
-struct region_buffer: video_buffer {     /* vb_ops == &region_buffer_ops || vb_ops == &region_buffer_xoff_ops */
+struct region_buffer: video_buffer {
+	/* >> vb_ops == &region_buffer_ops ||
+	 * >> vb_ops == &region_buffer_serial_ops */
 	video_offset_t           rbf_cxoff; /* [const] Starting X offset of Clip Rect in `rbf_base' */
 	video_offset_t           rbf_cyoff; /* [const] Starting Y offset of Clip Rect in `rbf_base' */
 	REF struct video_buffer *rbf_base;  /* [const] Underlying video buffer. */
@@ -45,6 +47,10 @@ struct region_buffer: video_buffer {     /* vb_ops == &region_buffer_ops || vb_o
 
 INTDEF struct video_buffer_ops region_buffer_ops;
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _region_buffer_ops(void);
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+INTDEF struct video_buffer_ops region_buffer_serial_ops;
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _region_buffer_serial_ops(void);
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
 
 
 /* Operators for region buffers, as seen above */
@@ -64,6 +70,13 @@ INTDEF ATTR_INOUT(1) NONNULL((2)) void NOTHROW(FCC region_buffer__unlockregion)(
 /* GFX */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC region_buffer__initgfx(struct video_gfx *__restrict self);
 #define region_buffer__updategfx (*(struct video_gfx *(FCC *)(struct video_gfx *__restrict, unsigned int))(void *)-1)
+
+/* FDINFO */
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) void FCC
+region_buffer__fdinfo(struct video_buffer *__restrict self,
+                      struct video_buffer_fdinfo *__restrict info);
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
 
 
 

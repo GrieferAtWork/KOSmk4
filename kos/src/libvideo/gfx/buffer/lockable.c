@@ -61,20 +61,20 @@ DECL_BEGIN
 
 /* Lockable buffer operator types */
 DEFINE_VIDEO_BUFFER_TYPE(lockable_buffer_ops,
-                         lockable_buffer__destroy, lockable_buffer__initgfx, lockable_buffer__updategfx,
-                         lockable_buffer__rlock, lockable_buffer__wlock, lockable_buffer__unlock,
-                         lockable_buffer__rlockregion, lockable_buffer__wlockregion, lockable_buffer__unlockregion,
-                         lockable_buffer__revoke, lockable_buffer__subregion);
+                         &lockable_buffer__destroy, &lockable_buffer__initgfx, &lockable_buffer__updategfx,
+                         &lockable_buffer__rlock, &lockable_buffer__wlock, &lockable_buffer__unlock,
+                         &lockable_buffer__rlockregion, &lockable_buffer__wlockregion, &lockable_buffer__unlockregion,
+                         NULL, &lockable_buffer__revoke, &lockable_buffer__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(lockable_buffer_subregion_ops,
-                         lockable_buffer_subregion__destroy, lockable_buffer_subregion__initgfx, lockable_buffer__updategfx,
-                         libvideo_buffer_notsup__rlock, libvideo_buffer_notsup__wlock, libvideo_buffer_noop__unlock,
-                         lockable_buffer_subregion__rlockregion, lockable_buffer_subregion__wlockregion, lockable_buffer_subregion__unlockregion,
-                         lockable_buffer__revoke, lockable_buffer_subregion__subregion);
+                         &lockable_buffer_subregion__destroy, &lockable_buffer_subregion__initgfx, &lockable_buffer__updategfx,
+                         &libvideo_buffer_notsup__rlock, &libvideo_buffer_notsup__wlock, &libvideo_buffer_noop__unlock,
+                         &lockable_buffer_subregion__rlockregion, &lockable_buffer_subregion__wlockregion, &lockable_buffer_subregion__unlockregion,
+                         NULL, &lockable_buffer__revoke, &lockable_buffer_subregion__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(lockable_buffer_subregion_norem_ops,
-                         lockable_buffer_subregion__destroy, lockable_buffer_subregion__initgfx, lockable_buffer__updategfx,
-                         lockable_buffer_subregion__rlock, lockable_buffer_subregion__wlock, lockable_buffer_subregion__unlock,
-                         lockable_buffer_subregion__rlockregion, lockable_buffer_subregion__wlockregion, lockable_buffer_subregion__unlockregion,
-                         lockable_buffer__revoke, lockable_buffer_subregion__subregion);
+                         &lockable_buffer_subregion__destroy, &lockable_buffer_subregion__initgfx, &lockable_buffer__updategfx,
+                         &lockable_buffer_subregion__rlock, &lockable_buffer_subregion__wlock, &lockable_buffer_subregion__unlock,
+                         &lockable_buffer_subregion__rlockregion, &lockable_buffer_subregion__wlockregion, &lockable_buffer_subregion__unlockregion,
+                         NULL, &lockable_buffer__revoke, &lockable_buffer_subregion__subregion);
 
 
 

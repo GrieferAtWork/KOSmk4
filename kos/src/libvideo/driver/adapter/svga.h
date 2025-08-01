@@ -43,6 +43,9 @@ struct svga_buffer;
 AXREF(svga_buffer_axref, svga_buffer);
 
 struct svga_buffer: video_rambuffer {
+	/* TODO: Buffer here must be derived from "video_ramfdbuffer",
+	 *       since it needs  to be  revocable and  FD-serializable */
+
 	/* NOTE: The buffer described here is owned and must be unmapped using `:sva_libphys_unmap' */
 	size_t                  svb_rb_total; /* [const] Total buffer size */
 	struct video_buffer_ops svb_ops;      /* [const] Operator table. */

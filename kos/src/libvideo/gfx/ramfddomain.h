@@ -76,6 +76,16 @@ INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC ramfdbuffer_subregion_rem__lockregion(
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC ramfdbuffer_subregion_rem__initgfx(struct video_gfx *__restrict self);
 #define ramfdbuffer_subregion_rem__updategfx (*(struct video_gfx *(FCC *)(struct video_gfx *__restrict, unsigned int))(void *)-1)
 
+/* FDINFO */
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) void FCC
+ramfdbuffer__fdinfo(struct video_buffer *__restrict self,
+                    struct video_buffer_fdinfo *__restrict info);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) void FCC
+ramfdbuffer_subregion_rem__fdinfo(struct video_buffer *__restrict self,
+                                  struct video_buffer_fdinfo *__restrict info);
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+
 /* RAMFD DOMAIN OPERATORS */
 INTDEF WUNUSED NONNULL((1)) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_ramfddomain_newbuffer(struct video_domain const *__restrict self,

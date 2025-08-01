@@ -41,6 +41,7 @@
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/serial.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/rect.h>
 #include <libvideo/types.h>
@@ -63,10 +64,19 @@ DECL_BEGIN
 
 
 DEFINE_VIDEO_BUFFER_TYPE(region_buffer_ops,
-                         region_buffer__destroy, region_buffer__initgfx, region_buffer__updategfx,
-                         libvideo_buffer_notsup__rlock, libvideo_buffer_notsup__wlock, libvideo_buffer_noop__unlock,
-                         region_buffer__rlockregion, region_buffer__wlockregion, region_buffer__unlockregion,
-                         region_buffer__revoke, region_buffer__subregion);
+                         &region_buffer__destroy, &region_buffer__initgfx, &region_buffer__updategfx,
+                         &libvideo_buffer_notsup__rlock, &libvideo_buffer_notsup__wlock, &libvideo_buffer_noop__unlock,
+                         &region_buffer__rlockregion, &region_buffer__wlockregion, &region_buffer__unlockregion,
+                         NULL, &region_buffer__revoke, &region_buffer__subregion);
+
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+DEFINE_VIDEO_BUFFER_TYPE(region_buffer_serial_ops,
+                         &region_buffer__destroy, &region_buffer__initgfx, &region_buffer__updategfx,
+                         &libvideo_buffer_notsup__rlock, &libvideo_buffer_notsup__wlock, &libvideo_buffer_noop__unlock,
+                         &region_buffer__rlockregion, &region_buffer__wlockregion, &region_buffer__unlockregion,
+                         &region_buffer__fdinfo, &region_buffer__revoke, &region_buffer__subregion);
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+
 
 /* Operators for region buffers, as seen above */
 
@@ -221,6 +231,29 @@ region_buffer__initgfx(struct video_gfx *__restrict self) {
 }
 
 
+/* FDINFO */
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+INTERN ATTR_INOUT(1) ATTR_OUT(2) void FCC
+region_buffer__fdinfo(struct video_buffer *__restrict self,
+                      struct video_buffer_fdinfo *__restrict info) {
+	struct region_buffer *me = (struct region_buffer *)self;
+
+	/* Get FD-info of wrapped buffer. */
+	assert(me->rbf_base->vb_ops->vi_fdinfo);
+	(*me->rbf_base->vb_ops->vi_fdinfo)(me->rbf_base, info);
+
+	/* Include super-region offsets in serialization info */
+	if (info->vbfdi_xdim > video_buffer_getxdim(me))
+		info->vbfdi_xdim = video_buffer_getxdim(me);
+	if (info->vbfdi_ydim > video_buffer_getydim(me))
+		info->vbfdi_ydim = video_buffer_getydim(me);
+	info->vbfdi_cxoff += me->rbf_cxoff;
+	info->vbfdi_cyoff += me->rbf_cyoff;
+}
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+
+
+
 
 
 
@@ -331,7 +364,13 @@ _libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 	__video_buffer_init_dim(result, buffer_rect->vr_xdim, buffer_rect->vr_ydim);
 	result->rbf_cxoff = buffer_rect->vr_xmin;
 	result->rbf_cyoff = buffer_rect->vr_ymin;
-	if (buffer->vb_ops == &region_buffer_ops) {
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+	if (buffer->vb_ops == &region_buffer_ops ||
+	    buffer->vb_ops == &region_buffer_serial_ops)
+#else /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+	if (buffer->vb_ops == &region_buffer_ops)
+#endif /* !CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+	{
 		struct region_buffer *me = (struct region_buffer *)self;
 		struct video_buffer *base = me->rbf_base;
 		struct video_rect me_crect, ret_crect, base_crect;
@@ -398,7 +437,14 @@ _libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 			base = used_base;
 		}
 	}
-	result->vb_ops   = _region_buffer_ops();
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+	if (buffer->vb_ops->vi_fdinfo) {
+		result->vb_ops = _region_buffer_serial_ops();
+	} else
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+	{
+		result->vb_ops = _region_buffer_ops();
+	}
 	result->rbf_base = buffer;
 	video_buffer_incref(buffer);
 
