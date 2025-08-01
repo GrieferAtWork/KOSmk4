@@ -70,7 +70,7 @@ DEFINE_VIDEO_BUFFER_TYPE(lockable_buffer_ops,
                          lockable_buffer__revoke, lockable_buffer__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(lockable_buffer_subregion_ops,
                          lockable_buffer_subregion__destroy, lockable_buffer_subregion__initgfx, lockable_buffer__updategfx,
-                         libvideo_buffer_notsup_rlock, libvideo_buffer_notsup_wlock, libvideo_buffer_noop_unlock,
+                         libvideo_buffer_notsup__rlock, libvideo_buffer_notsup__wlock, libvideo_buffer_noop__unlock,
                          lockable_buffer_subregion__rlockregion, lockable_buffer_subregion__wlockregion, lockable_buffer_subregion__unlockregion,
                          lockable_buffer__revoke, lockable_buffer_subregion__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(lockable_buffer_subregion_norem_ops,

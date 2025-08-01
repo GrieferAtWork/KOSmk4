@@ -134,7 +134,7 @@
 /* TODO: BGR101111 */
 
 /* 64bpp direct color */
-#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 /* TODO: RGBA16161616 */
 /* TODO: RGBX16161616 */
 /* TODO: ARGB16161616 */
@@ -143,7 +143,7 @@
 /* TODO: BGRX16161616 */
 /* TODO: ABGR16161616 */
 /* TODO: XBGR16161616 */
-#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 
 /* Gray-scale (Luminance) */
@@ -179,11 +179,11 @@
 #define VIDEO_CODEC_A4_MSB   0x101e /* 4-bit-per-pixel, 16-level alpha-mask (0=transparent; 15=opaque; rgb=0), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
 #define VIDEO_CODEC_A4_LSB   0x101f /* 4-bit-per-pixel, 16-level alpha-mask (0=transparent; 15=opaque; rgb=0), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
 #define VIDEO_CODEC_A8       0x1020 /* 1-byte-per-pixel, 256-level alpha-mask (0=transparent; 255=opaque; rgb=0) */
-#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 /* TODO: L16 */
 /* TODO: LA1616 */
 /* TODO: AL1616 */
-#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 /* Palette-driven:
  * - In those cases where only a palette is used (without a dedicated
@@ -255,9 +255,9 @@ struct video_codec_specs {
 	                             * unused. In the  case of a  palette-driven codec, `1 << vcs_cbits'  is the size  of the  palette.
 	                             * For normal codecs, this is always equal to `SUM(POPCOUNT(vcs_*mask))' (and includes "vcs_amask",
 	                             * which it doesn't for palette/gray-scale codecs) */
-#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 	__UINT32_TYPE__ _vcs_pad;   /* ... */
-#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 	/* Color masks. For grayscale / palette-driven codecs, these are all identical and
 	 * specify the mask of bits within a single pixel whose "PEXT" result is then used
@@ -266,19 +266,19 @@ struct video_codec_specs {
 	 * For whole/multi-byte codecs, these masks assume that you read a pixel as:
 	 * >> video_pixel64_t pixel = UNALIGNED_GET((uintN_t *)pixel_addr);
 	 * iow: these masks are always in host-endian */
-#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 	video_pixel64_t  vcs_rmask; /* Mask of bits in a pixel that make up red */
 	video_pixel64_t  vcs_gmask; /* Mask of bits in a pixel that make up green */
 	video_pixel64_t  vcs_bmask; /* Mask of bits in a pixel that make up blue */
 	/* The alpha-mask does not participate in palette/grayscale lookup; it always functions as its own thing */
 	video_pixel64_t  vcs_amask; /* Mask of bits in a pixel that make up alpha */
-#else /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#else /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 	video_pixel_t    vcs_rmask; /* Mask of bits in a pixel that make up red */
 	video_pixel_t    vcs_gmask; /* Mask of bits in a pixel that make up green */
 	video_pixel_t    vcs_bmask; /* Mask of bits in a pixel that make up blue */
 	/* The alpha-mask does not participate in palette/grayscale lookup; it always functions as its own thing */
 	video_pixel_t    vcs_amask; /* Mask of bits in a pixel that make up alpha */
-#endif /* !CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#endif /* !CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 };
 
 
@@ -313,7 +313,7 @@ typedef __ATTR_NONNULL_T((1)) void
 (LIBVIDEO_GFX_FCC *video_codec_setpixel_t)(__byte_t *__restrict __line,
                                            video_coord_t __x, video_pixel_t __pixel);
 
-#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
 #if __has_attribute(__regparm__)
 #define VIDEO_CODEC_SETPIXEL3_CC __attribute__((__regparm__(3)))
 /* Same as `vc_setpixel', but uses a different calling
@@ -325,7 +325,7 @@ typedef __ATTR_NONNULL_T((1)) void
 typedef void (*_video_codec_setpixel3_t)(void);
 #define VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY
 #endif /* !__has_attribute(__regparm__) */
-#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
 /* Fill `__num_pixels' neighboring pixels  horizontally.
  * The caller must ensure that all coords are in-bounds.
@@ -390,7 +390,7 @@ typedef __ATTR_NONNULL_T((1, 3)) void
                                            video_dim_t __size_x);
 
 /* 64-bit color/pixel functions */
-#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color64_t
 (LIBVIDEO_GFX_FCC *video_codec_pixel2color64_t)(struct video_surface const *__restrict __self,
                                                 video_pixel64_t __pixel);
@@ -411,7 +411,7 @@ typedef __ATTR_NONNULL_T((1)) void
 typedef __ATTR_NONNULL_T((1)) void
 (LIBVIDEO_GFX_FCC *video_codec_rectfill64_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
                                              video_pixel64_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
-#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 
 
@@ -443,9 +443,9 @@ struct video_codec {
 	video_codec_initconverter_t __VIDEO_CODEC_const vc_initconverter; /* Initialize a pixel format converter */
 	video_codec_getpixel_t      __VIDEO_CODEC_const vc_getpixel;      /* Get a pixel */
 	video_codec_setpixel_t      __VIDEO_CODEC_const vc_setpixel;      /* Set a pixel */
-#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
 	_video_codec_setpixel3_t   __VIDEO_CODEC_const _vc_setpixel3;     /* ... */
-#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 	video_codec_linefill_t      __VIDEO_CODEC_const vc_linefill;      /* Fill neighboring pixels horizontally. .*/
 	video_codec_vertfill_t      __VIDEO_CODEC_const vc_vertfill;      /* Fill a vertical line of pixels.*/
 	video_codec_rectfill_t      __VIDEO_CODEC_const vc_rectfill;      /* Fill a rect of pixels. */
@@ -456,7 +456,7 @@ struct video_codec {
 	/* TODO: More operators for fast rectcopy w/ rotation/mirroring */
 
 	/* HDR video codec operators */
-#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 	video_codec_pixel2color64_t __VIDEO_CODEC_const vc_pixel2color64; /* Convert between color and pixel values. */
 	video_codec_color2pixel64_t __VIDEO_CODEC_const vc_color2pixel64; /* ... */
 	video_codec_getpixel64_t    __VIDEO_CODEC_const vc_getpixel64;    /* Get a pixel */
@@ -464,7 +464,7 @@ struct video_codec {
 	video_codec_linefill64_t    __VIDEO_CODEC_const vc_linefill64;    /* Fill neighboring pixels horizontally. .*/
 	video_codec_vertfill64_t    __VIDEO_CODEC_const vc_vertfill64;    /* Fill a vertical line of pixels.*/
 	video_codec_rectfill64_t    __VIDEO_CODEC_const vc_rectfill64;    /* Fill a rect of pixels. */
-#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 	/* Extra implementation-specific operators/fields go here... */
 };
@@ -494,11 +494,11 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_codec, vc_refcnt, video_codec_destroy)
 
 
 /* If available for host+compiler, use "_vc_setpixel3" when possible */
-#if (defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3) && \
+#if (defined(CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3) && \
      !defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY))
 #define video_codec_setpixel_t _video_codec_setpixel3_t
 #define vc_setpixel            _vc_setpixel3
-#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
 
 

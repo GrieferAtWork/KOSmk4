@@ -40,10 +40,10 @@ struct video_rambuffer
     : video_buffer
 #endif /* __cplusplus */
 {
+	/* >> vb_ops == &video_rambuffer_ops */
 #ifndef __cplusplus
 	struct video_buffer rb_buffer;
 #endif /* !__cplusplus */
-	/* >> vb_ops == &video_rambuffer_ops */
 	/* This type is sufficient for doing simple GFX */
 	__byte_t *rb_data;   /* [1..1][owned][const] Buffer data */
 	__size_t  rb_stride; /* [const] Buffer stride */
@@ -54,10 +54,10 @@ struct video_rambuffer_formem
     : video_rambuffer
 #endif /* __cplusplus */
 {
+	/* >> vb_ops == &video_rambuffer_formem_ops */
 #ifndef __cplusplus
 	struct video_rambuffer rbfm_rambuffer;
 #endif /* !__cplusplus */
-	/* >> vb_ops == &video_rambuffer_formem_ops */
 	void (LIBVIDEO_GFX_CC *rbfm_release_mem)(void *__cookie, void *__mem); /* [1..1][const] Callback invoked the first time `rbrv_dummy' is written to `rbrv_data' */
 	void                  *rbfm_release_mem_cookie;                        /* [?..?][const] Cookie for `rbfm_release_mem' */
 };
@@ -67,13 +67,13 @@ struct video_rambuffer_subregion
     : video_rambuffer
 #endif /* __cplusplus */
 {
+	/* >> vb_ops == &video_rambuffer_subregion_ops ||
+	 * >> vb_ops == &video_rambuffer_subregion_norem_ops */
 #ifndef __cplusplus
 	struct video_rambuffer rbs_rambuffer;
 #endif /* !__cplusplus */
-	/* >> vb_ops == &video_rambuffer_subregion_ops ||
-	 * >> vb_ops == &video_rambuffer_subregion_norem_ops */
 	__REF struct video_rambuffer *rbs_base;  /* [0..1][lock(ATOMIC && CLEAR_ONCE)] Underlying base buffer */
-	video_coord_t                 rbs_bxrem; /* [const] Extra X-offset added to all pixel coords */
+	video_coord_t                 rbs_bxrem; /* [const] Extra (sub-byte) X-offset added to all pixel coords */
 	video_coord_t                 rbs_xoff;  /* [const] GFX X-offset */
 	video_coord_t                 rbs_yoff;  /* [const] GFX Y-offset */
 	video_coord_t                 rbs_xend;  /* [const] GFX X-end-offset */

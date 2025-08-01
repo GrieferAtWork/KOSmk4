@@ -312,12 +312,12 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_emptybuffer
 		 *       assumes that  **ONLY**  the  original  buffer  can  create  video  locks,  meaning  that
 		 *       **ONLY** locked created by **IT** can possible by released (for which it always
 		 *       just uses the original buffer). */
-		libvideo_emptybuffer_ops.vi_rlock        = &libvideo_buffer_notsup_rlock;
-		libvideo_emptybuffer_ops.vi_wlock        = &libvideo_buffer_notsup_wlock;
-		libvideo_emptybuffer_ops.vi_unlock       = &libvideo_buffer_noop_unlock;
-		libvideo_emptybuffer_ops.vi_rlockregion  = &libvideo_buffer_notsup_rlockregion;
-		libvideo_emptybuffer_ops.vi_wlockregion  = &libvideo_buffer_notsup_wlockregion;
-		libvideo_emptybuffer_ops.vi_unlockregion = &libvideo_buffer_noop_unlockregion;
+		libvideo_emptybuffer_ops.vi_rlock        = &libvideo_buffer_notsup__rlock;
+		libvideo_emptybuffer_ops.vi_wlock        = &libvideo_buffer_notsup__wlock;
+		libvideo_emptybuffer_ops.vi_unlock       = &libvideo_buffer_noop__unlock;
+		libvideo_emptybuffer_ops.vi_rlockregion  = &libvideo_buffer_notsup__rlockregion;
+		libvideo_emptybuffer_ops.vi_wlockregion  = &libvideo_buffer_notsup__wlockregion;
+		libvideo_emptybuffer_ops.vi_unlockregion = &libvideo_buffer_noop__unlockregion;
 		libvideo_emptybuffer_ops.vi_updategfx    = &libvideo_emptybuffer_updategfx;
 		COMPILER_WRITE_BARRIER();
 		libvideo_emptybuffer_ops.vi_initgfx    = &libvideo_emptybuffer_initgfx;

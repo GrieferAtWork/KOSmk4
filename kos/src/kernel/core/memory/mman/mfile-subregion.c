@@ -458,6 +458,9 @@ mfile_subregion_create(struct mfile *__restrict self,
 			destroy(result);
 			RETHROW();
 		}
+		assert(result->srf_base == parent->srf_base);
+		assert(result->srf_minaddr >= parent->srf_minaddr);
+		assert(result->srf_maxaddr <= parent->srf_maxaddr);
 		LIST_INSERT_HEAD(&parent->srf_children, result, srf_chain);
 		subregion_lock_release(parent);
 	}
@@ -1138,7 +1141,6 @@ again:
 	 * release locks from our children at this point. */
 	subregion_mfile_maskdeleted_and_unlock_and_decref_children_r(me);
 	assert(LIST_EMPTY(&me->srf_children));
-
 #undef LOCAL_unlockall
 #define LOCAL_unlockall()                              \
 	(/*mfile_subregion_unlock_and_decref_children_r(me),*/ \

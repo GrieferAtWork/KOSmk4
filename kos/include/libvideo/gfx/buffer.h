@@ -63,6 +63,13 @@ struct video_codec;
 struct video_palette;
 struct video_surface;
 struct video_rect;
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+struct video_buffer_fdinfo;
+struct video_deserializer_io;
+
+/* Video serialization type ID (one of `VIDEO_SERIAL_PROTO_*') */
+typedef __uintptr_t video_serial_proto_t;
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
 
 /* Descriptor for the format of a video buffer */
 struct video_buffer_format {
@@ -187,7 +194,34 @@ struct video_domain {
 	(LIBVIDEO_GFX_CC *vd_newpalette)(struct video_domain const *__restrict __self,
 	                                 video_pixel_t __count);
 
-	void (*_vd_pad[12])(void); /* Reserved for future expansion */
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+	/* Given  a deserialization `__proto' and I/O operators `__io', construct a client-side
+	 * `video_buffer* for `__self' that uses `__io' to communicate with a server-side video
+	 * serializer
+	 * @param: __self:  Video domain in which the  deserialization should happen. This  should
+	 *                  usually be the domain define for the purpose of communicating with the
+	 *                  server (which might support custom protocols expected by the  server),
+	 *                  or `video_ramdomain()' / `video_ramfddomain()', which already supports
+	 *                  the default protocols `VIDEO_SERIAL_PROTO_*'.
+	 * @param: __io:    I/O operators used by the returned buffer. On success (return != NULL),
+	 *                  this operator  table is  inherited, such  that the  destruction of  the
+	 *                  returned buffer will invoke its `vdrio_destroy' operator.
+	 * @param: __proto: Initial protocol, as communicated by the server (one of `VIDEO_SERIAL_PROTO_*')
+	 *                  The  value to pass  here should have already  been given to  you by the server.
+	 * @return: * : A video buffer that can be  used like any other, but  GFX
+	 *              operations may be serialized and transmitted over `__io'.
+	 * @return: NULL: [errno=ENOMEM] Insufficient memory
+	 * @return: NULL: [errno=ENOTSUP] Unsupported `__proto'
+	 * @return: NULL: [errno=*] Failed to initiate deserialization */
+	__ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) __REF struct video_buffer *
+	(LIBVIDEO_GFX_CC *vd_deserialize)(struct video_domain const *__restrict __self,
+	                                  /*inherit(on_success)*/ struct video_deserializer_io *__restrict __io,
+	                                  video_serial_proto_t __proto);
+#else /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+	void (*_vd_pad1[1])(void); /* ... */
+#endif /* !CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+
+	void (*_vd_pad2[11])(void); /* Reserved for future expansion */
 
 	/* TODO: Function for getting memory usage (for the ram-domain,
 	 *       just return regular ram usage info as per `sysinfo(2)) */
@@ -213,31 +247,30 @@ LIBVIDEO_GFX_DECL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED
 struct video_domain const *LIBVIDEO_GFX_CC video_ramdomain(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
-/* TODO: video_ramfddomain() -- Same as `video_ramdomain()', but buffers (and sub-regions)
- *       all  use their own, distinct `memfd' file  descriptors allowing them to be shared
- *       between processes.
+
+#ifdef CONFIG_LIBVIDEO_HAVE_RAMFD
+/* Same as  `video_ramdomain()', but  video buffers  allocate
+ * their  backing  memory using  `memfd_create()'.  Thus, the
+ * video buffers created by this domain implement "vi_fdinfo"
+ * and  allow for more efficient serialization on connections
+ * that support file descriptor sharing.
  *
- * TODO: Kernel must offer some way to create sub-region aliases for mfile-s that can still
- *       be mmap'd just like the  original file, and as a  matter of fact: perfectly  alias
- *       the  mappings of the original file (meaning: shared memory), but can be revoked by
- *       having all mappings  replaced with  /dev/void at  a moment's  notice, and  without
- *       running the chance of this revocation failing due to OOM.
- *       XXX: Does it really need to be /dev/void ??? Shouldn't the good, 'ol mfile_delete
- *            mechanism for anonymizing  all the  file's memory mappings  be good  enough?
- *       XXX: The real complication here would really  just be to track and  differentiate
- *            mappings created from a sub-region file vs. mappings created on the original
- *            file, such that only the sub-region mappings get anonymized.
+ * Additionally, `video_buffer_subregion()' for buffers created
+ * by this domain will use `FILE_IOC_SUBREGION' to create their
+ * buffers, and also  implement `video_buffer_revoke()' by  use
+ * of  `FILE_IOC_DELREGION', meaning that their FD being shared
+ * between processes will still allow you to delete mappings of
+ * said  sub-region in any process that the FD was shared with.
  *
- * For an initial prove-of-concept,  this sort of functionality  is only really gonna  be
- * needed for creating sub-regions of /dev/mem, which is way easier since here those sub-
- * region mfile-s don't actually need to be  related (iow: don't have to share  mpart-s).
- *
- * A full implementation would  require creation of sub-region  for memfd files, too,  since
- * that's needed when wanting to create a recursive compositor that operates not on a screen
- * buffer (backed by /dev/mem), but one that is backed by video_ramfddomain() buffer.
- *
- * s.a.: The TODOs in `mpart_tree_forall_makeanon_and_unlock_decref()' and `mfile_truncate()'
- */
+ * For reference, `video_ramdomain()' implements `video_buffer_revoke()' as a no-op. */
+typedef __ATTR_CONST_T __ATTR_RETNONNULL_T __ATTR_WUNUSED_T
+struct video_domain const *(LIBVIDEO_GFX_CC *PVIDEO_RAMFDDOMAIN)(void);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED
+struct video_domain const *LIBVIDEO_GFX_CC video_ramfddomain(void);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+#endif /* CONFIG_LIBVIDEO_HAVE_RAMFD */
+
 
 
 #ifdef __INTELLISENSE__
@@ -355,6 +388,32 @@ video_domain_supported_codec(struct video_domain const *__restrict __self,
 extern __ATTR_WUNUSED __ATTR_NONNULL((1)) __REF struct video_palette *
 video_domain_newpalette(struct video_domain const *__restrict __self,
                         video_pixel_t __count);
+
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+/* Given  a deserialization `__proto' and I/O operators `__io', construct a client-side
+ * `video_buffer* for `__self' that uses `__io' to communicate with a server-side video
+ * serializer
+ * @param: __self:  Video domain in which the  deserialization should happen. This  should
+ *                  usually be the domain define for the purpose of communicating with the
+ *                  server (which might support custom protocols expected by the  server),
+ *                  or `video_ramdomain()' / `video_ramfddomain()', which already supports
+ *                  the default protocols `VIDEO_SERIAL_PROTO_*'.
+ * @param: __io:    I/O operators used by the returned buffer. On success (return != NULL),
+ *                  this operator  table is  inherited, such  that the  destruction of  the
+ *                  returned buffer will invoke its `vdrio_destroy' operator.
+ * @param: __proto: Initial protocol, as communicated by the server (one of `VIDEO_SERIAL_PROTO_*')
+ *                  The  value to pass  here should have already  been given to  you by the server.
+ * @return: * : A video buffer that can be  used like any other, but  GFX
+ *              operations may be serialized and transmitted over `__io'.
+ * @return: NULL: [errno=ENOMEM] Insufficient memory
+ * @return: NULL: [errno=ENOTSUP] Unsupported `__proto'
+ * @return: NULL: [errno=*] Failed to initiate deserialization */
+extern __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) __REF struct video_buffer *
+video_domain_deserialize(struct video_domain const *__restrict __self,
+                         /*inherit(on_success)*/ struct video_deserializer_io *__restrict __io,
+                         video_serial_proto_t __proto);
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+
 #else /* __INTELLISENSE__ */
 #define _video_domain_newbuffer(self, format, buffer_xdim, buffer_ydim, flags) \
 	(*(self)->vd_newbuffer)(self, format, buffer_xdim, buffer_ydim, flags)
@@ -370,6 +429,10 @@ video_domain_newpalette(struct video_domain const *__restrict __self,
 	(*(self)->vd_supported_codec)(self, codec)
 #define video_domain_newpalette(self, count) \
 	(*(self)->vd_newpalette)(self, count)
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+#define video_domain_deserialize(self, io, proto) \
+	(*(self)->vd_deserialize)(self, io, proto)
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
 #endif /* !__INTELLISENSE__ */
 
 
@@ -418,7 +481,6 @@ video_regionlock_getline(struct video_regionlock const *__restrict __self, video
 #define video_regionlock_getline(self, y) ((self)->vrl_lock.vl_data + (y) * (self)->vrl_lock.vl_stride)
 #endif /* !__INTELLISENSE__ */
 
-
 struct video_buffer_ops {
 	/* NOTE: _ALL_ Callbacks are always [1..1] */
 
@@ -450,7 +512,21 @@ struct video_buffer_ops {
 	(LIBVIDEO_GFX_FCC *vi_updategfx)(struct video_gfx *__restrict __self,
 	                                 unsigned int __what);
 
-	void (*_vi_pad1[5])(void);
+	void (*_vi_pad1[4])(void);
+
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+	/* [0..1] Get fd-info about "__self" for use with `VIDEO_SERIAL_PROTO_MEMFD'
+	 * When this operator  isn't implemented, "VIDEO_SERIAL_PROTO_MEMFD"  cannot
+	 * be used for serialization.
+	 *
+	 * Note that the file-descriptor written to `__info' is owned by `__self'! */
+	__ATTR_INOUT_T(1) __ATTR_OUT_T(2) void
+	(LIBVIDEO_GFX_FCC *vi_fdinfo)(struct video_buffer *__restrict __self,
+	                              struct video_buffer_fdinfo *__restrict __info);
+#else /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+	void (*_vi_pad2[1])(void);
+#endif /* !CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
+
 
 	/* Lock the video buffer into memory for reading.
 	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding

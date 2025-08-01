@@ -78,7 +78,6 @@ INTDEF NONNULL((1)) void FCC rambuffer_formem__destroy(struct video_buffer *__re
 INTDEF NONNULL((1)) void FCC rambuffer_subregion__destroy(struct video_buffer *__restrict self);
 
 /* REVOKE+SUBREGION */
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC rambuffer__revoke)(struct video_buffer *__restrict self); /* TODO: Generalize as a no-op revoke function */
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_subregion__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
 
@@ -96,13 +95,13 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_subregion__
 /* Helpers for setting video buffer operators for ram-buffer-compatible buffers */
 
 /* Requires: Derived from "struct video_rambuffer" */
-#define video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(self)          \
-	(void)((self)->vi_rlock        = &rambuffer__lock,             \
-	       (self)->vi_wlock        = &rambuffer__lock,             \
-	       (self)->vi_unlock       = &libvideo_buffer_noop_unlock, \
-	       (self)->vi_rlockregion  = &rambuffer__lockregion,       \
-	       (self)->vi_wlockregion  = &rambuffer__lockregion,       \
-	       (self)->vi_unlockregion = &libvideo_buffer_noop_unlockregion)
+#define video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(self)           \
+	(void)((self)->vi_rlock        = &rambuffer__lock,              \
+	       (self)->vi_wlock        = &rambuffer__lock,              \
+	       (self)->vi_unlock       = &libvideo_buffer_noop__unlock, \
+	       (self)->vi_rlockregion  = &rambuffer__lockregion,        \
+	       (self)->vi_wlockregion  = &rambuffer__lockregion,        \
+	       (self)->vi_unlockregion = &libvideo_buffer_noop__unlockregion)
 
 /* Requires: Derived from "struct video_rambuffer" */
 #define video_buffer_ops_set_GFXOPS_like_RAMBUFFER(self) \
@@ -110,8 +109,8 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_subregion__
 	       (self)->vi_updategfx = &rambuffer__updategfx)
 
 /* Requires: Derived from "struct video_rambuffer" */
-#define video_buffer_ops_set_SUBREGION_like_RAMBUFFER(self) \
-	(void)((self)->vi_revoke    = &rambuffer__revoke,       \
+#define video_buffer_ops_set_SUBREGION_like_RAMBUFFER(self)      \
+	(void)((self)->vi_revoke    = &libvideo_buffer_noop__revoke, \
 	       (self)->vi_subregion = &rambuffer__subregion)
 
 

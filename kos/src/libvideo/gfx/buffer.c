@@ -47,8 +47,8 @@ libvideo_buffer_swgfx_updategfx(struct video_gfx *__restrict self, unsigned int 
 }
 
 INTERN WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
-libvideo_buffer_notsup_lock(struct video_buffer *__restrict self,
-                            struct video_lock *__restrict lock) {
+libvideo_buffer_notsup__lock(struct video_buffer *__restrict self,
+                             struct video_lock *__restrict lock) {
 	(void)self;
 	(void)lock;
 	errno = ENOTSUP;
@@ -56,17 +56,24 @@ libvideo_buffer_notsup_lock(struct video_buffer *__restrict self,
 }
 
 INTERN ATTR_INOUT(1) NONNULL((2)) void
-NOTHROW(FCC libvideo_buffer_noop_unlock)(struct video_buffer *__restrict self,
-                                         struct video_lock *__restrict lock) {
+NOTHROW(FCC libvideo_buffer_noop__unlock)(struct video_buffer *__restrict self,
+                                          struct video_lock *__restrict lock) {
 	(void)self;
 	(void)lock;
 	COMPILER_IMPURE();
 }
 
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *
+NOTHROW(FCC libvideo_buffer_noop__revoke)(struct video_buffer *__restrict self) {
+	COMPILER_IMPURE();
+	return self;
+}
+
+
 
 INTERN WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
-libvideo_buffer_generic_rlockregion(struct video_buffer *__restrict self,
-                                    struct video_regionlock *__restrict lock) {
+libvideo_buffer_generic__rlockregion(struct video_buffer *__restrict self,
+                                     struct video_regionlock *__restrict lock) {
 	int result = video_buffer_rlock(self, &lock->vrl_lock);
 	/*if likely(result == 0)*/ {
 		lock->vrl_xbas = lock->_vrl_rect.vcr_xmin;
@@ -76,8 +83,8 @@ libvideo_buffer_generic_rlockregion(struct video_buffer *__restrict self,
 }
 
 INTERN WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
-libvideo_buffer_generic_wlockregion(struct video_buffer *__restrict self,
-                                    struct video_regionlock *__restrict lock) {
+libvideo_buffer_generic__wlockregion(struct video_buffer *__restrict self,
+                                     struct video_regionlock *__restrict lock) {
 	int result = video_buffer_wlock(self, &lock->vrl_lock);
 	/*if likely(result == 0)*/ {
 		lock->vrl_xbas = lock->_vrl_rect.vcr_xmin;
@@ -87,8 +94,8 @@ libvideo_buffer_generic_wlockregion(struct video_buffer *__restrict self,
 }
 
 INTERN ATTR_INOUT(1) NONNULL((2)) void
-NOTHROW(FCC libvideo_buffer_generic_unlockregion)(struct video_buffer *__restrict self,
-                                                  struct video_regionlock *__restrict lock) {
+NOTHROW(FCC libvideo_buffer_generic__unlockregion)(struct video_buffer *__restrict self,
+                                                   struct video_regionlock *__restrict lock) {
 	lock->vrl_lock.vl_data -= lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 	video_buffer_unlock(self, &lock->vrl_lock);
 }

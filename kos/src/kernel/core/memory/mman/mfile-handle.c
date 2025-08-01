@@ -214,7 +214,6 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case FILE_IOC_SUBREGION: {
 		NCX struct file_subregion *info;
 		REF struct mfile *subregion;
-		REF struct filehandle *ma_handle;
 		struct handle hand;
 		pos_t minaddr, maxaddr;
 		info   = (NCX struct file_subregion *)validate_readwrite(arg, sizeof(struct file_subregion));
@@ -228,20 +227,11 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 		/* Create the misalignment wrapper. */
 		subregion = mfile_subregion(self, minaddr, maxaddr);
-
-		/* Wrap the new sub-region in a `struct filehandle'. */
-		{
-			REF struct fdirent *fh_dent;
-			FINALLY_DECREF_UNLIKELY(subregion);
-			fh_dent = mfile_subregion_getname(subregion);
-			FINALLY_XDECREF_UNLIKELY(fh_dent);
-			ma_handle = filehandle_new(subregion, NULL, fh_dent);
-		}
-		FINALLY_DECREF_UNLIKELY(ma_handle);
+		FINALLY_DECREF_UNLIKELY(subregion);
 
 		/* Set-up and install the new object as a handle. */
-		hand.h_type = HANDLE_TYPE_FILEHANDLE;
-		hand.h_data = ma_handle;
+		hand.h_type = HANDLE_TYPE_MFILE;
+		hand.h_data = subregion;
 		hand.h_mode = IO_RDWR;
 		return handles_install_openfd(hand, &info->fsr_resfd);
 	}	break;

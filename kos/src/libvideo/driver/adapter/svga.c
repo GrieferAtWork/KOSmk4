@@ -30,28 +30,46 @@
 
 #include <hybrid/overflow.h>
 
+#include <kos/anno.h>
+#include <kos/aref.h>
 #include <kos/io.h>
 #include <kos/ioctl/svga.h>
+#include <kos/sched/shared-lock.h>
+#include <kos/types.h>
 #include <sys/ioctl.h>
 #include <sys/perm.h>
 #include <sys/syslog.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <dlfcn.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <malloca.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 
+#include <libphys/api.h>
+#include <libphys/phys.h>
+#include <libsvgadrv/api.h>
+#include <libsvgadrv/chipset.h>
+#include <libvideo/color.h>
 #include <libvideo/driver/adapter.h>
+#include <libvideo/driver/monitor.h>
+#include <libvideo/gfx/api.h>
+#include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/buffer/rambuffer.h>
 #include <libvideo/gfx/codec/codec-extra.h>
 #include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/codec/palette.h>
+#include <libvideo/gfx/display.h>
+#include <libvideo/gfx/gfx.h>
 #include <libvideo/rect.h>
+#include <libvideo/types.h>
 
 #include "svga.h"
 
@@ -671,7 +689,11 @@ _err_vdlck_libsvgadrv:
 
 	/* Re-use RAM-domain operators */
 	{
+#if 0
+		struct video_domain const *ramdomain = video_ramfddomain();
+#else
 		struct video_domain const *ramdomain = video_ramdomain();
+#endif
 		result->vd_newbuffer       = ramdomain->vd_newbuffer;
 		result->vd_formem          = ramdomain->vd_formem;
 		result->vd_supported_codec = ramdomain->vd_supported_codec;

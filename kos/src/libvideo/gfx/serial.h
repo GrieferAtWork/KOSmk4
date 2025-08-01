@@ -17,46 +17,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIDEO_GFX_API_H
-#define _LIBVIDEO_GFX_API_H 1
+#ifndef GUARD_LIBVIDEO_GFX_SERIAL_H
+#define GUARD_LIBVIDEO_GFX_SERIAL_H 1
 
-#include <__stdinc.h>
-#include <hybrid/host.h>
+#include "api.h"
+/**/
 
-/*#define LIBVIDEO_GFX_EXPOSE_INTERNALS*/
+#include <libvideo/gfx/api.h>
 
-/* Feature flags */
-#define CONFIG_LIBVIDEO_HAVE_PIXEL64       /* Feature flag: are 64-bit pixel formats supported? */
-#define CONFIG_LIBVIDEO_HAVE_RAMFD         /* Feature flag: support video_ramfddomain() */
-#define CONFIG_LIBVIDEO_HAVE_SERIALIZATION /* Feature flag: support video_domain_deserialize() (and everything that implies) */
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+#include <hybrid/compiler.h>
 
+#include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/serial.h>
 
-#if defined(__i386__) && !defined(__x86_64__)
-#define LIBVIDEO_GFX_CC  __ATTR_STDCALL
-#define LIBVIDEO_GFX_FCC __ATTR_FASTCALL
-#ifndef CONFIG_NO_VIDEO_CODEC_HAVE__VC_SETPIXEL3
-#define CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
-#endif /* !CONFIG_NO_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
-#else /* ... */
-#define LIBVIDEO_GFX_CC  /* nothing */
-#define LIBVIDEO_GFX_FCC /* nothing */
-#endif /* !... */
+DECL_BEGIN
 
-#if (!defined(LIBVIDEO_GFX_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__))
-#define LIBVIDEO_GFX_WANT_PROTOTYPES
-#endif /* ... */
+/* General-purpose video deserializer. */
+INTDEF WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+libvideo_generic_deserialize(struct video_domain const *__restrict self,
+                             /*inherit(on_success)*/ struct video_deserializer_io *__restrict io,
+                             video_serial_proto_t proto);
 
-#if (defined(__KOS__) && defined(__KERNEL__) && \
-     defined(BUILDING_KERNEL_CORE))
-#define LIBVIDEO_GFX_DECL __PUBDEF
-#elif defined(__LIBVIDEO_GFX_STATIC)
-#define LIBVIDEO_GFX_DECL __INTDEF
-#else /* ... */
-#define LIBVIDEO_GFX_DECL __IMPDEF
-#endif /* !... */
+DECL_END
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
 
-/* Library name for use with `dlopen(3D)' */
-#define LIBVIDEO_GFX_LIBRARY_NAME "libvideo-gfx.so"
-
-#endif /* !_LIBVIDEO_GFX_API_H */
+#endif /* !GUARD_LIBVIDEO_GFX_SERIAL_H */

@@ -64,7 +64,7 @@ DECL_BEGIN
 
 DEFINE_VIDEO_BUFFER_TYPE(region_buffer_ops,
                          region_buffer__destroy, region_buffer__initgfx, region_buffer__updategfx,
-                         libvideo_buffer_notsup_rlock, libvideo_buffer_notsup_wlock, libvideo_buffer_noop_unlock,
+                         libvideo_buffer_notsup__rlock, libvideo_buffer_notsup__wlock, libvideo_buffer_noop__unlock,
                          region_buffer__rlockregion, region_buffer__wlockregion, region_buffer__unlockregion,
                          region_buffer__revoke, region_buffer__subregion);
 

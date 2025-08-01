@@ -171,22 +171,22 @@ extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_surface_hasalpha(str
 /* Convert between color and pixel values. */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) video_color_t video_surface_pixel2color(struct video_surface const *__restrict __self, video_pixel_t __pixel);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t video_surface_color2pixel(struct video_surface const *__restrict __self, video_color_t __color);
-#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) video_color64_t video_surface_pixel2color64(struct video_surface const *__restrict __self, video_pixel64_t __pixel64);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel64_t video_surface_color2pixel64(struct video_surface const *__restrict __self, video_color64_t __color64);
-#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 /* Convenience wrappers to get/set the pixel/color of a specific pixel within a memory-mapped line of pixel data */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) video_pixel_t _video_surface_getlinepixel(struct video_surface const *__restrict __self, __byte_t const *__restrict __line, video_coord_t __x);
 extern __ATTR_NONNULL((1, 2)) void _video_surface_setlinepixel(struct video_surface const *__restrict __self, __byte_t *__restrict __line, video_coord_t __x, video_pixel_t __pixel);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) video_color_t _video_surface_getlinecolor(struct video_surface const *__restrict __self, __byte_t const *__restrict __line, video_coord_t __x);
 extern __ATTR_NONNULL((1, 2)) void _video_surface_setlinecolor(struct video_surface const *__restrict __self, __byte_t *__restrict __line, video_coord_t __x, video_color_t __color);
-#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) video_pixel64_t _video_surface_getlinepixel64(struct video_surface const *__restrict __self, __byte_t const *__restrict __line, video_coord_t __x);
 extern __ATTR_NONNULL((1, 2)) void _video_surface_setlinepixel64(struct video_surface const *__restrict __self, __byte_t *__restrict __line, video_coord_t __x, video_pixel64_t __pixel64);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) video_color64_t _video_surface_getlinecolor64(struct video_surface const *__restrict __self, __byte_t const *__restrict __line, video_coord_t __x);
 extern __ATTR_NONNULL((1, 2)) void _video_surface_setlinecolor64(struct video_surface const *__restrict __self, __byte_t *__restrict __line, video_coord_t __x, video_color64_t __color64);
-#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 /* Same as above, but use the `strct video_surface' wrapped by a given `struct video_gfx' */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) video_color_t video_gfx_pixel2color(struct video_gfx const *__restrict __self, video_pixel_t __pixel);
@@ -195,14 +195,14 @@ extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) video_pixel_t _video_gf
 extern __ATTR_NONNULL((1, 2)) void _video_gfx_setlinepixel(struct video_gfx const *__restrict __self, __byte_t *__restrict __line, video_coord_t __x, video_pixel_t __pixel);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) video_color_t _video_gfx_getlinecolor(struct video_gfx const *__restrict __self, __byte_t const *__restrict __line, video_coord_t __x);
 extern __ATTR_NONNULL((1, 2)) void _video_gfx_setlinecolor(struct video_gfx const *__restrict __self, __byte_t *__restrict __line, video_coord_t __x, video_color_t __color);
-#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) video_color64_t video_gfx_pixel2color64(struct video_gfx const *__restrict __self, video_pixel64_t __pixel64);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel64_t video_gfx_color2pixel64(struct video_gfx const *__restrict __self, video_color64_t __color64);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) video_pixel64_t _video_gfx_getlinepixel64(struct video_gfx const *__restrict __self, __byte_t const *__restrict __line, video_coord_t __x);
 extern __ATTR_NONNULL((1, 2)) void _video_gfx_setlinepixel64(struct video_gfx const *__restrict __self, __byte_t *__restrict __line, video_coord_t __x, video_pixel64_t __pixel64);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) video_color64_t _video_gfx_getlinecolor64(struct video_gfx const *__restrict __self, __byte_t const *__restrict __line, video_coord_t __x);
 extern __ATTR_NONNULL((1, 2)) void _video_gfx_setlinecolor64(struct video_gfx const *__restrict __self, __byte_t *__restrict __line, video_coord_t __x, video_color64_t __color64);
-#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 
 /* Get graphics functions for use with the given surface.
@@ -435,7 +435,7 @@ video_buffer_convert_distinct(struct video_buffer *__restrict __self,
 #define _video_gfx_setlinepixel(self, line, x, pixel)     _video_surface_setlinepixel(video_gfx_assurface(self), line, x, pixel)
 #define _video_gfx_getlinecolor(self, line, x)            _video_surface_getlinecolor(video_gfx_assurface(self), line, x)
 #define _video_gfx_setlinecolor(self, line, x, color)     _video_surface_setlinecolor(video_gfx_assurface(self), line, x, color)
-#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 #define video_surface_pixel2color64(self, pixel64)            (*video_surface_getcodec(self)->vc_pixel2color64)(self, pixel64)
 #define video_surface_color2pixel64(self, color64)            (*video_surface_getcodec(self)->vc_color2pixel64)(self, color64)
 #define _video_surface_getlinepixel64(self, line, x)          (*video_surface_getcodec(self)->vc_getpixel64)(line, x)
@@ -448,7 +448,7 @@ video_buffer_convert_distinct(struct video_buffer *__restrict __self,
 #define _video_gfx_setlinepixel64(self, line, x, pixel64)     _video_surface_setlinepixel64(video_gfx_assurface(self), line, x, pixel64)
 #define _video_gfx_getlinecolor64(self, line, x)              _video_surface_getlinecolor64(video_gfx_assurface(self), line, x)
 #define _video_gfx_setlinecolor64(self, line, x, color64)     _video_surface_setlinecolor64(video_gfx_assurface(self), line, x, color64)
-#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 #define video_surface_getgfx(self, result, blendmode) \
 	((result)->vg_blend = (blendmode),                \

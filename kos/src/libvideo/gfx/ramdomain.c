@@ -40,6 +40,7 @@
 #include <stdint.h>
 
 #include <libvideo/crect.h>
+#include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/buffer/rambuffer.h>
 #include <libvideo/gfx/surface.h>
@@ -50,6 +51,7 @@
 #include "codec/palette.h"
 #include "gfx-empty.h"
 #include "ramdomain.h"
+#include "serial.h"
 
 DECL_BEGIN
 
@@ -64,24 +66,24 @@ DEFINE_PUBLIC_ALIAS(video_rambuffer_subregion_norem_ops, _rambuffer_subregion_no
 
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_ops, rambuffer__destroy,
                          rambuffer__initgfx, rambuffer__updategfx,
-                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop_unlock,
-                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop_unlockregion,
-                         rambuffer__revoke, rambuffer__subregion);
+                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop__unlock,
+                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop__unlockregion,
+                         libvideo_buffer_noop__revoke, rambuffer__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_ops, rambuffer_formem__destroy,
                          rambuffer__initgfx, rambuffer__updategfx,
-                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop_unlock,
-                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop_unlockregion,
-                         rambuffer__revoke, rambuffer__subregion);
+                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop__unlock,
+                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop__unlockregion,
+                         libvideo_buffer_noop__revoke, rambuffer__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_ops, rambuffer_subregion__destroy,
                          rambuffer_subregion__initgfx, rambuffer_subregion__updategfx,
-                         libvideo_buffer_notsup_rlock, libvideo_buffer_notsup_wlock, libvideo_buffer_noop_unlock,
-                         rambuffer_subregion__lockregion, rambuffer_subregion__lockregion, libvideo_buffer_noop_unlockregion,
-                         rambuffer__revoke, rambuffer_subregion__subregion);
+                         libvideo_buffer_notsup__rlock, libvideo_buffer_notsup__wlock, libvideo_buffer_noop__unlock,
+                         rambuffer_subregion__lockregion, rambuffer_subregion__lockregion, libvideo_buffer_noop__unlockregion,
+                         libvideo_buffer_noop__revoke, rambuffer_subregion__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_norem_ops, rambuffer_subregion__destroy,
                          rambuffer_subregion__initgfx, rambuffer_subregion__updategfx,
-                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop_unlock,
-                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop_unlockregion,
-                         rambuffer__revoke, rambuffer_subregion__subregion);
+                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop__unlock,
+                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop__unlockregion,
+                         libvideo_buffer_noop__revoke, rambuffer_subregion__subregion);
 
 
 /* Video buffer types used to represent ram buffers.
@@ -113,15 +115,8 @@ rambuffer_subregion__destroy(struct video_buffer *__restrict self) {
 	free(me);
 }
 
+
 /* REVOKE+SUBREGION */
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *
-NOTHROW(FCC rambuffer__revoke)(struct video_buffer *__restrict self) {
-	/* No-op */
-	COMPILER_IMPURE();
-	return self;
-}
-
-
 
 /* Common base for creation a sub-region. Caller must still:
  * - Add `return' to the chain of sub-regions of `self' (thus initializing `return->rbrvsr_chain')
@@ -237,7 +232,7 @@ libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
 	/* Initialize meta-data */
 	if unlikely(!__video_buffer_init_format(result, format)) {
 		errno = EINVAL;
-		goto err_result_data;
+		goto err_r;
 	}
 	__video_buffer_init_domain(result, self);
 	__video_buffer_init_ops(result, _rambuffer_ops());
@@ -248,13 +243,14 @@ libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
 	                  ? (byte_t *)calloc(req.vbs_bufsize)
 	                  : (byte_t *)malloc(req.vbs_bufsize);
 	if unlikely(!result->rb_data)
-		goto err_result;
+		goto err_r;
 	result->rb_stride = req.vbs_stride;
 	__video_buffer_init_common(result);
 	return result;
-err_result_data:
-	free(result->rb_data);
-err_result:
+/*
+err_r_data:
+	free(result->rb_data);*/
+err_r:
 	free(result);
 err:
 	return NULL;
@@ -340,6 +336,9 @@ struct video_domain const *CC _libvideo_ramdomain(void) {
 		libvideo_ramdomain.vd_newpalette      = &libvideo_generic_palette_create;
 		libvideo_ramdomain.vd_supported_codec = &libvideo_ramdomain_supported_codec;
 		libvideo_ramdomain.vd_formem          = &libvideo_ramdomain_formem;
+#ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
+		libvideo_ramdomain.vd_deserialize = &libvideo_generic_deserialize;
+#endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
 		COMPILER_WRITE_BARRIER();
 		libvideo_ramdomain.vd_newbuffer = &libvideo_ramdomain_newbuffer;
 		COMPILER_WRITE_BARRIER();

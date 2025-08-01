@@ -179,7 +179,7 @@ LOCAL_FUNC(setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel_t pix
 	*line = value;
 }
 
-#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
 PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
 LOCAL_FUNC(rp3_setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	byte_t value;
@@ -199,7 +199,7 @@ LOCAL_FUNC(rp3_setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel_t
 	value |= ((pixel & LOCAL_PIXELS_MASK) << shift);
 	*line = value;
 }
-#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
 
 
