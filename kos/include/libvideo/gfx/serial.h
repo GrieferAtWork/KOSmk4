@@ -54,9 +54,9 @@ typedef __uintptr_t video_serial_proto_t;
 /* Video buffer file descriptor info for implementing `VIDEO_SERIAL_PROTO_MEMFD' */
 struct video_buffer_fdinfo {
 	/* Pixel data for a pixel at <X> and <Y> is accessed like this:
-	 * >> video_coord_t x = (video_coord_t)(<X> + vbfdi_cxoff);
-	 * >> video_coord_t y = (video_coord_t)(<Y> + vbfdi_cyoff);
-	 * >> if (x >= vbfdi_xdim || y >= vbfdi_ydim)
+	 * >> video_offset_t x = <X> + vbfdi_cxoff;
+	 * >> video_offset_t y = <Y> + vbfdi_cyoff;
+	 * >> if (x < 0 || x >= vbfdi_xdim || y < 0 || y >= vbfdi_ydim)
 	 * >>     return OUT_OF_BOUNDS;
 	 * >> byte_t *base = mmap(NULL, vbfdi_total, MAP_FILE | MAP_SHARED, vbfdi_fd, vbfdi_bxoff);
 	 * >> byte_t *line = base + (y * vbfdi_stride);

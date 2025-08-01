@@ -34,7 +34,7 @@
 #include <libsvgadrv/chipset.h>
 #include <libvideo/driver/adapter.h>
 #include <libvideo/driver/monitor.h>
-#include <libvideo/gfx/buffer/rambuffer.h>
+#include <libvideo/gfx/buffer/ramfdbuffer.h>
 
 DECL_BEGIN
 
@@ -42,13 +42,9 @@ struct svga_adapter;
 struct svga_buffer;
 AXREF(svga_buffer_axref, svga_buffer);
 
-struct svga_buffer: video_rambuffer {
-	/* TODO: Buffer here must be derived from "video_ramfdbuffer",
-	 *       since it needs  to be  revocable and  FD-serializable */
-
+struct svga_buffer: video_ramfdbuffer {
 	/* NOTE: The buffer described here is owned and must be unmapped using `:sva_libphys_unmap' */
-	size_t                  svb_rb_total; /* [const] Total buffer size */
-	struct video_buffer_ops svb_ops;      /* [const] Operator table. */
+	struct video_buffer_ops svb_ops; /* [const] Operator table. */
 };
 #define svga_buffer_getadapter(self) \
 	video_domain_assvga(video_buffer_getdomain(self))
@@ -71,10 +67,9 @@ struct svga_adapter: video_adapter {
 	struct video_adapter_ops          sva_adapter_ops;   /* [const] Adapter operator table */
 	struct svga_monitor               sva_monitor;       /* [1..1][const] The one-and-only SVGA monitor */
 	struct video_monitor_ops          sva_monitor_ops;   /* [const] Monitor operator table */
-	fd_t                              sva_vdlck;         /* [const] Video lock file for /dev/svga */
+	fd_t                              sva_vdlck;         /* [owned][const] Video lock file for /dev/svga */
+	fd_t                              sva_devmem;        /* [const] File descriptor for /dev/mem (as returned by `libphys.so!getdevmem') */
 	void                             *sva_libphys;       /* [1..1][const] Handle for libphys */
-	PMMAPPHYS                         sva_libphys_map;   /* [1..1][const] Helper to map physical memory */
-	PMUNMAPPHYS                       sva_libphys_unmap; /* [1..1][const] Helper to unmap physical memory */
 	void                             *sva_libsvgadrv;    /* [1..1][const] Handle for libsvgadrv */
 	struct svga_chipset_driver const *sva_drv;           /* [1..1][const] SVGA driver */
 #define svga_adapter_modeset(self) ((self)->sva_modeinfo != NULL)

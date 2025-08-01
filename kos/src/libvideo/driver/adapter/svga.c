@@ -33,10 +33,12 @@
 #include <kos/anno.h>
 #include <kos/aref.h>
 #include <kos/io.h>
+#include <kos/ioctl/file.h>
 #include <kos/ioctl/svga.h>
 #include <kos/sched/shared-lock.h>
 #include <kos/types.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
 #include <sys/perm.h>
 #include <sys/syslog.h>
 #include <sys/types.h>
@@ -62,7 +64,7 @@
 #include <libvideo/driver/monitor.h>
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
-#include <libvideo/gfx/buffer/rambuffer.h>
+#include <libvideo/gfx/buffer/ramfdbuffer.h>
 #include <libvideo/gfx/codec/codec-extra.h>
 #include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/codec/palette.h>
@@ -83,6 +85,28 @@ DECL_BEGIN
 
 #define LOGERR(format, ...) \
 	syslog(LOG_ERR, "[libvideo-driver,svga.c:%d] " format, __LINE__, ##__VA_ARGS__)
+
+
+/* Ask the kernel to create a sub-region of "fd" */
+PRIVATE WUNUSED fd_t CC
+file_newsubregion(fd_t fd,
+                  /*page-aligned*/ uint64_t minaddr,
+                  /*page-aligned*/ uint64_t num_bytes) {
+	struct file_subregion sr;
+	bzero(&sr, sizeof(sr));
+	sr.fsr_minaddr = minaddr;
+	if (OVERFLOW_UADD(minaddr, num_bytes - 1, &sr.fsr_maxaddr))
+		goto err_range;
+	sr.fsr_resfd.of_mode  = OPENFD_MODE_AUTO;
+	sr.fsr_resfd.of_flags = IO_CLOEXEC;
+	if unlikely(ioctl(fd, FILE_IOC_SUBREGION, &sr) < 0)
+		goto err;
+	return sr.fsr_resfd.of_hint;
+err_range:
+	errno = ERANGE;
+err:
+	return -1;
+}
 
 
 PRIVATE ATTR_IN(1) ATTR_OUT(2) void CC
@@ -340,16 +364,6 @@ svga_noop_updaterects(struct video_display *__restrict self,
 
 
 
-PRIVATE NONNULL((1)) void LIBVIDEO_GFX_FCC
-svga_buffer_destroy(struct video_buffer *__restrict self) {
-	struct svga_buffer *me = video_buffer_assvga(self);
-	struct svga_adapter *svga = svga_buffer_getadapter(me);
-	(*svga->sva_libphys_unmap)(me->rb_data, me->svb_rb_total);
-	__video_buffer_fini_common(me);
-	free(me);
-}
-
-
 PRIVATE WUNUSED NONNULL((1)) REF struct video_palette *CC
 svga_palette_new(struct svga_adapter *__restrict self, shift_t colorbits) {
 	video_pixel_t i, palsize;
@@ -388,19 +402,23 @@ err:
 PRIVATE WUNUSED ATTR_INOUT(1) REF struct svga_buffer *CC
 svga_newbuffer(struct svga_adapter *__restrict self) {
 	REF struct svga_buffer *result;
-	struct video_buffer_ops const *rambuffer_ops;
 	struct svga_modeinfo *modeinfo;
 	physaddr_t lfb_addr;
+	uintptr_t lfb_offset;
+	size_t lfb_size;
+	size_t ps = getpagesize(), pm = ps - 1;
 	result = (REF struct svga_buffer *)malloc(sizeof(struct svga_buffer));
 	if unlikely(!result)
 		goto err;
 
-	/* Inherit all operators from "rambuffer_ops" by default. */
-	rambuffer_ops = video_rambuffer_ops();
-	memcpy(&result->svb_ops, rambuffer_ops, sizeof(struct video_buffer_ops));
+	/* Inherit  all operators from "rambuffer_ops" by default.
+	 * Note how we use  the subregion-variant, since that  one
+	 * also supports FD-revocation. Since the FD we're linking
+	 * is actually a sub-region  of /dev/mem, it actually  can
+	 * be consider a buffer sub-region, too. */
+	result->svb_ops = *video_ramfdbuffer_subregion_ops();
 
 	/* Override certain operators */
-	result->svb_ops.vi_destroy = &svga_buffer_destroy;
 	if (self->sva_cs.sc_modeops.sco_hw_async_copyrect ||
 	    self->sva_cs.sc_modeops.sco_hw_async_fillrect) {
 		/* TODO: Hook into GFX to provide hardware-accelerated fill/blit operators */
@@ -408,14 +426,28 @@ svga_newbuffer(struct svga_adapter *__restrict self) {
 
 	/* Map LFB for "result" */
 	modeinfo = self->sva_modeinfo;
-	result->rb_stride    = modeinfo->smi_scanline;
-	result->svb_rb_total = modeinfo->smi_scanline * modeinfo->smi_resy;
+	result->rb_stride  = modeinfo->smi_scanline;
+	result->rfdb_total = modeinfo->smi_scanline * modeinfo->smi_resy;
+
+	/* Determine address of linear frame buffer */
 	lfb_addr = modeinfo->smi_lfb;
 	if (!(modeinfo->smi_flags & SVGA_MODEINFO_F_LFB))
 		lfb_addr = (physaddr_t)0xA0000;
-	result->rb_data = (byte_t *)(*self->sva_libphys_map)(lfb_addr, result->svb_rb_total);
-	if unlikely(result->rb_data == MAP_FAILED)
+	lfb_offset = lfb_addr & pm;
+	lfb_addr &= ~pm;
+	lfb_size = (lfb_offset + result->rfdb_total + pm) & ~pm;
+
+	/* Create sub-region of /dev/mem for linear frame buffer */
+	result->rfdb_fd = file_newsubregion(self->sva_devmem, lfb_addr, lfb_size);
+	if unlikely(result->rfdb_fd < 0)
 		goto err_r;
+
+	/* Map linear frame buffer into memory */
+	result->rb_data = (byte_t *)mmap(NULL, result->rfdb_total, PROT_READ | PROT_WRITE,
+	                                 MAP_SHARED | MAP_FILE, result->rfdb_fd, lfb_offset);
+	if unlikely(result->rb_data == MAP_FAILED)
+		goto err_r_fd;
+	assert(((uintptr_t)result->rb_data & pm) == lfb_offset);
 
 	/* Allocate palette (if necessary) */
 	result->vb_surf.vs_flags = VIDEO_GFX_F_NORMAL;
@@ -424,7 +456,7 @@ svga_newbuffer(struct svga_adapter *__restrict self) {
 		shift_t cbits = self->sva_mode.vmm_codec->vc_specs.vcs_cbits;
 		result->vb_surf.vs_pal = svga_palette_new(self, cbits);
 		if unlikely(!result->vb_surf.vs_pal)
-			goto err_r_data;
+			goto err_r_fd_data;
 		result->vb_surf.vs_flags |= VIDEO_GFX_F_PALOBJ;
 	}
 
@@ -437,8 +469,10 @@ svga_newbuffer(struct svga_adapter *__restrict self) {
 	result->vb_surf.vs_buffer = result;
 	result->vb_refcnt = 1;
 	return result;
-err_r_data:
-	(*self->sva_libphys_unmap)(result->rb_data, result->svb_rb_total);
+err_r_fd_data:
+	(void)munmap(result->rb_data, result->rfdb_total);
+err_r_fd:
+	(void)close(result->rfdb_fd);
 err_r:
 	free(result);
 err:
@@ -590,6 +624,8 @@ INTERN WUNUSED struct svga_adapter *CC
 svga_tryopen(/*inherited(on_success)*/ fd_t fd) {
 	char csname[SVGA_CSNAMELEN];
 	struct svga_adapter *result;
+	PGETDEVMEM pdyn_getdevmem;
+
 	{
 		PSVGA_CHIPSET_GETDRIVERS svga_chipset_getdrivers;
 		struct svga_chipset_driver const *result__sva_drv;
@@ -667,14 +703,14 @@ _err_vdlck_libsvgadrv:
 		LOGERR("dlerror: %s\n", dlerror());
 		goto err_r_vdlck_libsvgadrv;
 	}
-	*(void **)&result->sva_libphys_map = dlsym(result->sva_libphys, "mmapphys");
-	if unlikely(!result->sva_libphys_map) {
+	*(void **)&pdyn_getdevmem = dlsym(result->sva_libphys, "getdevmem");
+	if unlikely(!pdyn_getdevmem) {
 		LOGERR("dlerror: %s\n", dlerror());
 		goto err_r_vdlck_libsvgadrv_libphys;
 	}
-	*(void **)&result->sva_libphys_unmap = dlsym(result->sva_libphys, "munmapphys");
-	if unlikely(!result->sva_libphys_unmap) {
-		LOGERR("dlerror: %s\n", dlerror());
+	result->sva_devmem = (*pdyn_getdevmem)();
+	if unlikely(result->sva_devmem < 0) {
+		LOGERR("Failed to obtain file descriptor for /dev/mem");
 		goto err_r_vdlck_libsvgadrv_libphys;
 	}
 
