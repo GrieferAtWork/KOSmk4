@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8356574f */
+/* HASH CRC-32:0xa4c92618 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -610,6 +610,15 @@ DEFINE_PUBLIC_ALIAS(DOS$_eof, libd__eof);
 
 /* kos.dosfs */
 DEFINE_PUBLIC_ALIAS(DOS$dosfs_setenabled, libd_dosfs_setenabled);
+
+/* kos.fd */
+DEFINE_PUBLIC_ALIAS(DOS$fd_polltest, libd_fd_polltest);
+DEFINE_PUBLIC_ALIAS(DOS$fd_cast, libd_fd_cast);
+DEFINE_PUBLIC_ALIAS(DOS$fd_msalign, libd_fd_msalign);
+DEFINE_PUBLIC_ALIAS(DOS$fd_subregion, libd_fd_subregion);
+DEFINE_PUBLIC_ALIAS(DOS$fd_delregion, libd_fd_delregion);
+DEFINE_PUBLIC_ALIAS(DOS$fd_tailread, libd_fd_tailread);
+DEFINE_PUBLIC_ALIAS(DOS$fd_trim, libd_fd_trim);
 
 /* kos.nopf */
 #include <kos/bits/nopf.h>

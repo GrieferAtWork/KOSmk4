@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5cfc35 */
+/* HASH CRC-32:0xc6e88c22 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -705,6 +705,15 @@ DFUN(".text.crt.dos.fs.utility", libd__eof, libc__eof, TD, 1, TIn(__SIZEOF_FD_T_
 
 /* kos.dosfs */
 DFUN(".text.crt.dos.io.access", libd_dosfs_setenabled, libc_dosfs_setenabled, TD, 1, TD)
+
+/* kos.fd */
+DFUN(".text.crt.io.utility.kos", libd_fd_polltest, libc_fd_polltest, TD, 2, TIn(__SIZEOF_FD_T__), TD)
+DFUN(".text.crt.io.utility.kos", libd_fd_cast, libc_fd_cast, TIn(__SIZEOF_FD_T__), 3, TIn(__SIZEOF_FD_T__), TI32, TIn(__SIZEOF_IOMODE_T__))
+DFUN(".text.crt.io.utility.kos", libd_fd_msalign, libc_fd_msalign, TIn(__SIZEOF_FD_T__), 3, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_IOMODE_T__))
+DFUN(".text.crt.io.utility.kos", libd_fd_subregion, libc_fd_subregion, TIn(__SIZEOF_FD_T__), 4, TIn(__SIZEOF_FD_T__), TI64, TI64, TIn(__SIZEOF_IOMODE_T__))
+DFUN(".text.crt.io.utility.kos", libd_fd_delregion, libc_fd_delregion, TD, 1, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.io.utility.kos", libd_fd_tailread, libc_fd_tailread, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TI64)
+DFUN(".text.crt.io.utility.kos", libd_fd_trim, libc_fd_trim, TI64, 4, TIn(__SIZEOF_FD_T__), TI64, TI64, TI32)
 
 /* kos.nopf */
 #include <kos/bits/nopf.h>

@@ -3317,6 +3317,13 @@
 #define __CRT_HAVE_fcntl
 #define __CRT_HAVE_fcvt
 #define __CRT_HAVE_fcvt_r
+#define __CRT_HAVE_fd_cast
+#define __CRT_HAVE_fd_delregion
+#define __CRT_HAVE_fd_msalign
+#define __CRT_HAVE_fd_polltest
+#define __CRT_HAVE_fd_subregion
+#define __CRT_HAVE_fd_tailread
+#define __CRT_HAVE_fd_trim
 #define __CRT_HAVE_fdatasync
 #define __CRT_HAVE_fdclosedir
 #define __CRT_HAVE_fdetach

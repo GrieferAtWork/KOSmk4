@@ -34,10 +34,9 @@
 #include <hybrid/overflow.h>
 
 #include <kos/anno.h>
+#include <kos/fd.h>
 #include <kos/io.h>
-#include <kos/ioctl/file.h>
 #include <kos/types.h>
-#include <sys/ioctl.h>
 #include <sys/mman.h>
 
 #include <assert.h>
@@ -65,28 +64,6 @@
 #include "serial.h"
 
 DECL_BEGIN
-
-/* Ask the kernel to create a sub-region of "fd" */
-PRIVATE WUNUSED fd_t CC
-file_newsubregion(fd_t fd,
-                  /*page-aligned*/ uint64_t minaddr,
-                  /*page-aligned*/ uint64_t num_bytes) {
-	struct file_subregion sr;
-	bzero(&sr, sizeof(sr));
-	sr.fsr_minaddr = minaddr;
-	if (OVERFLOW_UADD(minaddr, num_bytes - 1, &sr.fsr_maxaddr))
-		goto err_range;
-	sr.fsr_resfd.of_mode  = OPENFD_MODE_AUTO;
-	sr.fsr_resfd.of_flags = IO_CLOEXEC;
-	if unlikely(ioctl(fd, FILE_IOC_SUBREGION, &sr) < 0)
-		goto err;
-	return sr.fsr_resfd.of_hint;
-err_range:
-	errno = ERANGE;
-err:
-	return -1;
-}
-
 
 /************************************************************************/
 /* RAM DOMAIN OPERATORS                                                 */
@@ -143,7 +120,7 @@ NOTHROW(FCC ramfdbuffer_subregion__revoke)(struct video_buffer *__restrict self)
 	 * recursively delete all memory mappings created by the sub-region
 	 * or its descendants, and replace them with /dev/void */
 	struct video_ramfdbuffer *me = (struct video_ramfdbuffer *)self;
-	ioctl(me->rfdb_fd, FILE_IOC_DELREGION);
+	fd_delregion(me->rfdb_fd);
 	return me;
 }
 
@@ -222,7 +199,7 @@ ramfdbuffer__subregion(struct video_surface const *__restrict self,
 		goto err;
 
 	/* Create the actual sub-region */
-	result->rfdb_fd = file_newsubregion(me->rfdb_fd, aligned_region_offset, aligned_region_size);
+	result->rfdb_fd = fd_subregion(me->rfdb_fd, aligned_region_offset, aligned_region_size, IO_CLOEXEC);
 	if unlikely(result->rfdb_fd < 0)
 		goto err_r;
 

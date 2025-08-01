@@ -32,8 +32,8 @@
 
 #include <kos/anno.h>
 #include <kos/aref.h>
+#include <kos/fd.h>
 #include <kos/io.h>
-#include <kos/ioctl/file.h>
 #include <kos/ioctl/svga.h>
 #include <kos/sched/shared-lock.h>
 #include <kos/types.h>
@@ -85,29 +85,6 @@ DECL_BEGIN
 
 #define LOGERR(format, ...) \
 	syslog(LOG_ERR, "[libvideo-driver,svga.c:%d] " format, __LINE__, ##__VA_ARGS__)
-
-
-/* Ask the kernel to create a sub-region of "fd" */
-PRIVATE WUNUSED fd_t CC
-file_newsubregion(fd_t fd,
-                  /*page-aligned*/ uint64_t minaddr,
-                  /*page-aligned*/ uint64_t num_bytes) {
-	struct file_subregion sr;
-	bzero(&sr, sizeof(sr));
-	sr.fsr_minaddr = minaddr;
-	if (OVERFLOW_UADD(minaddr, num_bytes - 1, &sr.fsr_maxaddr))
-		goto err_range;
-	sr.fsr_resfd.of_mode  = OPENFD_MODE_AUTO;
-	sr.fsr_resfd.of_flags = IO_CLOEXEC;
-	if unlikely(ioctl(fd, FILE_IOC_SUBREGION, &sr) < 0)
-		goto err;
-	return sr.fsr_resfd.of_hint;
-err_range:
-	errno = ERANGE;
-err:
-	return -1;
-}
-
 
 PRIVATE ATTR_IN(1) ATTR_OUT(2) void CC
 modeinfo_to_codecspecs(struct svga_modeinfo const *__restrict modeinfo,
@@ -438,7 +415,7 @@ svga_newbuffer(struct svga_adapter *__restrict self) {
 	lfb_size = (lfb_offset + result->rfdb_total + pm) & ~pm;
 
 	/* Create sub-region of /dev/mem for linear frame buffer */
-	result->rfdb_fd = file_newsubregion(self->sva_devmem, lfb_addr, lfb_size);
+	result->rfdb_fd = fd_subregion(self->sva_devmem, lfb_addr, lfb_size, IO_CLOEXEC);
 	if unlikely(result->rfdb_fd < 0)
 		goto err_r;
 

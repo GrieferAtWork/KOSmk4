@@ -294,7 +294,7 @@
 	CB(PREFIX.crt.FILE.unlocked.utility) \
 	CB(PREFIX.crt.FILE.utility.ext) \
 	CB(PREFIX.crt.FILE.utility.popen) \
-	CB(PREFIX.crt.io.large.lock PREFIX.crt.io.large.seek PREFIX.crt.io.large.utility PREFIX.crt.io.lock PREFIX.crt.io.poll PREFIX.crt.io.seek PREFIX.crt.io.sync PREFIX.crt.io.utility) \
+	CB(PREFIX.crt.io.large.lock PREFIX.crt.io.large.seek PREFIX.crt.io.large.utility PREFIX.crt.io.lock PREFIX.crt.io.poll PREFIX.crt.io.seek PREFIX.crt.io.sync PREFIX.crt.io.utility PREFIX.crt.io.utility.kos) \
 	CB(PREFIX.crt.fs.basic_property PREFIX.crt.fs.property) \
 	CB(PREFIX.crt.fs.environ) \
 	CB(PREFIX.crt.fs.modify) \

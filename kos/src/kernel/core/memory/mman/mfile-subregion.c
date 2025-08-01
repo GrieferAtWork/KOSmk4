@@ -404,11 +404,6 @@ mfile_subregion_create(struct mfile *__restrict self,
 		THROW(E_ILLEGAL_OPERATION,
 		      E_ILLEGAL_OPERATION_CONTEXT_SUBREGION_NOT_POSSIBLE);
 	}
-	/* Assert that "self" supports "raw" I/O */
-	if (!mfile_hasrawio(self)) {
-		THROW(E_ILLEGAL_OPERATION,
-		      E_ILLEGAL_OPERATION_CONTEXT_SUBREGION_NOT_POSSIBLE);
-	}
 
 	result = (REF struct subregion_mfile *)kmalloc(sizeof(struct subregion_mfile), GFP_NORMAL);
 	TRY {
@@ -517,7 +512,7 @@ mfile_subregion(struct mfile *__restrict self,
 	if (!OVERFLOW_UADD(self_size, PAGEMASK, &self_size)) {
 		self_size &= ~PAGEMASK;
 		if (maxaddr >= self_size) {
-			THROW(E_ILLEGAL_OPERATION,
+			THROW(E_INVALID_OPERATION,
 			      E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE,
 			      (uint32_t)maxaddr, (uint32_t)(maxaddr >> 32),
 			      (uint32_t)self_size, (uint32_t)(self_size >> 32));

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fc584a9 */
+/* HASH CRC-32:0x50e43a7b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1531,6 +1531,13 @@
 #define __CRT_HAVE_DOS$fcntl
 #define __CRT_HAVE_DOS$fcvt
 #define __CRT_HAVE_DOS$fcvt_r
+#define __CRT_HAVE_DOS$fd_cast
+#define __CRT_HAVE_DOS$fd_delregion
+#define __CRT_HAVE_DOS$fd_msalign
+#define __CRT_HAVE_DOS$fd_polltest
+#define __CRT_HAVE_DOS$fd_subregion
+#define __CRT_HAVE_DOS$fd_tailread
+#define __CRT_HAVE_DOS$fd_trim
 #define __CRT_HAVE_DOS$fdatasync
 #define __CRT_HAVE_DOS$fdclosedir
 #define __CRT_HAVE_DOS$fdetach
@@ -5998,6 +6005,13 @@
 #define __CRT_HAVE_fcopylist_sz
 #define __CRT_HAVE_fcvt
 #define __CRT_HAVE_fcvt_r
+#define __CRT_HAVE_fd_cast
+#define __CRT_HAVE_fd_delregion
+#define __CRT_HAVE_fd_msalign
+#define __CRT_HAVE_fd_polltest
+#define __CRT_HAVE_fd_subregion
+#define __CRT_HAVE_fd_tailread
+#define __CRT_HAVE_fd_trim
 #define __CRT_HAVE_fdatasync
 #define __CRT_HAVE_fdclosedir
 #define __CRT_HAVE_fdetach
