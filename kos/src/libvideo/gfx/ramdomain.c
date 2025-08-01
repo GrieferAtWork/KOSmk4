@@ -143,8 +143,10 @@ rambuffer__subregion__common(struct video_surface const *__restrict surface,
 	result->rb_stride = self->rb_stride;
 	result->rbs_base  = self;
 	video_buffer_incref(self);
-	result->rbs_xoff = rect->vcr_xmin;
-	result->rbs_yoff = rect->vcr_ymin;
+	result->rbs_xoff = video_crect_getxmin(rect);
+	result->rbs_yoff = video_crect_getymin(rect);
+	result->rbs_xend = video_crect_getxend(rect);
+	result->rbs_yend = video_crect_getyend(rect);
 	__video_buffer_init_common(result);
 	return result;
 err:

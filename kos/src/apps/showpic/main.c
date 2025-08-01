@@ -599,7 +599,7 @@ int main(int argc, char *argv[]) {
 			err(EXIT_FAILURE, "Failed to allocate window1");
 
 		/* Create a second (small) window to interact with the first (big) one */
-		position.vwp_over = VIDEO_WINDOW_MOVE_OVER__FOREGROUND;
+		position.vwp_over = VIDEO_WINDOW_MOVE_OVER__BACKGROUND;
 		position.vwp_attr.vwa_flags = VIDEO_WINDOW_F_PASSTHRU | VIDEO_WINDOW_F_ALPHA;
 		position.vwp_attr.vwa_rect.vr_xmin = 10;
 		position.vwp_attr.vwa_rect.vr_ymin = 10;
