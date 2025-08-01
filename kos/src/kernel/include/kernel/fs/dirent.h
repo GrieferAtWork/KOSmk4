@@ -83,7 +83,7 @@ struct fdirent {
 	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, fd_name);    /* [const][fd_namelen] Directory entry name. (NUL-terminated) */
 };
 
-#define _FDIRENT_FIELDS_WITHOUT_NAME                                                                                                        \
+#define _FDIRENT_FIELDS_WITHOUT_NAME                                                                                         \
 	WEAK refcnt_t             fd_refcnt;  /* Reference counter. */                                                           \
 	struct fdirent_ops const *fd_ops;     /* [1..1][const] Operators. */                                                     \
 	ino_t                     fd_ino;     /* [const][valid_if(fd_ops->fdo_getino == NULL)] INode number of this directory    \

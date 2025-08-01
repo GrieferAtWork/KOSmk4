@@ -153,6 +153,7 @@ err:
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *
 NOTHROW(FCALL mfile_tryincref_and_lock_parts)(struct mfile *__restrict self) {
 	REF struct mpart *result;
+	assert(mfile_lock_writing(self));
 	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
 again:
 	result = self->mf_parts;

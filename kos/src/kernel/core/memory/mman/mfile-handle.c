@@ -40,6 +40,7 @@
 #include <kernel/handman.h>
 #include <kernel/iovec.h>
 #include <kernel/mman/mfile-misaligned.h>
+#include <kernel/mman/mfile-subregion.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/user.h>
@@ -209,6 +210,50 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		hand.h_mode = IO_RDONLY;
 		return handles_install_openfd(hand, &info->fmsa_resfd);
 	}	break;
+
+	case FILE_IOC_SUBREGION: {
+		NCX struct file_subregion *info;
+		REF struct mfile *subregion;
+		REF struct filehandle *ma_handle;
+		struct handle hand;
+		pos_t minaddr, maxaddr;
+		info   = (NCX struct file_subregion *)validate_readwrite(arg, sizeof(struct file_subregion));
+		minaddr = (pos_t)info->fsr_minaddr;
+		maxaddr = (pos_t)info->fsr_maxaddr;
+		COMPILER_READ_BARRIER();
+
+		/* The resulting wrapper can be used for reading and writing, so require both. */
+		if unlikely(!IO_CANREADWRITE(mode))
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_MMAP, mode);
+
+		/* Create the misalignment wrapper. */
+		subregion = mfile_subregion(self, minaddr, maxaddr);
+
+		/* Wrap the new sub-region in a `struct filehandle'. */
+		{
+			REF struct fdirent *fh_dent;
+			FINALLY_DECREF_UNLIKELY(subregion);
+			fh_dent = mfile_subregion_getname(subregion);
+			FINALLY_XDECREF_UNLIKELY(fh_dent);
+			ma_handle = filehandle_new(subregion, NULL, fh_dent);
+		}
+		FINALLY_DECREF_UNLIKELY(ma_handle);
+
+		/* Set-up and install the new object as a handle. */
+		hand.h_type = HANDLE_TYPE_FILEHANDLE;
+		hand.h_data = ma_handle;
+		hand.h_mode = IO_RDWR;
+		return handles_install_openfd(hand, &info->fsr_resfd);
+	}	break;
+
+	case FILE_IOC_DELREGION:
+		/* Assert that "self" is a sub-region mfile */
+		if (self->mf_ops != &mfile_subregion_ops) {
+			THROW(E_ILLEGAL_OPERATION,
+			      E_ILLEGAL_OPERATION_CONTEXT_NOT_A_SUBREGION);
+		}
+		mfile_subregion_delete(self);
+		return 0;
 
 	case FILE_IOC_TAILREAD: {
 		pos_t offset;

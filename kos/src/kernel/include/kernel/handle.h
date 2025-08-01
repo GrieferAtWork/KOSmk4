@@ -82,7 +82,12 @@ struct handle_mmap_info {
 	                                  * when trying  to mmap  beyond the  end of  a file,  attempting to  mmap
 	                                  * memory beyond  this address  will simply  result in  mfile_zero to  be
 	                                  * mapped within that area, rather  than the intended file being  mapped.
-	                                  * s.a. `mman_map_subrange()' and `mfile_getpart()' */
+	                                  * s.a. `mman_map_subrange()' and `mfile_getpart()'
+	                                  *
+	                                  * When  hooking `mfile_stream_ops::mso_mmap' and wanting mmap attempts
+	                                  * past some custom point in a file  to behave the same by throwing  an
+	                                  * `E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE' exception, you
+	                                  * can simply throw that exception from your hook! */
 	REF struct path    *hmi_fspath;  /* [0..1][in|out] Filesystem path of `hmi_file' */
 	REF struct fdirent *hmi_fsname;  /* [0..1][in|out] Filesystem name of `hmi_file' */
 };

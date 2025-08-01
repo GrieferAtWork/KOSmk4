@@ -79,6 +79,8 @@ enum {
 	E_ILLEGAL_OPERATION_CONTEXT_SENDFILE_NO_FILE_POSITION,             /* E_INVALID_OPERATION: [EINVAL] Tried to use `sendfile(2)' with `pin_offset == NULL', and `infd' doesn't have a writable file position attribute. */
 	E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS,                   /* E_ILLEGAL_OPERATION: [EPERM] Attempted to change one of `_MFILE_F_ROFLAGSMASK' of a file marked as `MFILE_F_ROFLAGS' */
 	E_ILLEGAL_OPERATION_CONTEXT_MSALIGN_NO_RAW_IO,                     /* E_ILLEGAL_OPERATION: [EPERM] Attempted to use `FILE_IOC_MSALIGN' on a file that doesn't support "Raw I/O" */
+	E_ILLEGAL_OPERATION_CONTEXT_SUBREGION_NOT_POSSIBLE,                /* E_ILLEGAL_OPERATION: [EPERM] Attempted to use `FILE_IOC_SUBREGION' on a file that doesn't support "Raw I/O", or is another sub-region file */
+	E_ILLEGAL_OPERATION_CONTEXT_NOT_A_SUBREGION,                       /* E_ILLEGAL_OPERATION: [EPERM] Attempted to use `FILE_IOC_DELREGION' on a file that isn't a sub-region file */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -133,6 +135,8 @@ enum {
 #define E_ILLEGAL_OPERATION_CONTEXT_SENDFILE_NO_FILE_POSITION             E_ILLEGAL_OPERATION_CONTEXT_SENDFILE_NO_FILE_POSITION             /* E_INVALID_OPERATION: [EINVAL] Tried to use `sendfile(2)' with `pin_offset == NULL', and `infd' doesn't have a writable file position attribute. */
 #define E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS                   E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS                   /* E_ILLEGAL_OPERATION: [EPERM] Attempted to change one of `_MFILE_F_ROFLAGSMASK' of a file marked as `MFILE_F_ROFLAGS' */
 #define E_ILLEGAL_OPERATION_CONTEXT_MSALIGN_NO_RAW_IO                     E_ILLEGAL_OPERATION_CONTEXT_MSALIGN_NO_RAW_IO                     /* E_ILLEGAL_OPERATION: [EPERM] Attempted to use `FILE_IOC_MSALIGN' on a file that doesn't support "Raw I/O" */
+#define E_ILLEGAL_OPERATION_CONTEXT_SUBREGION_NOT_POSSIBLE                E_ILLEGAL_OPERATION_CONTEXT_SUBREGION_NOT_POSSIBLE                /* E_ILLEGAL_OPERATION: [EPERM] Attempted to use `FILE_IOC_SUBREGION' on a file that doesn't support "Raw I/O", or is another sub-region file */
+#define E_ILLEGAL_OPERATION_CONTEXT_NOT_A_SUBREGION                       E_ILLEGAL_OPERATION_CONTEXT_NOT_A_SUBREGION                       /* E_ILLEGAL_OPERATION: [EPERM] Attempted to use `FILE_IOC_DELREGION' on a file that isn't a sub-region file */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_ILLEGAL_OPERATION_CONTEXT_GENERIC                               0  /* Generic context */
 #define E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK                         1  /* E_ILLEGAL_IO_OPERATION: Attempted to open(2) an `S_IFSOCK'-file */
@@ -184,6 +188,8 @@ enum {
 #define E_ILLEGAL_OPERATION_CONTEXT_SENDFILE_NO_FILE_POSITION             47 /* E_INVALID_OPERATION: [EINVAL] Tried to use `sendfile(2)' with `pin_offset == NULL', and `infd' doesn't have a writable file position attribute. */
 #define E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS                   48 /* E_ILLEGAL_OPERATION: [EPERM] Attempted to change one of `_MFILE_F_ROFLAGSMASK' of a file marked as `MFILE_F_ROFLAGS' */
 #define E_ILLEGAL_OPERATION_CONTEXT_MSALIGN_NO_RAW_IO                     49 /* E_ILLEGAL_OPERATION: [EPERM] Attempted to use `FILE_IOC_MSALIGN' on a file that doesn't support "Raw I/O" */
+#define E_ILLEGAL_OPERATION_CONTEXT_SUBREGION_NOT_POSSIBLE                50 /* E_ILLEGAL_OPERATION: [EPERM] Attempted to use `FILE_IOC_SUBREGION' on a file that doesn't support "Raw I/O", or is another sub-region file */
+#define E_ILLEGAL_OPERATION_CONTEXT_NOT_A_SUBREGION                       51 /* E_ILLEGAL_OPERATION: [EPERM] Attempted to use `FILE_IOC_DELREGION' on a file that isn't a sub-region file */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

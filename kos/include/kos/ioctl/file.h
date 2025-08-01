@@ -51,16 +51,20 @@
 /************************************************************************/
 /* Actually KOS-specific ioctls.                                        */
 /************************************************************************/
-#define FILE_IOC_DELETED   _IOR_KOS('F', 0x00, int)                  /* Check if the file was deleted (as per `unlink(2)') */
-#define FILE_IOC_HASRAWIO  _IOR_KOS('F', 0x01, int)                  /* Check if the file supports "Raw I/O" (s.a. `mfile_hasrawio()') */
-#define FILE_IOC_DCHANGED  _IOR_KOS('F', 0x02, int)                  /* Check if data of the file has changed (s.a. `fdatasync(2)', `mfile_haschanged()') */
-#define FILE_IOC_CHANGED   _IOR_KOS('F', 0x03, int)                  /* Check if attributes or data have changed (s.a. `fsync(2)', `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED') */
-#define FILE_IOC_BLKSHIFT  _IOR_KOS('F', 0x04, struct file_blkshift) /* This ioctl is meant to be used to query buffer requirements for `O_DIRECT',
-                                                                      * which requires file offsets be  aligned by `1 << fbs_blck', and I/O  buffer
-                                                                      * pointers to be aligned by `1 << fbs_ioba' (IOBaseAddress_SHIFT). */
-#define FILE_IOC_MSALIGN  _IOWR_KOS('F', 0x10, struct file_msalign)  /* Create an misaligned wrapper for this file (see below) */
-#define FILE_IOC_TAILREAD _IOWR_KOS('F', 0x20, struct file_tailread) /* Tail read (see below) */
-#define FILE_IOC_TRIM     _IOWR_KOS('F', 0x30, struct file_trim)     /* Trim file caches. */
+#define FILE_IOC_DELETED    _IOR_KOS('F', 0x00, int)                   /* Check if the file was deleted (as per `unlink(2)') */
+#define FILE_IOC_HASRAWIO   _IOR_KOS('F', 0x01, int)                   /* Check if the file supports "Raw I/O" (s.a. `mfile_hasrawio()') */
+#define FILE_IOC_DCHANGED   _IOR_KOS('F', 0x02, int)                   /* Check if data of the file has changed (s.a. `fdatasync(2)', `mfile_haschanged()') */
+#define FILE_IOC_CHANGED    _IOR_KOS('F', 0x03, int)                   /* Check if attributes or data have changed (s.a. `fsync(2)', `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED') */
+#define FILE_IOC_BLKSHIFT   _IOR_KOS('F', 0x04, struct file_blkshift)  /* This ioctl is meant to be used to query buffer requirements for `O_DIRECT',
+                                                                        * which requires file offsets be  aligned by `1 << fbs_blck', and I/O  buffer
+                                                                        * pointers to be aligned by `1 << fbs_ioba' (IOBaseAddress_SHIFT). */
+#define FILE_IOC_MSALIGN   _IOWR_KOS('F', 0x10, struct file_msalign)   /* Create an misaligned wrapper for this file (see below) */
+#define FILE_IOC_SUBREGION _IOWR_KOS('F', 0x11, struct file_subregion) /* Create a sub-region proxy */
+#define FILE_IOC_DELREGION   _IO_KOS('F', 0x12)                        /* Recursively delete a sub-region and its descendants, replacing
+                                                                        * all  memory  mappings   created  by   them  with   `/dev/void' */
+#define FILE_IOC_TAILREAD  _IOWR_KOS('F', 0x20, struct file_tailread)  /* Tail read (see below) */
+#define FILE_IOC_TRIM      _IOWR_KOS('F', 0x30, struct file_trim)      /* Trim file caches. */
+
 
 /* Return `_PC_*' for the superblock associated with the given file.
  * - This ioctl is only support for `fnode'-derived files */
@@ -140,7 +144,14 @@ struct file_blkshift {
  */
 struct file_msalign {
 	__uint64_t    fmsa_offset; /* [in|out] Unaligned file offset. */
-	struct openfd fmsa_resfd;  /* Resulting file descriptor. */
+	struct openfd fmsa_resfd;  /* [out] Resulting file descriptor. */
+};
+
+
+struct file_subregion {
+	__uint64_t    fsr_minaddr; /* [in] Sub-region lower bound. */
+	__uint64_t    fsr_maxaddr; /* [in] Sub-region upper bound. */
+	struct openfd fsr_resfd;   /* [out] Resulting file descriptor. */
 };
 
 
