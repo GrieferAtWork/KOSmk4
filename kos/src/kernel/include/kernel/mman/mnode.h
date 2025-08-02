@@ -99,6 +99,7 @@
                                        * must also be aware of the fact that requirements imposed by `MNODE_F_NOSPLIT'
                                        * and `MNODE_F_NOMERGE' also apply to nodes that are hinted! */
 #define MNODE_F_MLOCK      0x00002000 /* [valid_if(mn_part != NULL)][lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
+#define MNODE_F_MLOCK_RESERVED 0x00000000 /* Same as `MNODE_F_MLOCK', but must be used when there is no mem-part. */
 #define MNODE_F_VOIDMEM    0x00002000 /* [valid_if(mn_part == NULL)][lock(WRITE_ONCE)] Address range is a white-out region (maps to /dev/void) */
 #define MNODE_F__RBRED     0x00004000 /* [lock(mn_mman->mm_lock)] Internal flag: This node is red in the mman-mappings R/B tree. */
 #define MBNODE_F_POPULATE  0x00008000 /* Used internally by `struct mbnode' */

@@ -311,7 +311,7 @@ PUBLIC struct mnode x86_phys2virt64_node = {
 	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
 	                    MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 	                    MNODE_F_STATICPART | MNODE_F_KERNPART |
-	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),
+	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK_RESERVED),
 	MNODE_INIT_mn_part(NULL), /* Reserved mapping (with custom contents) */
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),

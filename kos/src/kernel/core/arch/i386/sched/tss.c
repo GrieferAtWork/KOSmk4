@@ -70,7 +70,7 @@ PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_iobnode_ = {
 	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
 	                    MNODE_F_NOMERGE | MNODE_F_STATICPART |
 	                    MNODE_F_KERNPART | MNODE_F_MPREPARED |
-	                    MNODE_F_MLOCK),
+	                    MNODE_F_MLOCK_RESERVED),
 	MNODE_INIT_mn_part(NULL), /* Reserved node */
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),

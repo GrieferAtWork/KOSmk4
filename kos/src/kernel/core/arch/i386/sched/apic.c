@@ -366,7 +366,7 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	cpu_node2->mn_flags   = MNODE_F_PWRITE | MNODE_F_PREAD |
 	                        MNODE_F_SHARED | MNODE_F_NOSPLIT |
 	                        MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	                        MNODE_F_MLOCK | MNODE_F_MPREPARED;
+	                        MNODE_F_MLOCK_RESERVED | MNODE_F_MPREPARED;
 	cpu_node2->mn_mman    = &mman_kernel;
 	cpu_node2->mn_part    = NULL; /* Reservation */
 	cpu_node2->mn_fspath  = NULL;

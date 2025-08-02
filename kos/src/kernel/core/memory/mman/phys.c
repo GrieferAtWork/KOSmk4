@@ -1244,7 +1244,7 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mnode) this_trampoline_node_ = {
 	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
 	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
 	                    MNODE_F_NOMERGE | MNODE_F_MPREPARED |
-	                    MNODE_F_MLOCK | MNODE_F_STATICPART),
+	                    MNODE_F_MLOCK_RESERVED | MNODE_F_STATICPART),
 	MNODE_INIT_mn_part(NULL),
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),

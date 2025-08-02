@@ -51,8 +51,6 @@ again:
 		size_t nodesize;
 		nodesize = mnode_getsize(node);
 		result->msi_size += nodesize;
-		if (node->mn_flags & MNODE_F_MLOCK)
-			result->msi_lock += nodesize;
 		if ((node->mn_flags & (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD)) == (MNODE_F_PEXEC | MNODE_F_PREAD))
 			result->msi_nexe += nodesize;
 		if ((node->mn_flags & (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD)) == (MNODE_F_PWRITE | MNODE_F_PREAD))
@@ -60,6 +58,8 @@ again:
 		part = node->mn_part;
 		if likely(part != NULL) {
 			uintptr_quarter_t state;
+			if (node->mn_flags & MNODE_F_MLOCK)
+				result->msi_lock += nodesize;
 			if (mpart_isanon_atomic(part))
 				result->msi_anon += nodesize;
 			state = atomic_read(&part->mp_state);

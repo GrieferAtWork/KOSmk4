@@ -170,7 +170,7 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mnode) this_kernel_stackguard_ = {
 	MNODE_INIT_mn_maxaddr(PAGESIZE - 1),
 	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 	                    MNODE_F_STATICPART | MNODE_F_KERNPART |
-	                    MNODE_F_MLOCK | _MNODE_F_MPREPARED_KERNEL),
+	                    MNODE_F_MLOCK_RESERVED | _MNODE_F_MPREPARED_KERNEL),
 	MNODE_INIT_mn_part(NULL), /* Reserved node! */
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),
