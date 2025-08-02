@@ -28,6 +28,7 @@
 #ifdef __x86_64__
 
 #include <kernel/panic.h>
+#include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/fsgsbase.h> /* x86_fsgsbase_patch() */
@@ -190,11 +191,13 @@ NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 	/* Check if our CPU supports fsgsbase. If it does, the we don't  have
 	 * to do anything, and we can NOP out calls to `x86_fsgsbase_patch()' */
 	if (X86_HAVE_FSGSBASE) {
+		printk(FREESTR(KERN_INFO "[fsgsbase] Supported by CPU\n"));
 		*((byte_t *)&x86_fsgsbase_patch + 0) = 0xc3; /* ret */
 		return;
 	}
 
 	/* Patch all fsgsbase instructions within the kernel core. */
+	printk(FREESTR(KERN_INFO "[fsgsbase] Not supported by CPU (patching kernel for MSR usage...)\n"));
 	for (iter = __x86_fixup_fsgsbase_start;
 	     iter < __x86_fixup_fsgsbase_end; ++iter) {
 		void *pc = (byte_t *)KERNEL_CORE_BASE + *iter;
