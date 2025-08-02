@@ -662,6 +662,12 @@ err:
 
 
 
+/* warning : 'pdyn_pci_device_cfg_write_u32' may be used uninitialized [-Wmaybe-uninitialized]
+ *
+ * It isn't uninitialized -- when libpci can't be loaded (meaning that callback is uninitialized),
+ * then "pci == NULL", which  also means that  `pdyn_pci_device_cfg_write_u32()' is never  called. */
+__pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
+
 /* Probe for VESA support.
  * @return: true:  Chipset found.
  * @return: false: Chipset isn't present. */
@@ -815,6 +821,7 @@ err_initfailed:
 #endif /* !__KERNEL__ */
 	return false;
 }
+__pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 DECL_END
 #endif /* CONFIG_HAVE_LIBSVGADRV_CHIPSET_VMWARE */

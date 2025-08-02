@@ -100,7 +100,11 @@ NOTHROW(FCC region_buffer__revoke)(struct video_buffer *__restrict self) {
 INTERN WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC
 region_buffer__subregion(struct video_surface const *__restrict self,
                          struct video_crect const *__restrict rect) {
-	struct video_rect old_rect, new_rect, result_rect, base_iorect;
+	struct video_rect old_rect, new_rect, result_rect;
+	union {
+		struct video_rect r;
+		struct video_crect c;
+	} base_iorect;
 	REF struct region_buffer *result;
 	struct region_buffer *me = (struct region_buffer *)video_surface_getbuffer(self);
 	struct video_buffer *base = me->rbf_base;
@@ -118,30 +122,30 @@ region_buffer__subregion(struct video_surface const *__restrict self,
 	if (!video_rect_intersect_overflow(&old_rect, &new_rect, &result_rect))
 		goto do_return_empty_buffer;
 	assert(!video_rect_isempty(&result_rect));
-	base_iorect.vr_xmin = 0;
-	base_iorect.vr_ymin = 0;
-	base_iorect.vr_xdim = video_buffer_getxdim(base);
-	base_iorect.vr_ydim = video_buffer_getydim(base);
-	if (!video_rect_intersect_overflow(&base_iorect, &result_rect, &base_iorect))
+	base_iorect.r.vr_xmin = 0;
+	base_iorect.r.vr_ymin = 0;
+	base_iorect.r.vr_xdim = video_buffer_getxdim(base);
+	base_iorect.r.vr_ydim = video_buffer_getydim(base);
+	if (!video_rect_intersect_overflow(&base_iorect.r, &result_rect, &base_iorect.r))
 		goto do_return_empty_buffer;
 
 	/* Check if this whole thing has once again turned into a sub-region-only buffer. */
-	if (result_rect.vr_xmin == base_iorect.vr_xmin &&
-	    result_rect.vr_ymin == base_iorect.vr_ymin &&
-	    result_rect.vr_xdim == base_iorect.vr_xdim &&
-	    result_rect.vr_ydim == base_iorect.vr_ydim)
-		return video_buffer_subregion(base, (struct video_crect const *)&base_iorect);
+	if (result_rect.vr_xmin == base_iorect.r.vr_xmin &&
+	    result_rect.vr_ymin == base_iorect.r.vr_ymin &&
+	    result_rect.vr_xdim == base_iorect.r.vr_xdim &&
+	    result_rect.vr_ydim == base_iorect.r.vr_ydim)
+		return video_buffer_subregion(base, &base_iorect.c);
 
 	/* Check if we need to use a sub-region of "base" for the  result
 	 * This essentially clamps the buffer I/O Rect if it got smaller. */
-	if (base_iorect.vr_xmin > 0 || base_iorect.vr_ymin > 0 ||
-	    base_iorect.vr_xdim < video_buffer_getxdim(base) ||
-	    base_iorect.vr_ydim < video_buffer_getydim(base)) {
-		base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect);
+	if (base_iorect.r.vr_xmin > 0 || base_iorect.r.vr_ymin > 0 ||
+	    base_iorect.r.vr_xdim < video_buffer_getxdim(base) ||
+	    base_iorect.r.vr_ydim < video_buffer_getydim(base)) {
+		base = video_buffer_subregion(base, &base_iorect.c);
 		if unlikely(!base)
 			goto err;
-		result_rect.vr_xmin -= base_iorect.vr_xmin;
-		result_rect.vr_ymin -= base_iorect.vr_ymin;
+		result_rect.vr_xmin -= base_iorect.r.vr_xmin;
+		result_rect.vr_ymin -= base_iorect.r.vr_ymin;
 	} else {
 		video_buffer_incref(base);
 	}
@@ -374,7 +378,10 @@ _libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 		struct region_buffer *me = (struct region_buffer *)self;
 		struct video_buffer *base = me->rbf_base;
 		struct video_rect me_crect, ret_crect, base_crect;
-		struct video_rect base_iorect;
+		union {
+			struct video_rect r;
+			struct video_crect c;
+		} base_iorect;
 
 		/* Calculate intersection of 3 rects:
 		 * - {{0,0},                           {video_buffer_getXYdim(base)}}
@@ -403,37 +410,37 @@ _libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 		ret_crect.vr_xdim  = video_buffer_getxdim(result);
 		ret_crect.vr_ydim  = video_buffer_getydim(result);
 
-		if (!video_rect_intersect_overflow(&me_crect, &ret_crect, &base_iorect))
+		if (!video_rect_intersect_overflow(&me_crect, &ret_crect, &base_iorect.r))
 			goto do_return_empty_buffer_r;
-		if (!video_rect_intersect_overflow(&base_iorect, &base_crect, &base_iorect))
+		if (!video_rect_intersect_overflow(&base_iorect.r, &base_crect, &base_iorect.r))
 			goto do_return_empty_buffer_r;
-		assert(!video_rect_isempty(&base_iorect));
-		assert(base_iorect.vr_xmin >= 0);
-		assert(base_iorect.vr_ymin >= 0);
-		assert((base_iorect.vr_xmin + base_iorect.vr_xdim) <= video_buffer_getxdim(base));
-		assert((base_iorect.vr_ymin + base_iorect.vr_ydim) <= video_buffer_getydim(base));
+		assert(!video_rect_isempty(&base_iorect.r));
+		assert(base_iorect.r.vr_xmin >= 0);
+		assert(base_iorect.r.vr_ymin >= 0);
+		assert((base_iorect.r.vr_xmin + base_iorect.r.vr_xdim) <= video_buffer_getxdim(base));
+		assert((base_iorect.r.vr_ymin + base_iorect.r.vr_ydim) <= video_buffer_getydim(base));
 
 		/* Populate "result" based on rect offsets */
 		result->rbf_cxoff = ret_crect.vr_xmin;
 		result->rbf_cyoff = ret_crect.vr_ymin;
 
 		/* Check if we need to create a new sub-region buffer to enforce an I/O Rect */
-		if (base_iorect.vr_xmin > 0 || base_iorect.vr_ymin > 0 ||
-		    base_iorect.vr_xdim < video_buffer_getxdim(base) ||
-		    base_iorect.vr_xdim < video_buffer_getydim(base)) {
+		if (base_iorect.r.vr_xmin > 0 || base_iorect.r.vr_ymin > 0 ||
+		    base_iorect.r.vr_xdim < video_buffer_getxdim(base) ||
+		    base_iorect.r.vr_xdim < video_buffer_getydim(base)) {
 			REF struct video_buffer *used_base;
 			static_assert(offsetof(struct video_rect, vr_xmin) == offsetof(struct video_crect, vcr_xmin));
 			static_assert(offsetof(struct video_rect, vr_ymin) == offsetof(struct video_crect, vcr_ymin));
 			static_assert(offsetof(struct video_rect, vr_xdim) == offsetof(struct video_crect, vcr_xdim));
 			static_assert(offsetof(struct video_rect, vr_ydim) == offsetof(struct video_crect, vcr_ydim));
-			used_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect);
+			used_base = video_buffer_subregion(base, &base_iorect.c);
 			video_buffer_decref(base);
 			if unlikely(!used_base)
 				goto err_r;
 
 			/* Make pixel offsets of "result" be relative to the new sub-region */
-			result->rbf_cxoff -= base_iorect.vr_xmin;
-			result->rbf_cyoff -= base_iorect.vr_ymin;
+			result->rbf_cxoff -= base_iorect.r.vr_xmin;
+			result->rbf_cyoff -= base_iorect.r.vr_ymin;
 			base = used_base;
 		}
 	}
