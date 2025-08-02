@@ -43,6 +43,10 @@
 
 #include <hybrid/align.h>
 #include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
+
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>

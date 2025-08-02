@@ -43,75 +43,31 @@ DECL_BEGIN
  *       any changes made will become lost the next time the mman
  *       is changed.
  * NOTE: These fields are _NOT_ inherited during `mman_fork()'! */
-PUBLIC ATTR_PERMMAN ATTR_ALIGN(void *) thismman_x86_dr0    = 0;
-PUBLIC ATTR_PERMMAN ATTR_ALIGN(void *) thismman_x86_dr1    = 0;
-PUBLIC ATTR_PERMMAN ATTR_ALIGN(void *) thismman_x86_dr2    = 0;
-PUBLIC ATTR_PERMMAN ATTR_ALIGN(void *) thismman_x86_dr3    = 0;
+PUBLIC ATTR_PERMMAN ATTR_ALIGN(void *) thismman_x86_drN[4] = { 0, 0, 0, 0};
+DEFINE_PUBLIC_ALIAS(thismman_x86_dr0, thismman_x86_drN);
+DEFINE_PUBLIC_ALIAS(thismman_x86_dr1, thismman_x86_drN + (__SIZEOF_POINTER__));
+DEFINE_PUBLIC_ALIAS(thismman_x86_dr2, thismman_x86_drN + (__SIZEOF_POINTER__ * 2));
+DEFINE_PUBLIC_ALIAS(thismman_x86_dr3, thismman_x86_drN + (__SIZEOF_POINTER__ * 3));
 PUBLIC ATTR_PERMMAN ATTR_ALIGN(uintptr_t) thismman_x86_dr7 = 0;
 
-
-#define thismman_x86_drN(n) (*thismman_x86_drN_impl(n))
-LOCAL ATTR_CONST WUNUSED void **
-NOTHROW(KCALL thismman_x86_drN_impl)(unsigned int n) {
-	void **result;
-	switch (n) {
-
-	case 0:
-		result = &thismman_x86_dr0;
-		break;
-	case 1:
-		result = &thismman_x86_dr1;
-		break;
-	case 2:
-		result = &thismman_x86_dr2;
-		break;
-	case 3:
-		result = &thismman_x86_dr3;
-		break;
-
-	default: __builtin_unreachable();
-	}
-	return result;
-}
-
-LOCAL ATTR_PURE void *KCALL __rddrN0123(unsigned int n) {
+LOCAL ATTR_PURE void *KCALL __rddrN(unsigned int n) {
 	void *result;
 	switch (n) {
-
-	case 0:
-		result = __rddr0();
-		break;
-	case 1:
-		result = __rddr1();
-		break;
-	case 2:
-		result = __rddr2();
-		break;
-	case 3:
-		result = __rddr3();
-		break;
-
+	case 0: result = __rddr0(); break;
+	case 1: result = __rddr1(); break;
+	case 2: result = __rddr2(); break;
+	case 3: result = __rddr3(); break;
 	default: __builtin_unreachable();
 	}
 	return result;
 }
 
-LOCAL void KCALL __wrdrN0123(unsigned int n, void *value) {
+LOCAL void KCALL __wrdrN(unsigned int n, void *value) {
 	switch (n) {
-
-	case 0:
-		__wrdr0(value);
-		break;
-	case 1:
-		__wrdr1(value);
-		break;
-	case 2:
-		__wrdr2(value);
-		break;
-	case 3:
-		__wrdr3(value);
-		break;
-
+	case 0: __wrdr0(value); break;
+	case 1: __wrdr1(value); break;
+	case 2: __wrdr2(value); break;
+	case 3: __wrdr3(value); break;
 	default: __builtin_unreachable();
 	}
 }
@@ -148,11 +104,11 @@ NOTHROW(KCALL mman_addhwbreak)(struct mman *__restrict self,
 		dr7 &= ~(DR7_CN(i) | DR7_SN(i));
 		dr7 |= br_cond << DR7_CN_SHIFT(i);
 		dr7 |= br_size << DR7_SN_SHIFT(i);
-		FORMMAN(self, thismman_x86_drN(i)) = addr;
+		FORMMAN(self, thismman_x86_drN[i]) = addr;
 		FORMMAN(self, thismman_x86_dr7) = dr7;
 		if (self == THIS_MMAN) {
 			/* Activate the breakpoint. */
-			__wrdrN0123(i, addr);
+			__wrdrN(i, addr);
 			__wrdr7(dr7);
 		}
 		result = true;
@@ -184,7 +140,7 @@ NOTHROW(KCALL mman_delhwbreak)(struct mman *__restrict self,
 		void *br_addr;
 		if (!(dr7 & DR7_LN(i)))
 			continue; /* unused */
-		br_addr = FORMMAN(self, thismman_x86_drN(i));
+		br_addr = FORMMAN(self, thismman_x86_drN[i]);
 		if (br_addr != addr)
 			continue; /* Different address. */
 		if (((dr7 & DR7_CN(i)) >> DR7_CN_SHIFT(i)) != br_cond)

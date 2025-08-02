@@ -27,6 +27,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <debugger/rt.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
@@ -38,6 +39,7 @@
 #include <kernel/mman/flags.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
 #include <kernel/mman/sync.h>
@@ -50,6 +52,8 @@
 #include <kernel/x86/phys2virt64.h>
 #include <sched/cpu.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/userkern.h> /* CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 #include <sched/x86/iobm.h>
@@ -57,26 +61,34 @@
 
 #include <hybrid/align.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/types.h>
+#include <kos/kernel/x86/gdt.h>
 #include <kos/kernel/x86/segment.h>
 #include <kos/nopf.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <inttypes.h>
 #include <signal.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
 #include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
+#include <libunwind/errno.h>
 #include <libvio/access.h>
+#include <libvio/api.h>
+#include <libvio/vio.h>
 #include <libviocore/viocore.h>
 #ifndef __x86_64__
 #include <cfi.h>
@@ -1091,7 +1103,7 @@ do_normal_vio:
 #ifndef __x86_64__
 			/* Check if the kernel %esp or %ss was modified */
 			if unlikely(vio_args.vea_kernel_override & (VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID |
-			                                        VIO_EMULATE_ARGS_386_KERNEL_SS_VALID)) {
+			                                            VIO_EMULATE_ARGS_386_KERNEL_SS_VALID)) {
 				u32 real_esp = vio_args.vea_kernel_esp_override;
 				u16 real_ss  = vio_args.vea_kernel_ss_override;
 				u32 *regload_area;

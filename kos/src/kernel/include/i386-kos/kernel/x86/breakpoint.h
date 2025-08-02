@@ -33,6 +33,7 @@ DECL_BEGIN
  *       any changes made will become lost the next time the mman
  *       is changed.
  * NOTE: These fields are _NOT_ inherited during `mman_fork()'! */
+DATDEF ATTR_PERMMAN void *thismman_x86_drN[4];
 DATDEF ATTR_PERMMAN void *thismman_x86_dr0;
 DATDEF ATTR_PERMMAN void *thismman_x86_dr1;
 DATDEF ATTR_PERMMAN void *thismman_x86_dr2;
