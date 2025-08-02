@@ -5590,6 +5590,7 @@ is_8bit_aligned(video_pixel64_t mask) {
  * - vc_nalgn  (set to "NULL" if an extra codec is needed here)
  * - vc_align
  * - vc_rambuffer_requirements
+ * - vc_coord2bytes
  * - vc_getpixel
  * - vc_setpixel
  * - vc_rectcopy
@@ -5620,6 +5621,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	case 1:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer1_requirements;
+		self->vc_coord2bytes            = &buffer1_coord2bytes;
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
 			self->vc_getpixel = &getpixel1_lsb;
 			INIT__vc_setpixel(self, setpixel1_lsb);
@@ -5643,6 +5645,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	case 2:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer2_requirements;
+		self->vc_coord2bytes            = &buffer2_coord2bytes;
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
 			self->vc_getpixel = &getpixel2_lsb;
 			INIT__vc_setpixel(self, setpixel2_lsb);
@@ -5666,6 +5669,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	case 4:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer4_requirements;
+		self->vc_coord2bytes            = &buffer4_coord2bytes;
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
 			self->vc_getpixel = &getpixel4_lsb;
 			INIT__vc_setpixel(self, setpixel4_lsb);
@@ -5689,6 +5693,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	case 8:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer8_requirements;
+		self->vc_coord2bytes            = &buffer8_coord2bytes;
 		self->vc_getpixel = &getpixel8;
 		INIT__vc_setpixel(self, setpixel8);
 		self->vc_linefill = &linefill8;
@@ -5701,6 +5706,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	case 16:
 		self->vc_align = 2;
 		self->vc_rambuffer_requirements = &buffer16_requirements;
+		self->vc_coord2bytes            = &buffer16_coord2bytes;
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 		if (populate_noalign) {
 			self->vc_getpixel = &unaligned_getpixel16;
@@ -5727,6 +5733,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	case 24:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer24_requirements;
+		self->vc_coord2bytes            = &buffer24_coord2bytes;
 		self->vc_getpixel = &getpixel24;
 		INIT__vc_setpixel(self, setpixel24);
 		self->vc_linefill = &linefill24;
@@ -5739,6 +5746,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	case 32:
 		self->vc_align = 4;
 		self->vc_rambuffer_requirements = &buffer32_requirements;
+		self->vc_coord2bytes            = &buffer32_coord2bytes;
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 		if (populate_noalign) {
 			self->vc_getpixel = &unaligned_getpixel32;

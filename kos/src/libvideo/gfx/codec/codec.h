@@ -82,6 +82,7 @@ struct video_codec_custom: video_codec {
  * - vc_nalgn  (set to "NULL" if an extra codec is needed here)
  * - vc_align
  * - vc_rambuffer_requirements
+ * - vc_coord2bytes
  * - vc_getpixel
  * - vc_setpixel
  * - vc_linecopy
