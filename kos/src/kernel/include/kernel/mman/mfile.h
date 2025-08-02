@@ -360,7 +360,7 @@ struct mfile_stream_ops {
 	 * WARNING: `wasdestroyed(self)' may be the case when `mso_notify_detach' is called,
 	 *          but  in this case  it is guarantied that  (aside from `mfm_notify'), all
 	 *          other fields of `self' remain in a valid state until after the  operator
-	 *          return (though the operator still isn't allowed to incref(self)!)
+	 *          returns (though the operator still isn't allowed to incref(self)!)
 	 *
 	 * NOTE: `mso_notify_attach' _is_ allowed to incref(self), and have `mso_notify_detach'
 	 *       be the one to eventually decref() it. HOWEVER! If you do this, the system will
@@ -381,12 +381,20 @@ struct mfile_stream_ops {
 
 };
 
-/* Default ioctl(2) operator for mfiles. Implements:
+/* Default ioctl(2) operator for mfile-s. Implements:
  *  - FS_IOC_GETFLAGS, FS_IOC_SETFLAGS
  *  - FS_IOC_GETFSLABEL, FS_IOC_SETFSLABEL
  *  - BLKROSET, BLKROGET, BLKFLSBUF
  *  - BLKSSZGET, BLKBSZGET,
- *  - BLKGETSIZE, BLKGETSIZE64 */
+ *  - BLKGETSIZE, BLKGETSIZE64
+ *  - FILE_IOC_BLKSHIFT
+ *  - FILE_IOC_MSALIGN
+ *  - FILE_IOC_SUBREGION
+ *  - FILE_IOC_DELREGION
+ *  - FILE_IOC_TAILREAD
+ *  - FILE_IOC_TRIM
+ *  - FILE_IOC_GETFS*
+ */
 FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
 mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
               NCX UNCHECKED void *arg, iomode_t mode)
@@ -413,9 +421,10 @@ mfile_v_open(struct mfile *__restrict self,
              oflag_t oflags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Generic open function for mem-file arbitrary mem-file objects. This function
- * is unconditionally invoked during a call to `open(2)' in order to  construct
- * wrapper  objects   and  the   like.  This   function  is   implemented   as:
+/* Generic open function for arbitrary  mem-file objects. This function  is
+ * unconditionally invoked during a call to `open(2)' in order to construct
+ * wrapper objects and the like. This function is implemented as:
+ *
  * >> struct mfile_stream_ops const *stream = self->mf_ops->mo_stream;
  * >> if (!stream) {
  * >>     mfile_v_open(self, hand, access_path, access_dent, oflags);
@@ -462,7 +471,7 @@ mfile_dosyncio(struct mfile *__restrict self,
  * it's also good enough to only fulfill `self->mf_blockshift'. As such:
  *   - (size_t)1 << self->mf_blockshift: This is the size of a logical data-block, as well
  *                                       as  the granularity of allowed buffer sizes, such
- *                                       that only whole blocks can read/written.
+ *                                       that only whole blocks can be read/written.
  *   - (size_t)1 << self->mf_iobashift:  This is the required alignment for `buf', that  is
  *                                       the  alignment required of DMA buffers. This tends
  *                                       to be less than `mf_blockshift', but in many cases
@@ -678,7 +687,7 @@ struct mfile_ops {
                                             * anonymous, at which point write access is  once again allowed). But note that  the
                                             * delete-operation itself will eventually be allowed to set the file's size to  `0'.
                                             * Once async deletion is complete, the file's part-tree and changed-list will be set
-                                            * to  MFILE_PARTS_ANONYMOUS, the file will have a zero  of `0', and all of its used-
+                                            * to  MFILE_PARTS_ANONYMOUS, the file will have a size  of `0', and all of its used-
                                             * to-be parts will be anon, too.
                                             * Once `mfile_delete()' has set this flag, `mf_initdone' is broadcast */
 /*      MFILE_F_                0x00000040  * ... Reserved: MS_MANDLOCK */
@@ -713,8 +722,8 @@ struct mfile_ops {
                                             * When the flag is set:
                                             * - Not allowed to increment `self->mf_trunclock'
                                             * - Not allowed to fault a `MAP_SHARED' file mappings
-                                            * - Not allowed to raise `self->mf_filesize'
-                                            * - Not allowed to lower `self->mf_filesize' (except in thread that set `MFILE_F_DELETING')
+                                            * - Not allowed to increase `self->mf_filesize'
+                                            * - Not allowed to decrease `self->mf_filesize' (except in thread that set `MFILE_F_DELETING')
                                             * - Not  allowed to trim any part of the file that is used by a MAP_PRIVATE mapping
                                             *   If the file is a misaligned sub-file, then this restriction also applies if the
                                             *   underlying file has this flag set.
@@ -751,7 +760,7 @@ struct mfile_ops {
 /*efine MFILE_F_                0x00800000  * ... */
 #define MFILE_F_STRICTATIME     0x01000000 /* [lock(ATOMIC)] Strict last-accessed timestamps ??? */
 #define MFILE_F_LAZYTIME        0x02000000 /* [lock(ATOMIC)] Lazy timestamps ??? */
-#define MFILE_F_EXTUSAGE        0x04000000 /* [lock(WRITE_ONCE)] This file *might* be used as the device of a super-block
+#define MFILE_F_EXTUSAGE        0x04000000 /* [lock(WRITE_ONCE)] A super-block *might* be using  this file as its  device
                                             * (or in the future: some other rarely used, global wrapper around an mfile). */
 #define MFILE_F_ROFLAGS         0x08000000 /* [lock(WRITE_ONCE)]
                                             * The following flags may not be changed by user-space:
@@ -839,9 +848,8 @@ struct mfile {
 	                                              *   >>     file->mf_changed == NULL
 	                                              */
 	size_t                        mf_part_amask; /* [const] == MAX(PAGESIZE, 1 << mf_blockshift) - 1
-	                                              * This field describes the minimum alignment of file positions
-	                                              * described by parts, minus one (meaning  it can be used as  a
-	                                              * mask) */
+	                                              * This field  describes the  minimum alignment  of file  positions
+	                                              * described by parts, minus one (meaning it can be used as a mask) */
 	shift_t                       mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
 	shift_t                       mf_iobashift;  /* [const][<= mf_blockshift] == log2(REQUIRED_BLOCK_BUFFER_ALIGNMENT) */
 #if ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) != 0
@@ -980,7 +988,7 @@ struct mfile {
 #endif /* __WANT_MFILE__mf_mpplop */
 
 #ifdef __WANT_MFILE__mf_ramdirlop
-		Toblockop(ramfs_dirnode) _mf_ramdirlop;  /* mem-part post-lock operation */
+		Toblockop(ramfs_dirnode) _mf_ramdirlop;  /* ramfs-disnode post-lock operation */
 #endif /* __WANT_MFILE__mf_ramdirlop */
 
 #if defined(__WANT_MFILE__mf_fsuperplop) && defined(__WANT_MFILE__mf_delfnodes)
@@ -1382,7 +1390,7 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
  *
  * This function is called when the given file `self' should be deleted,
  * or has become  unavailable for  some other reason  (e.g. the  backing
- * filesystem has been unmounted)
+ * filesystem has been unmounted or physically removed)
  *
  * Note that  (with the  exception of  `MFILE_F_DELETED' being  set, which  is
  * always done synchronously), this function operates entirely asynchronously,
@@ -1430,14 +1438,15 @@ mfile_sync(struct mfile *__restrict self)
 
 
 /* Check `self' for a known mem-part that contains `addr', and (if
- * found), return that part. Otherwise, construct a new part start
+ * found), return that part. Otherwise, construct a new part  that
  * starts at `addr' and spans around `hint_bytes' bytes (less  may
  * be returned if another part  already exists that describes  the
  * mapping above the requested location, and more may be  returned
- * if  a pre-existing part was spans beyond `addr +hint_bytes -1')
+ * if a pre-existing part spans beyond `addr +hint_bytes -1')
  *
  * Note that the caller must ensure that:
- * >> mfile_partaddr_aligned(addr) && mfile_partaddr_aligned(hint_bytes)
+ * @assume(mfile_partaddr_aligned(addr));
+ * @assume(mfile_partaddr_aligned(hint_bytes));
  * @return: * : A reference to a part that (at some point in the past) contained
  *              the given `addr'. It may no  longer contain that address now  as
  *              the result of being truncated since.

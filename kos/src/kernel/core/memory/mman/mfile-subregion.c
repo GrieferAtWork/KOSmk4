@@ -378,6 +378,10 @@ mfile_subregion_makename(struct subregion_mfile *__restrict self)
 	result = (REF struct fdirent *)kmalloc(offsetof(struct fdirent, fd_name) +
 	                                       (MAX_NAME_LEN + 1) * sizeof(char),
 	                                       GFP_NORMAL);
+	/* Note that the name here doesn't actually matter; `mfile_subregion_delete()'
+	 * will  compare region names by-pointer, so 2 sibling regions (with identical
+	 * names)  won't accidentally revoke each other's mappings when deleted one at
+	 * a time. */
 	result->fd_refcnt  = 1;
 	result->fd_ops     = &subregion_name_ops;
 	result->fd_ino     = (ino_t)(uintptr_t)skew_kernel_pointer(self->srf_base);
@@ -941,7 +945,10 @@ NOTHROW(FCALL mfile_replace_mappings_with_void_and_unlock_and_decref_mmans)(stru
 						continue; /* Dead mman */
 					assert(mman_lock_writing(mm));
 
-					/* Remove "node" from "part" and mark as "MNODE_F_VOIDMEM" */
+					/* Remove "node" from "part" and mark as "MNODE_F_VOIDMEM"
+					 * NOTE: The flag may (seem) to already be set for certain mnode-s at
+					 *       this point, but this only appears so because `MNODE_F_MLOCK'
+					 *       and `MNODE_F_VOIDMEM' share the same bit. */
 					atomic_or(&node->mn_flags, MNODE_F_VOIDMEM);
 					atomic_write(&node->mn_part, NULL);
 					decref_nokill(mima.mm_min); /* Reference stolen from "node->mn_part" */

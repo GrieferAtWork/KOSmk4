@@ -119,8 +119,9 @@ NOTHROW(LOCKOP_CC mfile_decref_after_delete_extusage_allsuper_plop)(struct postl
 		 * got from `fallsuper_try_remove_by_device_locked()'. */
 		fsuper_delete_and_decref(fs);
 
-		/* Repeat the search for more filesystems (unlikely, but *technically* you're allowed to mount
-		 * a file multiple times, so-long as you (somehow) skip the `fsuper') */
+		/* Repeat the search for more filesystems (unlikely, but *technically* you're
+		 * allowed to mount a file multiple times, so-long as you (somehow) skip  the
+		 * `fsuper') */
 		mfile_decref_after_delete_extusage(me);
 	} else {
 		mfile_decref_after_delete_extusage_mounts(me);
@@ -678,7 +679,7 @@ NOTHROW(FCALL mfile_delete_impl)(/*inherit(always)*/ REF struct mfile *__restric
  *
  * This function is called when the given file `self' should be deleted,
  * or has become  unavailable for  some other reason  (e.g. the  backing
- * filesystem has been unmounted)
+ * filesystem has been unmounted or physically removed)
  *
  * Note that  (with the  exception of  `MFILE_F_DELETED' being  set, which  is
  * always done synchronously), this function operates entirely asynchronously,

@@ -301,14 +301,15 @@ mfile_makepart(struct mfile *__restrict self,
 
 
 /* Check `self' for a known mem-part that contains `addr', and (if
- * found), return that part. Otherwise, construct a new part start
+ * found), return that part. Otherwise, construct a new part  that
  * starts at `addr' and spans around `hint_bytes' bytes (less  may
  * be returned if another part  already exists that describes  the
  * mapping above the requested location, and more may be  returned
- * if  a pre-existing part was spans beyond `addr +hint_bytes -1')
+ * if a pre-existing part spans beyond `addr +hint_bytes -1')
  *
  * Note that the caller must ensure that:
- * >> mfile_partaddr_aligned(addr) && mfile_partaddr_aligned(hint_bytes)
+ * @assume(mfile_partaddr_aligned(addr));
+ * @assume(mfile_partaddr_aligned(hint_bytes));
  * @return: * : A reference to a part that (at some point in the past) contained
  *              the given `addr'. It may no  longer contain that address now  as
  *              the result of being truncated since.

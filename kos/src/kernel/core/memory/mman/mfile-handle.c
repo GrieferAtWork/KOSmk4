@@ -77,12 +77,20 @@
 
 DECL_BEGIN
 
-/* Default ioctl(2) operator for mfiles. Implements:
+/* Default ioctl(2) operator for mfile-s. Implements:
  *  - FS_IOC_GETFLAGS, FS_IOC_SETFLAGS
  *  - FS_IOC_GETFSLABEL, FS_IOC_SETFSLABEL
  *  - BLKROSET, BLKROGET, BLKFLSBUF
  *  - BLKSSZGET, BLKBSZGET,
- *  - BLKGETSIZE, BLKGETSIZE64 */
+ *  - BLKGETSIZE, BLKGETSIZE64
+ *  - FILE_IOC_BLKSHIFT
+ *  - FILE_IOC_MSALIGN
+ *  - FILE_IOC_SUBREGION
+ *  - FILE_IOC_DELREGION
+ *  - FILE_IOC_TAILREAD
+ *  - FILE_IOC_TRIM
+ *  - FILE_IOC_GETFS*
+ */
 PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
 mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
               NCX UNCHECKED void *arg, iomode_t mode)
@@ -541,9 +549,10 @@ mfile_v_open(struct mfile *__restrict self,
 }
 
 
-/* Generic open function for mem-file arbitrary mem-file objects. This function
- * is unconditionally invoked during a call to `open(2)' in order to  construct
- * wrapper  objects   and  the   like.  This   function  is   implemented   as:
+/* Generic open function for arbitrary  mem-file objects. This function  is
+ * unconditionally invoked during a call to `open(2)' in order to construct
+ * wrapper objects and the like. This function is implemented as:
+ *
  * >> struct mfile_stream_ops const *stream = self->mf_ops->mo_stream;
  * >> if (!stream) {
  * >>     mfile_v_open(self, hand, access_path, access_dent, oflags);
