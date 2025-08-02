@@ -22,7 +22,7 @@
 
 /*[[[deemon (printSigSendCInlOptions from "...include.sched.sig-config")();]]]*/
 //#define DEFINE_sig_xsend
-//#define DEFINE_sig_xsendmany
+#define DEFINE_sig_xsendmany
 //#define DEFINE_sig_send
 //#define DEFINE_sig_altsend
 //#define DEFINE_sig_send_nopr
@@ -59,7 +59,7 @@
 //#define DEFINE_sig_altsendmanyas_nopr
 //#define DEFINE_sig_sendmanyas_cleanup_nopr
 //#define DEFINE_sig_altsendmanyas_cleanup_nopr
-#define DEFINE_sig_broadcast
+//#define DEFINE_sig_broadcast
 //#define DEFINE_sig_altbroadcast
 //#define DEFINE_sig_broadcast_nopr
 //#define DEFINE_sig_altbroadcast_nopr
@@ -694,7 +694,7 @@ NOTHROW(FCALL LOCAL_sig_send)(struct sig *LOCAL_sig_restrict self
 #ifdef LOCAL_HAVE_destroy_later
                               , struct task *destroy_later
 #define LOCAL_destroy_later                  destroy_later
-#define LOCAL_destroy_tasks__destroy_later() destroy_tasks(destroy_later)
+#define LOCAL_destroy_tasks__destroy_later() sig_destroylater_act(destroy_later)
 #else /* LOCAL_HAVE_destroy_later */
 #define LOCAL_destroy_later                  NULL
 #define LOCAL_destroy_tasks__destroy_later() (void)0

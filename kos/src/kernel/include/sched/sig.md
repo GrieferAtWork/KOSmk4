@@ -718,7 +718,7 @@ again:
 	atomic_write(&self->s_con, reprimed); /* Release SMP-lock; only reprimed connections remain */
 	HANDLE_CLEANUP_IF_PRESENT(); /* for sig_broadcast_cleanup */
 	preemption_pop(&was);
-	destroy_tasks(&destroy_later);
+	sig_destroylater_act(&destroy_later);
 	sig_run_phase_2(phase2, ...); // "context" not documented here
 	return result;
 }

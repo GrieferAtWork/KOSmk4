@@ -40,7 +40,6 @@
 
 #include <kernel/malloc.h>
 #include <kernel/paging.h>
-#include <kernel/panic.h>
 #include <sched/pertask.h>
 #include <sched/sigcomp.h>
 #include <sched/task-clone.h> /* DEFINE_PERTASK_RELOCATION */
@@ -91,16 +90,13 @@ static_assert(SIGCON_CONS_MINALIGN > (SIGCON_STAT_F_POLL));
 #define sigcon_link_self(self)       \
 	(void)((self)->sc_prev = (self), \
 	       (self)->sc_next = (self))
-#define sigcon_link_insert_before(self, successor)       \
+#define sigcon_link_insert_before(self, successor) \
 	sigcon_rlink_insert_before(self, self, successor)
 #define sigcon_rlink_insert_before(self_head, self_tail, successor) \
 	(void)((self_tail)->sc_next = (successor),                      \
 	       (self_head)->sc_prev = (successor)->sc_prev,             \
 	       (successor)->sc_prev = (self_tail),                      \
 	       (self_head)->sc_prev->sc_next = (self_head))
-
-/* Internal key used to chain threads that have to be destroyed. */
-#define sig_destroylater_next(thread) KEY_task__next(thread)
 
 #if defined(NDEBUG) || defined(NDEBUG_SIG) || 1
 #define sigcon_verify_ring_IS_NOOP
@@ -178,9 +174,13 @@ NOTHROW(FCALL sigcon_verify_ring)(struct sigcon *__restrict head) {
 #define sigcon_verify_ring_beforecount(head)  sigcon_verify_ring(head)
 
 
+/* Internal key used to chain threads that have to be destroyed. */
+#define sig_destroylater_next(thread) KEY_task__next(thread)
+
+/* Destroy a chain of tasks whose reference counters hit ZERO(0) */
 LOCAL NOBLOCK void
-NOTHROW(FCALL destroy_tasks)(struct task *destroy_later) {
-	while (destroy_later) {
+NOTHROW(FCALL sig_destroylater_act)(struct task *destroy_later) {
+	while unlikely(destroy_later) {
 		struct task *next;
 		next = sig_destroylater_next(destroy_later);
 		destroy(destroy_later);
@@ -476,27 +476,15 @@ DECL_END
 #include "sig-send.c.inl"
 #define DEFINE_sig_sendmany
 #include "sig-send.c.inl"
-#define DEFINE_sig_sendmany_nopr
-#include "sig-send.c.inl"
 #define DEFINE_sig_broadcast
-#include "sig-send.c.inl"
-#define DEFINE_sig_broadcast_nopr
 #include "sig-send.c.inl"
 #define DEFINE_sig_altbroadcast
 #include "sig-send.c.inl"
+#define DEFINE_sig_broadcast_nopr
+#include "sig-send.c.inl"
 #define DEFINE_sig_altbroadcast_nopr
 #include "sig-send.c.inl"
-#define DEFINE_sig_broadcast_cleanup_nopr
-#include "sig-send.c.inl"
 #define DEFINE_sig_broadcast_for_fini
-#include "sig-send.c.inl"
-#define DEFINE_sig_broadcast_for_fini_nopr
-#include "sig-send.c.inl"
-#define DEFINE_sig_altbroadcast_for_fini
-#include "sig-send.c.inl"
-#define DEFINE_sig_altbroadcast_for_fini_nopr
-#include "sig-send.c.inl"
-#define DEFINE_sig_broadcast_for_fini_cleanup_nopr
 #include "sig-send.c.inl"
 #else /* !__OPTIMIZE_SIZE__ */
 DECL_BEGIN
@@ -509,38 +497,20 @@ PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool NOTHROW(FCALL sig_send_nopr)(struct s
 PUBLIC NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_sendmany)(struct sig *__restrict self, size_t maxcount) {
 	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NORMAL, NULL, THIS_TASK, NULL, NULL, NULL);
 }
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_sendmany_nopr)(struct sig *__restrict self, size_t maxcount) {
-	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR, NULL, THIS_TASK, NULL, NULL, NULL);
-}
 PUBLIC NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self) {
 	return sig_xbroadcast(self, SIG_XSEND_F_NORMAL, NULL, THIS_TASK, NULL, NULL, NULL);
-}
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_nopr)(struct sig *__restrict self) {
-	return sig_xbroadcast(self, SIG_XSEND_F_NOPR, NULL, THIS_TASK, NULL, NULL, NULL);
 }
 PUBLIC NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast)(struct sig *self, struct sig *sender) {
 	return sig_xbroadcast(self, SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
 }
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_nopr)(struct sig *__restrict self) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR, NULL, THIS_TASK, NULL, NULL, NULL);
+}
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self, struct sig *sender) {
 	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
 }
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcast_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup) {
-	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP, NULL, THIS_TASK, cleanup, NULL, NULL);
-}
 PUBLIC NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini)(struct sig *__restrict self) {
 	return sig_xbroadcast(self, SIG_XSEND_F_FINI, NULL, THIS_TASK, NULL, NULL, NULL);
-}
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini_nopr)(struct sig *__restrict self) {
-	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI, NULL, THIS_TASK, NULL, NULL, NULL);
-}
-PUBLIC NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini)(struct sig *self, struct sig *sender) {
-	return sig_xbroadcast(self, SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
-}
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self, struct sig *sender) {
-	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
-}
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcast_for_fini_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup) {
-	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_CLEANUP, NULL, THIS_TASK, cleanup, NULL, NULL);
 }
 DECL_END
 #endif /* __OPTIMIZE_SIZE__ */
