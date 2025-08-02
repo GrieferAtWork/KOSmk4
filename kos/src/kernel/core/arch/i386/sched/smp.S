@@ -615,6 +615,21 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 .Lsmp_ini_crN_donefpu:
 #endif /* CONFIG_HAVE_FPU */
 
+	/* If supported, enable SMEP now that we're in 64-bit, high-memory mode
+	 * This can only be done **after** we jumped to high memory, since  the
+	 * we were previously running off of this mapping:
+	 * >> 00000000009E8000-00000000009E8FFF: 00000000009E8000+4KiB      [xwu-adp][0]
+	 * Since this mapping is in what is normally user-space, it has the "u"
+	 * flag. And since SMEP causes the kernel to fault when trying to execute
+	 * user-space code, we had to wait until we got here:
+	 * >> FFFFFFFF809E8000-FFFFFFFF809EBFFF: 00000000009E8000+16KiB     [xw-gadp][0]
+	 */
+	ttest  mask=CPUID_7B_SMEP, loc=(thiscpu_x86_cpuid + OFFSET_CPUID_7B)(R_CPU)
+	jz     1f
+	orP    $(CR4_SMEP), %Pcx
+1:
+
+
 	/* Store results */
 	EXTERN(thiscpu_x86_saved_cr0)
 	movP   %Pax, thiscpu_x86_saved_cr0(R_CPU)
@@ -700,7 +715,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	ttest  mask=CPUID_1D_MSR, loc=%edx
 	jz     x86_smp_boot_failure_no_msr
 
-	/* Configure the %CR4 register. */
+	/* Configure the %CR4 register (except for `CR4_SMEP') */
 	movl   %cr4, %esp
 	/* Enable PageSizeExtension (required for 2Mib pages & long-mode),
 	 * as well as  PhysicalAddressExtension (required  for the  48-bit
@@ -717,13 +732,17 @@ INTERN_FUNCTION(x86_smp_entry32)
 	xorl   %eax, %eax
 	cpuid
 	cmpl   $(7), %eax
-	jnae   2f
+	jnae   2f /* if (!(%eax >= 7)) goto 2f */
 	movl   $(7), %eax
+	movl   $(0), %ecx /* Sub-leaf:0 */
 	cpuid
+#if 0 /* This can only be enabled once we're in 64-bit mode! */
 	ttest  mask=CPUID_7B_SMEP, loc=%ebx /* Enable SMAP if supported by the host (optional feature) */
 	jz     1f
 	orl    $(CR4_SMEP), %esp
-1:	ttest  mask=CPUID_7B_FSGSBASE, loc=%ebx /* Enable FSGSBASE if supported by the host (emulated if unsupported) */
+1:
+#endif
+	ttest  mask=CPUID_7B_FSGSBASE, loc=%ebx /* Enable FSGSBASE if supported by the host (emulated if unsupported) */
 	jz     1f
 	orl    $(CR4_FSGSBASE), %esp
 1:
@@ -778,12 +797,6 @@ INTERN_FUNCTION(x86_smp_entry32)
 	rdmsr
 	orl    $(IA32_EFER_NXE), %eax
 	wrmsr
-	/* With PAE + NX, try to enable its effects while
-	 * in kernel-space  (if  supported  by  the  CPU) */
-	ttest  mask=CPUID_7B_SMEP, loc=(bootcpu_x86_cpuid + OFFSET_CPUID_7B)
-	jz     1f
-	orl    $(CR4_SMEP), %esp
-1:
 #endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 	/* Enable PGE support (if necessary for setting the page directory) */
 	ttest  mask=CPUID_1D_PGE, loc=((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)

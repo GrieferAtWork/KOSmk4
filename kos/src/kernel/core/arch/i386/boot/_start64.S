@@ -700,6 +700,8 @@ INTERN_FUNCTION(_start)
 	movl   $(pagedir_kernel_phys), %eax
 	movl   %eax, %cr3
 
+
+
 	/* Configure the %CR4 register. */
 	movl   %cr4, %eax
 	/* Enable PageSizeExtension (required for 2Mib pages & long-mode),
@@ -712,18 +714,23 @@ INTERN_FUNCTION(_start)
 	jz     1f
 	orl    $(CR4_PGE), %eax
 1:
-	/* Enable SMAP if supported by the host (optional feature) */
+
+	/* Enable SMEP if supported by the host (optional feature) */
 	ttest  mask=CPUID_7B_SMEP, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B)
 	jz     1f
 	orl    $(CR4_SMEP), %eax
 1:
+
 	/* Enable FSGSBASE if supported by the host (emulated if unsupported) */
 	ttest  mask=CPUID_7B_FSGSBASE, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B)
 	jz     1f
 	orl    $(CR4_FSGSBASE), %eax
 1:
+
 	/* Save the fully configured CR4 register. */
 	movl   %eax, %cr4
+
+
 
 	/* Set the LME bit in the EFER MSR register. */
 	movl   $(IA32_EFER), %ecx
@@ -738,6 +745,7 @@ INTERN_FUNCTION(_start)
 	jz     1f
 	orl    $(IA32_EFER_SCE), %eax
 1:	wrmsr  /* Save the new configuration. */
+
 
 	/* Now to actually enable paging! */
 	movl  %cr0, %eax

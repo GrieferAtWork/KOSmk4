@@ -185,9 +185,19 @@ did_update_x86_64_kernel:
 				qemuExe = fs.joinpath(qemuExe, f"qemu-system-{TARGET_ARCH}");
 			break;
 		case "accel":
-			/* "-accel hax" breaks qemu's builtin GDB stub. :(
-			 * -> For now, ignore accel options if GDB is on. */
-			if (gdbMode != "emulator") {
+			/* "-accel *" breaks qemu's builtin GDB stub. :(
+			 *
+			 * -> For now, ignore accel options if GDB is on.
+			 *
+			 * On x86_64:
+			 *    GDB keeps truncating registers to 32-bits, which makes debugging pretty much impossible
+			 * On i386:
+			 *    Breakpoints don't seem to work. Though you can manually pause execution, at which point
+			 *    everything else seems to be working.
+			 */
+			if (gdbMode == "emulator") {
+				/* ... */
+			} else {
 				qemuArgs.extend({ "-accel", arg });
 			}
 			break;
