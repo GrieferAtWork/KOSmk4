@@ -865,7 +865,7 @@ libregdump_coregs(struct regdump_printer *__restrict self,
 	format(REGDUMP_FORMAT_VALUE_SUFFIX);
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_cr4(self, data->co_cr0));
+	DO(libregdump_cr4(self, data->co_cr4));
 	PRINT("    ");
 	format(REGDUMP_FORMAT_REGISTER_PREFIX);
 	PRINT("%cr3");
