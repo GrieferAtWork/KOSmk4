@@ -476,8 +476,8 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	while (!mman_lock_tryacquire(&mman_kernel))
 		task_pause();
 	assert(!LIST_ISBOUND(&FORCPU(self, thiscpu_x86_dfstacknode_), mn_writable));
-	assert(!LIST_ISBOUND(&FORCPU(self, this_kernel_stacknode_), mn_writable));
-	assert(!LIST_ISBOUND(&FORCPU(self, this_trampoline_node_), mn_writable));
+	assert(!LIST_ISBOUND(&FORTASK(myidle, this_kernel_stacknode_), mn_writable));
+	assert(!LIST_ISBOUND(&FORTASK(myidle, this_trampoline_node_), mn_writable));
 	mman_mappings_removenode(&mman_kernel, &FORCPU(self, thiscpu_x86_dfstacknode_));
 	mman_mappings_removenode(&mman_kernel, &FORTASK(myidle, this_kernel_stacknode_));
 	mman_mappings_removenode(&mman_kernel, &FORTASK(myidle, this_trampoline_node_));

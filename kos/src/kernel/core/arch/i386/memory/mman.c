@@ -206,7 +206,7 @@ INTERN struct mpart x86_kernel_mparts[6] = {
 		MNODE_INIT_mn_maxaddr(maxaddr),                                 \
 		MNODE_INIT_mn_flags((prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT | \
 		                    MNODE_F_NOMERGE | MNODE_F_STATICPART |      \
-		                    MNODE_F_KERNPART | MNODE_F_MLOCK_RESERVED |   \
+		                    MNODE_F_KERNPART | MNODE_F_MLOCK_RESERVED | \
 		                    _MNODE_F_MPREPARED_KERNEL),                 \
 		MNODE_INIT_mn_part(NULL),                                       \
 		MNODE_INIT_mn_fspath(NULL),                                     \
@@ -224,7 +224,7 @@ INTERN struct mpart x86_kernel_mparts[6] = {
 		MNODE_INIT_mn_maxaddr(maxaddr),                                 \
 		MNODE_INIT_mn_flags((prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT | \
 		                    MNODE_F_NOMERGE | MNODE_F_STATICPART |      \
-		                    MNODE_F_KERNPART | MNODE_F_MLOCK_RESERVED |   \
+		                    MNODE_F_KERNPART | MNODE_F_MLOCK_RESERVED | \
 		                    _MNODE_F_MPREPARED_KERNEL),                 \
 		MNODE_INIT_mn_part(&(part)),                                    \
 		MNODE_INIT_mn_fspath(NULL),                                     \
