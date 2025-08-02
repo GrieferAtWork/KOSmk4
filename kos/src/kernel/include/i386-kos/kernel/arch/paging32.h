@@ -53,10 +53,10 @@
 
 
 
-/* Since the entire kernel-space has its E1-vectors pre-allocated  (so-as
- * to allow them to be share across all page-directories), page directory
- * mappings within  kernel  space  itself  do not  require  and  sort  of
- * preparations being made. */
+/* Since the entire  kernel-space has  its E1-vectors  pre-allocated
+ * (so-as to allow them to  be shared across all  page-directories),
+ * page directory mappings within kernel space itself do not require
+ * and sort of preparations being made. */
 #undef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 //#define ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE 1
 

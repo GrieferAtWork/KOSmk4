@@ -704,7 +704,6 @@ DATDEF WEAK unsigned int mman_kernel_hintinit_inuse;
 #define mnode_mman_sync_p(self)                        mman_sync_p((self)->mn_mman, mnode_getaddr(self), mnode_getsize(self))
 #define mnode_mman_supersync(self)                     mman_supersync(mnode_getaddr(self), mnode_getsize(self))
 
-
 DECL_END
 #endif /* __CC__ */
 

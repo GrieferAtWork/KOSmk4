@@ -373,11 +373,20 @@ struct ATTR_ALIGNED(P64_PDIR_ALIGN) p64_pdir {
 
 
 #ifdef __CC__
+#ifdef __INTELLISENSE__
+ /* Prevent "array is too large" error ("p64_pdir_e1_identity_t" is 64GiB large after all...) */
+typedef union p64_pdir_e1
+p64_pdir_e1_identity_t[3 /*P64_PDIR_VEC4INDEX(pointer)*/]
+                      [512 /*P64_PDIR_VEC3INDEX(pointer)*/]
+                      [512 /*P64_PDIR_VEC2INDEX(pointer)*/]
+                      [512 /*P64_PDIR_VEC1INDEX(pointer)*/];
+#else /* __INTELLISENSE__ */
 typedef union p64_pdir_e1
 p64_pdir_e1_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/]
                       [512 /*P64_PDIR_VEC3INDEX(pointer)*/]
                       [512 /*P64_PDIR_VEC2INDEX(pointer)*/]
                       [512 /*P64_PDIR_VEC1INDEX(pointer)*/];
+#endif /* !__INTELLISENSE__ */
 typedef union p64_pdir_e2
 p64_pdir_e2_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/]
                       [512 /*P64_PDIR_VEC3INDEX(pointer)*/]
@@ -420,10 +429,21 @@ p64_pdir_e4_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/];
  * >>     }
  * >> }
  */
+#ifdef __INTELLISENSE__
+extern p64_pdir_e1_identity_t P64_PDIR_E1_IDENTITY; /* `union p64_pdir_e2::p_e1' */
+extern p64_pdir_e2_identity_t P64_PDIR_E2_IDENTITY; /* `union p64_pdir_e3::p_e2' */
+extern p64_pdir_e3_identity_t P64_PDIR_E3_IDENTITY; /* `union p64_pdir_e4::p_e3' */
+extern p64_pdir_e4_identity_t P64_PDIR_E4_IDENTITY; /* `struct p64_pdir::p_e4' */
+#define P64_PDIR_E1_IDENTITY P64_PDIR_E1_IDENTITY
+#define P64_PDIR_E2_IDENTITY P64_PDIR_E2_IDENTITY
+#define P64_PDIR_E3_IDENTITY P64_PDIR_E3_IDENTITY
+#define P64_PDIR_E4_IDENTITY P64_PDIR_E4_IDENTITY
+#else /* __INTELLISENSE__ */
 #define P64_PDIR_E1_IDENTITY  (*(p64_pdir_e1_identity_t *)P64_PDIR_E1_IDENTITY_BASE) /* `union p64_pdir_e2::p_e1' */
 #define P64_PDIR_E2_IDENTITY  (*(p64_pdir_e2_identity_t *)P64_PDIR_E2_IDENTITY_BASE) /* `union p64_pdir_e3::p_e2' */
 #define P64_PDIR_E3_IDENTITY  (*(p64_pdir_e3_identity_t *)P64_PDIR_E3_IDENTITY_BASE) /* `union p64_pdir_e4::p_e3' */
 #define P64_PDIR_E4_IDENTITY  (*(p64_pdir_e4_identity_t *)P64_PDIR_E4_IDENTITY_BASE) /* `struct p64_pdir::p_e4' */
+#endif /* !__INTELLISENSE__ */
 
 #else /* __CC__ */
 

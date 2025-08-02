@@ -159,7 +159,7 @@ union p32_pdir_e2 {
 #define P32_PDIR_E2_ISUNUSED(e2_word)     ((e2_word) == P32_PAGE_ABSENT)
 	PHYS union p32_pdir_e1 (*p_e1)[1024]; /* [MASK(P32_PAGE_FVECTOR)]
 	                                       * [owned_if(P32_PDIR_E2_ISVEC1(p_word) &&
-	                                       *         ((self - :p_e2) < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE)))]
+	                                       *           ((self - :p_e2) < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE)))]
 	                                       * [const_if((self - :p_e2) >= P32_PDIR_VEC2INDEX(KERNELSPACE_BASE))]
 	                                       * [valid_if(P32_PDIR_E2_ISVEC1(p_word))]
 	                                       * _Physical_ pointer to a level #1 paging vector. */

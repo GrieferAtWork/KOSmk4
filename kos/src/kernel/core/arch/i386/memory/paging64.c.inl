@@ -37,20 +37,18 @@
 #include <kernel/mman/phys.h>
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
-#include <kernel/panic.h>
-#include <kernel/printk.h>
 #include <kernel/x86/cpuid.h>
 #include <sched/cpu.h>
-#include <sched/userkern.h>
+#include <sched/pertask.h>
 #include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/sched/preemption.h>
 
-#include <asm/cpu-cpuid.h>
-#include <asm/cpu-flags.h>
-#include <asm/farptr.h>
+#include <bits/types.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
@@ -58,6 +56,9 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+
+#include <libansitty/ansitty.h>
+#include <libansitty/ctl.h>
 
 #include "paging.h"
 
@@ -193,11 +194,13 @@ typedef struct {
 	/* Allocate enough  structures to  allow _start64.S  to create  an
 	 * identity mapping of the first 2GiB of physical memory at -2GiB,
 	 * using only 2MiB mappings.
+	 *
 	 * With this in mind, we need:
 	 *  - 255 * E3-VECTOR  (`union p64_pdir_e3[255][512]') that will be used for the kernel-share
 	 *  - 1 * E3-VECTOR    (`union p64_pdir_e3[512]') that goes into `pagedir_kernel.p_e4[511]'
 	 *  - 2 * E2-VECTOR    (`union p64_pdir_e2[2][512]') that go into `p64_pdir_e3[510]' and `p64_pdir_e3[511]'
-	 * _start64.S will then fill the two E2-vectors with 2MiB identity mappings,
+	 *
+	 * _start64.S  will then fill the two E2-vectors with 2MiB identity mappings,
 	 * before having the E3 vector point towards them, before finally placing the
 	 * E3 vector within the kernel page directory. */
 	union p64_pdir_e3 ks_share_e3[256][512];
@@ -237,8 +240,11 @@ NOTHROW(FCALL p64_pagedir_init)(VIRT struct p64_pdir *__restrict self,
 	/* Assert that the page directory is properly aligned. */
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
-	memsetq(self->p_e4 + 0, P64_PAGE_ABSENT, 256);              /* user-space */
-	memcpyq(self->p_e4 + 256, P64_PDIR_E4_IDENTITY + 256, 256); /* kernel-space */
+	{
+		void *ptr;
+		ptr = mempsetq(self->p_e4 + 0, P64_PAGE_ABSENT, 256); /* user-space */
+		memcpyq(ptr, P64_PDIR_E4_IDENTITY + 256, 256);        /* kernel-space */
+	}
 
 	/* Set the control word for the page directory identity mapping. */
 	self->p_e4[257].p_word = (u64)phys_self | P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT;
@@ -310,13 +316,11 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p64_pagedir_set_prepared)(union p64_pdir_e1 *__restrict e1_p) {
 	u64 word;
-	for (;;) {
+	do {
 		word = atomic_read(&e1_p->p_word);
 		if unlikely(P64_PDIR_E1_ISHINT(word))
 			break; /* Special case: Hint */
-		if likely(atomic_cmpxch_weak(&e1_p->p_word, word, word | P64_PAGE_FPREPARED))
-			break;
-	}
+	} while unlikely(!atomic_cmpxch_weak(&e1_p->p_word, word, word | P64_PAGE_FPREPARED));
 }
 
 
@@ -364,12 +368,12 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 #define X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was)        \
 	do {                                                  \
 		atomic_rwlock_endread(&x86_pagedir_prepare_lock); \
-		preemption_pop(&was);                              \
+		preemption_pop(&was);                             \
 	}	__WHILE0
 #define X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was)        \
 	do {                                                   \
 		atomic_rwlock_endwrite(&x86_pagedir_prepare_lock); \
-		preemption_pop(&was);                               \
+		preemption_pop(&was);                              \
 	}	__WHILE0
 
 
