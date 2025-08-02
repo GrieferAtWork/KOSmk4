@@ -120,7 +120,7 @@ NOTHROW(FCC ramfdbuffer_subregion__revoke)(struct video_buffer *__restrict self)
 	 * recursively delete all memory mappings created by the sub-region
 	 * or its descendants, and replace them with /dev/void */
 	struct video_ramfdbuffer *me = (struct video_ramfdbuffer *)self;
-	fd_delregion(me->rfdb_fd);
+	(void)fd_delregion(me->rfdb_fd);
 	return me;
 }
 
