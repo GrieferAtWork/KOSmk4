@@ -514,6 +514,162 @@ PUBLIC NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini)(struct 
 }
 DECL_END
 #endif /* __OPTIMIZE_SIZE__ */
+PUBLIC NOBLOCK NONNULL((1, 2)) bool NOTHROW(FCALL sig_altsend)(struct sig *self, struct sig *sender) {
+	return sig_xsend(self, SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) bool NOTHROW(FCALL sig_altsend_nopr)(struct sig *self, struct sig *sender) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) bool NOTHROW(FCALL sig_send_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP, NULL, THIS_TASK, NULL, cleanup, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool NOTHROW(FCALL sig_altsend_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP, sender, THIS_TASK, NULL, cleanup, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2)) bool NOTHROW(FCALL sig_sendas)(struct sig *__restrict self, struct task *__restrict caller) {
+	return sig_xsend(self, SIG_XSEND_F_CALLER, NULL, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) bool NOTHROW(FCALL sig_altsendas)(struct sig *self, struct sig *sender, struct task *__restrict caller) {
+	return sig_xsend(self, SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) bool NOTHROW(FCALL sig_sendas_nopr)(struct sig *__restrict self, struct task *__restrict caller) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER, NULL, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool NOTHROW(FCALL sig_altsendas_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool NOTHROW(FCALL sig_sendas_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, NULL, caller, NULL, cleanup, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) bool NOTHROW(FCALL sig_altsendas_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, sender, caller, NULL, cleanup, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2)) bool NOTHROW(FCALL sig_sendto)(struct sig *__restrict self, struct task *__restrict target) {
+	return sig_xsend(self, SIG_XSEND_F_TARGET, NULL, THIS_TASK, target, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) bool NOTHROW(FCALL sig_altsendto)(struct sig *self, struct sig *sender, struct task *__restrict target) {
+	return sig_xsend(self, SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET, sender, THIS_TASK, target, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) bool NOTHROW(FCALL sig_sendto_nopr)(struct sig *__restrict self, struct task *__restrict target) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_TARGET, NULL, THIS_TASK, target, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool NOTHROW(FCALL sig_altsendto_nopr)(struct sig *self, struct sig *sender, struct task *__restrict target) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET, sender, THIS_TASK, target, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool NOTHROW(FCALL sig_sendto_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict target, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP, NULL, THIS_TASK, target, cleanup, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) bool NOTHROW(FCALL sig_altsendto_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict target, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP, sender, THIS_TASK, target, cleanup, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) bool NOTHROW(FCALL sig_sendasto)(struct sig *__restrict self, struct task *caller, struct task *target) {
+	return sig_xsend(self, SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET, NULL, caller, target, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2, 3, 4)) bool NOTHROW(FCALL sig_altsendasto)(struct sig *self, struct sig *sender, struct task *caller, struct task *target) {
+	return sig_xsend(self, SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET, sender, caller, target, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool NOTHROW(FCALL sig_sendasto_nopr)(struct sig *__restrict self, struct task *caller, struct task *target) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET, NULL, caller, target, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) bool NOTHROW(FCALL sig_altsendasto_nopr)(struct sig *self, struct sig *sender, struct task *caller, struct task *target) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET, sender, caller, target, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) bool NOTHROW(FCALL sig_sendasto_cleanup_nopr)(struct sig *__restrict self, struct task *caller, struct task *target, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP, NULL, caller, target, cleanup, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4, 5)) bool NOTHROW(FCALL sig_altsendasto_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *caller, struct task *target, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP, sender, caller, target, cleanup, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altsendmany)(struct sig *self, struct sig *sender, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_sendmany_nopr)(struct sig *__restrict self, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR, NULL, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altsendmany_nopr)(struct sig *self, struct sig *sender, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_sendmany_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP, NULL, THIS_TASK, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altsendmany_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP, sender, THIS_TASK, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_sendmanyas)(struct sig *__restrict self, struct task *__restrict caller, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_CALLER, NULL, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altsendmanyas)(struct sig *self, struct sig *sender, struct task *__restrict caller, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_sendmanyas_nopr)(struct sig *__restrict self, struct task *__restrict caller, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER, NULL, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altsendmanyas_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_sendmanyas_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, NULL, caller, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altsendmanyas_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, sender, caller, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini)(struct sig *self, struct sig *sender) {
+	return sig_xbroadcast(self, SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini_nopr)(struct sig *__restrict self) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI, NULL, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self, struct sig *sender) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcast_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP, NULL, THIS_TASK, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcast_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP, sender, THIS_TASK, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcast_for_fini_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_CLEANUP, NULL, THIS_TASK, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP, sender, THIS_TASK, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas)(struct sig *__restrict self, struct task *__restrict caller) {
+	return sig_xbroadcast(self, SIG_XSEND_F_CALLER, NULL, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas)(struct sig *self, struct sig *sender, struct task *__restrict caller) {
+	return sig_xbroadcast(self, SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas_nopr)(struct sig *__restrict self, struct task *__restrict caller) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER, NULL, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_broadcastas_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, NULL, caller, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altbroadcastas_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, sender, caller, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas_for_fini)(struct sig *__restrict self, struct task *__restrict caller) {
+	return sig_xbroadcast(self, SIG_XSEND_F_FINI | SIG_XSEND_F_CALLER, NULL, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini)(struct sig *self, struct sig *sender, struct task *__restrict caller) {
+	return sig_xbroadcast(self, SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas_for_fini_nopr)(struct sig *__restrict self, struct task *__restrict caller) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_CALLER, NULL, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_broadcastas_for_fini_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, NULL, caller, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, sender, caller, cleanup, NULL, NULL);
+}
 /*[[[end]]]*/
 DECL_BEGIN
 #endif /* !__INTELLISENSE__ */

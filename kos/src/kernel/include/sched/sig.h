@@ -399,7 +399,8 @@ FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast)(struct sig
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_nopr)(struct sig *__restrict self);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self, struct sig *sender);
 FUNDEF NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini)(struct sig *__restrict self);
-#ifdef __INTELLISENSE__
+
+/* Functions without fast-paths */
 FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_altsend)(struct sig *self, struct sig *sender);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_altsend_nopr)(struct sig *self, struct sig *sender);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_send_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup);
@@ -452,7 +453,7 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas_fo
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_broadcastas_for_fini_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
-#else /* __INTELLISENSE__ */
+#if !defined(__INTELLISENSE__) && !defined(__OPTIMIZE_SIZE__)
 #define sig_altsend(self, sender)                                               sig_xsend(self, SIG_XSEND_F_SENDER, sender, THIS_TASK, __NULLPTR, __NULLPTR, __NULLPTR)
 #define sig_altsend_nopr(self, sender)                                          sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER, sender, THIS_TASK, __NULLPTR, __NULLPTR, __NULLPTR)
 #define sig_send_cleanup_nopr(self, cleanup)                                    sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP, __NULLPTR, THIS_TASK, __NULLPTR, cleanup, __NULLPTR)
@@ -505,7 +506,7 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altbroad
 #define sig_altbroadcastas_for_fini_nopr(self, sender, caller)                  sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, __NULLPTR, __NULLPTR, __NULLPTR)
 #define sig_broadcastas_for_fini_cleanup_nopr(self, caller, cleanup)            sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, __NULLPTR, caller, cleanup, __NULLPTR, __NULLPTR)
 #define sig_altbroadcastas_for_fini_cleanup_nopr(self, sender, caller, cleanup) sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, sender, caller, cleanup, __NULLPTR, __NULLPTR)
-#endif /* !__INTELLISENSE__ */
+#endif /* !__INTELLISENSE__ && !__OPTIMIZE_SIZE__ */
 #define sig_send_unlikely(self)                                                          _sig_deliver_unlikely(self, sig_send(self))
 #define sig_altsend_unlikely(self, sender)                                               _sig_deliver_unlikely(self, sig_altsend(self, sender))
 #define sig_send_nopr_unlikely(self)                                                     _sig_deliver_unlikely(self, sig_send_nopr(self))

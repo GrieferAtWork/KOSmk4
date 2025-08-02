@@ -24,6 +24,10 @@ import * from deemon;
  */
 
 
+/* When defined, also export functions that aren't being defined explicitly */
+#define EXPORT_UNDEFINED_FUNCTIONS
+
+
 @@Mapping from <function-name> to <function-prototype>
 global final FUNCTIONS: {string: string} = r"
 FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL sig_send)(struct sig *__restrict self);
@@ -106,7 +110,6 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altbroad
 	))
 	.asmap
 	.frozen;
-
 
 @@Set of functions that are actually defined (all others are macro wrappers around `sig_xsend*`)
 global final DEFINED_FUNCTIONS = {
@@ -231,12 +234,34 @@ function printPrototypes() {
 		for (local name, decl: FUNCTIONS)
 			(name, getArgNamesFromPrototype(decl))
 	);
+#if 0
+	for (local name, decl: FUNCTIONS) {
+		if (name !in DEFINED_FUNCTIONS) {
+			local none, attr, Treturn, nothrow, params = decl.rescanf(
+					r"(FUNDEF\s+)?(.*)\s+(\w+)\s*(NOTHROW)\s*\(\s*FCALL\s+\w+\s*\)\s*\((.*)\)"
+			)...;
+			print(f"EIDECLARE({attr}, {Treturn}, {nothrow}, FCALL, {name}, ({params}), "
+			      f"\{ return {getSubstitutionCallExpr(name, argsByFun[name])}; \})");
+		}
+	}
+#endif
+
+#ifdef EXPORT_UNDEFINED_FUNCTIONS
+	print;
+	print("/* Functions without fast-paths */");
+#else /* EXPORT_UNDEFINED_FUNCTIONS */
 	print("#ifdef __INTELLISENSE__");
+#endif /* !EXPORT_UNDEFINED_FUNCTIONS */
 	for (local name, decl: FUNCTIONS) {
 		if (name !in DEFINED_FUNCTIONS)
 			print(decl);
 	}
+
+#ifdef EXPORT_UNDEFINED_FUNCTIONS
+	print("#if !defined(__INTELLISENSE__) && !defined(__OPTIMIZE_SIZE__)");
+#else /* EXPORT_UNDEFINED_FUNCTIONS */
 	print("#else /* __INTELLISENSE__ */");
+#endif /* !EXPORT_UNDEFINED_FUNCTIONS */
 	local longestUndefinedDeclLen = ((
 		for (local functionName: FUNCTIONS.keys - DEFINED_FUNCTIONS) ({
 			local args = argsByFun[functionName];
@@ -250,7 +275,11 @@ function printPrototypes() {
 			print(getSubstitutionCallExpr(name, args));
 		}
 	}
+#ifdef EXPORT_UNDEFINED_FUNCTIONS
+	print("#endif /* !__INTELLISENSE__ && !__OPTIMIZE_SIZE__ */");
+#else /* EXPORT_UNDEFINED_FUNCTIONS */
 	print("#endif /* !__INTELLISENSE__ */");
+#endif /* !EXPORT_UNDEFINED_FUNCTIONS */
 
 	local longestDeclLen = ((
 		for (local functionName, args: argsByFun)
@@ -290,6 +319,22 @@ function printSigCIncludes() {
 	}
 	print('DECL_END');
 	print('#endif /* __OPTIMIZE_SIZE__ */');
+#ifdef EXPORT_UNDEFINED_FUNCTIONS
+	for (local name, decl: FUNCTIONS) {
+		if (name !in DEFINED_FUNCTIONS) {
+			local proto = decl
+				.rereplace(r"\bFUNDEF\b", "PUBLIC")
+				.rereplace(r"\b__BOOL\b", "bool")
+				.rstrip(";");
+			print(proto, " {");
+			print("	return ",
+				getSubstitutionCallExpr(name)
+					.rereplace(r"\b__NULLPTR\b", "NULL"),
+				";");
+			print("}");
+		}
+	}
+#endif /* EXPORT_UNDEFINED_FUNCTIONS */
 }
 
 function printSigSendCInlOptions() {
