@@ -389,7 +389,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       of which KOS is already implementing, but currently does so w/o support
 	 *       for SIGIO.
 	 *       Note that in  all of  these cases,  we can make  the jump  from the  NOBLOCK
-	 *       world that  `sig_postcompletion_t' would  still be  stuck in  by posting  an
+	 *       world  that  `sigcomp_postcb_t'  would  still  be  stuck  in  by  posting an
 	 *       event to an async worker that is registered using  `register_async_worker()'
 	 *       on a per-object basis. (and gets enabled/disabled as O_ASYNC is set/cleared)
 	 *       Essentially, SIGIO should be send  whenever there's a rising-edge event  for

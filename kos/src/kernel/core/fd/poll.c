@@ -152,7 +152,7 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 PRIVATE size_t KCALL
 do_poll_scan(NCX struct pollfd *fds, size_t nfds) {
 	size_t i, result = 0;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	for (i = 0; i < nfds; ++i) {
 		struct handle hnd;
 		struct pollfd pfd;
@@ -261,7 +261,7 @@ do_select_scan(size_t nfds,
 	typedef u8 fds_word_t;
 	enum { BITS_PER_FDS_WORD = 8 };
 	size_t nfds_words, i, result = 0;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	nfds_words = CEILDIV(nfds, BITS_PER_FDS_WORD);
 	for (i = 0; i < nfds_words; ++i) {
 		fds_word_t rbits, wbits, ebits, mask;
@@ -1199,7 +1199,7 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 #ifdef __ARCH_WANT_SYSCALL_PAUSE
 DEFINE_SYSCALL0(errno_t, pause) {
 	for (;;) {
-		assert(!task_wasconnected());
+		assert(!task_isconnected());
 		/* Wait forever (equivalent to `select(0, NULL, NULL, NULL, NULL)')
 		 * NOTE: `task_waitfor()' calls `task_serve()', which may in turn throw
 		 *       `E_INTERRUPT' when  a signal  gets  delivered to  our  thread. */

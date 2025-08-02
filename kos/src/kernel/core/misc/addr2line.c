@@ -74,22 +74,22 @@ NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
                                void const *abs_pc) {
 	REF module_t *mod;
 	uintptr_t relpc;
-	struct task_connections newcons;
+	struct taskcons newcons;
 
 	/* Because  signals may be  used by the below  functions, but we ourselves
 	 * may be used in a context where the caller had already made connections,
 	 * save those of the caller and restore  them below. That way, our use  of
 	 * connections won't interfere. */
-	task_pushconnections(&newcons);
+	task_pushcons(&newcons);
 	if unlikely((mod = module_fromaddr_nx(abs_pc)) == NULL) {
-		task_popconnections();
+		task_popcons();
 		bzero(buf, sizeof(*buf));
 		return (uintptr_t)abs_pc;
 	}
 	relpc = (uintptr_t)((byte_t const *)abs_pc - module_getloadaddr(mod));
 	if (debug_addr2line_sections_lock(mod, &buf->ds_info, &buf->ds_sect) != DEBUG_INFO_ERROR_SUCCESS)
 		bzero(buf, sizeof(*buf));
-	task_popconnections();
+	task_popcons();
 	buf->ds_mod = mod; /* Inherit reference */
 	return relpc;
 }

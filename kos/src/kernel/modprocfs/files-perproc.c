@@ -2365,16 +2365,16 @@ AWREF(mfile_awref, mfile);
 #endif /* !__mfile_awref_defined */
 
 struct procfs_perproc_fd_notify_controller {
-	WEAK refcnt_t         pfppfdnc_refcnt;             /* Reference counter. */
-	struct mfile_awref    pfppfdnc_procfd_folder;      /* [0..1] File to which events should be posted. */
-	struct sig_completion pfppfdnc_addhand_completion; /* Hook for `[handman]->hm_addhand' */
-	struct sig_completion pfppfdnc_delhand_completion; /* Hook for `[handman]->hm_delhand' */
+	WEAK refcnt_t      pfppfdnc_refcnt;             /* Reference counter. */
+	struct mfile_awref pfppfdnc_procfd_folder;      /* [0..1] File to which events should be posted. */
+	struct sigcompcon  pfppfdnc_addhand_completion; /* Hook for `[handman]->hm_addhand' */
+	struct sigcompcon  pfppfdnc_delhand_completion; /* Hook for `[handman]->hm_delhand' */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL procfs_perproc_fd_notify_controller_destroy)(struct procfs_perproc_fd_notify_controller *__restrict self) {
-	sig_completion_disconnect(&self->pfppfdnc_addhand_completion);
-	sig_completion_disconnect(&self->pfppfdnc_delhand_completion);
+	sigcompcon_disconnect(&self->pfppfdnc_addhand_completion);
+	sigcompcon_disconnect(&self->pfppfdnc_delhand_completion);
 	kfree(self);
 }
 
@@ -2389,7 +2389,7 @@ struct procfs_perproc_fd_event {
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL procfs_perproc_fd_hand_postcompletion)(struct sig_completion_context *__restrict context,
+NOTHROW(FCALL procfs_perproc_fd_hand_postcompletion)(struct sigcompctx *__restrict context,
                                                      void *buf) {
 	struct procfs_perproc_fd_event *e;
 	fd_t fd = HANDMAN_HANDSIG_DECODE(context->scc_sender);
@@ -2403,8 +2403,8 @@ NOTHROW(FCALL procfs_perproc_fd_hand_postcompletion)(struct sig_completion_conte
 
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
-NOTHROW(FCALL procfs_perproc_fd_hand_completion)(struct sig_completion *__restrict self,
-                                                 struct sig_completion_context *__restrict ctx,
+NOTHROW(FCALL procfs_perproc_fd_hand_completion)(struct sigcompcon *__restrict self,
+                                                 struct sigcompctx *__restrict context,
                                                  struct procfs_perproc_fd_notify_controller *__restrict controller,
                                                  void *buf, size_t bufsize, uint16_t mask) {
 	struct procfs_perproc_fd_event *e = (struct procfs_perproc_fd_event *)buf;
@@ -2415,26 +2415,20 @@ NOTHROW(FCALL procfs_perproc_fd_hand_completion)(struct sig_completion *__restri
 	/* Load the mfile of the `/proc/[pid]/fd' directory. */
 	e->pfppfde_file = awref_get(&controller->pfppfdnc_procfd_folder);
 	if unlikely(e->pfppfde_file == NULL) {
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-		ctx->scc_mode |= SIGCOMP_MODE_F_NONVIABLE;
-#endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+		context->scc_mode |= SIGCOMP_MODE_F_NONVIABLE;
 		return 0; /* Special case: /fd directory was unloaded (stop monitoring) */
 	}
 	e->pfppfde_mask = mask;
-	ctx->scc_post = &procfs_perproc_fd_hand_postcompletion;
+	context->scc_post = &procfs_perproc_fd_hand_postcompletion;
 
 	/* Re-prime the signal completion handler so we keep monitoring *all* events. */
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-	ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME;
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-	sig_completion_reprime(self, true);
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+	context->scc_mode |= SIGCOMP_MODE_F_REPRIME;
 	return sizeof(struct procfs_perproc_fd_event);
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL procfs_perproc_fd_addhand_completion)(struct sig_completion *__restrict self,
-                                                    struct sig_completion_context *__restrict context,
+NOTHROW(FCALL procfs_perproc_fd_addhand_completion)(struct sigcompcon *__restrict self,
+                                                    struct sigcompctx *__restrict context,
                                                     void *buf, size_t bufsize) {
 	return procfs_perproc_fd_hand_completion(self, context,
 	                                         container_of(self, struct procfs_perproc_fd_notify_controller, pfppfdnc_addhand_completion),
@@ -2442,8 +2436,8 @@ NOTHROW(FCALL procfs_perproc_fd_addhand_completion)(struct sig_completion *__res
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL procfs_perproc_fd_delhand_completion)(struct sig_completion *__restrict self,
-                                                    struct sig_completion_context *__restrict context,
+NOTHROW(FCALL procfs_perproc_fd_delhand_completion)(struct sigcompcon *__restrict self,
+                                                    struct sigcompctx *__restrict context,
                                                     void *buf, size_t bufsize) {
 	return procfs_perproc_fd_hand_completion(self, context,
 	                                         container_of(self, struct procfs_perproc_fd_notify_controller, pfppfdnc_delhand_completion),
@@ -2472,10 +2466,10 @@ procfs_perproc_fd_v_notify_attach(struct mfile *__restrict self)
 	/* Initialize the controller and connect it to the handle manager's add/del-hand signals. */
 	result->pfppfdnc_refcnt = 1;
 	awref_init(&result->pfppfdnc_procfd_folder, self);
-	sig_completion_init(&result->pfppfdnc_addhand_completion, &procfs_perproc_fd_addhand_completion);
-	sig_completion_init(&result->pfppfdnc_delhand_completion, &procfs_perproc_fd_delhand_completion);
-	sig_connect_completion_for_poll(&handman->hm_addhand, &result->pfppfdnc_addhand_completion);
-	sig_connect_completion_for_poll(&handman->hm_delhand, &result->pfppfdnc_delhand_completion);
+	sigcompcon_init(&result->pfppfdnc_addhand_completion, &procfs_perproc_fd_addhand_completion);
+	sigcompcon_init(&result->pfppfdnc_delhand_completion, &procfs_perproc_fd_delhand_completion);
+	sigcompcon_connect_for_poll(&result->pfppfdnc_addhand_completion, &handman->hm_addhand);
+	sigcompcon_connect_for_poll(&result->pfppfdnc_delhand_completion, &handman->hm_delhand);
 	printk(KERN_INFO "[procfs] Notify object attached to '/proc/%d/fd' [cookie:%p]\n",
 	       taskpid_getroottid(tpid), result);
 	return result;
@@ -3598,17 +3592,17 @@ AWREF(mfile_awref, mfile);
 #endif /* !__mfile_awref_defined */
 
 struct procfs_perproc_task_notify_controller {
-	WEAK refcnt_t         pfpptnc_refcnt;             /* Reference counter. */
-	struct taskpid       *pfpptnc_proc;               /* [1..1][const] Process main() thread (filter for thread events). (not a reference because we never need to deref it) */
-	struct mfile_awref    pfpptnc_task_folder;        /* [0..1] File to which events should be posted. */
-	struct sig_completion pfpptnc_addproc_completion; /* Hook for `pidns_root.pn_addproc' */
-	struct sig_completion pfpptnc_delproc_completion; /* Hook for `pidns_root.pn_delproc' */
+	WEAK refcnt_t      pfpptnc_refcnt;             /* Reference counter. */
+	struct taskpid    *pfpptnc_proc;               /* [1..1][const] Process main() thread (filter for thread events). (not a reference because we never need to deref it) */
+	struct mfile_awref pfpptnc_task_folder;        /* [0..1] File to which events should be posted. */
+	struct sigcompcon  pfpptnc_addproc_completion; /* Hook for `pidns_root.pn_addproc' */
+	struct sigcompcon  pfpptnc_delproc_completion; /* Hook for `pidns_root.pn_delproc' */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL procfs_perproc_task_notify_controller_destroy)(struct procfs_perproc_task_notify_controller *__restrict self) {
-	sig_completion_disconnect(&self->pfpptnc_addproc_completion);
-	sig_completion_disconnect(&self->pfpptnc_delproc_completion);
+	sigcompcon_disconnect(&self->pfpptnc_addproc_completion);
+	sigcompcon_disconnect(&self->pfpptnc_delproc_completion);
 	kfree(self);
 }
 
@@ -3623,7 +3617,7 @@ struct procfs_perproc_task_event {
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL procfs_perproc_task_hand_postcompletion)(struct sig_completion_context *__restrict context,
+NOTHROW(FCALL procfs_perproc_task_hand_postcompletion)(struct sigcompctx *__restrict context,
                                                        void *buf) {
 	struct taskpid *tpid;
 	struct procfs_perproc_task_event *e;
@@ -3644,18 +3638,14 @@ NOTHROW(FCALL procfs_perproc_task_hand_postcompletion)(struct sig_completion_con
 
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
-NOTHROW(FCALL procfs_perproc_task_hand_completion)(struct sig_completion *__restrict self,
-                                                   struct sig_completion_context *__restrict ctx,
+NOTHROW(FCALL procfs_perproc_task_hand_completion)(struct sigcompcon *__restrict self,
+                                                   struct sigcompctx *__restrict context,
                                                    struct procfs_perproc_task_notify_controller *__restrict controller,
                                                    void *buf, size_t bufsize, uint16_t mask) {
-	struct taskpid *tpid = PIDNS_PROCSIG_DECODE(ctx->scc_sender);
+	struct taskpid *tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
 	struct procfs_perproc_task_event *e = (struct procfs_perproc_task_event *)buf;
 	if (taskpid_getprocpid(tpid) != controller->pfpptnc_proc) {
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-		ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME | SIGCOMP_MODE_F_NONVIABLE;
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-		sig_completion_reprime(self, true);
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+		context->scc_mode |= SIGCOMP_MODE_F_REPRIME | SIGCOMP_MODE_F_NONVIABLE;
 		return 0; /* Thread belongs to some other process (but not ours) */
 	}
 	if (bufsize < sizeof(struct procfs_perproc_task_event))
@@ -3665,26 +3655,20 @@ NOTHROW(FCALL procfs_perproc_task_hand_completion)(struct sig_completion *__rest
 	/* Load the mfile of the `/proc/[pid]/task' directory. */
 	e->pfppfde_file = awref_get(&controller->pfpptnc_task_folder);
 	if unlikely(e->pfppfde_file == NULL) {
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-		ctx->scc_mode |= SIGCOMP_MODE_F_NONVIABLE;
-#endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+		context->scc_mode |= SIGCOMP_MODE_F_NONVIABLE;
 		return 0; /* Special case: /task directory was unloaded (stop monitoring) */
 	}
 	e->pfppfde_mask = mask;
-	ctx->scc_post = &procfs_perproc_task_hand_postcompletion;
+	context->scc_post = &procfs_perproc_task_hand_postcompletion;
 
 	/* Re-prime the signal completion handler so we keep monitoring *all* events. */
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-	ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME;
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-	sig_completion_reprime(self, true);
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+	context->scc_mode |= SIGCOMP_MODE_F_REPRIME;
 	return sizeof(struct procfs_perproc_task_event);
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL procfs_perproc_task_addhand_completion)(struct sig_completion *__restrict self,
-                                                      struct sig_completion_context *__restrict context,
+NOTHROW(FCALL procfs_perproc_task_addhand_completion)(struct sigcompcon *__restrict self,
+                                                      struct sigcompctx *__restrict context,
                                                       void *buf, size_t bufsize) {
 	return procfs_perproc_task_hand_completion(self, context,
 	                                           container_of(self, struct procfs_perproc_task_notify_controller, pfpptnc_addproc_completion),
@@ -3692,8 +3676,8 @@ NOTHROW(FCALL procfs_perproc_task_addhand_completion)(struct sig_completion *__r
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL procfs_perproc_task_delhand_completion)(struct sig_completion *__restrict self,
-                                                      struct sig_completion_context *__restrict context,
+NOTHROW(FCALL procfs_perproc_task_delhand_completion)(struct sigcompcon *__restrict self,
+                                                      struct sigcompctx *__restrict context,
                                                       void *buf, size_t bufsize) {
 	return procfs_perproc_task_hand_completion(self, context,
 	                                           container_of(self, struct procfs_perproc_task_notify_controller, pfpptnc_delproc_completion),
@@ -3717,10 +3701,10 @@ procfs_perproc_task_v_notify_attach(struct mfile *__restrict self)
 	result->pfpptnc_refcnt = 1;
 	result->pfpptnc_proc   = taskpid_getprocpid(tpid);
 	awref_init(&result->pfpptnc_task_folder, self);
-	sig_completion_init(&result->pfpptnc_addproc_completion, &procfs_perproc_task_addhand_completion);
-	sig_completion_init(&result->pfpptnc_delproc_completion, &procfs_perproc_task_delhand_completion);
-	sig_connect_completion_for_poll(&pidns_root.pn_addproc, &result->pfpptnc_addproc_completion);
-	sig_connect_completion_for_poll(&pidns_root.pn_delproc, &result->pfpptnc_delproc_completion);
+	sigcompcon_init(&result->pfpptnc_addproc_completion, &procfs_perproc_task_addhand_completion);
+	sigcompcon_init(&result->pfpptnc_delproc_completion, &procfs_perproc_task_delhand_completion);
+	sigcompcon_connect_for_poll(&result->pfpptnc_addproc_completion, &pidns_root.pn_addproc);
+	sigcompcon_connect_for_poll(&result->pfpptnc_delproc_completion, &pidns_root.pn_delproc);
 	printk(KERN_INFO "[procfs] Notify object attached to '/proc/%d/task' [cookie:%p]\n",
 	       taskpid_getroottid(tpid), result);
 	return result;

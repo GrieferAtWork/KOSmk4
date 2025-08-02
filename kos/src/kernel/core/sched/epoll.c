@@ -39,8 +39,8 @@
 #include <sched/pid.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
-#include <sched/sig-completion.h>
 #include <sched/sig.h>
+#include <sched/sigcomp.h>
 #include <sched/sigmask.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
@@ -176,7 +176,7 @@ again:
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
-NOTHROW(FCALL epoll_postcompletion)(struct sig_completion_context *__restrict UNUSED(context),
+NOTHROW(FCALL epoll_postcompletion)(struct sigcompctx *__restrict UNUSED(context),
                                     void *buf) {
 	REF struct epoll_controller *ctrl;
 	ctrl = *(REF struct epoll_controller **)buf; /* Inherit reference */
@@ -185,8 +185,8 @@ NOTHROW(FCALL epoll_postcompletion)(struct sig_completion_context *__restrict UN
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
-                                struct sig_completion_context *__restrict context,
+NOTHROW(FCALL epoll_completion)(struct sigcompcon *__restrict self,
+                                struct sigcompctx *__restrict context,
                                 void *buf, size_t bufsize) {
 	struct epoll_handle_monitor *monitor;
 	uintptr_half_t oldraise;
@@ -196,11 +196,12 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 	 * well as its controller because the monitor owns `self', and right  now
 	 * our caller is preventing `self'  from being destroyed by holding  onto
 	 * an internal SMP-lock that will block:
-	 *  - `sig_completion_disconnect()', as called by
-	 *  - `sig_multicompletion_disconnectall()', as called by
+	 *  - `sigcompcon_disconnect()', as called by
+	 *  - `sigmulticomp_disconnectall()', as called by
 	 *  - `epoll_controller_destroy()' */
-	monitor = container_of(sig_multicompletion_controller(self),
-	                       struct epoll_handle_monitor, ehm_comp);
+	monitor = container_of(sigmulticomp_fromcon(self),
+	                       struct epoll_handle_monitor,
+	                       ehm_comp);
 #ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	assertf(!epoll_handle_monitor_isrpc(monitor),
 	        "RPC monitors should be using a different completion function");
@@ -276,7 +277,7 @@ NOTHROW(FCALL epoll_handle_monitor_destroy)(struct epoll_handle_monitor *__restr
 
 	/* NOTE: The caller must ensure that `&self->ehm_comp'
 	 *       has  been  disconnected before  we  get here! */
-	sig_multicompletion_fini(&self->ehm_comp);
+	sigmulticomp_fini(&self->ehm_comp);
 
 	/* Drop our weak reference from the associated handle. */
 	(*handle_type_db.h_weakdecref[self->ehm_handtyp])(self->ehm_handptr);
@@ -301,26 +302,25 @@ NOTHROW(FCALL epoll_handle_monitor_destroy)(struct epoll_handle_monitor *__restr
 /* Connect the given monitor `self' to the monitored signals of `handle_obptr' */
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 epoll_handle_monitor_pollconnect(struct epoll_handle_monitor *__restrict self,
-                                 void *handle_obptr, sig_completion_t cb) {
+                                 void *handle_obptr, sigcomp_cb_t cb) {
 again:
-	assert(!task_wasconnected());
-	assert(!sig_multicompletion_wasconnected(&self->ehm_comp));
+	assert(!task_isconnected());
+	assert(!sigmulticomp_isconnected(&self->ehm_comp));
 	TRY {
 		/* Connect to monitored signals. */
 		(*handle_type_db.h_pollconnect[self->ehm_handtyp])(handle_obptr,
 		                                                   self->ehm_events);
-		sig_multicompletion_connect_from_task(/* completion: */ &self->ehm_comp,
-		                                      /* cb:         */ cb,
-		                                      /* for_poll:   */ true);
+		sigmulticomp_connect_from_task(&self->ehm_comp, cb, 0,
+		                               SIGCOMPCON_CONNECT_F_POLL);
 	} EXCEPT {
-		sig_multicompletion_disconnectall(&self->ehm_comp);
+		sigmulticomp_disconnectall(&self->ehm_comp);
 		task_disconnectall();
 		RETHROW();
 	}
 	if unlikely(task_receiveall() != NULL) {
 		/* Signals were delivered in the mean time, and we have not been able
 		 * to  transfer all of  them over to  `self->ehm_comp'. -> Try again. */
-		sig_multicompletion_disconnectall(&self->ehm_comp);
+		sigmulticomp_disconnectall(&self->ehm_comp);
 		goto again;
 	}
 }
@@ -348,7 +348,7 @@ epoll_handle_monitor_prime(struct epoll_handle_monitor *__restrict self,
                            void *handptr, bool test_before_connect) {
 	poll_mode_t what;
 	assert(epoll_controller_lock_acquired(self->ehm_ctrl));
-	assert(!sig_multicompletion_wasconnected(&self->ehm_comp));
+	assert(!sigmulticomp_isconnected(&self->ehm_comp));
 	COMPILER_BARRIER();
 	self->ehm_raised = 0;
 #ifndef NDEBUG
@@ -372,11 +372,11 @@ was_asserted:
 		what = epoll_handle_monitor_polltest(self, handptr);
 		if unlikely(what) {
 			/* Disconnect */
-			sig_multicompletion_disconnectall(&self->ehm_comp);
+			sigmulticomp_disconnectall(&self->ehm_comp);
 			goto was_asserted;
 		}
 	} EXCEPT {
-		sig_multicompletion_disconnectall(&self->ehm_comp);
+		sigmulticomp_disconnectall(&self->ehm_comp);
 		/* Deal with the case where the handle was already  raised.
 		 * In this case, we must remove it from the queue of raised
 		 * monitors in order to ensure consistency. */
@@ -429,13 +429,13 @@ NOTHROW(FCALL epoll_controller_destroy)(struct epoll_controller *__restrict self
 			continue;
 		assert(epoll_handle_monitor_isrpc(mon) || mon->ehm_ctrl == self);
 		/* Make sure that this monitor isn't still connected to anything! */
-		sig_multicompletion_disconnectall(&mon->ehm_comp);
+		sigmulticomp_disconnectall(&mon->ehm_comp);
 		epoll_handle_monitor_destroy(mon);
 	}
 	kfree(self->ec_list);
 
 	/* Broadcast private signals for finalization */
-	assert(!sig_iswaiting(&self->ec_lock.sl_sig));
+	assert(!sig_hascon(&self->ec_lock.sl_sig));
 	sig_broadcast_for_fini(&self->ec_avail);
 	weakdecref_likely(self);
 }
@@ -884,7 +884,7 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 	newmon->ehm_handtyp = hand->h_type;
 	newmon->ehm_fdkey   = fd_key;
 /*	newmon->ehm_handptr = ...; // Filled later */
-	sig_multicompletion_init(&newmon->ehm_comp);
+	sigmulticomp_init(&newmon->ehm_comp);
 	TRY {
 		/* Fill in monitor event information. */
 		COMPILER_READ_BARRIER();
@@ -925,7 +925,7 @@ again_acquire:
 						goto again_acquire;
 #endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 					(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
-					sig_multicompletion_fini(&newmon->ehm_comp);
+					sigmulticomp_fini(&newmon->ehm_comp);
 					kfree(newmon);
 					return false;
 				}
@@ -948,7 +948,7 @@ again_acquire:
 		}
 		epoll_controller_lock_release(self);
 	} EXCEPT {
-		sig_multicompletion_fini(&newmon->ehm_comp);
+		sigmulticomp_fini(&newmon->ehm_comp);
 		kfree(newmon);
 		RETHROW();
 	}
@@ -983,7 +983,7 @@ NOTHROW(FCALL epoll_rpc_trigger)(/*inherit(always)*/ struct epoll_monitor_rpc *_
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
-NOTHROW(FCALL epoll_rpc_postcompletion)(struct sig_completion_context *__restrict UNUSED(context),
+NOTHROW(FCALL epoll_rpc_postcompletion)(struct sigcompctx *__restrict UNUSED(context),
                                         void *buf) {
 	struct epoll_monitor_rpc *rpc;
 	REF struct epoll_controller *ctrl;
@@ -1005,7 +1005,7 @@ NOTHROW(FCALL epoll_rpc_postcompletion)(struct sig_completion_context *__restric
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
-NOTHROW(FCALL epoll_rpc_postcompletion_with_inherited_lock)(struct sig_completion_context *__restrict UNUSED(context),
+NOTHROW(FCALL epoll_rpc_postcompletion_with_inherited_lock)(struct sigcompctx *__restrict UNUSED(context),
                                                             void *buf) {
 	struct epoll_monitor_rpc *rpc;
 	struct epoll_handle_monitor *monitor;
@@ -1017,8 +1017,8 @@ NOTHROW(FCALL epoll_rpc_postcompletion_with_inherited_lock)(struct sig_completio
 	epoll_controller_lock_release(monitor->ehm_ctrl);
 
 	/* Destroy the monitor. */
-	sig_multicompletion_disconnectall(&monitor->ehm_comp);
-	sig_multicompletion_fini(&monitor->ehm_comp);
+	sigmulticomp_disconnectall(&monitor->ehm_comp);
+	sigmulticomp_fini(&monitor->ehm_comp);
 	(*handle_type_db.h_weakdecref[monitor->ehm_handtyp])(monitor->ehm_handptr);
 	kfree(monitor);
 
@@ -1033,8 +1033,8 @@ NOTHROW(LOCKOP_CC epoll_rpc_monitor_remove_postlop)(Tobpostlockop(epoll_controll
 	monitor = container_of(self, struct epoll_handle_monitor, _ehm_plop);
 
 	/* Destroy the monitor. */
-	sig_multicompletion_disconnectall(&monitor->ehm_comp);
-	sig_multicompletion_fini(&monitor->ehm_comp);
+	sigmulticomp_disconnectall(&monitor->ehm_comp);
+	sigmulticomp_fini(&monitor->ehm_comp);
 	(*handle_type_db.h_weakdecref[monitor->ehm_handtyp])(monitor->ehm_handptr);
 	kfree(monitor);
 }
@@ -1057,8 +1057,8 @@ NOTHROW(LOCKOP_CC epoll_rpc_monitor_remove_lop)(Toblockop(epoll_controller) *__r
 
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL epoll_rpc_completion)(struct sig_completion *__restrict self,
-                                    struct sig_completion_context *__restrict context,
+NOTHROW(FCALL epoll_rpc_completion)(struct sigcompcon *__restrict self,
+                                    struct sigcompctx *__restrict context,
                                     void *buf, size_t bufsize) {
 	struct epoll_monitor_rpc *rpc;
 	struct epoll_handle_monitor *monitor;
@@ -1068,11 +1068,12 @@ NOTHROW(FCALL epoll_rpc_completion)(struct sig_completion *__restrict self,
 	 * well as its controller because the monitor owns `self', and right  now
 	 * our caller is preventing `self'  from being destroyed by holding  onto
 	 * an internal SMP-lock that will block:
-	 *  - `sig_completion_disconnect()', as called by
-	 *  - `sig_multicompletion_disconnectall()', as called by
+	 *  - `sigcompcon_disconnect()', as called by
+	 *  - `sigmulticomp_disconnectall()', as called by
 	 *  - `epoll_controller_destroy()' */
-	monitor = container_of(sig_multicompletion_controller(self),
-	                       struct epoll_handle_monitor, ehm_comp);
+	monitor = container_of(sigmulticomp_fromcon(self),
+	                       struct epoll_handle_monitor,
+	                       ehm_comp);
 	assert(epoll_handle_monitor_isrpc(monitor));
 
 	if (atomic_read(&monitor->ehm_rpc) != NULL && bufsize < 2 * sizeof(void *))
@@ -1137,7 +1138,7 @@ epoll_controller_addmonitor_rpc(struct epoll_controller *__restrict self,
 	newmon->ehm_rpc     = rpc;                /* Inherited (always) */
 	newmon->ehm_raised  = (uintptr_half_t)-1; /* Marker for RPC monitors */
 /*	newmon->ehm_handptr = ...; // Filled later */
-	sig_multicompletion_init(&newmon->ehm_comp);
+	sigmulticomp_init(&newmon->ehm_comp);
 
 	/* Make sure that these 2 events are always polled for.
 	 * By setting them  here, this  simplifies other  code. */
@@ -1167,7 +1168,7 @@ again_acquire:
 					if (status == EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP)
 						goto again_acquire;
 					(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
-					sig_multicompletion_fini(&newmon->ehm_comp);
+					sigmulticomp_fini(&newmon->ehm_comp);
 					kfree(newmon);
 					epoll_monitor_rpc_destroy(rpc);
 					return false;
@@ -1181,7 +1182,7 @@ again_acquire:
 			RETHROW();
 		}
 	} EXCEPT {
-		sig_multicompletion_fini(&newmon->ehm_comp);
+		sigmulticomp_fini(&newmon->ehm_comp);
 		kfree(newmon);
 		/* Destroy the RPC */
 		epoll_monitor_rpc_destroy(rpc);
@@ -1224,8 +1225,8 @@ again_acquire:
 			/* Managed  to cancel  the RPC.  As such,  we've essentially inherited
 			 * ownership of the monitor and are thus also responsible for removing
 			 * it from the associated epoll controller. */
-			sig_multicompletion_disconnectall(&newmon->ehm_comp);
-			sig_multicompletion_fini(&newmon->ehm_comp);
+			sigmulticomp_disconnectall(&newmon->ehm_comp);
+			sigmulticomp_fini(&newmon->ehm_comp);
 			(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
 			kfree(newmon);
 
@@ -1238,11 +1239,11 @@ again_acquire:
 		if unlikely(raised != 0) {
 			struct epoll_monitor_rpc *canceled_rpc;
 			canceled_rpc = atomic_xch(&newmon->ehm_rpc, NULL);
-			sig_multicompletion_disconnectall(&newmon->ehm_comp);
+			sigmulticomp_disconnectall(&newmon->ehm_comp);
 			if (canceled_rpc) {
 				/* Remove the monitor from the epoll controller. */
 				epoll_controller_intern_delmon_and_maybe_rehash(self, newmon);
-				sig_multicompletion_fini(&newmon->ehm_comp);
+				sigmulticomp_fini(&newmon->ehm_comp);
 				(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
 				kfree(newmon);
 
@@ -1318,9 +1319,9 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
 		    /* Special case: Re-arm a ONESHOT monitor after that monitor has been left
 		     *               dangling  and disconnected. This behavior is required for
 		     *               linux compatibility (but s.a. `KP_EPOLL_DELETE_ONESHOT') */
-			((monitor->ehm_events & EPOLLONESHOT) && !sig_multicompletion_wasconnected(&monitor->ehm_comp))) {
+			((monitor->ehm_events & EPOLLONESHOT) && !sigmulticomp_isconnected(&monitor->ehm_comp))) {
 			/* Change monitored events. */
-			sig_multicompletion_disconnectall(&monitor->ehm_comp);
+			sigmulticomp_disconnectall(&monitor->ehm_comp);
 			COMPILER_BARRIER();
 			/* If the monitor has already been raised, then we
 			 * must remove it  from the raised-monitor  queue. */
@@ -1389,7 +1390,7 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
 	}
 
 	/* Note that we've just inherited `monitor', so now we have to destroy it! */
-	sig_multicompletion_disconnectall(&monitor->ehm_comp);
+	sigmulticomp_disconnectall(&monitor->ehm_comp);
 
 #ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	if (epoll_handle_monitor_isrpc(monitor)) {
@@ -1410,8 +1411,8 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
 		/* Cleanup... */
 		epoll_controller_intern_rehash_after_remove(self);
 		epoll_controller_lock_release(self);
-		/*sig_multicompletion_disconnectall(&monitor->ehm_comp);*/ /* Already done above */
-		sig_multicompletion_fini(&monitor->ehm_comp);
+		/*sigmulticomp_disconnectall(&monitor->ehm_comp);*/ /* Already done above */
+		sigmulticomp_fini(&monitor->ehm_comp);
 		(*handle_type_db.h_weakdecref[monitor->ehm_handtyp])(monitor->ehm_handptr);
 		kfree(monitor);
 		/* Destroy the RPC via shutdown */
@@ -1420,8 +1421,8 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
 	}
 #endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
-	/* With signal completion callbacks all diconnected (by `sig_multicompletion_disconnectall()'),
-	 * we must also ensure that `monitor' isn't apart  of the raised monitor chain. If it is,  then
+	/* With  signal  completion  callbacks all  diconnected  (by `sigmulticomp_disconnectall()'),
+	 * we must also ensure that `monitor' isn't apart of the raised monitor chain. If it is, then
 	 * we must remove it prior to releasing our lock from `ec_lock' */
 	if (monitor->ehm_raised != 0)
 		epoll_controller_remove_from_raised_or_pending(self, monitor);
@@ -1458,7 +1459,7 @@ PRIVATE void
 NOTHROW(FCALL epoll_handle_monitor_dc_chain)(struct epoll_handle_monitor *chain) {
 	for (; chain; chain = chain->ehm_rnext) {
 		assert(chain->ehm_raised != 0);
-		sig_multicompletion_disconnectall(&chain->ehm_comp);
+		sigmulticomp_disconnectall(&chain->ehm_comp);
 	}
 }
 
@@ -1481,7 +1482,7 @@ NOTHROW(FCALL epoll_handle_monitor_dc_chain)(struct epoll_handle_monitor *chain)
  * as raised once again, and be  back onto the queue of  pending
  * events. The same thing also happens when writing to  `events'
  * would result in a SEGFAULT.
- * NOTE: The caller must ensure that !task_wasconnected()
+ * NOTE: The caller must ensure that !task_isconnected()
  * @param: maxevents: The max number of events to consume (asserted to be >= 1)
  * @return: * : The actual number of consumed events.
  * @return: 0 : No monitors have  been raised at  this time. Once  any
@@ -1529,7 +1530,7 @@ scan_monitors:
 #endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 					/* First of all: Ensure that `monitor' isn't connected. */
-					sig_multicompletion_disconnectall(&monitor->ehm_comp);
+					sigmulticomp_disconnectall(&monitor->ehm_comp);
 
 					/* Now   acquire  a  reference   to  the  monitor's  handle.
 					 * If this fails, silently destroy the monitor and move one. */
@@ -1557,7 +1558,7 @@ scan_monitors:
 							epoll_handle_monitor_pollconnect(monitor, monitor_handptr, &epoll_completion);
 							what = epoll_handle_monitor_polltest(monitor, monitor_handptr);
 							if unlikely(what != 0) {
-								sig_multicompletion_disconnectall(&monitor->ehm_comp);
+								sigmulticomp_disconnectall(&monitor->ehm_comp);
 								if (atomic_read(&monitor->ehm_raised) != 0) {
 									struct epoll_handle_monitor *more_raised;
 									struct epoll_handle_monitor *more_raised_last;
@@ -1659,7 +1660,7 @@ next_monitor:
 					 *     should still  be a  relatively fast  operation, especially  if  we
 					 *     combine the set of )
 					 * >> } */
-					assert(!sig_multicompletion_wasconnected(&result_events->ehm_comp));
+					assert(!sigmulticomp_isconnected(&result_events->ehm_comp));
 					assert(result_events->ehm_raised != 0);
 					if (result_events->ehm_events & EPOLLONESHOT) {
 						if (has_personality(KP_EPOLL_DELETE_ONESHOT)) {
@@ -1740,7 +1741,7 @@ epoll_controller_wait(struct epoll_controller *__restrict self,
                       size_t maxevents, ktime_t abs_timeout)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT) {
 	size_t result;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 again:
 	result = epoll_controller_trywait(self, events, maxevents);
 	if (result == 0) {
@@ -1771,7 +1772,7 @@ epoll_controller_wait_with_sigmask(struct epoll_controller *__restrict self,
                                    ktime_t abs_timeout)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT) {
 	size_t result;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 again:
 	result = epoll_controller_trywait(self, events, maxevents);
 	if (result == 0) {

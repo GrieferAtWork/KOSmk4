@@ -42,8 +42,8 @@
 #include <kernel/mman/mpart.h>
 #include <misc/unlockinfo.h>
 #include <sched/atomic64.h>
-#include <sched/sig-completion.h>
 #include <sched/sig.h>
+#include <sched/sigcomp.h>
 
 #include <hybrid/minmax.h>
 #include <hybrid/sequence/list.h>
@@ -459,7 +459,7 @@ NOTHROW(LOCKOP_CC mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
 }
 
 PRIVATE NOBLOCK void
-NOTHROW(FCALL mfile_zerotrunc_completion2_cb)(struct sig_completion_context *__restrict UNUSED(context),
+NOTHROW(FCALL mfile_zerotrunc_completion2_cb)(struct sigcompctx *__restrict UNUSED(context),
                                               void *buf) {
 	REF struct mfile *file;
 	file = *(REF struct mfile **)buf;
@@ -470,19 +470,15 @@ NOTHROW(FCALL mfile_zerotrunc_completion2_cb)(struct sig_completion_context *__r
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL mfile_zerotrunc_completion_cb)(struct sig_completion *__restrict self,
-                                             struct sig_completion_context *__restrict ctx,
+NOTHROW(FCALL mfile_zerotrunc_completion_cb)(struct sigcompcon *__restrict self,
+                                             struct sigcompctx *__restrict ctx,
                                              void *buf, size_t bufsize) {
 	REF struct mfile *me;
 	me = container_of(self, struct mfile, _mf_compl);
 
 	/* Check if the trunc-lock has been released... */
 	if (atomic_read(&me->mf_trunclock) != 0) {
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 		ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME | SIGCOMP_MODE_F_NONVIABLE;
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-		sig_completion_reprime(self, true);
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		return 0;
 	}
 
@@ -595,10 +591,10 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 
 	/* Success! - All that's left now is to set the file's size to zero! */
 	if unlikely(atomic_read(&file->mf_trunclock) != 0) {
-		/* Use `struct sig_completion' to wait for `mf_trunclock' to
-		 * become ZERO before  setting the file  size down to  zero. */
-		sig_completion_init(&file->_mf_compl, &mfile_zerotrunc_completion_cb);
-		sig_connect_completion_for_poll(&file->mf_initdone, &file->_mf_compl);
+		/* Use  `struct sigcompcon' to wait for `mf_trunclock' to
+		 * become ZERO before setting the file size down to zero. */
+		sigcompcon_init(&file->_mf_compl, &mfile_zerotrunc_completion_cb);
+		sigcompcon_connect_for_poll(&file->_mf_compl, &file->mf_initdone);
 
 		/* Make sure that the completion-callback is always invoked in case
 		 * the `mf_trunclock' counter dropped to zero before our completion

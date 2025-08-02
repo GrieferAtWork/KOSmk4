@@ -25,7 +25,7 @@
 #include <kernel/fs/dirhandle.h>
 #include <kernel/types.h>
 #include <sched/atomic64.h>
-#include <sched/sig-completion.h>
+#include <sched/sigcomp.h>
 
 #include <hybrid/__atomic.h>
 
@@ -59,7 +59,7 @@ struct dirhandlex_hdr {
 	/* This structure appears prepended before `struct dirhandle'
 	 * when  the dir object  is of type `HANDLE_TYPE_DIRHANDLEX'! */
 	REF struct notifyfd  *dxh_notify; /* [1..1][const] Associated notify controller. */
-	struct sig_completion dxh_com;    /* [const] Completion controller listening to `dxh_notify->nf_avail' */
+	struct sigcompcon     dxh_com;    /* [const] Completion controller listening to `dxh_notify->nf_avail' */
 	signo_t               dxh_sigio;  /* [lock(ATOMIC)][sigvalid(.)] Signal send upon notify */
 	/* TODO: To support F_SETOWN_EX, we must be able to specify target types:
 	 *  - thread         (deliver signal using `_task_raisesignothread()')

@@ -1196,7 +1196,7 @@ again_read_status_in_nonspecific:
 			return -ECHILD; /* No candidates */
 		}
 		if (options & WNOHANG) {
-			assert(!task_wasconnected());
+			assert(!task_isconnected());
 			goto err_EAGAIN; /* Operation would have blocked */
 		}
 		task_waitfor();

@@ -25,8 +25,8 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/types.h>
-#include <sched/sig-completion.h>
 #include <sched/sig.h>
+#include <sched/sigcomp.h>
 
 #include <kos/sched/shared-lock.h>
 #include <sys/epoll.h>
@@ -126,25 +126,18 @@ struct epoll_handle_monitor {
 #else /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	union epoll_data             ehm_data;    /* [lock(ehm_ctrl->ec_lock)] Epoll user data. */
 #endif /* !CONFIG_HAVE_KERNEL_EPOLL_RPC */
-	struct sig_multicompletion   ehm_comp;    /* Completion controller attached to pollable signals of `ehm_hand*'
+	struct sigmulticomp          ehm_comp;    /* Completion controller attached to pollable signals of `ehm_hand*'
 	                                           * Signals monitored by this controller  are established by doing  a
 	                                           * regular `handle_poll()' on `ehm_hand*', followed by making use of
-	                                           * `sig_multicompletion_connect_from_task()'. */
+	                                           * `sigmulticomp_connect_from_task()'. */
 };
 
 /* Get/set  the mask of raised, pollable data channels. The field accessed
  * by these macros is only valid for monitors from the `ec_pending' chain. */
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 #define epoll_handle_monitor_getwtest(self) \
 	((uint32_t)(uintptr_t)(self)->ehm_comp.smc_cons[0].sc_next)
 #define epoll_handle_monitor_setwtest(self, value) \
 	(void)((self)->ehm_comp.smc_cons[0].sc_next = (struct sigcon *)(uintptr_t)(uint32_t)(value))
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-#define epoll_handle_monitor_getwtest(self) \
-	((uint32_t)(uintptr_t)(self)->ehm_comp.sm_set.sms_routes[0].tc_signext)
-#define epoll_handle_monitor_setwtest(self, value) \
-	(void)((self)->ehm_comp.sm_set.sms_routes[0].tc_signext = (struct task_connection *)(uintptr_t)(uint32_t)(value))
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 /* Check if a given monitor is an RPC event (as opposed to a pollable event) */
 #ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
@@ -301,7 +294,7 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
  * as raised once again, and be  back onto the queue of  pending
  * events. The same thing also happens when writing to  `events'
  * would result in a SEGFAULT.
- * NOTE: The caller must ensure that !task_wasconnected()
+ * NOTE: The caller must ensure that !task_isconnected()
  * @param: maxevents: The max number of events to consume (asserted to be >= 1)
  * @return: * : The actual number of consumed events.
  * @return: 0 : No monitors have  been raised at  this time. Once  any

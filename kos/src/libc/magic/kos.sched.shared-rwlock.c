@@ -323,7 +323,7 @@ DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
 void shared_rwlock_read([[inout]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!shared_rwlock_tryread(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (shared_rwlock_tryread(self))
@@ -357,7 +357,7 @@ success:
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
 void shared_rwlock_write([[inout]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!shared_rwlock_trywrite(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (shared_rwlock_trywrite(self))
@@ -396,7 +396,7 @@ success:
 $bool shared_rwlock_read_with_timeout([[inout]] struct shared_rwlock *__restrict self,
                                       __shared_rwlock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!shared_rwlock_tryread(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (shared_rwlock_tryread(self))
@@ -438,7 +438,7 @@ success:
 $bool shared_rwlock_write_with_timeout([[inout]] struct shared_rwlock *__restrict self,
                                        __shared_rwlock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!shared_rwlock_trywrite(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (shared_rwlock_trywrite(self))
@@ -483,7 +483,7 @@ success:
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
 void shared_rwlock_waitread([[inout]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1)
@@ -516,7 +516,7 @@ success:
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
 void shared_rwlock_waitwrite([[inout]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
@@ -554,7 +554,7 @@ success:
 $bool shared_rwlock_waitread_with_timeout([[inout]] struct shared_rwlock *__restrict self,
                                           __shared_rwlock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1)
@@ -598,7 +598,7 @@ success:
 $bool shared_rwlock_waitwrite_with_timeout([[inout]] struct shared_rwlock *__restrict self,
                                            __shared_rwlock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
@@ -730,7 +730,7 @@ $bool shared_rwlock_waitwrite_with_timeout64([[inout]] struct shared_rwlock *__r
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_read_nx([[inout]] struct shared_rwlock *__restrict self) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!shared_rwlock_tryread(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (shared_rwlock_tryread(self))
@@ -761,7 +761,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_write_nx([[inout]] struct shared_rwlock *__restrict self) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!shared_rwlock_trywrite(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (shared_rwlock_trywrite(self))
@@ -793,7 +793,7 @@ success:
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_read_with_timeout_nx([[inout]] struct shared_rwlock *__restrict self,
                                          __shared_rwlock_timespec abs_timeout) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!shared_rwlock_tryread(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (shared_rwlock_tryread(self))
@@ -825,7 +825,7 @@ success:
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_write_with_timeout_nx([[inout]] struct shared_rwlock *__restrict self,
                                           __shared_rwlock_timespec abs_timeout) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!shared_rwlock_trywrite(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (shared_rwlock_trywrite(self))
@@ -854,7 +854,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_waitread_nx([[inout]] struct shared_rwlock *__restrict self) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1)
@@ -885,7 +885,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_waitwrite_nx([[inout]] struct shared_rwlock *__restrict self) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
@@ -917,7 +917,7 @@ success:
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_waitread_with_timeout_nx([[inout]] struct shared_rwlock *__restrict self,
                                              __shared_rwlock_timespec abs_timeout) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1)
@@ -949,7 +949,7 @@ success:
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_waitwrite_with_timeout_nx([[inout]] struct shared_rwlock *__restrict self,
                                               __shared_rwlock_timespec abs_timeout) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)

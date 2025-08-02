@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79445411 */
+/* HASH CRC-32:0x55041282 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_lock_acquire) __BLOCKING __ATTR_INOUT(1) void
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_acquire))(struct shared_lock *__restrict __self) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!__shared_lock_tryacquire(__self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__shared_lock_tryacquire(__self))

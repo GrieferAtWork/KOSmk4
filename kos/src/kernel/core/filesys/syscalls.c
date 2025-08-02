@@ -2498,7 +2498,7 @@ send_rpc_to_main_thread:
 		memcpy(&data->er_args, &args, sizeof(struct execargs));
 		sig_init(&data->er_error);
 		data->er_refcnt = 2;
-		assert(!task_wasconnected());
+		assert(!task_isconnected());
 		task_connect(&data->er_error);
 		/* XXX: Instead of using a cookie object, inline the RPC and use `_RPC_CONTEXT_DONTFREE' */
 		TRY {

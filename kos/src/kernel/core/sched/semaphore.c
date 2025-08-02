@@ -42,7 +42,7 @@ semaphore_wait(struct semaphore *__restrict self, ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK) {
 	uintptr_t count;
 again:
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	do {
 		count = atomic_read(&self->s_count);
 		if (!count) {
@@ -79,7 +79,7 @@ NOTHROW(FCALL semaphore_wait_nx)(struct semaphore *__restrict self,
                                  ktime_t abs_timeout) {
 	uintptr_t count;
 again:
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	do {
 		count = atomic_read(&self->s_count);
 		if (!count) {

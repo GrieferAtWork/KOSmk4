@@ -630,7 +630,7 @@ PRIVATE NONNULL((1)) signo_t KCALL
 signal_waitfor(sigset_t const *__restrict these,
                NCX siginfo_t *uinfo,
                ktime_t abs_timeout) {
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	assert(PREEMPTION_ENABLED());
 
 	/* Since we may (very likely)  be waiting for signals that  are

@@ -2608,7 +2608,7 @@ do_process_notif:
 	for (;;) {
 		byte_t b;
 next_packet:
-		assert(!task_wasconnected());
+		assert(!task_isconnected());
 		assert(PREEMPTION_ENABLED());
 		if (((GDBServer_Features &
 		      (GDB_SERVER_FEATURE_ATTACHED | GDB_SERVER_FEATURE_NONSTOP)) ==
@@ -2616,7 +2616,7 @@ next_packet:
 		    !GDBServer_DidSendAsyncStopNotification) {
 			int bi;
 check_for_notif_or_remote_byte:
-			assert(!task_wasconnected());
+			assert(!task_isconnected());
 			/* In non-stop mode, we must wait for both:
 			 *  - The GDB remote to send us something
 			 *  - A new async stop notification to arrive (which we would have)
@@ -2633,7 +2633,7 @@ check_for_notif_or_remote_byte:
 			if (bi < 0) {
 				/* No incoming data, nor outgoing notification packets.
 				 * -> connect to both signals, and wait for either one. */
-				assert(!task_wasconnected());
+				assert(!task_isconnected());
 				task_connect(&GDBThread_AsyncNotifStopEventsAdded);
 				task_connect(&GDBServer_RemoteDataAvailable);
 				/* Re-try the checks above, now that we've become interlocked. */

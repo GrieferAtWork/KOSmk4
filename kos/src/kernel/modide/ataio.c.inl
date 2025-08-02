@@ -185,7 +185,7 @@ LOCAL_AtaBus_IoDataSectors(AtaBus *__restrict bus,
 		AtaBus_HW_ResetBusAuto(bus);
 		RETHROW();
 	}
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	return ATA_ERROR_OK;
 }
 #undef LOCAL_inoutsphysw
@@ -367,7 +367,7 @@ done_part_sectors:
 again_service_io:
 	for (;;) {
 		LOCAL_MAX_SECTORS_PER_TRANSFER_T part_sectors;
-		assert(!task_wasconnected());
+		assert(!task_isconnected());
 
 		/* Figure out how many sectors to transfer. */
 		part_sectors = LOCAL_MAX_SECTORS_PER_TRANSFER;
@@ -439,7 +439,7 @@ again_service_io:
 
 		/* Transfer sectors! */
 		error = LOCAL_AtaBus_IoDataSectors(bus, me, buf, part_sectors);
-		assert(!task_wasconnected());
+		assert(!task_isconnected());
 		if unlikely(error != ATA_ERROR_OK)
 			goto err_io_error;
 
@@ -453,7 +453,7 @@ again_service_io:
 	return;
 err_io_error:
 	/* Always reset the bus (even if merely done for the next access) */
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	printk(KERN_ERR "Reseting IDE on PIO-I/O error code "
 	                "%#" PRIx16 ":%#" PRIx16 ":%#" PRIx16 " ("
 	                "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","

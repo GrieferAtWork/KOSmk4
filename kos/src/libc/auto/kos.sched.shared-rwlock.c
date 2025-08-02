@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb03e6420 */
+/* HASH CRC-32:0x58c777c2 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -159,7 +159,7 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_rwlock_read)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!libc_shared_rwlock_tryread(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (libc_shared_rwlock_tryread(self))
@@ -207,7 +207,7 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_rwlock_write)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!libc_shared_rwlock_trywrite(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (libc_shared_rwlock_trywrite(self))
@@ -239,7 +239,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 (__FCALL libc_shared_rwlock_read_with_timeout)(struct shared_rwlock *__restrict self,
                                                __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!libc_shared_rwlock_tryread(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (libc_shared_rwlock_tryread(self))
@@ -274,7 +274,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 (__FCALL libc_shared_rwlock_write_with_timeout)(struct shared_rwlock *__restrict self,
                                                 __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!libc_shared_rwlock_trywrite(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (libc_shared_rwlock_trywrite(self))
@@ -306,7 +306,7 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_rwlock_waitread)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
@@ -334,7 +334,7 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_rwlock_waitwrite)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
@@ -365,7 +365,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 (__FCALL libc_shared_rwlock_waitread_with_timeout)(struct shared_rwlock *__restrict self,
                                                    __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
@@ -402,7 +402,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 (__FCALL libc_shared_rwlock_waitwrite_with_timeout)(struct shared_rwlock *__restrict self,
                                                     __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
@@ -586,7 +586,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
  * @return: false: There are pending X-RPCs that could not be serviced. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_read_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!libc_shared_rwlock_tryread(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (libc_shared_rwlock_tryread(self))
@@ -613,7 +613,7 @@ success:
  * @return: false: There are pending X-RPCs that could not be serviced. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_write_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!libc_shared_rwlock_trywrite(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (libc_shared_rwlock_trywrite(self))
@@ -641,7 +641,7 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_read_with_timeout_nx)(struct shared_rwlock *__restrict self,
                                                   __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!libc_shared_rwlock_tryread(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (libc_shared_rwlock_tryread(self))
@@ -669,7 +669,7 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_write_with_timeout_nx)(struct shared_rwlock *__restrict self,
                                                    __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!libc_shared_rwlock_trywrite(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (libc_shared_rwlock_trywrite(self))
@@ -695,7 +695,7 @@ success:
  * @return: false: There are pending X-RPCs that could not be serviced. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_waitread_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
@@ -722,7 +722,7 @@ success:
  * @return: false: There are pending X-RPCs that could not be serviced. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_waitwrite_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
@@ -750,7 +750,7 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_waitread_with_timeout_nx)(struct shared_rwlock *__restrict self,
                                                       __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
@@ -778,7 +778,7 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_waitwrite_with_timeout_nx)(struct shared_rwlock *__restrict self,
                                                        __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)

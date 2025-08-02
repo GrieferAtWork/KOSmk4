@@ -97,11 +97,11 @@ Whether a connection is poll- or non-poll-based depends on how it was establishe
 
 - Normal (non-poll) connections:
 	- `task_connect()`
-	- `sig_connect_completion()`
+	- `sigcompcon_connect()`
 	- `SIGCOMP_MODE_F_REPRIME` (under `sigcompcon_disablepoll()`)
 - Poll connections:
 	- `task_connect_for_poll()`
-	- `sig_connect_completion_for_poll()`
+	- `sigcompcon_connect_for_poll()`
 	- `SIGCOMP_MODE_F_REPRIME` (under `sigcompcon_enablepoll()`)
 
 
@@ -209,7 +209,7 @@ struct sigtaskcon: sigcon {
 };
 
 struct sigcompcon: sigcon {
-	sig_completion_t sc_cb;  /* [1..1][const] Completion callback. */
+	sigcomp_cb_t sc_cb;  /* [1..1][const] Completion callback. */
 };
 
 struct taskcons {

@@ -67,7 +67,7 @@ struct dirhandlex_SIGIO_notify_data {
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL dirhandlex_SIGIO_notify_p)(struct sig_completion_context *__restrict UNUSED(context),
+NOTHROW(FCALL dirhandlex_SIGIO_notify_p)(struct sigcompctx *__restrict UNUSED(context),
                                          void *buf) {
 	struct dirhandlex_hdr *hdr;
 	REF struct dirhandlex *dir;
@@ -93,8 +93,8 @@ NOTHROW(FCALL dirhandlex_SIGIO_notify_p)(struct sig_completion_context *__restri
 
 /* Called in order to trigger SIGIO */
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL dirhandlex_SIGIO_notify)(struct sig_completion *__restrict self,
-                                       struct sig_completion_context *__restrict ctx,
+NOTHROW(FCALL dirhandlex_SIGIO_notify)(struct sigcompcon *__restrict self,
+                                       struct sigcompctx *__restrict ctx,
                                        void *buf, size_t bufsize) {
 	struct dirhandlex_hdr *hdr;
 	struct dirhandlex *dir;
@@ -109,18 +109,12 @@ NOTHROW(FCALL dirhandlex_SIGIO_notify)(struct sig_completion *__restrict self,
 
 	/* Need to get a reference to the associated dirhandle! */
 	if (!tryincref(dir)) {
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 		ctx->scc_mode |= SIGCOMP_MODE_F_NONVIABLE;
-#endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		return 0; /* Can't send SIGIO like that! */
 	}
 
 	/* Re-prime our function so we get re-invoked on the next event! */
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 	ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME;
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-	sig_completion_reprime(self, true);
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 	/* Setup a post-completion callback (our current context doesn't
 	 * allow us to actually send signals, so we have to do the  rest
@@ -138,7 +132,7 @@ NOTHROW(FCALL dirhandlex_destroy)(struct dirhandlex *__restrict self) {
 	struct dirhandlex_hdr *hdr = dirhandlex_ashdr(self);
 
 	/* Destroy fields of the extended object header. */
-	sig_completion_disconnect(&hdr->dxh_com);
+	sigcompcon_disconnect(&hdr->dxh_com);
 	arref_fini(&hdr->dxh_thrio);
 	decref_likely(hdr->dxh_notify);
 
@@ -216,8 +210,8 @@ dirhandle_xadd(struct dirhandle *__restrict self) {
 	mypid = incref(THIS_TASKPID);
 	arref_init(&hdr->dxh_thrio, mypid);
 	hdr->dxh_sigio = SIGIO;
-	sig_completion_init(&hdr->dxh_com, &dirhandlex_SIGIO_notify);
-	sig_connect_completion_for_poll(&hdr->dxh_notify->nf_avail, &hdr->dxh_com);
+	sigcompcon_init(&hdr->dxh_com, &dirhandlex_SIGIO_notify);
+	sigcompcon_connect_for_poll(&hdr->dxh_com, &hdr->dxh_notify->nf_avail);
 	return result;
 }
 

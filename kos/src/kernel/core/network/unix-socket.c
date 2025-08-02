@@ -1513,7 +1513,7 @@ UnixSocket_Recvv(struct socket *__restrict self,
 	UnixSocket *me;
 	struct pb_buffer *pbuf;
 	struct pb_packet *packet;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	me = (UnixSocket *)self;
 	{
 		struct fsocknode *node;

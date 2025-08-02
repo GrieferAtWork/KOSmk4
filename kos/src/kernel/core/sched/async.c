@@ -32,8 +32,8 @@
 #include <sched/async-intern.h>
 #include <sched/async.h>
 #include <sched/pertask.h>
-#include <sched/sig-completion.h>
 #include <sched/sig.h>
+#include <sched/sigcomp.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
@@ -163,7 +163,7 @@ again_read_first:
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_addready_postlop)(struct postlockop *__restrict self) {
 	REF struct async *me = async_from_postlockop(self);
-	sig_multicompletion_init(&me->a_comp);
+	sigmulticomp_init(&me->a_comp);
 	async_ready_insert(me);
 	sig_send(&async_ready_sig);
 }
@@ -222,20 +222,19 @@ again:
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL async_postcompletion)(struct sig_completion_context *__restrict UNUSED(context),
+NOTHROW(FCALL async_postcompletion)(struct sigcompctx *__restrict UNUSED(context),
                                     void *buf);
 
 
 /* Must be INTERN because used in the static init of `mpart_ajob_fallback_worker' */
 INTERN NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL async_completion)(struct sig_completion *__restrict self,
-                                struct sig_completion_context *__restrict context,
+NOTHROW(FCALL async_completion)(struct sigcompcon *__restrict self,
+                                struct sigcompctx *__restrict context,
                                 void *buf, size_t bufsize) {
 	struct async *me;
 
 	/*sig_multicompletion_trydisconnectall(self);*/ /* TODO: Optimization */
-	me = container_of(sig_multicompletion_controller(self),
-	                  struct async, a_comp);
+	me = container_of(sigmulticomp_fromcon(self), struct async, a_comp);
 	if (bufsize < sizeof(REF struct async *))
 		return sizeof(REF struct async *);
 	if unlikely(!tryincref(me))
@@ -254,21 +253,20 @@ PRIVATE NONNULL((1)) ktime_t FCALL
 async_reconnect(struct async *__restrict self) {
 	ktime_t result;
 again:
-	sig_multicompletion_disconnectall(&self->a_comp);
-	assert(!task_wasconnected());
-	assert(!sig_multicompletion_wasconnected(&self->a_comp));
+	sigmulticomp_disconnectall(&self->a_comp);
+	assert(!task_isconnected());
+	assert(!sigmulticomp_isconnected(&self->a_comp));
 	TRY {
 		result = (*self->a_ops->ao_connect)(self);
-		sig_multicompletion_connect_from_task(/* completion: */ &self->a_comp,
-		                                      /* cb:         */ &async_completion,
-		                                      /* for_poll:   */ true);
+		sigmulticomp_connect_from_task(&self->a_comp, &async_completion,
+		                               0, SIGCOMPCON_CONNECT_F_POLL);
 	} EXCEPT {
-		sig_multicompletion_disconnectall(&self->a_comp);
+		sigmulticomp_disconnectall(&self->a_comp);
 		task_disconnectall();
 		RETHROW();
 	}
 	if unlikely(task_receiveall() != NULL) {
-		sig_multicompletion_disconnectall(&self->a_comp);
+		sigmulticomp_disconnectall(&self->a_comp);
 		goto again;
 	}
 	return result;
@@ -339,7 +337,7 @@ PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(FCALL async_deltmo_lop)(struct lockop *__restrict self);
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL async_postcompletion)(struct sig_completion_context *__restrict UNUSED(context),
+NOTHROW(FCALL async_postcompletion)(struct sigcompctx *__restrict UNUSED(context),
                                     void *buf) {
 	REF struct async *me;
 	unsigned int st;
@@ -488,7 +486,7 @@ again_pop_job:
 					decref_unlikely(ctx);
 					task_disconnectall(); /* &async_ready_sig */
 do_handle_timeout:
-					assert(!task_wasconnected());
+					assert(!task_isconnected());
 					/* Timeout expired. */
 					tmo_status = ASYNC_CANCEL;
 					if (job->a_ops->ao_time != NULL) {
@@ -641,8 +639,8 @@ do_delete_job:
 
 			/* Schedule a pending lock-operation to remove
 			 * `job'  from  the  list of  all  async jobs. */
-			sig_multicompletion_disconnectall(&job->a_comp);
-			sig_multicompletion_fini(&job->a_comp);
+			sigmulticomp_disconnectall(&job->a_comp);
+			sigmulticomp_fini(&job->a_comp);
 			lop          = async_as_lockop(job);
 			lop->lo_func = &async_delall_lop; /* NOTE: `async_delall_lop' inherits a reference to `job'! */
 			SLIST_ATOMIC_INSERT(&async_all_lops, lop, lo_link);
@@ -727,7 +725,7 @@ again_rd_stat_after_work:
 			/* Now that we're interlocked with the job's connect callback,
 			 * check  once again  if there is  more work left  to be done. */
 			if ((*job->a_ops->ao_test)(job)) {
-				sig_multicompletion_disconnectall(&job->a_comp);
+				sigmulticomp_disconnectall(&job->a_comp);
 				goto again_do_work_after_test;
 			}
 
@@ -751,7 +749,7 @@ again_rd_stat_after_work:
 			/* Switch back to ready-mode */
 			if (!async_stat__cmpxch(job, st, _ASYNC_ST_READY)) {
 disconnect_and_again_rd_stat_after_work:
-				sig_multicompletion_disconnectall(&job->a_comp);
+				sigmulticomp_disconnectall(&job->a_comp);
 				goto again_rd_stat_after_work;
 			}
 		} else {
@@ -961,7 +959,7 @@ again:
 
 	case _ASYNC_ST_INIT:
 	case _ASYNC_ST_INIT_STOP:
-		sig_multicompletion_init(&self->a_comp);
+		sigmulticomp_init(&self->a_comp);
 		if (async_all_tryacquire()) {
 			if (!async_stat__cmpxch_weak(self, st, _ASYNC_ST_TRIGGERED)) {
 				async_all_release();
@@ -1112,8 +1110,8 @@ again:
 			async_all_release();
 
 			/* Disconnect completion signals & finalize the controller. */
-			sig_multicompletion_disconnectall(&self->a_comp);
-			sig_multicompletion_fini(&self->a_comp);
+			sigmulticomp_disconnectall(&self->a_comp);
+			sigmulticomp_fini(&self->a_comp);
 
 			/* Drop the old reference from `async_all_list' */
 			decref_nokill(self);
@@ -1150,8 +1148,8 @@ do_async_cancel:
 					_async_tmo_release();
 					async_all_reap();
 					async_tmo_reap();
-					sig_multicompletion_disconnectall(&self->a_comp);
-					sig_multicompletion_fini(&self->a_comp);
+					sigmulticomp_disconnectall(&self->a_comp);
+					sigmulticomp_fini(&self->a_comp);
 					decref_nokill(self); /* Drop the old reference from `async_all_list' */
 					decref_nokill(self); /* Drop the old reference from `async_tmo_list' */
 					break;

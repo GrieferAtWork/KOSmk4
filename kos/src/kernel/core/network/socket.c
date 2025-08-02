@@ -143,19 +143,19 @@ socket_isconnected(struct socket *__restrict self) {
 	 * The hacky part is that this function may be called while the caller has an active
 	 * set of connections, however `so_getpeername()'  may expect that there aren't  any
 	 * active connections, meaning that we must save/restore active connections. */
-	struct task_connections cons;
-	task_pushconnections(&cons);
+	struct taskcons cons;
+	task_pushcons(&cons);
 	TRY {
 		(*self->sk_ops->so_getpeername)(self, NULL, 0);
 	} EXCEPT {
-		task_popconnections();
+		task_popcons();
 		if (was_thrown(E_ILLEGAL_BECAUSE_NOT_READY) &&
 		    PERTASK_EQ(this_exception_args.e_illegal_operation.io_reason,
 		               E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED))
 			return false; /* Not connected. */
 		RETHROW();
 	}
-	task_popconnections();
+	task_popcons();
 	return true;
 }
 
@@ -239,7 +239,7 @@ socket_connect(struct socket *__restrict self,
 	/* First step: Check if there is a background connection attempt in progress. */
 	REF struct socket_connect_aio *nc;
 again:
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	nc = axref_get(&self->sk_ncon);
 	if unlikely(nc) {
 		/* A previous connect() is still in progress... */

@@ -198,7 +198,7 @@ uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 co
 	struct uvio *self;
 	unsigned int reqid;
 	struct kernel_uvio_request *slot;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	self = (struct uvio *)args->va_file;
 	assert(self->mf_ops == &uvio_mfile_ops);
 	assert(self->mf_ops->mo_vio == &uvio_ops);
@@ -581,7 +581,7 @@ uvio_server_read(struct mfile *__restrict self,
                  size_t num_bytes, iomode_t mode) THROWS(...) {
 	struct uvio *me = mfile_asuvio(self);
 	NCX struct uvio_request *req;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 
 	/* Have the caller check for (IO_NONBLOCK), or wait (!IO_NONBLOCK)  until
 	 * a UVIO request has become available, at which point the request should

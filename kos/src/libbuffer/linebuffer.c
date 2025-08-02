@@ -152,7 +152,7 @@ liblinebuffer_write(struct linebuffer *__restrict self,
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT)) {
 	linebuffer_retval_t temp, result = 0;
 #ifdef __KERNEL__
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 #endif /* __KERNEL__ */
 again:
 	assert((size_t)result <= num_bytes);
@@ -219,7 +219,7 @@ liblinebuffer_writesome(struct linebuffer *__restrict self,
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT)) {
 	linebuffer_retval_t result;
 #ifdef __KERNEL__
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 #endif /* __KERNEL__ */
 again:
 	result = liblinebuffer_write_nonblock(self,

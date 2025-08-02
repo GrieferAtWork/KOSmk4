@@ -579,8 +579,8 @@
 #include <kernel/compiler.h>
 
 #include <kernel/panic.h>
-#include <sched/sig-completion.h>
 #include <sched/sig.h>
+#include <sched/sigcomp.h>
 #include <sched/task.h>
 
 #include <hybrid/sched/preemption.h>

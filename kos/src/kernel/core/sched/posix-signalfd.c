@@ -80,7 +80,7 @@ handle_signalfd_read(struct signalfd *__restrict self,
                      NCX void *dst,
                      size_t num_bytes, iomode_t mode) {
 	size_t result;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	if unlikely(num_bytes < sizeof(struct signalfd_siginfo)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_BUFSIZE,
@@ -101,7 +101,7 @@ handle_signalfd_read(struct signalfd *__restrict self,
 					break;
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
 			}
-			assert(!task_wasconnected());
+			assert(!task_isconnected());
 			task_connect(&PERTASK(this_rpcs_sig));
 			TRY {
 				task_connect(&task_getprocctl()->pc_sig_more);

@@ -158,7 +158,7 @@ NOTHROW(FCALL mpart_initdone_or_unlock_nx)(struct mpart *__restrict self,
 		incref(self);
 		file = incref(self->mp_file);
 		UNLOCK_OPTREAP(self, unlock);
-		assert(!task_wasconnected());
+		assert(!task_isconnected());
 		task_connect_nx(&file->mf_initdone);
 		if (!mpart_lock_acquire_nx(self)) {
 			task_disconnectall();
@@ -221,7 +221,7 @@ NOTHROW(FCALL mpart_nodma_or_unlock_nx)(struct mpart *__restrict self,
 		/* Must blocking-wait until all DMA locks have been released. */
 		incref(self);
 		UNLOCK(self, unlock);
-		assert(!task_wasconnected());
+		assert(!task_isconnected());
 		task_connect_nx(&meta->mpm_dma_done);
 		if unlikely(atomic_read(&meta->mpm_dmalocks) == 0) {
 			task_disconnectall();

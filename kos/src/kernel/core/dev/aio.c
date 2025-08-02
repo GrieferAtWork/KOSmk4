@@ -138,7 +138,7 @@ PUBLIC NONNULL((1)) bool KCALL
 aio_handle_generic_waitfor_or_cancel(struct aio_handle_generic *__restrict self,
                                      ktime_t abs_timeout /*DFL(KTIME_INFINITE)*/)
 		THROWS(E_WOULDBLOCK, ...) {
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	while (!aio_handle_generic_hascompleted(self)) {
 		TRY {
 			aio_handle_generic_connect_for_poll(self);
@@ -227,7 +227,7 @@ PUBLIC NONNULL((1)) bool KCALL
 aio_multihandle_generic_waitfor_or_cancel(struct aio_multihandle_generic *__restrict self,
                                           ktime_t abs_timeout /*DFL(KTIME_INFINITE)*/)
 		THROWS(E_WOULDBLOCK, ...) {
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	while (!aio_multihandle_generic_hascompleted(self)) {
 		TRY {
 			aio_multihandle_generic_connect_for_poll(self);

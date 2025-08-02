@@ -88,7 +88,7 @@ sys_futex_impl(NCX UNCHECKED uint32_t *uaddr,
                uint32_t val3) {
 	syscall_slong_t result;
 	REF struct mfutex *f;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	switch (futex_op & 127) {
 
 	case FUTEX_WAIT_BITSET: /* XXX: Channel support? */
@@ -147,7 +147,7 @@ sys_futex_impl(NCX UNCHECKED uint32_t *uaddr,
 		      futex_op);
 		break;
 	}
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	return result;
 }
 #endif /* WANT_FUTEX */

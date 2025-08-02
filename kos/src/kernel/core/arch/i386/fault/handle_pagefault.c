@@ -500,7 +500,7 @@ x86_handle_pagefault(struct icpustate *__restrict state,
 #endif
 	void const *pc;
 	struct mfault mf;
-	struct task_connections con;
+	struct taskcons con;
 #ifdef LIBVIO_CONFIG_ENABLED
 	struct vio_emulate_args vio_args;
 	REF struct mpart *vio_part;
@@ -610,7 +610,7 @@ x86_handle_pagefault(struct icpustate *__restrict state,
 	}
 
 	/* Preserve high-level task connections. */
-	task_pushconnections(&con);
+	task_pushcons(&con);
 
 	/* Fill in missing members of the mem-fault controller. */
 	__mfault_init(&mf);
@@ -809,7 +809,7 @@ got_node_and_lock:
 				}
 				if unlikely(!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
 					mman_lock_release(mf.mfl_mman);
-					task_popconnections();
+					task_popcons();
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 				}
 				pagedir_mapvoidone(mf.mfl_addr, prot_from_mnodeflags(mf.mfl_node->mn_flags));
@@ -1094,12 +1094,12 @@ do_normal_vio:
 			} EXCEPT {
 				decref_unlikely(vio_args.vea_args.va_file);
 				decref_unlikely(vio_part);
-				/*task_popconnections();*/ /* Handled by outer EXCEPT */
+				/*task_popcons();*/ /* Handled by outer EXCEPT */
 				RETHROW();
 			}
 			decref_unlikely(vio_args.vea_args.va_file);
 			decref_unlikely(vio_part);
-			task_popconnections();
+			task_popcons();
 #ifndef __x86_64__
 			/* Check if the kernel %esp or %ss was modified */
 			if unlikely(vio_args.vea_kernel_override & (VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID |
@@ -1161,7 +1161,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 			goto again_lock_mman;
 	} EXCEPT {
 		mfault_fini(&mf);
-		task_popconnections();
+		task_popcons();
 		RETHROW();
 	}
 
@@ -1176,7 +1176,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 			if unlikely(!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
 				mpart_lock_release(mf.mfl_part);
 				mman_lock_release(mf.mfl_mman);
-				task_popconnections();
+				task_popcons();
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
 			prot = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
@@ -1222,7 +1222,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 	/* And we're done! */
 
 pop_connections_and_return:
-	task_popconnections();
+	task_popcons();
 	return state;
 
 	/************************************************************************/
@@ -1231,17 +1231,17 @@ pop_connections_and_return:
 #ifdef NEED_pop_connections_and_set_exception_pointers
 #undef NEED_pop_connections_and_set_exception_pointers
 pop_connections_and_set_exception_pointers:
-	task_popconnections();
+	task_popcons();
 	goto set_exception_pointers;
 #endif /* NEED_pop_connections_and_set_exception_pointers */
 #ifdef NEED_pop_connections_and_set_exception_pointers2
 #undef NEED_pop_connections_and_set_exception_pointers2
 pop_connections_and_set_exception_pointers2:
-	task_popconnections();
+	task_popcons();
 	goto set_exception_pointers2;
 #endif /* NEED_pop_connections_and_set_exception_pointers2 */
 pop_connections_and_throw_segfault:
-	task_popconnections();
+	task_popcons();
 /*throw_segfault:*/
 	if (pc == addr) {
 		/* This can happen when trying to call an invalid function pointer.
@@ -1404,13 +1404,13 @@ do_vio_call:
 			mfault_fini(&mf); /* Should always be empty */
 			decref_unlikely(vio_args.vea_args.va_file);
 			decref_unlikely(vio_part);
-			task_popconnections();
+			task_popcons();
 			RETHROW();
 		}
 		mfault_fini(&mf); /* Should always be empty */
 		decref_unlikely(vio_args.vea_args.va_file);
 		decref_unlikely(vio_part);
-		task_popconnections();
+		task_popcons();
 		return vio_args.vea_args.va_state;
 	}
 #endif /* LIBVIO_CONFIG_ENABLED */

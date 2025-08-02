@@ -81,7 +81,7 @@ NOTHROW(FCALL arch_sched_super_override_ipi)(struct icpustate *__restrict state,
 /* Callback invoked by `arch_sched_super_override_ipi()' */
 INTERN NOBLOCK NOPREEMPT ATTR_COLDTEXT void
 NOTHROW(FCALL sched_super_override_ipi)(void) {
-	struct task_connections cons;
+	struct taskcons cons;
 
 	/* Report that we can now be considered to be suspended. */
 	atomic_inc(&super_override_ack);
@@ -89,7 +89,7 @@ NOTHROW(FCALL sched_super_override_ipi)(void) {
 	/* Preserve active connections, so we don't interfere with
 	 * signals that may have been connected by the thread that
 	 * we're hi-jacking. */
-	task_pushconnections(&cons);
+	task_pushcons(&cons);
 
 	/* Ensure  that our  CPU's current  FPU state  is written to
 	 * memory, thus allowing the super-override holder to modify
@@ -127,7 +127,7 @@ NOTHROW(FCALL sched_super_override_ipi)(void) {
 	PREEMPTION_DISABLE();
 
 	/* Restore old connections. */
-	task_popconnections();
+	task_popcons();
 
 	/* Report that we've resumed execution. */
 	atomic_dec(&super_override_ack);
@@ -138,7 +138,7 @@ sched_super_override_start_impl(bool force)
 		THROWS(E_WOULDBLOCK, ...) {
 	struct cpu *me;
 	bool was_already_override;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	assert(!super_override_active);
 
 	/* Start by acquiring the regular scheduler override. */

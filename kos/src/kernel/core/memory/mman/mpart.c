@@ -739,7 +739,7 @@ mpart_sync_impl(struct mpart *__restrict self, bool keep_lock)
 	struct mfile *file;
 	size_t start, block_count;
 	bool has_initializing_parts;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 
 	/* Deal with the special case where our part is a VIO-part. */
 #ifdef LIBVIO_CONFIG_ENABLED

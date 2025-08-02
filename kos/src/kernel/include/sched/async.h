@@ -23,11 +23,10 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
+#include <sched/sigcomp.h>
 
-#include <sched/sig-completion.h>
-
-#include <hybrid/sequence/list.h>
 #include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/lockop.h>
 
@@ -220,12 +219,12 @@ struct async {
 	struct async_ops const    *a_ops;     /* [1..1][const] Worker operators. */
 #ifdef __WANT_ASYNC__a_lockop
 	union {
-		struct lockop             _a_lockop;     /* ... */
-		struct postlockop         _a_postlockop; /* ... */
-		struct sig_multicompletion a_comp;       /* ... */
+		struct lockop         _a_lockop;     /* ... */
+		struct postlockop     _a_postlockop; /* ... */
+		struct sigmulticomp    a_comp;       /* ... */
 	};
 #else /* __WANT_ASYNC__a_lockop */
-	struct sig_multicompletion a_comp;    /* [valid_if(a_stat >= _ASYNC_ST_READY)][lock(ASYNC_WORKER)]
+	struct sigmulticomp        a_comp;    /* [valid_if(a_stat >= _ASYNC_ST_READY)][lock(ASYNC_WORKER)]
 	                                       * Internal  signal  completion controller  used  to monitor
 	                                       * async  jobs for completion, as well as to maintain a list
 	                                       * of ready jobs, without having to globally re-connect  all

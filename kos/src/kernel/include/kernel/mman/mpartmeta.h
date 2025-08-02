@@ -136,7 +136,7 @@ DEFINE_WEAKREFCNT_FUNCTIONS(struct mfutex, mfu_weakrefcnt, mfutex_free)
 #define mfutex_sendmany_nopr(self, maxcount) sig_sendmany_nopr(&(self)->mfu_signal, maxcount)
 #define mfutex_broadcast(self)               sig_broadcast(&(self)->mfu_signal)
 #define mfutex_broadcast_nopr(self)          sig_broadcast_nopr(&(self)->mfu_signal)
-#define mfutex_iswaiting(self)               sig_iswaiting(&(self)->mfu_signal)
+#define mfutex_iswaiting(self)               sig_hascon(&(self)->mfu_signal)
 #define mfutex_connect(self)                 task_connect(&(self)->mfu_signal)
 #define mfutex_connect_for_poll(self)        task_connect_for_poll(&(self)->mfu_signal)
 #define mfutex_getpart(self)                 awref_get(&(self)->mfu_part) /* REF */

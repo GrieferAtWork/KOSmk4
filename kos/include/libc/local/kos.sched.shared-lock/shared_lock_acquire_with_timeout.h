@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefa472d2 */
+/* HASH CRC-32:0xe201eb7d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_lock_acquire_with_timeout) __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_acquire_with_timeout))(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!__shared_lock_tryacquire(__self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__shared_lock_tryacquire(__self))

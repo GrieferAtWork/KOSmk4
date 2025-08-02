@@ -97,21 +97,17 @@ NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout)
 #endif /* ... */
 {
 	struct sig *result;
-	struct task_connections *self;
-	self = THIS_CONNECTIONS;
+	struct taskcons *self;
+	self = THIS_CONS;
 again:
-	result = atomic_read(&self->tcs_dlvr);
+	result = atomic_read(&self->tcs_deliver);
 	if (result) {
 		COMPILER_READ_BARRIER();
 got_result:
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 		taskcons_disconnectall(self, _SIGCON_DISCONNECT_F_NORMAL);
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-		task_connection_disconnect_all(self, false);
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		COMPILER_WRITE_BARRIER();
-		assert(result == self->tcs_dlvr);
-		self->tcs_dlvr = NULL;
+		assert(result == self->tcs_deliver);
+		self->tcs_deliver = NULL;
 	} else {
 		if unlikely_untraced(!preemption_ison()) {
 #ifdef LOCAL_NOEXCEPT
@@ -127,7 +123,7 @@ got_result:
 		}
 		PREEMPTION_DISABLE();
 		COMPILER_READ_BARRIER();
-		result = atomic_read(&self->tcs_dlvr);
+		result = atomic_read(&self->tcs_deliver);
 		if unlikely(result) {
 			PREEMPTION_ENABLE();
 			goto got_result;
@@ -179,7 +175,7 @@ do_return_with_disconnect:
 #undef NEED_done
 done:
 #endif /* NEED_done */
-	assert(!task_wasconnected()); /* Sanity check */
+	assert(!task_isconnected()); /* Sanity check */
 	return result;
 }
 

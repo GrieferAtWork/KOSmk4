@@ -46,7 +46,7 @@
 #endif /* __WANT_FS_INIT */
 
 #ifdef __WANT_MFILE__mf_compl
-#include <sched/sig-completion.h>
+#include <sched/sigcomp.h>
 #endif /* __WANT_MFILE__mf_compl */
 
 #if (__SIZEOF_POINTER__ < 8 && defined(__WANT_MFILE_INIT_mf_filesize_symbol) && defined(__WANT_FS_INIT))
@@ -1025,7 +1025,7 @@ struct mfile {
 #endif /* __WANT_MFILE__mf_deadrament */
 
 #ifdef __WANT_MFILE__mf_compl
-		struct sig_completion    _mf_compl;      /* Signal completion callback. (used for waiting on `mf_trunclock') */
+		struct sigcompcon        _mf_compl;      /* Signal completion callback. (used for waiting on `mf_trunclock') */
 #endif /* __WANT_MFILE__mf_compl */
 
 #ifdef __WANT_MFILE__mf_deadnod

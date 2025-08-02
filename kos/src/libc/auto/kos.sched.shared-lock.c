@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe22bd149 */
+/* HASH CRC-32:0x25f1e0ba */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,7 +103,7 @@ NOTHROW_NCX(__FCALL libc_shared_lock_release_ex)(struct shared_lock *__restrict 
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_lock_acquire)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!__shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__shared_lock_tryacquire(self))
@@ -132,7 +132,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 (__FCALL libc_shared_lock_acquire_with_timeout)(struct shared_lock *__restrict self,
                                                 __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!__shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__shared_lock_tryacquire(self))
@@ -160,7 +160,7 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_lock_waitfor)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!__shared_lock_available(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__shared_lock_available(self))
@@ -187,7 +187,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 (__FCALL libc_shared_lock_waitfor_with_timeout)(struct shared_lock *__restrict self,
                                                 __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!__shared_lock_available(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__shared_lock_available(self))
@@ -258,7 +258,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
  * @return: false: There are pending X-RPCs that could not be serviced. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_lock_acquire_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!__shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__shared_lock_tryacquire(self))
@@ -286,7 +286,7 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_lock_acquire_with_timeout_nx)(struct shared_lock *__restrict self,
                                                    __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!__shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__shared_lock_tryacquire(self))
@@ -312,7 +312,7 @@ success:
  * @return: false: There are pending X-RPCs that could not be serviced. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_lock_waitfor_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!__shared_lock_available(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__shared_lock_available(self))
@@ -340,7 +340,7 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_lock_waitfor_with_timeout_nx)(struct shared_lock *__restrict self,
                                                    __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
-	__hybrid_assert(!task_wasconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!__shared_lock_available(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__shared_lock_available(self))

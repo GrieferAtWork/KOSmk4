@@ -37,7 +37,6 @@
 #endif /* !CONFIG_SIGMULTICOMP_STATIC_CONNECTIONS */
 /*[[[end]]]*/
 
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 #ifdef __CC__
 DECL_BEGIN
 
@@ -56,7 +55,7 @@ NOTHROW_T(FCALL *sigcomp_postcb_t)(struct sigcompctx *__restrict ctx,
                                    void *buf);
 
 struct sigcompctx {
-	struct sig          *scc_sender; /* [1..1][const] The sender-signal (which may differ from `self->tc_sig'
+	struct sig          *scc_sender; /* [1..1][const] The sender-signal (which may differ from `self->sc_sig'
 	                                  * when the signal is being sent through something like `sig_altsend()') */
 	struct task         *scc_caller; /* [1..1][const] The thread that (supposedly) is sending the  signal.
 	                                  * In  order to support  functions like `sig_broadcastas_nopr()', the
@@ -97,7 +96,7 @@ struct sigcompctx {
  *          the completion function may set-up  a phase-2 `sigcomp_postcb_t' callback  that
  *          will be invoked once SMP-locks have been released. (s.a. `scc_post')
  * @param: self:        The signal completion controller.
- *                      HINT: The signal that was sent is `self->tc_sig'
+ *                      HINT: The signal that was sent is `self->sc_sig'
  * @param: ctx:         Context information about how the completion function is being invoked.
  * @param: buf:         A variable-length buffer (of length `bufsize') that is aligned by at
  *                      least `sizeof(void *)' and will be passed to `ctx->scc_post' if that
@@ -471,16 +470,17 @@ _sigmulticomp_connect_ex_nxN,(struct sigmulticomp *__restrict self,
 /* Connect `self' to all signals currently connected to by the calling  thread.
  * In other words: all signals the caller is connected to via `task_connect()'.
  *
- * Note that for this purpose,  only signals from the  currently active set of  task
- * connections will  be connected.  Connections established  outside the  bounds  of
- * the current `task_pushconnections()...task_popconnections()'  pair will _NOT_  be
- * connected. If one of  the signals which  the calling thread  is connected to  has
- * already been  sent (i.e.  `task_waitfor()' wouldn't  block), then  this  function
- * will return early, and the exact (if  any) signals that were connected to  `self'
- * are left undefined (meaning that the caller can really only handle this happening
- * by using `sigmulticomp_disconnectall()', but also meaning that `cb' may still get
- * invoked  in case the caller was connected to  more than one signal, and more than
- * one of those gets triggered before connections of `self' get disconnected).
+ * Note that for this purpose, only signals from the currently active set  of
+ * task connections will  be connected. Connections  established outside  the
+ * bounds  of the current  `task_pushcons()...task_popcons()' pair will _NOT_
+ * be connected. If one of the signals which the calling thread is  connected
+ * to has  already been  sent (i.e.  `task_waitfor()' wouldn't  block),  then
+ * this function will return early, and the exact (if any) signals that  were
+ * connected  to  `self'  are left  undefined  (meaning that  the  caller can
+ * really only handle this happening by using `sigmulticomp_disconnectall()',
+ * but also meaning that `cb'  may still get invoked  in case the caller  was
+ * connected  to  more than  one  signal, and  more  than one  of  those gets
+ * triggered before connections of `self' get disconnected).
  *
  * As such, the safe way to use this function is as follows
  * (exception  handling   not   displayed   for   brevity):
@@ -532,6 +532,5 @@ _sigmulticomp_connect_from_taskN(struct sigmulticomp *__restrict self,
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGCOMP_H */

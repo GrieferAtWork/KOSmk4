@@ -153,7 +153,7 @@ PRIVATE struct sig usb_probe_unknown_unlock = SIG_INIT;
 
 PRIVATE bool KCALL usb_probe_unknown_acquire(void) {
 	struct task *ot, *me;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	me = THIS_TASK;
 again:
 	ot = atomic_cmpxch_val(&usb_probe_unknown_lock, NULL, me);

@@ -159,7 +159,7 @@ again:
 PUBLIC BLOCKING NONNULL((1)) void FCALL
 mfile_trunclock_waitfor(struct mfile *__restrict self)
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...) {
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	do {
 		task_connect(&self->mf_initdone);
 		if unlikely(atomic_read(&self->mf_trunclock) == 0) {

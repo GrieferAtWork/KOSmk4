@@ -410,9 +410,9 @@ again:
 		/* Wait for data to become available. */
 		task_connect(&self->mf_initdone);
 		{
-			struct task_connections cons;
-			task_pushconnections(&cons);
-			RAII_FINALLY { task_popconnections(); };
+			struct taskcons cons;
+			task_pushcons(&cons);
+			RAII_FINALLY { task_popcons(); };
 #ifdef LOCAL_BUFFER_IS_IOVEC
 			result = LOCAL_mfile_normrw(self, buffer, buf_offset, num_bytes, offset);
 #else /* LOCAL_BUFFER_IS_IOVEC */

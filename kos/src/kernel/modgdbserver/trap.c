@@ -183,7 +183,7 @@ do_print_message_in_nonstop_mode:
 	if (!debugtrap_reason_isenabled(reason))
 		return state;
 
-	task_pushconnections(&stop_event.tse_oldcon);
+	task_pushcons(&stop_event.tse_oldcon);
 	stop_event.tse_thread    = THIS_TASK;
 	stop_event.tse_reason    = (struct debugtrap_reason *)reason;
 	stop_event.tse_state     = state;
@@ -342,7 +342,7 @@ done_unlock:
 	sig_broadcast(&GDBServer_HostUnlocked);
 
 done:
-	task_popconnections();
+	task_popcons();
 	return stop_event.tse_state;
 }
 

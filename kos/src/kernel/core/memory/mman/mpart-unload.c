@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_UNLOAD_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_UNLOAD_C 1
-#define __WANT_SIG_COMPLETION_INIT /* TODO: Remove after "CONFIG_EXPERIMENTAL_KERNEL_SIG_V2" */
 #define __WANT_SIGCOMPCON_INIT
 #define _KOS_SOURCE 1
 
@@ -30,8 +29,8 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/types.h>
 #include <sched/async.h>
-#include <sched/sig-completion.h>
 #include <sched/sig.h>
+#include <sched/sigcomp.h>
 #include <sched/task.h>
 
 #include <hybrid/sequence/list.h>
@@ -180,13 +179,8 @@ PRIVATE struct async_ops const mpart_ajob_ops = {
 INTDEF struct mpart_ajob mpart_ajob_fallback_worker;
 
 /* Signal broadcast when something gets added to `mpart_ajob_fallback_list' */
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 PRIVATE struct sig mpart_ajob_fallback_sig =
 SIG_INIT_EX(&mpart_ajob_fallback_worker.mpaj_async.a_comp.smc_cons[0].mr_com.scc_con);
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-PRIVATE struct sig mpart_ajob_fallback_sig =
-SIG_INIT_EX(&mpart_ajob_fallback_worker.mpaj_async.a_comp.sm_set.sms_routes[0].mr_com.sc_con);
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 
 /* [0..n][lock(ATOMIC)] Fallback list of mem-parts with pending async jobs. */
@@ -316,8 +310,8 @@ PRIVATE struct async_ops const mpart_ajob_fallback_ops = {
 };
 
 INTDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t /* From "sched/async.c" */
-NOTHROW(FCALL async_completion)(struct sig_completion *__restrict self,
-                                struct sig_completion_context *__restrict context,
+NOTHROW(FCALL async_completion)(struct sigcompcon *__restrict self,
+                                struct sigcompctx *__restrict context,
                                 void *buf, size_t bufsize);
 
 /* Fallback async worker for `mpart_start_asyncjob()'
@@ -329,7 +323,6 @@ INTERN struct mpart_ajob mpart_ajob_fallback_worker = {
 		.a_stat   = _ASYNC_ST_READY,
 		.a_ops    = &mpart_ajob_fallback_ops,
 		.a_comp   = {
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 			.smc_xtra = NULL,
 			.smc_cons = {
 				[0] = {
@@ -340,50 +333,6 @@ INTERN struct mpart_ajob mpart_ajob_fallback_worker = {
 					.mr_multcon = &mpart_ajob_fallback_worker.mpaj_async.a_comp,
 				}
 			},
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-			.sm_set = {
-				.sms_next   = NULL,
-				.sms_routes = {
-					[0] = {
-						.mr_com = {
-							.sc_con = {
-								.tc_sig     = &mpart_ajob_fallback_sig,
-								.tc_connext = NULL,
-								.tc_signext = NULL,
-								{ .tc_stat = TASK_CONNECTION_STAT_COMPLETION },
-							},
-							.sc_cb  = &async_completion,
-						},
-						.mr_con = &mpart_ajob_fallback_worker.mpaj_async.a_comp,
-					},
-#define INIT_ADDITIONAL_CON                                    \
-	{                                                          \
-		 .mr_com = {                                           \
-		 	.sc_con = {                                        \
-		 		.tc_sig     = NULL,                            \
-		 		.tc_connext = NULL,                            \
-		 		.tc_signext = NULL,                            \
-		 		{ .tc_stat = TASK_CONNECTION_STAT_BROADCAST }, \
-		 	},                                                 \
-		 	.sc_cb = NULL,                                     \
-		 },                                                    \
-		 .mr_con = NULL,                                       \
-	}
-#if CONFIG_TASK_STATIC_CONNECTIONS >= 2
-					[1] = INIT_ADDITIONAL_CON,
-#if CONFIG_TASK_STATIC_CONNECTIONS >= 3
-					[2] = INIT_ADDITIONAL_CON,
-#if CONFIG_TASK_STATIC_CONNECTIONS >= 4
-					[3] = INIT_ADDITIONAL_CON,
-#if CONFIG_TASK_STATIC_CONNECTIONS >= 5
-#error "CONFIG_TASK_STATIC_CONNECTIONS is too large; please adjust this code"
-#endif /* CONFIG_TASK_STATIC_CONNECTIONS >= 5 */
-#endif /* CONFIG_TASK_STATIC_CONNECTIONS >= 4 */
-#endif /* CONFIG_TASK_STATIC_CONNECTIONS >= 3 */
-#endif /* CONFIG_TASK_STATIC_CONNECTIONS >= 2 */
-				},
-			},
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		},
 		.a_all = {
 			.le_next = NULL,

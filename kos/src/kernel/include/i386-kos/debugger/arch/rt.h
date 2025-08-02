@@ -155,7 +155,7 @@ struct x86_dbg_hoststate {
 	uintptr_t                dhs_taskflags; /* Saved `this_task.t_flags' */
 	struct x86_dbg_psp0state dhs_psp0;      /* Saved `this_x86_kernel_psp0' */
 	struct task             *dhs_override;  /* Saved `THIS_CPU->c_override' */
-	struct task_connections  dhs_signals;   /* Saved signal connections. */
+	struct taskcons          dhs_signals;   /* Saved signal connections. */
 	bool                     dhs_pint;      /* Set to true if preemptive interrupts were enabled. */
 #ifndef CONFIG_NO_SMP
 	struct x86_dbg_cpustate  dhs_cpus[CONFIG_MAX_CPU_COUNT];

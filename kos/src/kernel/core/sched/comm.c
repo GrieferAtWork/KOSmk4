@@ -122,7 +122,7 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC) {
 	unsigned int status;
 	REF struct task_setcomm_rpc *rpc;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	size_t namelen;
 	if (self == THIS_TASK) {
 		/* Special (and much simpler) case: change our own name */

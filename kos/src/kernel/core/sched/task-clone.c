@@ -968,8 +968,8 @@ NOTHROW(FCALL _task_init_relocations)(struct task *__restrict self) {
 	assert(FORTASK(self, this_kernel_stacknode_).mn_part == &FORTASK(self, this_kernel_stackpart_));
 	assert(FORTASK(self, this_kernel_stacknode_).mn_link.le_prev == &FORTASK(self, this_kernel_stackpart_).mp_share.lh_first);
 	assert(FORTASK(self, this_kernel_stackpart_).mp_share.lh_first == &FORTASK(self, this_kernel_stacknode_));
-	assert(FORTASK(self, this_connections) == &FORTASK(self, this_root_connections));
-	assert(FORTASK(self, this_root_connections).tcs_thread == self);
+	assert(FORTASK(self, this_cons) == &FORTASK(self, this_rootcons));
+	assert(FORTASK(self, this_rootcons).tcs_thread == self);
 }
 
 

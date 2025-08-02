@@ -1229,10 +1229,10 @@ again:
 		 * >> *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar)
 		 *
 		 * Intended for ATTR_PERxxx variables within the kernel:
-		 * >> this_connections@caller
+		 * >> this_cons@caller
 		 * Where `caller' is presumably a local variable `struct task *caller'.
 		 * This  will  then resolve  to  print information  about  the per-task
-		 * variable `this_connections', as viewed by `caller'
+		 * variable `this_cons', as viewed by `caller'
 		 *
 		 * TODO: The 2 operands  should be  interchangeable, so-long  as
 		 *       at most one of them is a pointer. When both, or neither

@@ -259,7 +259,7 @@ LOCAL_sys_coredump_impl(struct icpustate *__restrict return_state,
 				signo = si.si_signo;
 		}
 	}
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	THROW(E_EXIT_PROCESS,
 	      W_EXITCODE(1, signo & 0x7f) | WCOREFLAG);
 }

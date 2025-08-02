@@ -283,7 +283,7 @@ NOTHROW(FCALL task_exit)(uint16_t w_status) {
 	assert(!WIFSTOPPED(w_status));
 	assert(!WIFCONTINUED(w_status));
 	assertf(PREEMPTION_ENABLED(), "Without preemption, how do you want to switch tasks?");
-	assertf(!task_wasconnected(), "Don't exit a thread while you've still got connections");
+	assertf(!task_isconnected(), "Don't exit a thread while you've still got connections");
 	assert(caller->t_flags & TASK_FRUNNING);
 
 	if unlikely(caller->t_flags & TASK_FCRITICAL) {
@@ -563,10 +563,10 @@ again_get_ctty:
 	 *
 	 * Our current thread context is already too broken to allow us to
 	 * re-schedule  others threads that may be waiting for us to exit. */
-	sig_broadcast_as_nopr(&pid->tp_changed, next);
+	sig_broadcastas_nopr(&pid->tp_changed, next);
 
 	/* Also notify our parent process that one of its children has changed state. */
-	sig_broadcast_as_nopr(&parpid->tp_pctl->pc_chld_changed, next);
+	sig_broadcastas_nopr(&parpid->tp_pctl->pc_chld_changed, next);
 	if unlikely(atomic_decfetch(&parpid->tp_refcnt) == 0) {
 		struct scpustate *state;
 		state = FORTASK(next, this_sstate);

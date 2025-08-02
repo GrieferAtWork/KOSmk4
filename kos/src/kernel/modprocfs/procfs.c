@@ -52,8 +52,8 @@
 #include <unicode.h>
 
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-#include <sched/sig-completion.h>
 #include <sched/sig.h>
+#include <sched/sigcomp.h>
 #endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
@@ -624,7 +624,7 @@ NOTHROW(FCALL procfs_notify_startstop)(struct taskpid *__restrict tpid, uint32_t
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL procfs_root_addproc_postcompletion)(struct sig_completion_context *__restrict context,
+NOTHROW(FCALL procfs_root_addproc_postcompletion)(struct sigcompctx *__restrict context,
                                                   void *buf) {
 	struct taskpid *tpid;
 	tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
@@ -633,7 +633,7 @@ NOTHROW(FCALL procfs_root_addproc_postcompletion)(struct sig_completion_context 
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL procfs_root_delproc_postcompletion)(struct sig_completion_context *__restrict context,
+NOTHROW(FCALL procfs_root_delproc_postcompletion)(struct sigcompctx *__restrict context,
                                                   void *buf) {
 	struct taskpid *tpid;
 	tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
@@ -642,41 +642,33 @@ NOTHROW(FCALL procfs_root_delproc_postcompletion)(struct sig_completion_context 
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL procfs_root_addproc_completion)(struct sig_completion *__restrict self,
-                                              struct sig_completion_context *__restrict ctx,
+NOTHROW(FCALL procfs_root_addproc_completion)(struct sigcompcon *__restrict self,
+                                              struct sigcompctx *__restrict context,
                                               void *buf, size_t bufsize) {
 	(void)self;
 	(void)buf;
 	(void)bufsize;
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-	ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME;
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-	sig_completion_reprime(self, true);
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-	ctx->scc_post = &procfs_root_addproc_postcompletion;
+	context->scc_mode |= SIGCOMP_MODE_F_REPRIME;
+	context->scc_post = &procfs_root_addproc_postcompletion;
 	return 0;
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL procfs_root_delproc_completion)(struct sig_completion *__restrict self,
-                                              struct sig_completion_context *__restrict ctx,
+NOTHROW(FCALL procfs_root_delproc_completion)(struct sigcompcon *__restrict self,
+                                              struct sigcompctx *__restrict context,
                                               void *buf, size_t bufsize) {
 	(void)self;
 	(void)buf;
 	(void)bufsize;
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-	ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME;
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-	sig_completion_reprime(self, true);
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
-	ctx->scc_post = &procfs_root_delproc_postcompletion;
+	context->scc_mode |= SIGCOMP_MODE_F_REPRIME;
+	context->scc_post = &procfs_root_delproc_postcompletion;
 	return 0;
 }
 
 
 struct procfs_root_notify_controller {
-	struct sig_completion pfrnc_addproc_completion; /* Hook for `pidns_root.pn_addproc' */
-	struct sig_completion pfrnc_delproc_completion; /* Hook for `pidns_root.pn_delproc' */
+	struct sigcompcon pfrnc_addproc_completion; /* Hook for `pidns_root.pn_addproc' */
+	struct sigcompcon pfrnc_delproc_completion; /* Hook for `pidns_root.pn_delproc' */
 };
 
 PRIVATE BLOCKING NONNULL((1)) void *KCALL
@@ -687,10 +679,10 @@ procfs_root_v_notify_attach(struct mfile *__restrict self)
 	(void)self;
 	result = (REF struct procfs_root_notify_controller *)kmalloc(sizeof(struct procfs_root_notify_controller),
 	                                                             GFP_NORMAL);
-	sig_completion_init(&result->pfrnc_addproc_completion, &procfs_root_addproc_completion);
-	sig_completion_init(&result->pfrnc_delproc_completion, &procfs_root_delproc_completion);
-	sig_connect_completion_for_poll(&pidns_root.pn_addproc, &result->pfrnc_addproc_completion);
-	sig_connect_completion_for_poll(&pidns_root.pn_delproc, &result->pfrnc_delproc_completion);
+	sigcompcon_init(&result->pfrnc_addproc_completion, &procfs_root_addproc_completion);
+	sigcompcon_init(&result->pfrnc_delproc_completion, &procfs_root_delproc_completion);
+	sigcompcon_connect_for_poll(&result->pfrnc_addproc_completion, &pidns_root.pn_addproc);
+	sigcompcon_connect_for_poll(&result->pfrnc_delproc_completion, &pidns_root.pn_delproc);
 	printk(KERN_INFO "[procfs] Notify object attached to '/proc' [cookie:%p]\n", result);
 	return result; /* This will be destroyed by `procfs_root_v_notify_detach' */
 }
@@ -704,8 +696,8 @@ NOTHROW(KCALL procfs_root_v_notify_detach)(struct mfile *__restrict self, void *
 	controller = (struct procfs_root_notify_controller *)cookie;
 
 	/* Disconnect signal completion callbacks and free the controller. */
-	sig_completion_disconnect(&controller->pfrnc_addproc_completion);
-	sig_completion_disconnect(&controller->pfrnc_delproc_completion);
+	sigcompcon_disconnect(&controller->pfrnc_addproc_completion);
+	sigcompcon_disconnect(&controller->pfrnc_delproc_completion);
 	kfree(controller);
 }
 

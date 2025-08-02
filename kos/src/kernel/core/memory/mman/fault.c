@@ -604,7 +604,7 @@ _mfault_unlock_and_waitfor_part(struct mfault *__restrict self)
  * >> void pf_handler(void *addr, bool is_write) {
  * >>     struct mfault mf;
  * >>     // Missing: Handling for `MNODE_F_MHINT'
- * >>     // Missing: Call to `task_pushconnections()'
+ * >>     // Missing: Call to `task_pushcons()'
  * >>     mfault_init(&mf, ADDR_ISKERN(addr) ? &mman_kernel : THIS_MMAN,
  * >>                 FLOOR_ALIGN(addr, PAGESIZE), PAGESIZE,
  * >>                 is_write ? MMAN_FAULT_F_WRITE : 0);

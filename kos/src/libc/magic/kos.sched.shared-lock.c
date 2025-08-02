@@ -192,7 +192,7 @@ $bool shared_lock_release_ex([[inout]] struct shared_lock *__restrict self) {
 [[impl_include("<kos/bits/shared-lock.h>")]]
 void shared_lock_acquire([[inout]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!__shared_lock_tryacquire(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__shared_lock_tryacquire(self))
@@ -229,7 +229,7 @@ success:
 $bool shared_lock_acquire_with_timeout([[inout]] struct shared_lock *__restrict self,
                                        __shared_lock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!__shared_lock_tryacquire(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__shared_lock_tryacquire(self))
@@ -263,7 +263,7 @@ success:
 [[impl_include("<kos/bits/shared-lock.h>")]]
 void shared_lock_waitfor([[inout]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!__shared_lock_available(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__shared_lock_available(self))
@@ -298,7 +298,7 @@ void shared_lock_waitfor([[inout]] struct shared_lock *__restrict self) {
 $bool shared_lock_waitfor_with_timeout([[inout]] struct shared_lock *__restrict self,
                                        __shared_lock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!__shared_lock_available(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__shared_lock_available(self))
@@ -374,7 +374,7 @@ $bool shared_lock_waitfor_with_timeout64([[inout]] struct shared_lock *__restric
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, E_INTERRUPT)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_lock_acquire_nx([[inout]] struct shared_lock *__restrict self) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!__shared_lock_tryacquire(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__shared_lock_tryacquire(self))
@@ -405,7 +405,7 @@ success:
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_lock_acquire_with_timeout_nx([[inout]] struct shared_lock *__restrict self,
                                           __shared_lock_timespec abs_timeout) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!__shared_lock_tryacquire(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__shared_lock_tryacquire(self))
@@ -434,7 +434,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, E_INTERRUPT)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_lock_waitfor_nx([[inout]] struct shared_lock *__restrict self) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!__shared_lock_available(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__shared_lock_available(self))
@@ -465,7 +465,7 @@ success:
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_lock_waitfor_with_timeout_nx([[inout]] struct shared_lock *__restrict self,
                                           __shared_lock_timespec abs_timeout) {
-	__hybrid_assert(!@task_wasconnected@());
+	__hybrid_assert(!@task_isconnected@());
 	while (!__shared_lock_available(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__shared_lock_available(self))

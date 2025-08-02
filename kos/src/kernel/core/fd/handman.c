@@ -2158,7 +2158,7 @@ handman_install_into(struct handman *__restrict self, fd_t fd,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
 		       E_INTERRUPT) {
 	struct handrange *range;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	assert(nhand->h_type != HANDLE_TYPE_UNDEFINED);
 again_lock:
 	handman_write(self);

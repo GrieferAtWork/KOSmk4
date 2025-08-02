@@ -121,7 +121,7 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 	struct gdb_thread_stop_event_with_reason stop_event;
 	uintptr_t old_flags;
 	assert(!PREEMPTION_ENABLED());
-	task_pushconnections(&stop_event.e.tse_oldcon);
+	task_pushcons(&stop_event.e.tse_oldcon);
 #ifdef CONFIG_HAVE_FPU
 	fpustate_save();
 #endif /* CONFIG_HAVE_FPU */
@@ -285,7 +285,7 @@ do_normal_stop:
 	/* Clear our thread's KEEPCORE flags */
 	if likely(!(old_flags & TASK_FKEEPCORE))
 		atomic_and(&stop_event.e.tse_thread->t_flags, ~TASK_FKEEPCORE);
-	task_popconnections();
+	task_popcons();
 	return (struct icpustate *)stop_event.e.tse_state;
 }
 

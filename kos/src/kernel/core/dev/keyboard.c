@@ -185,7 +185,7 @@ PUBLIC NONNULL((1)) u16 KCALL
 kbdbuf_getkey(struct kbdbuf *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	u16 result;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	while ((result = kbdbuf_trygetkey(self)) == KEY_NONE) {
 		task_connect(&self->kb_avail);
 		result = kbdbuf_trygetkey(self);
@@ -421,7 +421,7 @@ PUBLIC NONNULL((1)) struct kbd_packet KCALL
 kbddev_getkey(struct kbddev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	struct kbd_packet result;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	for (;;) {
 		result = kbddev_trygetkey(self);
 		if (result.kp_key != KEY_NONE)

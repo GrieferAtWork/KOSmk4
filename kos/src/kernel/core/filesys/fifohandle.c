@@ -163,7 +163,7 @@ fifohandle_new(struct ffifonode *__restrict self, iomode_t iomode,
                struct path *access_path, struct fdirent *access_dent)
 		THROWS(E_BADALLOC, E_ILLEGAL_IO_OPERATION, ...) {
 	REF struct fifohandle *result;
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	result = (REF struct fifohandle *)kmalloc(sizeof(struct fifohandle),
 	                                          GFP_NORMAL);
 	/* Register a new reader/writer/both */

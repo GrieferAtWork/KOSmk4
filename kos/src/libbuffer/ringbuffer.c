@@ -201,7 +201,7 @@ libringbuffer_read(struct ringbuffer *__restrict self,
                    NCX void *dst, size_t num_bytes)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...) {
 	size_t result, temp;
-	IF_KERNEL(assert(!task_wasconnected()));
+	IF_KERNEL(assert(!task_isconnected()));
 	result = libringbuffer_read_nonblock(self, dst, num_bytes);
 	if (result || !atomic_read(&self->rb_limit)) {
 done:
@@ -439,7 +439,7 @@ libringbuffer_write(struct ringbuffer *__restrict self,
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...)) {
 	KERNEL_SELECT(size_t, ssize_t) result, temp;
-	IF_KERNEL(assert(!task_wasconnected()));
+	IF_KERNEL(assert(!task_isconnected()));
 	result = libringbuffer_write_nonblock(self, src, num_bytes);
 #ifndef __KERNEL__
 	if unlikely(result < 0)
@@ -515,7 +515,7 @@ libringbuffer_writesome(struct ringbuffer *__restrict self,
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...)) {
 	KERNEL_SELECT(size_t, ssize_t) result, temp;
-	IF_KERNEL(assert(!task_wasconnected()));
+	IF_KERNEL(assert(!task_isconnected()));
 	result = libringbuffer_write_nonblock(self, src, num_bytes);
 #ifndef __KERNEL__
 	if unlikely(result < 0)

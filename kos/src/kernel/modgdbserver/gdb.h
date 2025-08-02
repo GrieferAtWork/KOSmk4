@@ -62,7 +62,7 @@ struct gdb_thread_stop_event {
 	uintptr_quarter_t        tse_mayresume; /* Set to non-zero if this thread's stop notification was delivered. */
 	uintptr_quarter_t        tse_isacpu;    /* non-zero if this stop event describes an entire CPU. */
 	struct sig               tse_sigresume; /* Signal broadcast when this thread should be resumed (aka. `GDB_THREAD_MAYRESUME_RESUME' is set). */
-	struct task_connections  tse_oldcon;    /* Saved task connections. */
+	struct taskcons          tse_oldcon;    /* Saved task connections. */
 };
 
 /* [0..1][lock(PRIVATE(<GDB_HOST_THREAD>))]

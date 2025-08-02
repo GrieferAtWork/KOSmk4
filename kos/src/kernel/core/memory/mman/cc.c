@@ -1546,15 +1546,15 @@ NOTHROW(FCALL system_cc_impl_wrapper)(struct ccinfo *__restrict info) {
 		/* Preserve task connections (technically only necessary when not noblock,
 		 * but  better be safe and always do this, so cc-code is allowed to assume
 		 * that the hosting thread doesn't have any connections) */
-		struct task_connections saved;
-		task_pushconnections(&saved);
+		struct taskcons saved;
+		task_pushcons(&saved);
 
 		/* Call the actual cc-implementation */
 		system_cc_impl(info);
 
 		/* Context restore... */
-		assert(!task_wasconnected());
-		task_popconnections();
+		assert(!task_isconnected());
+		task_popcons();
 	}
 }
 

@@ -117,8 +117,8 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	/* Assert that there are no active task connections. */
 #ifndef NDEBUG
 	{
-		struct task_connections *self = THIS_CONNECTIONS;
-		struct task_connection *con   = self->tcs_con;
+		struct taskcons *self = THIS_CONS;
+		struct sigtaskcon *con = SLIST_FIRST(&self->tcs_cons);
 		assertf(con == NULL, "con = %p", con);
 	}
 #endif /* !NDEBUG */

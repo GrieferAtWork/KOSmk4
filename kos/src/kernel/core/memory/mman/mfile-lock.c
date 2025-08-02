@@ -62,7 +62,7 @@ mfile_deleting_waitfor(struct mfile *__restrict self)
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...) {
 	uintptr_t flags;
 again:
-	assert(!task_wasconnected());
+	assert(!task_isconnected());
 	task_connect(&self->mf_initdone);
 	flags = atomic_read(&self->mf_flags);
 	if unlikely(flags & MFILE_F_DELETED) {

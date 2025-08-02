@@ -427,7 +427,7 @@ mfile_flock_acquire(struct mfile *__restrict self,
 
 	case LOCK_SH:
 		/* Block-acquire a read-lock */
-		assert(!task_wasconnected());
+		assert(!task_isconnected());
 		while (!mfilemeta_flock_tryread(meta, key)) {
 			task_connect(&meta->mfm_flock.mffl_flock.sl_rdwait);
 			if unlikely(mfilemeta_flock_tryread(meta, key)) {
@@ -448,7 +448,7 @@ mfile_flock_acquire(struct mfile *__restrict self,
 
 	case LOCK_EX:
 		/* Block-acquire a write-lock */
-		assert(!task_wasconnected());
+		assert(!task_isconnected());
 		while (!mfilemeta_flock_trywrite(meta, key)) {
 			task_connect(&meta->mfm_flock.mffl_flock.sl_wrwait);
 			if unlikely(mfilemeta_flock_trywrite(meta, key)) {
