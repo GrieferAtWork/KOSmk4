@@ -49,8 +49,7 @@ BEGIN
 		/* Required for: Decompressing compressed .debug_* sections */
 		"../../libzlib/*.c",
 
-		/* Required for: Exception handlers to unify PC positions
-		 * (exceptions always point _after_ the faulting instruction) */
+		/* Required for: Exception handlers to unify PC positions */
 		"../../libinstrlen/*.c",
 
 		/* Required for: Exception handling, as well as tracebacks */

@@ -88,7 +88,6 @@ struct sigcompctx {
 	                                  * NOTE: This field may only be accessed during phase-1 callbacks. */
 };
 
-
 /* Callback prototype for signal completion functions.
  * WARNING: Signal completion functions are invoked in a context where SMP-locks are  held,
  *          meaning that the set of things they're allowed to do is _very_ limited. (As in:

@@ -1864,6 +1864,20 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "ptyslave", &note_mfile },
 	{ "ramfs_dirnode", &note_mfile },
 	{ "ramfs_super", &note_fsuper },
+	/* TODO: sig   (as in: <sched/sig.h>)
+	 * - If no connections:
+	 *   - "empty"
+	 * - If there is at least 1 sigtaskcon:
+	 *   - "→<note_task-of-sigtaskcon>[+<N>]"
+	 *   - "→~<note_task-of-sigtaskcon>[+<N>]"
+	 *   - "note_task" uses the "note_task" function above to print a description of the task
+	 * - else:
+	 *   - "→comp[+<N>]"
+	 *   - "→~comp[+<N>]"
+	 * - Where "[,<N>]" is printed if there are more connections,
+	 *   with  "+<N>" being the number of additional connections.
+	 * - The leading "~" is printed if the associated connection is poll-based
+	 */
 	{ "task", &note_task },
 	{ "taskpid", &note_taskpid },
 	{ "time_t", &note_time_t },
@@ -1879,11 +1893,15 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "userelf_module", &note_module },
 	{ "userelf_module_section", &note_module_section },
 	{ "videodev", &note_mfile },
+	/* TODO: It would be amazing if we could render a miniature preview of video_buffer-s,
+	 *       but that's probably  impossible. Next-best thing  though: show dimension  and
+	 *       rotation. */
 };
 
 PRIVATE WUNUSED ATTR_PURE NONNULL((1)) struct obnote_entry const *
 NOTHROW(KCALL obnote_entry_byname)(char const *__restrict name) {
 	unsigned int i;
+	/* TODO: bsearch */
 	for (i = 0; i < lengthof(notes); ++i) {
 		if (strcmp(notes[i].one_name, name) == 0)
 			return &notes[i];

@@ -45,7 +45,7 @@ NOTHROW(FCALL red_phase2)(struct sigcompctx *__restrict UNUSED(context), void *b
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL red_phase1)(struct sigcompcon *__restrict self,
-                          struct sigcompctx *__restrict ctx,
+                          struct sigcompctx *__restrict context,
                           void *buf, size_t bufsize) {
 	struct rising_edge_detector *me;
 	if (bufsize < sizeof(void *))
@@ -56,18 +56,21 @@ NOTHROW(FCALL red_phase1)(struct sigcompcon *__restrict self,
 	 * and instead remembering the connected signal and re-connecting every time
 	 * the edge is consumed in `rising_edge_detector_waitfor()'
 	 *
-	 * But for the purpose of simplicity and this only being meant as a demo,
-	 * just we  always  re-prime  (meaning  we'll  always  stack  connected). */
-	ctx->scc_mode = SIGCOMP_MODE_F_REPRIME;
+	 * But for the  purpose of simplicity  and this only  being meant as  a
+	 * demo, just we always re-prime (meaning we'll always stay connected).
+	 *
+	 * Note that the `SIGCOMP_MODE_F_REPRIME' flag is ignored if the caller
+	 * uses `sig_broadcast_for_fini()'  (or  similar,  `SIG_XSEND_F_FINI'). */
+	context->scc_mode = SIGCOMP_MODE_F_REPRIME;
 	if (atomic_xch(&me->red_detected, true)) {
 		/* Don't consume "sig_send" signals after we've already detected an  edge.
-		 * This is done by marking out context-mode as "SIGCOMP_MODE_F_NONVIABLE",
+		 * This is done by marking our context-mode as "SIGCOMP_MODE_F_NONVIABLE",
 		 * which will cause "sig_send" to go looking for another receiver. */
-		ctx->scc_mode |= SIGCOMP_MODE_F_NONVIABLE;
+		context->scc_mode |= SIGCOMP_MODE_F_NONVIABLE;
 		return 0; /* Only need phase2 if we manage to set `red_detected' to true. */
 	}
 	*(void **)buf = incref(me); /* Inherited by `red_phase2()' */
-	ctx->scc_post = &red_phase2;
+	context->scc_post = &red_phase2;
 	return sizeof(void *);
 }
 
