@@ -43,10 +43,19 @@ DECL_BEGIN
 enum filefmt {
 	FMT_BAD,
 #define FMT_FIRST FMT_PNG
-	FMT_PNG,
+	FMT_PNG, /* TODO: Enable support for animated PNGs */
 	FMT_JPG,
 	FMT_BMP,
-	FMT_GIF,
+	FMT_GIF, /* TODO: Writer backend, and support animation writers in general */
+	/* TODO: TIFF */
+	/* TODO: TGA */
+	/* TODO: WEBP */
+	/* TODO: PSD (read-only) */
+	/* TODO: SVG (read-only)
+	 *       Should come with some more, general support for vector  graphics,
+	 *       including allowing the caller to specify an intended  resolution,
+	 *       as well as allowing them to render to a given buffer, rather than
+	 *       having to load the image as its own buffer. */
 #define FMT_LAST FMT_GIF
 };
 

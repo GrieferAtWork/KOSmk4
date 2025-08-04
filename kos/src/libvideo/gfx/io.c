@@ -68,6 +68,11 @@ DECL_BEGIN
 
 INTERN ATTR_PURE WUNUSED NONNULL((1)) enum filefmt CC
 filefmt_detect(char const *__restrict format) {
+	/* Format "names" are also just file extensions.
+	 *
+	 * However, if the format indicated by a file extensions isn't
+	 * able to load a file (as per `VIDEO_BUFFER_WRONG_FMT'), then
+	 * all other formats are tried one-at-a-time. */
 	if (strcasecmp(format, "png") == 0)
 		return FMT_PNG;
 	if (strcasecmp(format, "jpg") == 0 ||
@@ -81,7 +86,7 @@ filefmt_detect(char const *__restrict format) {
 }
 
 PRIVATE ATTR_NOINLINE REF struct video_buffer *CC
-anim2frame(REF struct video_anim *anim) {
+anim2frame(/*inherit(always)*/ REF struct video_anim *anim) {
 	REF struct video_buffer *result;
 	struct video_anim_frame *frame;
 	if (!anim || anim == VIDEO_ANIM_WRONG_FMT)
@@ -90,11 +95,11 @@ anim2frame(REF struct video_anim *anim) {
 	/* Create temp. buffer for animation frame */
 	frame = (struct video_anim_frame *)malloca(video_anim_sizeof_frame(anim));
 	if unlikely(!frame)
-		goto err;
+		goto err_anim;
 
 	/* Load first animation frame */
 	if unlikely(video_anim_firstframe(anim, frame))
-		goto err_frame;
+		goto err_anim_frame;
 
 	/* Take first frame */
 	result = frame->vaf_frame;
@@ -107,9 +112,10 @@ anim2frame(REF struct video_anim *anim) {
 
 	/* Return first frame */
 	return result;
-err_frame:
+err_anim_frame:
 	freea(frame);
-err:
+err_anim:
+	video_anim_decref(anim);
 	return NULL;
 }
 
@@ -169,17 +175,17 @@ PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_anim *CC
 libvideo_anim_open_fmt(struct video_domain const *__restrict domain,
                        void const *blob, size_t blob_size,
                        struct mapfile *p_mapfile, enum filefmt fmt) {
-	REF struct video_buffer *frame;
+	REF struct video_buffer *result;
 	switch (fmt) {
 	case FMT_PNG:
 		/* TODO: Use the (now-apng-patched) libpng to support animated PNG files */
-		frame = libvideo_buffer_open_png(domain, blob, blob_size);
+		result = libvideo_buffer_open_png(domain, blob, blob_size);
 		break;
 	case FMT_JPG:
-		frame = libvideo_buffer_open_jpg(domain, blob, blob_size);
+		result = libvideo_buffer_open_jpg(domain, blob, blob_size);
 		break;
 	case FMT_BMP:
-		frame = libvideo_buffer_open_bmp(domain, blob, blob_size, p_mapfile);
+		result = libvideo_buffer_open_bmp(domain, blob, blob_size, p_mapfile);
 		break;
 	case FMT_GIF:
 		return libvideo_anim_open_gif(domain, blob, blob_size, p_mapfile);
@@ -187,9 +193,9 @@ libvideo_anim_open_fmt(struct video_domain const *__restrict domain,
 		errno = ENOTSUP;
 		return NULL;
 	}
-	if (frame && frame != VIDEO_BUFFER_WRONG_FMT)
-		frame = convert_to_wanted_domain(domain, frame);
-	return frame2anim(frame);
+	if (result && result != VIDEO_BUFFER_WRONG_FMT)
+		result = convert_to_wanted_domain(domain, result);
+	return frame2anim(result);
 }
 
 INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
@@ -285,7 +291,8 @@ INTERN WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
 libvideo_buffer_fopen(struct video_domain const *__restrict domain, FILE *__restrict fp) {
 	struct mapfile mf;
 	REF struct video_buffer *result;
-	if (ffmapfile(&mf, fp, 0, 0, (size_t)-1, 0, 0))
+	if (ffmapfile(&mf, fp, 0, 0,
+	              SIZE_MAX, 0, 0))
 		return NULL;
 	result = libvideo_buffer_open_impl(domain, mf.mf_addr, mf.mf_size, NULL, &mf);
 	(void)unmapfile(&mf);
@@ -297,7 +304,8 @@ INTERN WUNUSED NONNULL((1)) REF struct video_buffer *CC
 libvideo_buffer_fdopen(struct video_domain const *__restrict domain, fd_t fd) {
 	struct mapfile mf;
 	REF struct video_buffer *result;
-	if (fmapfile(&mf, fd, 0, 0, (size_t)-1, 0, 0))
+	if (fmapfile(&mf, fd, 0, 0,
+	             SIZE_MAX, 0, 0))
 		return NULL;
 	result = libvideo_buffer_open_impl(domain, mf.mf_addr, mf.mf_size, NULL, &mf);
 	(void)unmapfile(&mf);
@@ -311,7 +319,7 @@ libvideo_buffer_open(struct video_domain const *__restrict domain, char const *f
 	char const *format_hint;
 	REF struct video_buffer *result;
 	if (mapfile(&mf, filename, 0, 0,
-	            (size_t)-1, 0, 0))
+	            SIZE_MAX, 0, 0))
 		return NULL;
 	format_hint = strrchr(filename, '.');
 	if (format_hint)
@@ -457,7 +465,8 @@ INTERN WUNUSED NONNULL((1, 2)) REF struct video_anim *CC
 libvideo_anim_fopen(struct video_domain const *__restrict domain, FILE *__restrict fp) {
 	struct mapfile mf;
 	REF struct video_anim *result;
-	if (ffmapfile(&mf, fp, 0, 0, (size_t)-1, 0, 0))
+	if (ffmapfile(&mf, fp, 0, 0,
+	              SIZE_MAX, 0, 0))
 		return NULL;
 	result = libvideo_anim_open_impl(domain, mf.mf_addr, mf.mf_size, NULL, &mf);
 	(void)unmapfile(&mf);
@@ -469,7 +478,8 @@ INTERN WUNUSED NONNULL((1)) REF struct video_anim *CC
 libvideo_anim_fdopen(struct video_domain const *__restrict domain, fd_t fd) {
 	struct mapfile mf;
 	REF struct video_anim *result;
-	if (fmapfile(&mf, fd, 0, 0, (size_t)-1, 0, 0))
+	if (fmapfile(&mf, fd, 0, 0,
+	             SIZE_MAX, 0, 0))
 		return NULL;
 	result = libvideo_anim_open_impl(domain, mf.mf_addr, mf.mf_size, NULL, &mf);
 	(void)unmapfile(&mf);
@@ -483,7 +493,7 @@ libvideo_anim_open(struct video_domain const *__restrict domain, char const *fil
 	char const *format_hint;
 	REF struct video_anim *result;
 	if (mapfile(&mf, filename, 0, 0,
-	            (size_t)-1, 0, 0))
+	            SIZE_MAX, 0, 0))
 		return NULL;
 	format_hint = strrchr(filename, '.');
 	if (format_hint)
