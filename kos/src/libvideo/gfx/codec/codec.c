@@ -66,6 +66,12 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 DECL_BEGIN
 
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
+#define lpixel_t video_pixel64_t
+#else /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
+#define lpixel_t video_pixel_t
+#endif /* !CONFIG_LIBVIDEO_HAVE_PIXEL64 */
+
 union word32 {
 	uint32_t dword;
 	uint16_t words[2];
@@ -6422,13 +6428,13 @@ video_codec_custom__init__usedmask(video_pixel_t spec_mask,    /* Channel mask, 
 }
 
 PRIVATE ATTR_COLD WUNUSED struct video_codec const *FCC
-builtin_codec_from_masks(video_pixel64_t rmask,
-                         video_pixel64_t gmask,
-                         video_pixel64_t bmask,
-                         video_pixel64_t amask) {
+builtin_codec_from_masks(lpixel_t rmask,
+                         lpixel_t gmask,
+                         lpixel_t bmask,
+                         lpixel_t amask) {
 	struct video_codec const *result;
 	struct video_codec_specs specs;
-	video_pixel64_t fullmask;
+	lpixel_t fullmask;
 	specs.vcs_flags = VIDEO_CODEC_FLAG_NORMAL;
 	specs.vcs_rmask = rmask;
 	specs.vcs_gmask = gmask;
@@ -6466,7 +6472,7 @@ builtin_codec_from_masks(video_pixel64_t rmask,
 }
 
 PRIVATE ATTR_COLD ATTR_CONST WUNUSED bool FCC
-is_8bit_aligned(video_pixel64_t mask) {
+is_32bpp_8bit_aligned(lpixel_t mask) {
 	return mask == UINT32_C(0x000000ff) ||
 	       mask == UINT32_C(0x0000ff00) ||
 	       mask == UINT32_C(0x00ff0000) ||
@@ -6502,171 +6508,197 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	self->vc_specs.vcs_pxsz = CEILDIV(self->vc_specs.vcs_bpp, NBBY);
 	switch (self->vc_specs.vcs_bpp) {
 #if defined(CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3) && defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY)
-#define INIT__vc_setpixel(self, f) (&rp3_##f, self->vc_setpixel = &f, self->_vc_setpixel3 = NULL)
+#define _INIT__vc_setpixel(self, f) (&rp3_##f, self->vc_setpixel = &f, self->_vc_setpixel3 = NULL)
 #elif defined(CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3)
-#define INIT__vc_setpixel(self, f) (self->vc_setpixel = &f, self->_vc_setpixel3 = &rp3_##f)
+#define _INIT__vc_setpixel(self, f) (self->vc_setpixel = &f, self->_vc_setpixel3 = &rp3_##f)
 #else /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
-#define INIT__vc_setpixel(self, f) (self->vc_setpixel = &f)
+#define _INIT__vc_setpixel(self, f) (self->vc_setpixel = &f)
 #endif /* !CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
+#define INIT__vc_getpixel(self, f) (self->vc_getpixel = &f, self->vc_getpixel64 = &f##_64)
+#define INIT__vc_setpixel(self, f) (_INIT__vc_setpixel(self, f), self->vc_setpixel64 = &f##_64)
+#define INIT__vc_linefill(self, f) (self->vc_linefill64 = &f##_64, self->vc_linefill = &f)
+#define INIT__vc_vertfill(self, f) (self->vc_vertfill64 = &f##_64, self->vc_vertfill = &f)
+#define INIT__vc_rectfill(self, f) (self->vc_rectfill64 = &f##_64, self->vc_rectfill = &f)
+#else /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
+#define INIT__vc_getpixel(self, f) (self->vc_getpixel = &f)
+#define INIT__vc_setpixel(self, f) _INIT__vc_setpixel(self, f)
+#define INIT__vc_linefill(self, f) (self->vc_linefill = &f)
+#define INIT__vc_vertfill(self, f) (self->vc_vertfill = &f)
+#define INIT__vc_rectfill(self, f) (self->vc_rectfill = &f)
+#endif /* !CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 	case 1:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer1_requirements;
 		self->vc_coord2bytes            = &buffer1_coord2bytes;
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
-			self->vc_getpixel = &getpixel1_lsb;
+			INIT__vc_getpixel(self, getpixel1_lsb);
 			INIT__vc_setpixel(self, setpixel1_lsb);
-			self->vc_linefill = &linefill1_lsb;
-			self->vc_vertfill = &vertfill1_lsb;
-			self->vc_rectfill = &rectfill1_lsb;
+			INIT__vc_linefill(self, linefill1_lsb);
+			INIT__vc_vertfill(self, vertfill1_lsb);
+			INIT__vc_rectfill(self, rectfill1_lsb);
 			self->vc_rectcopy = &rectcopy1_lsb;
 			self->vc_rectmove = &rectmove1_lsb;
 			self->vc_linecopy = &linecopy1_lsb;
 		} else {
-			self->vc_getpixel = &getpixel1_msb;
+			INIT__vc_getpixel(self, getpixel1_msb);
 			INIT__vc_setpixel(self, setpixel1_msb);
-			self->vc_linefill = &linefill1_msb;
-			self->vc_vertfill = &vertfill1_msb;
-			self->vc_rectfill = &rectfill1_msb;
+			INIT__vc_linefill(self, linefill1_msb);
+			INIT__vc_vertfill(self, vertfill1_msb);
+			INIT__vc_rectfill(self, rectfill1_msb);
 			self->vc_rectcopy = &rectcopy1_msb;
 			self->vc_rectmove = &rectmove1_msb;
 			self->vc_linecopy = &linecopy1_msb;
 		}
 		break;
+
 	case 2:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer2_requirements;
 		self->vc_coord2bytes            = &buffer2_coord2bytes;
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
-			self->vc_getpixel = &getpixel2_lsb;
+			INIT__vc_getpixel(self, getpixel2_lsb);
 			INIT__vc_setpixel(self, setpixel2_lsb);
-			self->vc_linefill = &linefill2_lsb;
-			self->vc_vertfill = &vertfill2_lsb;
-			self->vc_rectfill = &rectfill2_lsb;
+			INIT__vc_linefill(self, linefill2_lsb);
+			INIT__vc_vertfill(self, vertfill2_lsb);
+			INIT__vc_rectfill(self, rectfill2_lsb);
 			self->vc_rectcopy = &rectcopy2_lsb;
 			self->vc_rectmove = &rectmove2_lsb;
 			self->vc_linecopy = &linecopy2_lsb;
 		} else {
-			self->vc_getpixel = &getpixel2_msb;
+			INIT__vc_getpixel(self, getpixel2_msb);
 			INIT__vc_setpixel(self, setpixel2_msb);
-			self->vc_linefill = &linefill2_msb;
-			self->vc_vertfill = &vertfill2_msb;
-			self->vc_rectfill = &rectfill2_msb;
+			INIT__vc_linefill(self, linefill2_msb);
+			INIT__vc_vertfill(self, vertfill2_msb);
+			INIT__vc_rectfill(self, rectfill2_msb);
 			self->vc_rectcopy = &rectcopy2_msb;
 			self->vc_rectmove = &rectmove2_msb;
 			self->vc_linecopy = &linecopy2_msb;
 		}
 		break;
+
 	case 4:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer4_requirements;
 		self->vc_coord2bytes            = &buffer4_coord2bytes;
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
-			self->vc_getpixel = &getpixel4_lsb;
+			INIT__vc_getpixel(self, getpixel4_lsb);
 			INIT__vc_setpixel(self, setpixel4_lsb);
-			self->vc_linefill = &linefill4_lsb;
-			self->vc_vertfill = &vertfill4_lsb;
-			self->vc_rectfill = &rectfill4_lsb;
+			INIT__vc_linefill(self, linefill4_lsb);
+			INIT__vc_vertfill(self, vertfill4_lsb);
+			INIT__vc_rectfill(self, rectfill4_lsb);
 			self->vc_rectcopy = &rectcopy4_lsb;
 			self->vc_rectmove = &rectmove4_lsb;
 			self->vc_linecopy = &linecopy4_lsb;
 		} else {
-			self->vc_getpixel = &getpixel4_msb;
+			INIT__vc_getpixel(self, getpixel4_msb);
 			INIT__vc_setpixel(self, setpixel4_msb);
-			self->vc_linefill = &linefill4_msb;
-			self->vc_vertfill = &vertfill4_msb;
-			self->vc_rectfill = &rectfill4_msb;
+			INIT__vc_linefill(self, linefill4_msb);
+			INIT__vc_vertfill(self, vertfill4_msb);
+			INIT__vc_rectfill(self, rectfill4_msb);
 			self->vc_rectcopy = &rectcopy4_msb;
 			self->vc_rectmove = &rectmove4_msb;
 			self->vc_linecopy = &linecopy4_msb;
 		}
 		break;
+
 	case 8:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer8_requirements;
 		self->vc_coord2bytes            = &buffer8_coord2bytes;
-		self->vc_getpixel = &getpixel8;
+		INIT__vc_getpixel(self, getpixel8);
 		INIT__vc_setpixel(self, setpixel8);
-		self->vc_linefill = &linefill8;
-		self->vc_vertfill = &vertfill8;
-		self->vc_rectfill = &rectfill8;
+		INIT__vc_linefill(self, linefill8);
+		INIT__vc_vertfill(self, vertfill8);
+		INIT__vc_rectfill(self, rectfill8);
 		self->vc_rectcopy = &rectcopy8;
 		self->vc_rectmove = &rectmove8;
 		self->vc_linecopy = &linecopy8;
 		break;
+
 	case 16:
 		self->vc_align = 2;
 		self->vc_rambuffer_requirements = &buffer16_requirements;
 		self->vc_coord2bytes            = &buffer16_coord2bytes;
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 		if (populate_noalign) {
-			self->vc_getpixel = &unaligned_getpixel16;
+			INIT__vc_getpixel(self, unaligned_getpixel16);
 			INIT__vc_setpixel(self, unaligned_setpixel16);
-			self->vc_linefill = &unaligned_linefill16;
-			self->vc_vertfill = &unaligned_vertfill16;
-			self->vc_rectfill = &unaligned_rectfill16;
+			INIT__vc_linefill(self, unaligned_linefill16);
+			INIT__vc_vertfill(self, unaligned_vertfill16);
+			INIT__vc_rectfill(self, unaligned_rectfill16);
 			self->vc_rectcopy = &unaligned_rectcopy16;
 			self->vc_rectmove = &unaligned_rectmove16;
 			self->vc_linecopy = &unaligned_linecopy16;
 		} else
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 		{
-			self->vc_getpixel = &getpixel16;
+			INIT__vc_getpixel(self, getpixel16);
 			INIT__vc_setpixel(self, setpixel16);
-			self->vc_linefill = &linefill16;
-			self->vc_vertfill = &vertfill16;
-			self->vc_rectfill = &rectfill16;
+			INIT__vc_linefill(self, linefill16);
+			INIT__vc_vertfill(self, vertfill16);
+			INIT__vc_rectfill(self, rectfill16);
 			self->vc_rectcopy = &rectcopy16;
 			self->vc_rectmove = &rectmove16;
 			self->vc_linecopy = &linecopy16;
 		}
 		break;
+
 	case 24:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer24_requirements;
 		self->vc_coord2bytes            = &buffer24_coord2bytes;
-		self->vc_getpixel = &getpixel24;
+		INIT__vc_getpixel(self, getpixel24);
 		INIT__vc_setpixel(self, setpixel24);
-		self->vc_linefill = &linefill24;
-		self->vc_vertfill = &vertfill24;
-		self->vc_rectfill = &rectfill24;
+		INIT__vc_linefill(self, linefill24);
+		INIT__vc_vertfill(self, vertfill24);
+		INIT__vc_rectfill(self, rectfill24);
 		self->vc_rectcopy = &rectcopy24;
 		self->vc_rectmove = &rectmove24;
 		self->vc_linecopy = &linecopy24;
 		break;
+
 	case 32:
 		self->vc_align = 4;
 		self->vc_rambuffer_requirements = &buffer32_requirements;
 		self->vc_coord2bytes            = &buffer32_coord2bytes;
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 		if (populate_noalign) {
-			self->vc_getpixel = &unaligned_getpixel32;
+			INIT__vc_getpixel(self, unaligned_getpixel32);
 			INIT__vc_setpixel(self, unaligned_setpixel32);
-			self->vc_linefill = &unaligned_linefill32;
-			self->vc_vertfill = &unaligned_vertfill32;
-			self->vc_rectfill = &unaligned_rectfill32;
+			INIT__vc_linefill(self, unaligned_linefill32);
+			INIT__vc_vertfill(self, unaligned_vertfill32);
+			INIT__vc_rectfill(self, unaligned_rectfill32);
 			self->vc_rectcopy = &unaligned_rectcopy32;
 			self->vc_rectmove = &unaligned_rectmove32;
 			self->vc_linecopy = &unaligned_linecopy32;
 		} else
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 		{
-			self->vc_getpixel = &getpixel32;
+			INIT__vc_getpixel(self, getpixel32);
 			INIT__vc_setpixel(self, setpixel32);
-			self->vc_linefill = &linefill32;
-			self->vc_vertfill = &vertfill32;
-			self->vc_rectfill = &rectfill32;
+			INIT__vc_linefill(self, linefill32);
+			INIT__vc_vertfill(self, vertfill32);
+			INIT__vc_rectfill(self, rectfill32);
 			self->vc_rectcopy = &rectcopy32;
 			self->vc_rectmove = &rectmove32;
 			self->vc_linecopy = &linecopy32;
 		}
 		break;
 
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 	/* TODO: 40bpp, 48bpp, 56bpp, 64bpp */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 	default:
 		/* Impossible/Unsupported BPP */
 		return false;
+#undef _INIT__vc_setpixel
+#undef INIT__vc_getpixel
 #undef INIT__vc_setpixel
+#undef INIT__vc_linefill
+#undef INIT__vc_vertfill
+#undef INIT__vc_rectfill
 	}
 
 	/* Fix  broken color masks -- only the least significant "vcs_bpp" bits
@@ -6674,8 +6706,8 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	 * above that is impossible to store, so we may as well mask those bits
 	 * away since there would be no way to store them anyways. */
 	{
-		video_pixel64_t cmask;
-		video_pixel64_t bpp_mask = ((video_pixel64_t)1 << self->vc_specs.vcs_bpp) - 1;
+		lpixel_t cmask;
+		lpixel_t bpp_mask = ((lpixel_t)1 << self->vc_specs.vcs_bpp) - 1;
 		self->vc_specs.vcs_rmask &= bpp_mask;
 		self->vc_specs.vcs_gmask &= bpp_mask;
 		self->vc_specs.vcs_bmask &= bpp_mask;
@@ -6743,8 +6775,8 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	/* Check if the codec qualifies for INTERP8888 optimizations. */
 	self->vc_specs.vcs_flags &= ~VIDEO_CODEC_FLAG_INTERP8888;
 	if (!(self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) &&
-	    is_8bit_aligned(self->vcc_used_rmask) && is_8bit_aligned(self->vcc_used_gmask) &&
-	    is_8bit_aligned(self->vcc_used_bmask) && is_8bit_aligned(self->vcc_used_amask))
+	    is_32bpp_8bit_aligned(self->vcc_used_rmask) && is_32bpp_8bit_aligned(self->vcc_used_gmask) &&
+	    is_32bpp_8bit_aligned(self->vcc_used_bmask) && is_32bpp_8bit_aligned(self->vcc_used_amask))
 		self->vc_specs.vcs_flags |= VIDEO_CODEC_FLAG_INTERP8888;
 
 	/* Select color <=> pixel conversion algorithm */
@@ -6770,7 +6802,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 				if (alpha_bits >= 1 && alpha_bits <= 8 && (self->vcc_used_amask & 1)) {
 					bool alpha_first = (self->vcc_used_amask & 1);
 					if (alpha_first) {
-						video_pixel64_t cmask_after_alpha = cmask << alpha_bits;
+						lpixel_t cmask_after_alpha = cmask << alpha_bits;
 						if ((self->vc_specs.vcs_rmask & cmask_after_alpha) == cmask_after_alpha) {
 							/* Looks like a usable alpha codec */
 #define AL(n_alpha, n_lum) ((n_alpha - 1) | ((n_lum - 1) << 3))
