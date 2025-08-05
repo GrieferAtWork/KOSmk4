@@ -1516,11 +1516,11 @@ DEFINE_PIXEL64_IO_WRAPPERS(PRIVATE, MAP_IO, MAP_IO64)
 LOCAL ATTR_CONST video_channel16_t FCC
 fill_missing_bits16(video_channel16_t value, shift_t miss_bits) {
 	/* TODO: Optimizations */
-#define nmax(n) ((1 << (n)) - 1)
+#define bitmask(n) ((1 << (n)) - 1)
 	return (video_channel16_t)((((uint_fast32_t)value * 0xffff) +
-	                            nmax(16 - miss_bits - 1)) /
-	                           nmax(16 - miss_bits));
-#undef nmax
+	                            bitmask(16 - miss_bits - 1)) /
+	                           bitmask(16 - miss_bits));
+#undef bitmask
 }
 
 LOCAL ATTR_CONST video_channel16_t FCC
@@ -2123,17 +2123,46 @@ fill_missing_bits(video_channel_t value,
 
 
 /* Channel upscaling for HDR codecs */
-#define c2_to_c16(c)  ((uint16_t)(c) << 14) /* TODO: Smooth upscaling */
-#define c8_to_c10(c)  ((uint16_t)(c) << 2)  /* TODO: Smooth upscaling */
-#define c8_to_c11(c)  ((uint16_t)(c) << 3)  /* TODO: Smooth upscaling */
-#define c8_to_c16(c)  ((uint16_t)(c) << 8)  /* TODO: Smooth upscaling */
-#define c10_to_c16(c) ((uint16_t)(c) << 6)  /* TODO: Smooth upscaling */
-#define c11_to_c16(c) ((uint16_t)(c) << 5)  /* TODO: Smooth upscaling */
+#define c2_to_c16(c) ((uint16_t)0x5555 * (c))
+#define c8_to_c16(c) ((uint16_t)0x0101 * (c))
+STATIC_ASSERT(c2_to_c16(0) == 0x0000);
+STATIC_ASSERT(c2_to_c16(1) == 0x5555);
+STATIC_ASSERT(c2_to_c16(2) == 0xaaaa);
+STATIC_ASSERT(c2_to_c16(3) == 0xffff);
+
+/* Psuedo-smooth scaling. These don't perfectly match the optimial N->M scanling of:
+ * >> #define bitmask(n) ((1 << n) - 1)
+ * >> OUT = ((IN * bitmask(M)) + (bitmask(N) / 2)) / bitmask(N);
+ *
+ * But on the up-side, these don't need division! */
+#define c8_to_c10(c)  (((uint16_t)(c) << 2) | ((uint16_t)(c) >> 6))
+#define c8_to_c11(c)  (((uint16_t)(c) << 3) | ((uint16_t)(c) >> 5))
+#define c10_to_c16(c) (((uint16_t)(c) << 6) | ((uint16_t)(c) >> 4))
+#define c11_to_c16(c) (((uint16_t)(c) << 5) | ((uint16_t)(c) >> 6))
+
+STATIC_ASSERT(c8_to_c10(0x00) == 0x000);
+STATIC_ASSERT(c8_to_c10(0xff) == 0x3ff);
+STATIC_ASSERT(c8_to_c11(0x00) == 0x000);
+STATIC_ASSERT(c8_to_c11(0xff) == 0x7ff);
+STATIC_ASSERT(c10_to_c16(0x000) == 0x0000);
+STATIC_ASSERT(c10_to_c16(0x3ff) == 0xffff);
+STATIC_ASSERT(c11_to_c16(0x000) == 0x0000);
+STATIC_ASSERT(c11_to_c16(0x7ff) == 0xffff);
 
 
 
 
-#define rgb_getlumen16(r, g, b)     c8_to_c16(rgb_getlumen8(r, g, b)) /* TODO: Smooth upscaling */
+
+#if 1
+/* Smooth RGB888 to LUM16 formula (and its simplification) */
+#define _rgb_getlumen16(sum)    (video_channel16_t)(((sum) * 0xffff + 764) / 765)
+#define rgb_getlumen16(r, g, b) _rgb_getlumen16((uint_fast32_t)r + g + b)
+STATIC_ASSERT(rgb_getlumen16(0x00, 0x00, 0x00) == 0x0000);
+STATIC_ASSERT(rgb_getlumen16(0xff, 0xff, 0xff) == 0xffff);
+#else
+#define rgb_getlumen16(r, g, b) c8_to_c16(rgb_getlumen8(r, g, b))
+#endif
+
 #define rgb_getlumen8(r, g, b)      ((uint8_t)((uint_fast16_t)((uint_fast16_t)r + g + b + (3 / 2)) / 3))
 #define rgb_getlumen1(r, g, b)      (rgb_getlumen8(r, g, b) >> 7)
 #define rgb_getlumen2(r, g, b)      (rgb_getlumen8(r, g, b) >> 6)
