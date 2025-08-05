@@ -2819,13 +2819,6 @@
 #define DEFINE_LIBICONV_SYMBOL_BINDING(T,n) T pdyn_##n=0;char const name_##n[]=#n;T libc_resolve_##n(){}
 #define DEFINE_SUPPLEMENTAL_LIBICONV_LIBRARY_BINDING(n) typedef void(*_PSUPENCODE_INIT_##n)(struct iconv_encode*self,struct iconv_printer*input);typedef void(*_PSUPDECODE_INIT_##n)(struct iconv_decode*self,struct iconv_printer*input);_PSUPENCODE_INIT_##n pdyn_iconv_##n##_encode_init=0;_PSUPDECODE_INIT_##n pdyn_iconv_##n##_decode_init=0;void*pdyn_libiconv_##n=0;bool load_libiconv_##n(){}
 #define DEFINE_CPUSTATE_GETTERS(get_struct_xcpustate,set_struct_xcpustate,libuw_unwind_getreg_xcpustate,b1,libuw_unwind_getreg_xcpustate_exclusive,libuw_unwind_setreg_xcpustate,b2,libuw_unwind_setreg_xcpustate_exclusive) unwind_errno_t libuw_unwind_getreg_xcpustate(get_struct_xcpustate self,unwind_regno_t dw_regno,void*dst){}unwind_errno_t libuw_unwind_setreg_xcpustate(set_struct_xcpustate self,unwind_regno_t dw_regno,void const*src){}unwind_errno_t libuw_unwind_getreg_xcpustate_exclusive(get_struct_xcpustate self,unwind_regno_t dw_regno,void*dst){}unwind_errno_t libuw_unwind_setreg_xcpustate_exclusive(set_struct_xcpustate self,unwind_regno_t dw_regno,void const*src){}
-#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union_type) video_pixel_t n##_color2pixel(struct video_surface const*surface,video_color_t color){}video_color_t n##_pixel2color(struct video_surface const*surface,video_pixel_t pixel){}
-#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union_type) video_pixel_t n##_color2pixel(struct video_surface const*surface,video_color_t color){}video_color_t n##_pixel2color(struct video_surface const*surface,video_pixel_t pixel){}
-#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(n,d,union_type)  video_pixel_t n##_color2pixel(struct video_surface const*surface,video_color_t color){}video_color_t n##_pixel2color(struct video_surface const*surface,video_pixel_t pixel){}
-#define DEFINE_FORMAT_PIXEL_UNION(n,d,...) union pixel_##n{d data;struct __VA_ARGS__;};
-#define DEFINE_FORMAT_CONVERTER_RGBA(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union pixel_##n)
-#define DEFINE_FORMAT_CONVERTER_RGBX(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union pixel_##n)
-#define DEFINE_FORMAT_CONVERTER_RGB(n,d,...)  DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(n,d,union pixel_##n)
 #define _ASYNC_WORKER_CXX_DECLARE(_,T)\
 	async*async_worker_new(async_worker_ops const*ops,T*ob_pointer){}\
 	bool register_async_worker(async_worker_ops const*ops,T*ob_pointer){}\
@@ -2860,6 +2853,16 @@
 #define DEFINE_vp_kd_treeN_find(N)void vp_kd_tree##N##_find(struct video_palette_cache const*node,video_color_t color,unsigned int chan_id,struct kd_tree_result*result){}
 #define LOCAL_IF_IMATRIX(x)
 #define LOCAL_ATTR
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union_type) video_pixel_t n##_color2pixel(struct video_surface const*surface,video_color_t color){}video_color_t n##_pixel2color(struct video_surface const*surface,video_pixel_t pixel){}video_pixel64_t n##_color2pixel64(struct video_surface const*surface,video_color64_t color){}video_color64_t n##_pixel2color64(struct video_surface const*surface,video_pixel64_t pixel){}
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA
+#define DEFINE_FORMAT_PIXEL_UNION(n,d,...) union pixel_##n{d data;struct __VA_ARGS__;};
+#define DEFINE_FORMAT_CONVERTER_RGBA(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union pixel_##n)
+#define DEFINE_FORMAT_CONVERTER_RGBX(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union pixel_##n)
+#define DEFINE_FORMAT_CONVERTER_RGB(n,d,...)  DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(n,d,union pixel_##n)
+#define DEFINE_FORMAT_CONVERTER_RGBA32_64(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union pixel_##n)
+#define DEFINE_FORMAT_CONVERTER_RGBX32_64(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union pixel_##n)
+#define DEFINE_FORMAT_CONVERTER_RGB32_64(n,d,...)  DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(n,d,union pixel_##n)
 #define DEFINE_PIXEL2COLOR64_WRAPPER32(d,_,x)video_color64_t x(struct video_surface const*__restrict surface,video_pixel64_t pixel){}
 #define DEFINE_COLOR2PIXEL64_WRAPPER32(d,_,x)video_pixel64_t x(struct video_surface const*__restrict surface,video_color64_t color){}
 #define DEFINE_PIXEL64_WRAPPERS(d,x)video_color64_t x##_pixel2color64(struct video_surface const*__restrict surface,video_pixel64_t pixel){}video_pixel64_t x##_color2pixel64(struct video_surface const*__restrict surface,video_color64_t color){}

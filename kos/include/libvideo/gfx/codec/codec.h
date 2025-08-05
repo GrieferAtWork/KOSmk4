@@ -118,20 +118,20 @@
 #define VIDEO_CODEC_XBGR2222 0x0037 /* 0b__BBGGRR  [r: 0x03, g: 0x0c, b: 0x30] */
 
 /* 32bpp HDR codecs */
-/* TODO: RGBA1010102 */
-/* TODO: RGBX1010102 */
-/* TODO: ARGB2101010 */
-/* TODO: XRGB2101010 */
-/* TODO: BGRA1010102 */
-/* TODO: BGRX1010102 */
-/* TODO: ABGR2101010 */
-/* TODO: XBGR2101010 */
-/* TODO: RGB111110 */
-/* TODO: RGB111011 */
-/* TODO: RGB101111 */
-/* TODO: BGR111110 */
-/* TODO: BGR111011 */
-/* TODO: BGR101111 */
+#define VIDEO_CODEC_RGBA1010102 0x0038
+#define VIDEO_CODEC_RGBX1010102 0x0039
+#define VIDEO_CODEC_ARGB2101010 0x003a
+#define VIDEO_CODEC_XRGB2101010 0x003b
+#define VIDEO_CODEC_BGRA1010102 0x003c
+#define VIDEO_CODEC_BGRX1010102 0x003d
+#define VIDEO_CODEC_ABGR2101010 0x003e
+#define VIDEO_CODEC_XBGR2101010 0x003f
+#define VIDEO_CODEC_RGB111110   0x0040
+#define VIDEO_CODEC_RGB111011   0x0041
+#define VIDEO_CODEC_RGB101111   0x0042
+#define VIDEO_CODEC_BGR111110   0x0043
+#define VIDEO_CODEC_BGR111011   0x0044
+#define VIDEO_CODEC_BGR101111   0x0045
 
 /* 64bpp direct color */
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
@@ -172,18 +172,17 @@
 #define VIDEO_CODEC_AL17     0x1017 /* 1-byte-per-pixel, 128-level grayscale+alpha (0=black; 15=white) */
 #define VIDEO_CODEC_LA88     0x1018 /* 2-byte-per-pixel, 256-level grayscale+alpha (0=black; 255=white) */
 #define VIDEO_CODEC_AL88     0x1019 /* 2-byte-per-pixel, 256-level grayscale+alpha (0=black; 255=white) */
-#define VIDEO_CODEC_A1_MSB   0x101a /* 1-bit-per-pixel, alpha-mask (rgb=0), left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
-#define VIDEO_CODEC_A1_LSB   0x101b /* 1-bit-per-pixel, alpha-mask (rgb=0), left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
-#define VIDEO_CODEC_A2_MSB   0x101c /* 2-bit-per-pixel, 4-level alpha-mask (0=transparent; 3=opaque; rgb=0), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
-#define VIDEO_CODEC_A2_LSB   0x101d /* 2-bit-per-pixel, 4-level alpha-mask (0=transparent; 3=opaque; rgb=0), left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
-#define VIDEO_CODEC_A4_MSB   0x101e /* 4-bit-per-pixel, 16-level alpha-mask (0=transparent; 15=opaque; rgb=0), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
-#define VIDEO_CODEC_A4_LSB   0x101f /* 4-bit-per-pixel, 16-level alpha-mask (0=transparent; 15=opaque; rgb=0), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
-#define VIDEO_CODEC_A8       0x1020 /* 1-byte-per-pixel, 256-level alpha-mask (0=transparent; 255=opaque; rgb=0) */
-#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
-/* TODO: L16 */
-/* TODO: LA1616 */
-/* TODO: AL1616 */
-#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
+#define VIDEO_CODEC_L16      0x101a /* 2-byte-per-pixel, 65536-level grayscale (0=black; 65535=white) */
+#define VIDEO_CODEC_LA1616   0x101b /* 4-byte-per-pixel, 65536-level grayscale+alpha (0=black; 65535=white) */
+#define VIDEO_CODEC_AL1616   0x101c /* 4-byte-per-pixel, 65536-level grayscale+alpha (0=black; 65535=white) */
+#define VIDEO_CODEC_A1_MSB   0x101d /* 1-bit-per-pixel, alpha-mask (rgb=0), left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
+#define VIDEO_CODEC_A1_LSB   0x101e /* 1-bit-per-pixel, alpha-mask (rgb=0), left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
+#define VIDEO_CODEC_A2_MSB   0x101f /* 2-bit-per-pixel, 4-level alpha-mask (0=transparent; 3=opaque; rgb=0), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
+#define VIDEO_CODEC_A2_LSB   0x1020 /* 2-bit-per-pixel, 4-level alpha-mask (0=transparent; 3=opaque; rgb=0), left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
+#define VIDEO_CODEC_A4_MSB   0x1021 /* 4-bit-per-pixel, 16-level alpha-mask (0=transparent; 15=opaque; rgb=0), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
+#define VIDEO_CODEC_A4_LSB   0x1022 /* 4-bit-per-pixel, 16-level alpha-mask (0=transparent; 15=opaque; rgb=0), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
+#define VIDEO_CODEC_A8       0x1023 /* 1-byte-per-pixel, 256-level alpha-mask (0=transparent; 255=opaque; rgb=0) */
+#define VIDEO_CODEC_A16      0x1024 /* 2-byte-per-pixel, 65536-level alpha-mask (0=transparent; 65535=opaque; rgb=0) */
 
 /* Palette-driven:
  * - In those cases where only a palette is used (without a dedicated
@@ -217,6 +216,9 @@
 #define VIDEO_CODEC_AP17     0x2017 /* 1-byte-per-pixel, 128-color palette+alpha */
 #define VIDEO_CODEC_PA88     0x2018 /* 2-byte-per-pixel, 256-color palette+alpha */
 #define VIDEO_CODEC_AP88     0x2019 /* 2-byte-per-pixel, 256-color palette+alpha */
+#define VIDEO_CODEC_P16      0x201a /* 2-byte-per-pixel, 65536-level palette */
+#define VIDEO_CODEC_PA1616   0x201b /* 4-byte-per-pixel, 65536-level palette+alpha */
+#define VIDEO_CODEC_AP1616   0x201c /* 4-byte-per-pixel, 65536-level palette+alpha */
 
 
 
