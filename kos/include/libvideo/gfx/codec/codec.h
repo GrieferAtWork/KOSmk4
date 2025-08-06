@@ -45,10 +45,11 @@
  *
  * CHANNELS:
  * - Color/data channels used by the codec, written in order:
- *   >> byte ASC, bit ASC
+ *   >> byte ASC, bit DESC
  *   iow: channels that appear in bytes at lower memory addresses
  *        are listed first, and channels that appear in the  same
- *        byte are listed from least-to-most significant bit.
+ *        byte  are  listed from  most-to-least  significant bit.
+ *        e.g. `VIDEO_CODEC_RGB332' uses: r:0xe0, g:0x1c,  b:0x03
  * - P: Palette index
  * - L: Luminance / brightness (0: black; 1: white)
  * - R: Red color component/intensity   (direct color codecs only)
@@ -73,35 +74,34 @@
  */
 
 /* Full-color */
-#define VIDEO_CODEC_RGBA8888 0x0001 /* >> struct { uint8_t r; uint8_t g; uint8_t b; uint8_t a; }
-                                     * Hint: in this codec, "video_pixel_t" and "video_color_t" are identical */
-#define VIDEO_CODEC_RGBX8888 0x0002 /* >> struct { uint8_t r; uint8_t g; uint8_t b; uint8_t x; } */
-#define VIDEO_CODEC_ARGB8888 0x0003 /* >> struct { uint8_t a; uint8_t r; uint8_t g; uint8_t b; } */
-#define VIDEO_CODEC_XRGB8888 0x0004 /* >> struct { uint8_t x; uint8_t r; uint8_t g; uint8_t b; } */
-#define VIDEO_CODEC_ABGR8888 0x0005 /* >> struct { uint8_t a; uint8_t b; uint8_t g; uint8_t r; } */
-#define VIDEO_CODEC_XBGR8888 0x0006 /* >> struct { uint8_t x; uint8_t b; uint8_t g; uint8_t r; } */
-#define VIDEO_CODEC_BGRA8888 0x0007 /* >> struct { uint8_t b; uint8_t g; uint8_t r; uint8_t a; } */
-#define VIDEO_CODEC_BGRX8888 0x0008 /* >> struct { uint8_t b; uint8_t g; uint8_t r; uint8_t x; } */
-#define VIDEO_CODEC_RGB888   0x0009 /* >> struct { uint8_t r; uint8_t g; uint8_t b; } */
-#define VIDEO_CODEC_BGR888   0x000a /* >> struct { uint8_t b; uint8_t g; uint8_t r; } */
-#define VIDEO_CODEC_RGBA4444 0x0011
-#define VIDEO_CODEC_RGBX4444 0x0012
-#define VIDEO_CODEC_ARGB4444 0x0013
-#define VIDEO_CODEC_XRGB4444 0x0014
-#define VIDEO_CODEC_ABGR4444 0x0015
-#define VIDEO_CODEC_XBGR4444 0x0016
-#define VIDEO_CODEC_BGRA4444 0x0017
-#define VIDEO_CODEC_BGRX4444 0x0018
-#define VIDEO_CODEC_RGB565   0x0019
-#define VIDEO_CODEC_BGR565   0x001a
-#define VIDEO_CODEC_RGBA5551 0x0021
-#define VIDEO_CODEC_RGBX5551 0x0022
-#define VIDEO_CODEC_ARGB1555 0x0023
-#define VIDEO_CODEC_XRGB1555 0x0024
-#define VIDEO_CODEC_ABGR1555 0x0025
-#define VIDEO_CODEC_XBGR1555 0x0026
-#define VIDEO_CODEC_BGRA5551 0x0027
-#define VIDEO_CODEC_BGRX5551 0x0028
+#define VIDEO_CODEC_RGBA8888 0x0001 /* { 0xRR, 0xGG, 0xBB, 0xAA } (Hint: in this codec, "video_pixel_t" and "video_color_t" are identical) */
+#define VIDEO_CODEC_RGBX8888 0x0002 /* { 0xRR, 0xGG, 0xBB, 0x__ } */
+#define VIDEO_CODEC_ARGB8888 0x0003 /* { 0xAA, 0xRR, 0xGG, 0xBB } */
+#define VIDEO_CODEC_XRGB8888 0x0004 /* { 0x__, 0xRR, 0xGG, 0xBB } */
+#define VIDEO_CODEC_ABGR8888 0x0005 /* { 0xAA, 0xBB, 0xGG, 0xRR } */
+#define VIDEO_CODEC_XBGR8888 0x0006 /* { 0x__, 0xBB, 0xGG, 0xRR } */
+#define VIDEO_CODEC_BGRA8888 0x0007 /* { 0xBB, 0xGG, 0xRR, 0xAA } */
+#define VIDEO_CODEC_BGRX8888 0x0008 /* { 0xBB, 0xGG, 0xRR, 0x__ } */
+#define VIDEO_CODEC_RGB888   0x0009 /* { 0xRR, 0xGG, 0xBB } */
+#define VIDEO_CODEC_BGR888   0x000a /* { 0xBB, 0xGG, 0xRR } */
+#define VIDEO_CODEC_RGBA4444 0x0011 /* { 0bRRRRGGGG, 0bBBBBAAAA } */
+#define VIDEO_CODEC_RGBX4444 0x0012 /* { 0bRRRRGGGG, 0bBBBB____ } */
+#define VIDEO_CODEC_ARGB4444 0x0013 /* { 0bAAAARRRR, 0bGGGGBBBB } */
+#define VIDEO_CODEC_XRGB4444 0x0014 /* { 0b____RRRR, 0bGGGGBBBB } */
+#define VIDEO_CODEC_ABGR4444 0x0015 /* { 0bAAAABBBB, 0bGGGGRRRR } */
+#define VIDEO_CODEC_XBGR4444 0x0016 /* { 0b____BBBB, 0bGGGGRRRR } */
+#define VIDEO_CODEC_BGRA4444 0x0017 /* { 0bBBBBGGGG, 0bRRRRAAAA } */
+#define VIDEO_CODEC_BGRX4444 0x0018 /* { 0bBBBBGGGG, 0bRRRR____ } */
+#define VIDEO_CODEC_RGB565   0x0019 /* { 0bRRRRRGGG, 0bGGGBBBBB } */
+#define VIDEO_CODEC_BGR565   0x001a /* { 0bBBBBBGGG, 0bGGGRRRRR } */
+#define VIDEO_CODEC_RGBA5551 0x0021 /* { 0bRRRRRGGG, 0bGGBBBBBA } */
+#define VIDEO_CODEC_RGBX5551 0x0022 /* { 0bRRRRRGGG, 0bGGBBBBB_ } */
+#define VIDEO_CODEC_ARGB1555 0x0023 /* { 0bARRRRRGG, 0bGGGBBBBB } */
+#define VIDEO_CODEC_XRGB1555 0x0024 /* { 0b_RRRRRGG, 0bGGGBBBBB } */
+#define VIDEO_CODEC_ABGR1555 0x0025 /* { 0bABBBBBGG, 0bGGGRRRRR } */
+#define VIDEO_CODEC_XBGR1555 0x0026 /* { 0b_BBBBBGG, 0bGGGRRRRR } */
+#define VIDEO_CODEC_BGRA5551 0x0027 /* { 0bBBBBBGGG, 0bGGRRRRRA } */
+#define VIDEO_CODEC_BGRX5551 0x0028 /* { 0bBBBBBGGG, 0bGGRRRRR_ } */
 #define VIDEO_CODEC_RGB332   0x0029 /* 0bRRRGGGBB  [r: 0xe0, g: 0x1c, b: 0x03] */
 #define VIDEO_CODEC_RGB323   0x002a /* 0bRRRGGBBB  [r: 0xe0, g: 0x18, b: 0x07] */
 #define VIDEO_CODEC_RGB233   0x002b /* 0bRRGGGBBB  [r: 0xc0, g: 0x38, b: 0x07] */
@@ -118,20 +118,20 @@
 #define VIDEO_CODEC_XBGR2222 0x0037 /* 0b__BBGGRR  [r: 0x03, g: 0x0c, b: 0x30] */
 
 /* 32bpp HDR codecs */
-#define VIDEO_CODEC_RGBA1010102 0x0038
-#define VIDEO_CODEC_RGBX1010102 0x0039
-#define VIDEO_CODEC_ARGB2101010 0x003a
-#define VIDEO_CODEC_XRGB2101010 0x003b
-#define VIDEO_CODEC_BGRA1010102 0x003c
-#define VIDEO_CODEC_BGRX1010102 0x003d
-#define VIDEO_CODEC_ABGR2101010 0x003e
-#define VIDEO_CODEC_XBGR2101010 0x003f
-#define VIDEO_CODEC_RGB111110   0x0040
-#define VIDEO_CODEC_RGB111011   0x0041
-#define VIDEO_CODEC_RGB101111   0x0042
-#define VIDEO_CODEC_BGR111110   0x0043
-#define VIDEO_CODEC_BGR111011   0x0044
-#define VIDEO_CODEC_BGR101111   0x0045
+#define VIDEO_CODEC_RGBA1010102 0x0038 /* { 0bRRRRRRRR, 0bRRGGGGGG, 0bGGGGBBBB, 0bBBBBBBAA } */
+#define VIDEO_CODEC_RGBX1010102 0x0039 /* { 0bRRRRRRRR, 0bRRGGGGGG, 0bGGGGBBBB, 0bBBBBBB__ } */
+#define VIDEO_CODEC_ARGB2101010 0x003a /* { 0bAARRRRRR, 0bRRRRGGGG, 0bGGGGGGBB, 0bBBBBBBBB } */
+#define VIDEO_CODEC_XRGB2101010 0x003b /* { 0b__RRRRRR, 0bRRRRGGGG, 0bGGGGGGBB, 0bBBBBBBBB } */
+#define VIDEO_CODEC_BGRA1010102 0x003c /* { 0bBBBBBBBB, 0bBBGGGGGG, 0bGGGGRRRR, 0bRRRRRRAA } */
+#define VIDEO_CODEC_BGRX1010102 0x003d /* { 0bBBBBBBBB, 0bBBGGGGGG, 0bGGGGRRRR, 0bRRRRRR__ } */
+#define VIDEO_CODEC_ABGR2101010 0x003e /* { 0bAABBBBBB, 0bBBBBGGGG, 0bGGGGGGRR, 0bRRRRRRRR } */
+#define VIDEO_CODEC_XBGR2101010 0x003f /* { 0b__BBBBBB, 0bBBBBGGGG, 0bGGGGGGRR, 0bRRRRRRRR } */
+#define VIDEO_CODEC_RGB111110   0x0040 /* { 0bRRRRRRRR, 0bRRRGGGGG, 0bGGGGGGBB, 0bBBBBBBBB } */
+#define VIDEO_CODEC_RGB111011   0x0041 /* { 0bRRRRRRRR, 0bRRRGGGGG, 0bGGGGGBBB, 0bBBBBBBBB } */
+#define VIDEO_CODEC_RGB101111   0x0042 /* { 0bRRRRRRRR, 0bRRGGGGGG, 0bGGGGGBBB, 0bBBBBBBBB } */
+#define VIDEO_CODEC_BGR111110   0x0043 /* { 0bBBBBBBBB, 0bBBBGGGGG, 0bGGGGGGRR, 0bRRRRRRRR } */
+#define VIDEO_CODEC_BGR111011   0x0044 /* { 0bBBBBBBBB, 0bBBBGGGGG, 0bGGGGGRRR, 0bRRRRRRRR } */
+#define VIDEO_CODEC_BGR101111   0x0045 /* { 0bBBBBBBBB, 0bBBGGGGGG, 0bGGGGGRRR, 0bRRRRRRRR } */
 
 /* 64bpp direct color */
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64

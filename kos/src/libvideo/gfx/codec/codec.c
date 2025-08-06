@@ -1517,16 +1517,20 @@ DEFINE_PIXEL64_IO_WRAPPERS(PRIVATE, MAP_IO, MAP_IO64)
 /* COLOR CONVERSION                                                     */
 /************************************************************************/
 
+#define bitmask(T, n) (((T)1 << (n)) - 1)
+
+/* Slow (but accurate), generic upscaling from "Nin" to "Nout" bits. */
+#define upscale_slow(c, Tresult, Ttworesult, Nin, Nout)        \
+	(Tresult)((((Ttworesult)(c) * bitmask(Ttworesult, Nout)) + \
+	           (bitmask(Ttworesult, Nin) / 2)) /               \
+	          bitmask(Ttworesult, Nin))
+
 /* 64-bit pixel format support */
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 LOCAL ATTR_CONST video_channel16_t FCC
 fill_missing_bits16(video_channel16_t value, shift_t miss_bits) {
 	/* TODO: Optimizations */
-#define bitmask(n) ((1 << (n)) - 1)
-	return (video_channel16_t)((((uint_fast32_t)value * 0xffff) +
-	                            bitmask(16 - miss_bits - 1)) /
-	                           bitmask(16 - miss_bits));
-#undef bitmask
+	return upscale_slow(value, video_channel16_t, uint_fast32_t, 16 - miss_bits, 16);
 }
 
 LOCAL ATTR_CONST video_channel16_t FCC
@@ -1795,7 +1799,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, bgrx8888)
 	          ((c) << 5))  /* ABC=abc */
 #else
 #define c3_to_c8(c) \
-	(uint8_t)((((uint_fast16_t)(c) * 255) + (7 / 2)) / 7)
+	upscale_slow(c, uint8_t, uint_fast16_t, 3, 8)
 #endif
 
 
@@ -1861,7 +1865,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, bgrx8888)
 	          ((c) << 3))  /* ABCDE=abcde */
 #else /* USE_FAST_COLOR_UPSCALE */
 #define c5_to_c8(c) \
-	(uint8_t)((((uint_fast16_t)(c) * 255) + (31 / 2)) / 31)
+	upscale_slow(c, uint8_t, uint_fast16_t, 5, 8)
 #endif /* !USE_FAST_COLOR_UPSCALE */
 
 
@@ -1959,7 +1963,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, bgrx8888)
 	          ((c) << 2))  /* ABCDEF=abcdef */
 #else /* USE_FAST_COLOR_UPSCALE */
 #define c6_to_c8(c) \
-	(uint8_t)((((uint_fast16_t)(c) * 255) + (63 / 2)) / 63)
+	upscale_slow(c, uint8_t, uint_fast16_t, 6, 8)
 #endif /* !USE_FAST_COLOR_UPSCALE */
 
 
@@ -2057,7 +2061,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, bgrx8888)
 	          ((c) >> 6))  /* H=a */
 #else
 #define c7_to_c8(c) \
-	(uint8_t)((((uint_fast16_t)(c) * 255) + (127 / 2)) / 127)
+	upscale_slow(c, uint8_t, uint_fast16_t, 7, 8)
 #endif
 
 
@@ -2077,9 +2081,8 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, bgrx8888)
  * >> fill_missing_bits(0x03, 6) == 0xff;
  */
 #ifndef USE_FAST_COLOR_UPSCALE
-#define __nmax(n) ((1 << (n)) - 1)
 #define __fill_missing_bits(c, n) \
-	(uint8_t)((((uint_fast16_t)(c) * 255) + __nmax(8 - (n) - 1)) / __nmax(8 - (n)))
+	upscale_slow(c, uint8_t, uint_fast16_t, 8 - (n), 8)
 #define _fill_missing_bits(c, n, _else) __fill_missing_bits(c, n)
 #define fill_missing_bits(c, n)         __fill_missing_bits(c, n)
 #else /* !USE_FAST_COLOR_UPSCALE */
@@ -2136,15 +2139,21 @@ STATIC_ASSERT(c2_to_c16(1) == 0x5555);
 STATIC_ASSERT(c2_to_c16(2) == 0xaaaa);
 STATIC_ASSERT(c2_to_c16(3) == 0xffff);
 
-/* Psuedo-smooth scaling. These don't perfectly match the optimial N->M scanling of:
- * >> #define bitmask(n) ((1 << n) - 1)
- * >> OUT = ((IN * bitmask(M)) + (bitmask(N) / 2)) / bitmask(N);
+/* Pseudo-smooth scaling. These don't perfectly match
+ * the optimal N->M scanling done by `upscale_slow()'
  *
  * But on the up-side, these don't need division! */
+#ifdef USE_FAST_COLOR_UPSCALE
 #define c8_to_c10(c)  (((uint16_t)(c) << 2) | ((uint16_t)(c) >> 6))
 #define c8_to_c11(c)  (((uint16_t)(c) << 3) | ((uint16_t)(c) >> 5))
 #define c10_to_c16(c) (((uint16_t)(c) << 6) | ((uint16_t)(c) >> 4))
 #define c11_to_c16(c) (((uint16_t)(c) << 5) | ((uint16_t)(c) >> 6))
+#else /* USE_FAST_COLOR_UPSCALE */
+#define c8_to_c10(c)  upscale_slow(c, uint16_t, uint_fast32_t, 8, 10)
+#define c8_to_c11(c)  upscale_slow(c, uint16_t, uint_fast32_t, 8, 11)
+#define c10_to_c16(c) upscale_slow(c, uint16_t, uint_fast32_t, 10, 16)
+#define c11_to_c16(c) upscale_slow(c, uint16_t, uint_fast32_t, 11, 16)
+#endif /* !USE_FAST_COLOR_UPSCALE */
 
 STATIC_ASSERT(c8_to_c10(0x00) == 0x000);
 STATIC_ASSERT(c8_to_c10(0xff) == 0x3ff);

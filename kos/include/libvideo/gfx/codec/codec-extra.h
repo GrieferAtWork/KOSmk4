@@ -56,7 +56,5 @@
  * As such, this format could also be called "RGB844" */
 #define VIDEO_CODEC_X_TILE16 0x3002
 
-/* TODO: 4-bit-per-pixel, 8-pixels-per-byte, planar */
-
 
 #endif /* !_LIBVIDEO_GFX_CODEC_CODEC_EXTRA_H */

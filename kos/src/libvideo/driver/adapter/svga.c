@@ -118,6 +118,8 @@ modeinfo_to_monitormode(struct svga_modeinfo const *__restrict modeinfo,
 		if unlikely(!monitor_mode->vmm_codec)
 			goto err;
 		video_codec_incref(monitor_mode->vmm_codec);
+//	} else if (modeinfo->smi_flags & SVGA_MODEINFO_F_PLANAR) {
+//		/* TODO: Custom codec for planar video modes. */
 	} else if (modeinfo->smi_bits_per_pixel == 4) {
 		monitor_mode->vmm_codec = video_codec_lookup(VIDEO_CODEC_X_VBE16);
 		if unlikely(!monitor_mode->vmm_codec)
@@ -692,8 +694,8 @@ _err_vdlck_libsvgadrv:
 	}
 
 	/* Initialize the chipset for user-space. */
-	/* TODO: Add a second  function "driver->scd_open"  that's allowed to  assume that  the
-	 *       chipset is correct, meaning it won't have to probe for the driver's existence. */
+	/* TODO: Add a second  function "driver->scd_open" that's  allowed to assume  that
+	 *       the chipset is correct, meaning it won't have to probe for its existence. */
 	bzero(&result->sva_cs.sc_modeops, sizeof(result->sva_cs.sc_modeops));
 	if (!(*result->sva_drv->scd_probe)(&result->sva_cs)) {
 		LOGERR("Failed to init chipset %q\n", csname);
