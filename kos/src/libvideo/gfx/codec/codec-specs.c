@@ -59,6 +59,10 @@ DECL_BEGIN
 DEFINE_PUBLIC_ALIAS(video_codec_lookup_specs, libvideo_codec_lookup_specs);
 INTERN WUNUSED ATTR_PURE ATTR_IN(1) struct video_codec *FCC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
+#define IS_RMASK8_LE(v) (specs->vcs_rmask == MASK8_LE(v))
+#define IS_GMASK8_LE(v) (specs->vcs_gmask == MASK8_LE(v))
+#define IS_BMASK8_LE(v) (specs->vcs_bmask == MASK8_LE(v))
+#define IS_AMASK8_LE(v) (specs->vcs_amask == MASK8_LE(v))
 #define IS_RMASK4_LE(v) (specs->vcs_rmask == MASK4_LE(v))
 #define IS_GMASK4_LE(v) (specs->vcs_gmask == MASK4_LE(v))
 #define IS_BMASK4_LE(v) (specs->vcs_bmask == MASK4_LE(v))
@@ -227,6 +231,41 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 	} else {
 #define SET_CODEC(c) do{codec = (c); goto return_codec;}__WHILE0
 		switch (specs->vcs_bpp) {
+
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
+		case 64:
+			if (IS_RMASK8_LE(0x000000000000ffff)) {
+				if (IS_GMASK8_LE(0x00000000ffff0000) && IS_BMASK8_LE(0x0000ffff00000000)) {
+					if (IS_AMASK8_LE(0xffff000000000000))
+						SET_CODEC(VIDEO_CODEC_RGBA16161616);
+					if (IS_AMASK0())
+						SET_CODEC(VIDEO_CODEC_RGBX16161616);
+				}
+			} else if (IS_RMASK8_LE(0x00000000ffff0000)) {
+				if (IS_GMASK8_LE(0x0000ffff00000000) && IS_BMASK8_LE(0xffff000000000000)) {
+					if (IS_AMASK8_LE(0x000000000000ffff))
+						SET_CODEC(VIDEO_CODEC_ARGB16161616);
+					if (IS_AMASK0())
+						SET_CODEC(VIDEO_CODEC_XRGB16161616);
+				}
+			} else if (IS_RMASK8_LE(0x0000ffff00000000)) {
+				if (IS_GMASK8_LE(0x00000000ffff0000) && IS_BMASK8_LE(0x000000000000ffff)) {
+					if (IS_AMASK8_LE(0xffff000000000000))
+						SET_CODEC(VIDEO_CODEC_BGRA16161616);
+					if (IS_AMASK0())
+						SET_CODEC(VIDEO_CODEC_BGRX16161616);
+				}
+			} else if (IS_RMASK8_LE(0xffff000000000000)) {
+				if (IS_GMASK8_LE(0x0000ffff00000000) && IS_BMASK8_LE(0x00000000ffff0000)) {
+					if (IS_AMASK8_LE(0x000000000000ffff))
+						SET_CODEC(VIDEO_CODEC_ABGR16161616);
+					if (IS_AMASK0())
+						SET_CODEC(VIDEO_CODEC_XBGR16161616);
+				}
+			}
+			break;
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
+
 		case 32:
 			if (IS_RMASK4_LE(0x000000ff)) {
 				if (IS_GMASK4_LE(0x0000ff00) && IS_BMASK4_LE(0x00ff0000)) {
@@ -477,6 +516,10 @@ return_codec:
 	return libvideo_codec_lookup(codec);
 nope:
 	return NULL;
+#undef IS_RMASK8_LE
+#undef IS_GMASK8_LE
+#undef IS_BMASK8_LE
+#undef IS_AMASK8_LE
 #undef IS_RMASK4_LE
 #undef IS_GMASK4_LE
 #undef IS_BMASK4_LE

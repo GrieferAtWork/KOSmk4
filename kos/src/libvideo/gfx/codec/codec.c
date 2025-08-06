@@ -8394,6 +8394,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
                                bool populate_noalign) {
 	self->vc_codec = VIDEO_CODEC_CUSTOM;
 	self->vc_specs.vcs_pxsz = CEILDIV(self->vc_specs.vcs_bpp, NBBY);
+	self->vc_specs.vcs_flags &= ~(VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64);
 	switch (self->vc_specs.vcs_bpp) {
 #if defined(CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3) && defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY)
 #define _INIT__vc_setpixel(self, f) (&rp3_##f, self->vc_setpixel = &f, self->_vc_setpixel3 = NULL)

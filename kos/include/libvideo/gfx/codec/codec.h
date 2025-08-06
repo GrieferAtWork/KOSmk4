@@ -233,13 +233,14 @@
                                           * then converting back)  This applies  to all  codecs supporting linear  blending, that  also make  use of  8-bits-per-channel.
                                           * The caller need not pre-calculate this flag for `video_codec_fromspecs' */
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
-/* HINT:
- * - VIDEO_CODEC_FLAG_COLOR64:
- *   - VIDEO_CODEC_RGBA1010102   (because channels are >8bit)
- *   - video_color64_t must be used for loss-less pixel<=>color conversion
- * - VIDEO_CODEC_FLAG_PIXEL64:
- *   - VIDEO_CODEC_RGBA16161616  (because "video_pixel_t" is too small to hold the full pixel)
- *   - video_pixel64_t must be used for loss-less reads/writes */
+/* VIDEO_CODEC_FLAG_COLOR64:
+ *  - video_color64_t must be used for loss-less pixel<=>color conversion
+ *  - Example: VIDEO_CODEC_RGBA1010102
+ *    because color channels are >8bit
+ * VIDEO_CODEC_FLAG_PIXEL64:
+ *  - video_pixel64_t must be used for loss-less reads/writes
+ *  - Example: VIDEO_CODEC_RGBA16161616
+ *    because "video_pixel_t" is too small to hold the full pixel */
 #define VIDEO_CODEC_FLAG_COLOR64    0x20 /* This codec uses color channels >8bit, meaning `vc_pixel2color' produces truncated results and `vc_pixel2color64' should be used */
 #define VIDEO_CODEC_FLAG_PIXEL64    0x40 /* This codec's bpp is >32, meaning `vc_color2pixel' produces truncated results and `vc_color2pixel64' should be used. This flag implies `VIDEO_CODEC_FLAG_COLOR64' */
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
