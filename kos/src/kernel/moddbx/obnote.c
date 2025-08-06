@@ -536,6 +536,14 @@ NOTHROW(KCALL note_fdirent)(pformatprinter printer, void *arg,
 	return note_fdirent_ex(printer, arg, pointer, pstatus, true);
 }
 
+PRIVATE NONNULL((1, 4)) ssize_t
+NOTHROW(KCALL note_devdirent)(pformatprinter printer, void *arg,
+                              NCX void const *pointer,
+                              unsigned int *__restrict pstatus) {
+	NCX struct devdirent *me = (struct devdirent *)pointer;
+	return note_fdirent_ex(printer, arg, &me->dd_dirent, pstatus, false);
+}
+
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_cpu)(pformatprinter printer, void *arg,
@@ -1824,6 +1832,7 @@ PRIVATE struct obnote_entry const notes[] = {
 #endif /* __ARCH_HAVE_COMPAT */
 	{ "constdir", &note_mfile },
 	{ "cpu", &note_cpu },
+	{ "devdirent", &note_devdirent },
 	{ "device", &note_mfile },
 	{ "dirhandle", &note_dirhandle },
 	{ "driver", &note_module },
