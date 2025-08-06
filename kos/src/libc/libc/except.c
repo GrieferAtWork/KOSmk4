@@ -26,23 +26,30 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <hybrid/host.h>
 #include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/bsearch.h>
 
+#include <bits/syscalls.h>
 #include <kos/bits/except-register-state-helpers.h>
 #include <kos/bits/except-register-state.h>
+#include <kos/coredump.h>
 #include <kos/debugtrap.h>
 #include <kos/except-handler.h>
 #include <kos/except.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/malloc.h>
+#include <kos/nopf.h>
 #include <kos/rpc.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
 #include <sys/syslog.h>
 
 #include <assert.h>
 #include <atomic.h>
-#include <format-printer.h>
+#include <dlfcn.h>
 #include <malloc.h>
 #include <sched.h>
 #include <signal.h>
@@ -50,9 +57,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <syscall.h>
 #include <unistd.h>
 
+#include <libunwind/api.h>
+#include <libunwind/cfi.h>
 #include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/errno.h>
@@ -63,8 +71,6 @@
 #include "dl.h"
 #include "except-libunwind.h"
 #include "except.h"
-#include "globals.h"
-#include "sigreturn.h"
 #include "tls.h"
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -171,24 +177,10 @@ PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_sigframe_exec[]  = "unw
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_sigframe_apply[] = "unwind_cfa_sigframe_apply";
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 
-PRIVATE SECTION_EXCEPT_TEXT ssize_t FORMATPRINTER_CC
-libunwind_error_printer(void *arg, char const *__restrict data, size_t datalen) {
-	(void)syslog_printer(arg, data, datalen);
-	(void)writeall(STDERR_FILENO, data, datalen);
-	return (ssize_t)datalen;
-}
-
 PRIVATE SECTION_EXCEPT_TEXT ATTR_NORETURN void LIBCCALL libunwind_init_failed(void) {
 	PRIVATE SECTION_EXCEPT_STRING char const
-	message_libunwind_init_failed[] = "%s: failed to initialize libunwind: %s\n";
-	pformatprinter printer = &syslog_printer;
-	if (isatty(STDERR_FILENO))
-		printer = &libunwind_error_printer;
-	format_printf(printer, SYSLOG_PRINTER_CLOSURE(LOG_ERR),
-	              message_libunwind_init_failed,
-	              program_invocation_short_name,
-	              dlerror());
-	exit(EXIT_FAILURE);
+	message_libunwind_init_failed[] = "failed to initialize libunwind: %s";
+	abortf(message_libunwind_init_failed, dlerror());
 }
 
 /* Initialize libunwind bindings. */
