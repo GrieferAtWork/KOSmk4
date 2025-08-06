@@ -383,7 +383,7 @@ nicdev_routepacket(struct nicdev *__restrict self,
                    size_t real_packet_size);
 
 
-/* Get/set the the default NIC device. */
+/* Get/set the default NIC device. */
 FUNDEF WUNUSED REF struct nicdev *
 NOTHROW(KCALL nicdev_getdefault)(void);
 FUNDEF NONNULL((1)) void

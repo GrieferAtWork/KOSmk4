@@ -991,9 +991,9 @@ done_writeback:
 		goto again;
 	}
 
-	/* Clear the LOCK-bit and CHANGED-flag at the same time! :)
-	 * Also  clear the the `MPART_F_MAYBE_BLK_INIT' flag, since
-	 * we're handling that case as well (see above) */
+	/* Clear the LOCK-bit and CHANGED-flag at the same time!  :)
+	 * Also clear the `MPART_F_MAYBE_BLK_INIT' flag, since we're
+	 * handling that case as well (see above) */
 	if (keep_lock) {
 		atomic_and(&self->mp_flags, ~(MPART_F_CHANGED | MPART_F_MAYBE_BLK_INIT));
 		return result;

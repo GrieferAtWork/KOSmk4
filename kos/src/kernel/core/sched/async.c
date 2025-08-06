@@ -1095,8 +1095,8 @@ again:
 		/* Special handling for when the job has a custom cancel callback.
 		 * If it does, then we must force one of the async  worker-threads
 		 * to invoke that callback for us!
-		 * We can do this by transitioning the the job to `_ASYNC_ST_TRIGGERED_STOP',
-		 * the  same  we also  would  if we  can't  acquire `async_all_tryacquire()'. */
+		 * We can do this by transitioning the job to `_ASYNC_ST_TRIGGERED_STOP',
+		 * the same we also would  if we can't acquire  `async_all_tryacquire()'. */
 		if (self->a_ops->ao_cancel != NULL)
 			goto do_async_cancel;
 

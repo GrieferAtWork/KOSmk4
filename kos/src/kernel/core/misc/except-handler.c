@@ -1423,7 +1423,7 @@ NOTHROW(FCALL libc_except_unwind_fault)(except_register_state_t *__restrict stat
 
 
 /* Throw the current exception (which must _NOT_ be E_INTERRUPT_USER_RPC)
- * at the the given `state' and  perform all of the necessary  unwinding.
+ * at  the  given `state'  and perform  all  of the  necessary unwinding.
  *
  * This  function should  be used  for throwing  exception from interrupt
  * handlers (read: CPU exception handler), such as page-faults & similar. */

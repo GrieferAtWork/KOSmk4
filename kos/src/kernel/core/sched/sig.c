@@ -1698,7 +1698,7 @@ DEFINE_TEST(recursive_signals) {
 	sig_broadcast(&s);
 
 	/* Simulate what kfree() for the signal would do, thus
-	 * ensuring that the the signal can still be received,
+	 * ensuring  that  the signal  can still  be received,
 	 * even after it was destroyed. */
 	memset(&s, 0xcc, sizeof(s));
 

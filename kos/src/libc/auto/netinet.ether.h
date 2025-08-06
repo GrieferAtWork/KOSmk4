@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1aa6a144 */
+/* HASH CRC-32:0x9a6a903e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,25 +32,25 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+ * uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation. */
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBDCALL libd_ether_ntoa)(struct ether_addr const *__restrict addr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+ * uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation. */
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+ * uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation. */
 INTDEF ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBDCALL libd_ether_ntoa_r)(struct ether_addr const *__restrict addr, char *__restrict buf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+ * uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation. */
 INTDEF ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr, char *__restrict buf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

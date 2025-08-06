@@ -42,7 +42,7 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs);
  * new codecs on-the-fly. Because this function is able/allowed to  create
  * new codecs on-the-fly, the caller must take ownership of a reference to
  * `*p_handle'  on success, and  keep that reference alive  for as long as
- * the the returned codec is in-use.
+ * the returned codec is in-use.
  *
  * When the described codec is actually a built-in one, this function always
  * succeeds,  and a  reference to a  dummy object is  stored in `*p_handle'.

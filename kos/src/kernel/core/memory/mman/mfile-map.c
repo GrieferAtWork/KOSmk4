@@ -387,10 +387,9 @@ again_acquire:
  * to all of the individual parts pointed to by the nodes allocated by `self')
  * For this purpose,  re-locking a mem-node-allocator  will (once again)  make
  * sure that _all_ parts and nodes form a single, continuous range of mappings
- * as  specified  in  the  original  call  to  `mfile_map_init()',  leaving no
- * holes  anywhere along the way, while the the act of holding locks to all of
- * the  parts then guaranties that no new holes can possibly pop up out of the
- * blue. */
+ * as specified in the original  call to `mfile_map_init()', leaving no  holes
+ * anywhere  along the way, while the act of holding locks to all of the parts
+ * then guaranties that no new holes can possibly pop up out of the blue. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_map_release)(struct mfile_map *__restrict self) {
 	struct mnode *node;

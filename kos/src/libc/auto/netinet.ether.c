@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa80dc17 */
+/* HASH CRC-32:0xea921aea */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ DECL_BEGIN
 #include "../libc/tls-globals.h"
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+ * uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation. */
 INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *
 NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr) {
 
@@ -57,7 +57,7 @@ NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr) 
 #include <net/ethernet.h>
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+ * uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation. */
 INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT(2) char *
 NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr,
                                         char *__restrict buf) {

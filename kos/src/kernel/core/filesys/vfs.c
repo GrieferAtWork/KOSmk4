@@ -151,7 +151,7 @@ NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
 
 		/* Update # of live recent paths */
 		if (path_vfs->vf_recentcnt >= path_vfs->vf_recentmax) {
-			/* Must remove the least recently used path from the the cache. */
+			/* Must remove the least recently used path from the cache. */
 			REF struct path *oldpath;
 			oldpath = TAILQ_LAST(&path_vfs->vf_recent);
 			TAILQ_REMOVE_TAIL(&path_vfs->vf_recent, p_recent);

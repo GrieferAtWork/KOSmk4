@@ -86,10 +86,10 @@ static_assert(offsetof(struct pae_pdir_e3_identity_t_struct, x[1])       == 8);
 
 
 #ifndef __x86_64__
-/* We can't use the the normal atomic_read(), since the code that GCC (rightfully) generates
+/* We can't use  the normal atomic_read(),  since the code  that GCC (rightfully)  generates
  * for atomically reading a 64-bit  value makes use of the  FPU, which is something that  we
  * can't have, as the paging system can't possibly make use of the FPU, as this would create
- * a dependency on the heap sub-system (which could cause E_BADALLOC), as well as a loop:
+ * a dependency on the heap  sub-system (which could cause E_BADALLOC),  as well as a  loop:
  *
  *    PAGING ─> FPU ─> MALLOC ─> HEAP ─> MMAP
  *       ^                                │

@@ -694,7 +694,7 @@ decode_symbol_nocache:
 					distance += extra;
 				}
 				/* At this point, we've decoded both `length' and `distance'!
-				 * -> Time to the the actual work. */
+				 * -> Time to the actual work. */
 				if unlikely(!distance)
 					YIELD_FOREVER(ZLIB_ERROR_BAD_DISTANCE);
 				if unlikely(!length)

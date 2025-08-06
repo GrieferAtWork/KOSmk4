@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc039444f */
+/* HASH CRC-32:0x2749ed5f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,25 +45,25 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_ether_ntoa
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+ * uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation. */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,ether_ntoa,(struct ether_addr const *__restrict __addr),(__addr))
 #else /* __CRT_HAVE_ether_ntoa */
 #include <libc/local/netinet.ether/ether_ntoa.h>
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+ * uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ether_ntoa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char *__NOTHROW_NCX(__LIBCCALL ether_ntoa)(struct ether_addr const *__restrict __addr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_ntoa))(__addr); })
 #endif /* !__CRT_HAVE_ether_ntoa */
 #ifdef __CRT_HAVE_ether_ntoa_r
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+ * uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation. */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,ether_ntoa_r,(struct ether_addr const *__restrict __addr, char *__restrict __buf),(__addr,__buf))
 #else /* __CRT_HAVE_ether_ntoa_r */
 #include <libc/local/netinet.ether/ether_ntoa_r.h>
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+ * uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ether_ntoa_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_IN(1) __ATTR_OUT(2) char *__NOTHROW_NCX(__LIBCCALL ether_ntoa_r)(struct ether_addr const *__restrict __addr, char *__restrict __buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_ntoa_r))(__addr, __buf); })
 #endif /* !__CRT_HAVE_ether_ntoa_r */
 #ifdef __CRT_HAVE_ether_aton

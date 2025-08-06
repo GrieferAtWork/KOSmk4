@@ -460,8 +460,8 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	--pidns_root.pn_size;
 
 	/* Unmap, sync, & unprepare the mappings for the CPU's IDLE and #DF stacks.
-	 * NOTE: Because these mappings are private the the CPU itself, we don't
-	 *       need to  be holding  a lock  to the  kernel VM  for this  part! */
+	 * NOTE: Because these mappings are private the CPU itself, we don't
+	 *       need  to be holding a lock to  the kernel VM for this part! */
 	mnode_pagedir_unmap(&FORCPU(self, thiscpu_x86_dfstacknode_));
 	mnode_pagedir_sync(&FORCPU(self, thiscpu_x86_dfstacknode_));
 	mnode_pagedir_kernelunprepare(&FORCPU(self, thiscpu_x86_dfstacknode_));

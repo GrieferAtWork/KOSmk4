@@ -95,7 +95,7 @@ struct ATTR_PACKED gcc_lsda_callsite {
 	                            * Otherwise,  this  is   1+  a   byte  offset  into   the  action   table?? */
 };
 struct ATTR_PACKED gcc_lsda {
-	/* Format the the GCC LanguageSpecificData pointed to by `unwind_fde_struct::f_lsdaaddr' */
+	/* Format for the GCC LanguageSpecificData pointed to by `unwind_fde_struct::f_lsdaaddr' */
 	u8              gl_landing_enc;  /* Encoding used for `gl_landing_pad' (One of `DW_EH_PE_*') */
 	uintptr_t       gl_landing_pad;  /* [exists_if(gl_landing_enc != DW_EH_PE_omit)]
 	                                  * [ENCODING(gl_landing_enc)] Base address of the landing pad

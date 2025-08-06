@@ -266,7 +266,7 @@ AXREF(nic_device_axref, nicdev);
 /* [0..1] The default NIC device. */
 PRIVATE struct nic_device_axref default_nic_device = AXREF_INIT(NULL);
 
-/* Get/set the the default NIC device. */
+/* Get/set the default NIC device. */
 PUBLIC WUNUSED REF struct nicdev *
 NOTHROW(KCALL nicdev_getdefault)(void) {
 	return axref_get(&default_nic_device);

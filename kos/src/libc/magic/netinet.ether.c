@@ -45,7 +45,7 @@ __SYSDECL_BEGIN
 
 @@>> ether_ntoa(3), ether_ntoa_r(3)
 @@Convert `addr' into a 20-character-long string that
-@@uses the the standard `AA:BB:CC:DD:EE:FF' notation.
+@@uses  the  standard  `AA:BB:CC:DD:EE:FF'  notation.
 [[decl_prefix(struct ether_addr;)]]
 [[nonnull, wunused, impl_include("<net/ethernet.h>")]]
 char *ether_ntoa([[in]] struct ether_addr const *__restrict addr) {

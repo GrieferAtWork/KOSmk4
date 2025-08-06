@@ -38,8 +38,8 @@
 
 
 /* Push a `struct ucpustate' upon entry to some function. The pushed
- * structure describes the the CPU state as it was for the caller of
- * the function (as closely as possible).
+ * structure describes the CPU state as it was for the caller of the
+ * function (as closely as possible).
  *
  * Note that the `lr' register will have already been lost, so a stub
  * value is pushed for it instead.
