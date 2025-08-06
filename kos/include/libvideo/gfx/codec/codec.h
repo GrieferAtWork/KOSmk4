@@ -136,13 +136,13 @@
 /* 64bpp direct color */
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 #define VIDEO_CODEC_RGBA16161616 0x0046 /* { 0bRRRRRRRR, 0bRRRRRRRR, 0bGGGGGGGG, 0bGGGGGGGG, 0bBBBBBBBB, 0bBBBBBBBB, 0bAAAAAAAA, 0bAAAAAAAA } */
-/* TODO: RGBX16161616 */
-/* TODO: ARGB16161616 */
-/* TODO: XRGB16161616 */
-/* TODO: BGRA16161616 */
-/* TODO: BGRX16161616 */
-/* TODO: ABGR16161616 */
-/* TODO: XBGR16161616 */
+#define VIDEO_CODEC_RGBX16161616 0x0047 /* { 0bRRRRRRRR, 0bRRRRRRRR, 0bGGGGGGGG, 0bGGGGGGGG, 0bBBBBBBBB, 0bBBBBBBBB, 0b________, 0b________ } */
+#define VIDEO_CODEC_ARGB16161616 0x0048 /* { 0bAAAAAAAA, 0bAAAAAAAA, 0bRRRRRRRR, 0bRRRRRRRR, 0bGGGGGGGG, 0bGGGGGGGG, 0bBBBBBBBB, 0bBBBBBBBB } */
+#define VIDEO_CODEC_XRGB16161616 0x0049 /* { 0b________, 0b________, 0bRRRRRRRR, 0bRRRRRRRR, 0bGGGGGGGG, 0bGGGGGGGG, 0bBBBBBBBB, 0bBBBBBBBB } */
+#define VIDEO_CODEC_BGRA16161616 0x004a /* { 0bBBBBBBBB, 0bBBBBBBBB, 0bGGGGGGGG, 0bGGGGGGGG, 0bRRRRRRRR, 0bRRRRRRRR, 0bAAAAAAAA, 0bAAAAAAAA } */
+#define VIDEO_CODEC_BGRX16161616 0x004b /* { 0bBBBBBBBB, 0bBBBBBBBB, 0bGGGGGGGG, 0bGGGGGGGG, 0bRRRRRRRR, 0bRRRRRRRR, 0b________, 0b________ } */
+#define VIDEO_CODEC_ABGR16161616 0x004c /* { 0bAAAAAAAA, 0bAAAAAAAA, 0bBBBBBBBB, 0bBBBBBBBB, 0bGGGGGGGG, 0bGGGGGGGG, 0bRRRRRRRR, 0bRRRRRRRR } */
+#define VIDEO_CODEC_XBGR16161616 0x004d /* { 0b________, 0b________, 0bBBBBBBBB, 0bBBBBBBBB, 0bGGGGGGGG, 0bGGGGGGGG, 0bRRRRRRRR, 0bRRRRRRRR } */
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 
@@ -234,9 +234,12 @@
                                           * The caller need not pre-calculate this flag for `video_codec_fromspecs' */
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 /* HINT:
- * - VIDEO_CODEC_FLAG_COLOR64: VIDEO_CODEC_RGBA1010102   (because channels are >8bit)
- * - VIDEO_CODEC_FLAG_PIXEL64: VIDEO_CODEC_RGBA16161616  (because "video_pixel_t" is too small to hold the full pixel)
- */
+ * - VIDEO_CODEC_FLAG_COLOR64:
+ *   - VIDEO_CODEC_RGBA1010102   (because channels are >8bit)
+ *   - video_color64_t must be used for loss-less pixel<=>color conversion
+ * - VIDEO_CODEC_FLAG_PIXEL64:
+ *   - VIDEO_CODEC_RGBA16161616  (because "video_pixel_t" is too small to hold the full pixel)
+ *   - video_pixel64_t must be used for loss-less reads/writes */
 #define VIDEO_CODEC_FLAG_COLOR64    0x20 /* This codec uses color channels >8bit, meaning `vc_pixel2color' produces truncated results and `vc_pixel2color64' should be used */
 #define VIDEO_CODEC_FLAG_PIXEL64    0x40 /* This codec's bpp is >32, meaning `vc_color2pixel' produces truncated results and `vc_color2pixel64' should be used. This flag implies `VIDEO_CODEC_FLAG_COLOR64' */
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
