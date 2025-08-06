@@ -335,6 +335,14 @@ FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct async *
 NOTHROW(FCALL async_cancel)(struct async *__restrict self);
 
 
+/* This is the comletion function that gets linked against `struct async::a_comp->*->scc_cb' */
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL __async_completion)(struct sigcompcon *__restrict self,
+                                  struct sigcompctx *__restrict context,
+                                  void *buf, size_t bufsize);
+
+
+
 #ifndef __async_list_defined
 #define __async_list_defined
 LIST_HEAD(async_list, async);

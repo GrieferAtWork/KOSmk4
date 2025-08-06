@@ -1252,10 +1252,9 @@ NOTHROW_CB_NCX(KCALL print_named_pointer)(struct ctyperef const *__restrict self
 	{
 		REF module_t *mod;
 		if ((mod = module_fromaddr_nx(ptr)) != NULL) {
-			uintptr_t module_relative_ptr;
 			di_addr2line_sections_t sections;
 			di_addr2line_dl_sections_t dl_sections;
-			module_relative_ptr = (uintptr_t)ptr - module_getloadaddr(mod);
+			uintptr_t module_relative_ptr = (uintptr_t)ptr - module_getloadaddr(mod);
 			/* Try to lookup  the name/base-address  of a  symbol
 			 * that contains the given `ptr' and is part of `mod' */
 			if (debug_addr2line_sections_lock(mod, &sections, &dl_sections) == DEBUG_INFO_ERROR_SUCCESS) {
@@ -1644,12 +1643,11 @@ err:
  * @return: DBX_EOK:    A custom representation was printed.
  * @return: DBX_ENOENT: Given struct-type has no custom representation.
  * @return: DBX_EFAULT: Segmentation fault while trying to read from `ptr' */
-PRIVATE WUNUSED NONNULL((1, 2, 4)) dbx_errno_t
+PRIVATE WUNUSED NONNULL((1, 2, 4, 6)) dbx_errno_t
 NOTHROW_CB_NCX(KCALL print_special_struct)(struct ctyperef const *__restrict self,
                                            struct cprinter const *__restrict printer,
                                            NCX void const *ptr, ssize_t *__restrict p_result,
-                                           unsigned int flags) {
-	NCX char const *raw_name /*= NULL*/;
+                                           unsigned int flags, bool *p_omit_struct_fields) {
 	struct ctype *typ = self->ct_typ;
 
 	/* Caller should  have already  ensured  that this  is  a
@@ -1657,25 +1655,24 @@ NOTHROW_CB_NCX(KCALL print_special_struct)(struct ctyperef const *__restrict sel
 	if unlikely(!CTYPE_KIND_ISSTRUCT(typ->ct_kind))
 		return DBX_ENOENT;
 
-	/* Special handling for `int128_t' and `uint128_t'. For
-	 * this purpose, we (at least) want to match the types:
-	 * - `int128_t'                 (from `<int128.h>')
-	 * - `uint128_t'                (from `<int128.h>')
-	 * - `__hybrid_int128_struct'   (from `<hybrid/int128.h>')
-	 * - `__hybrid_uint128_struct'  (from `<hybrid/int128.h>')
-	 * - `__hybrid_int128_t'        (from `<hybrid/int128.h>')
-	 * - `__hybrid_uint128_t'       (from `<hybrid/int128.h>')
-	 */
-	if (typ->ct_struct.ct_sizeof == 16) {
+	switch (typ->ct_struct.ct_sizeof) {
+
+	case 16: {
+		/* Special handling for `int128_t' and `uint128_t'. For
+		 * this purpose, we (at least) want to match the types:
+		 * - `int128_t'                 (from `<int128.h>')
+		 * - `uint128_t'                (from `<int128.h>')
+		 * - `__hybrid_int128_struct'   (from `<hybrid/int128.h>')
+		 * - `__hybrid_uint128_struct'  (from `<hybrid/int128.h>')
+		 * - `__hybrid_int128_t'        (from `<hybrid/int128.h>')
+		 * - `__hybrid_uint128_t'       (from `<hybrid/int128.h>')
+		 */
 		NCX char const *name;
-		bool is_unsigned;
-		/*if (raw_name == NULL)*/ {
-			raw_name = ctype_struct_getname(typ);
-			if (raw_name == NULL)
-				raw_name = self->ct_info.ci_name;
-		}
-		name = raw_name;
+		name = ctype_struct_getname(typ);
+		if (name == NULL)
+			name = self->ct_info.ci_name;
 		if (name != NULL) {
+			bool is_unsigned;
 			for (;;) {
 				if (*name == '_') {
 					++name;
@@ -1696,6 +1693,31 @@ NOTHROW_CB_NCX(KCALL print_special_struct)(struct ctyperef const *__restrict sel
 			if (strcmp(name, "int128_struct") == 0 || strcmp(name, "int128_t") == 0)
 				return do_print_int128(printer, ptr, is_unsigned, flags, p_result);
 		}
+	}	break;
+
+	case sizeof(void *): {
+		NCX char const *name;
+		struct cmodule *mod = typ->ct_struct.ct_info.cd_mod;
+		if (cmodule_iskern(mod)) {
+			name = ctype_struct_getname(typ);
+			if (name == NULL)
+				name = self->ct_info.ci_name;
+			if (name != NULL) {
+				if (strcmp(name, "sig") == 0 && (flags & CTYPE_PRINTVALUE_FLAG_NESTED)) {
+					/* Omit signal fields, since "s_con" would just repeat info  already
+					 * available by the obnote of "sig". Note that we only do this  when
+					 * the signal is being printed in a nested context (as the member of
+					 * some larger struct, or an  array element). When printing the  sig
+					 * directly, we don't do this special handling.
+					 */
+					*p_omit_struct_fields = true;
+					return DBX_ENOENT;
+				}
+			}
+		}
+	}	break;
+
+	default: break;
 	}
 
 	/* Support for other special struct-types would go here. */
@@ -1900,6 +1922,12 @@ NOTHROW_CB_NCX(KCALL ctype_printvalue)(struct ctyperef const *__restrict self,
 					break;
 				}
 			}
+			/* TODO: Special handling for flag-style fields of known structs:
+			 * - When  we get here  due to printing "struct mfile::mf_flags",
+			 *   instead  of printing the raw number, print a |-joined set of
+			 *   flag names describing what this number *actually* represents
+			 */
+
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
 			if (flags & CTYPE_PRINTVALUE_FLAG_FORCEHEX)
 				goto print_integer_value_as_hex;
@@ -1945,7 +1973,8 @@ print_integer_value_as_hex:
 			/* Support for (compiler-native) 128-bit integers (if not already covered by `intmax_t'). */
 			dbx_errno_t error;
 			temp  = 0;
-			error = do_print_int128(printer, buf, CTYPE_KIND_INT_ISUNSIGNED(kind), flags, &temp);
+			error = do_print_int128(printer, buf, CTYPE_KIND_INT_ISUNSIGNED(kind),
+			                        flags, &temp);
 			if (error == DBX_EFAULT)
 				goto err_segfault;
 			if unlikely(temp < 0)
@@ -2021,10 +2050,12 @@ print_integer_value_as_hex:
 			struct ctype_printstruct_data ps;
 		} data;
 		unsigned int inner_flags;
+		bool omit_struct_fields = false;
 		if (!(flags & CTYPE_PRINTVALUE_FLAG_NOSPECSTRUCT)) {
 			/* Special handling for structs that have custom representations (like `int128_t'). */
 			dbx_errno_t error;
-			error = print_special_struct(self, printer, buf, &temp, flags);
+			error = print_special_struct(self, printer, buf, &temp, flags,
+			                             &omit_struct_fields);
 			if (error != DBX_ENOENT) {
 				if unlikely(error == DBX_EFAULT)
 					goto err_segfault;
@@ -2039,13 +2070,19 @@ print_integer_value_as_hex:
 			}
 		}
 
+		flags |= CTYPE_PRINTVALUE_FLAG_NESTED;
 		inner_flags = flags;
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
 		PRINT("{");
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
 		++firstline_indent; /* Account for the leading '{' */
-		if (flags & CTYPE_PRINTVALUE_FLAG_NORECURSION)
-			goto do_print_no_recursion_dots_and_rbrace;
+		if ((flags & CTYPE_PRINTVALUE_FLAG_NORECURSION) || omit_struct_fields) {
+			FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_PREFIX);
+			PRINT("...");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_SUFFIX);
+			goto done_struct;
+		}
+
 		/* First pass: Figure out if we want multi-line mode. */
 		if (flags & CTYPE_PRINTVALUE_FLAG_ONELINE) {
 			do_multiline = false;
@@ -2169,6 +2206,7 @@ done_struct:
 			DO(ctype_printcstring(printer, buf, buflen, string_kind));
 			break;
 		}
+		flags |= CTYPE_PRINTVALUE_FLAG_NESTED;
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
 		PRINT("{");
 		elem_size = ctype_sizeof(me->ct_array.ca_elem);
@@ -2177,7 +2215,7 @@ done_struct:
 		} else {
 			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
 			if (flags & CTYPE_PRINTVALUE_FLAG_NORECURSION) {
-do_print_no_recursion_dots_and_rbrace:
+/*do_print_no_recursion_dots_and_rbrace:*/
 				FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_PREFIX);
 				PRINT("...");
 				FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_SUFFIX);

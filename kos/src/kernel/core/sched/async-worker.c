@@ -61,7 +61,7 @@ struct aworker: async {
 	uintptr_t       aw_inuse; /* # of CPUs using `aw_obj' right now. */
 #endif /* !CONFIG_NO_SMP */
 };
-#define aworker_getops(self) ((struct async_worker_ops *)(self)->a_ops)
+#define aworker_getops(self) ((struct async_worker_ops const *)(self)->a_ops)
 
 #define aworker_decref_obj(self, obj) \
 	(*handle_type_db.h_decref[(self)->aw_typ])(obj);

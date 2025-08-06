@@ -309,11 +309,6 @@ PRIVATE struct async_ops const mpart_ajob_fallback_ops = {
 	.ao_work    = &mpart_ajob_fallback_v_work,
 };
 
-INTDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t /* From "sched/async.c" */
-NOTHROW(FCALL async_completion)(struct sigcompcon *__restrict self,
-                                struct sigcompctx *__restrict context,
-                                void *buf, size_t bufsize);
-
 /* Fallback async worker for `mpart_start_asyncjob()'
  * This one's defined as INTERN because it is  linked
  * into the global `async_all_list' by default. */
@@ -329,7 +324,7 @@ INTERN struct mpart_ajob mpart_ajob_fallback_worker = {
 					.mr_com = SIGCOMPCON_INIT_EX(&mpart_ajob_fallback_sig,
 					                             &mpart_ajob_fallback_worker.mpaj_async.a_comp.smc_cons[0].mr_com.scc_con,
 					                             &mpart_ajob_fallback_worker.mpaj_async.a_comp.smc_cons[0].mr_com.scc_con,
-					                             0, &async_completion),
+					                             0, &__async_completion),
 					.mr_multcon = &mpart_ajob_fallback_worker.mpaj_async.a_comp,
 				}
 			},

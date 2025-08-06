@@ -226,11 +226,11 @@ NOTHROW(FCALL async_postcompletion)(struct sigcompctx *__restrict UNUSED(context
                                     void *buf);
 
 
-/* Must be INTERN because used in the static init of `mpart_ajob_fallback_worker' */
-INTERN NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL async_completion)(struct sigcompcon *__restrict self,
-                                struct sigcompctx *__restrict context,
-                                void *buf, size_t bufsize) {
+/* This is the comletion function that gets linked against `struct async::a_comp->*->scc_cb' */
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL __async_completion)(struct sigcompcon *__restrict self,
+                                  struct sigcompctx *__restrict context,
+                                  void *buf, size_t bufsize) {
 	struct async *me;
 
 	/*sig_multicompletion_trydisconnectall(self);*/ /* TODO: Optimization */
@@ -242,7 +242,7 @@ NOTHROW(FCALL async_completion)(struct sigcompcon *__restrict self,
 
 	/* Do all of the actual work in a post-completion callback. */
 	*(REF struct async **)buf = me; /* Inherit reference */
-	context->scc_post         = &async_postcompletion;
+	context->scc_post = &async_postcompletion;
 	return sizeof(REF struct async *);
 }
 
@@ -258,7 +258,7 @@ again:
 	assert(!sigmulticomp_isconnected(&self->a_comp));
 	TRY {
 		result = (*self->a_ops->ao_connect)(self);
-		sigmulticomp_connect_from_task(&self->a_comp, &async_completion,
+		sigmulticomp_connect_from_task(&self->a_comp, &__async_completion,
 		                               0, SIGCOMPCON_CONNECT_F_POLL);
 	} EXCEPT {
 		sigmulticomp_disconnectall(&self->a_comp);

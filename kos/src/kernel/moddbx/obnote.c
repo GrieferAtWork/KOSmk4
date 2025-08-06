@@ -30,6 +30,7 @@
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 /**/
+#include <debugger/input.h>
 #include <debugger/rt.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
@@ -68,10 +69,13 @@
 #include <kernel/mman/ramfile.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
+#include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/pertask.h>
 #include <sched/pid.h>
 #include <sched/scheduler.h>
+#include <sched/sig.h>
+#include <sched/sigcomp.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
@@ -81,6 +85,7 @@
 
 #include <compat/config.h>
 #include <kos/exec/elf.h>
+#include <kos/exec/module.h>
 #include <kos/exec/rtld.h>
 #include <kos/io.h>
 #include <kos/kernel/handle.h>
@@ -98,6 +103,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+
+#include <libdebuginfo/addr2line.h>
 
 #include "include/obnote.h"
 
@@ -126,6 +133,51 @@ DECL_BEGIN
 #define PRINT(str)         DO(RAWPRINT(str))
 #define REPEAT(ch, count)  DO(format_repeat(printer, arg, ch, count))
 #define PRINTF(...)        DO(format_printf(printer, arg, __VA_ARGS__))
+
+
+
+/* Try to print the name of a given "addr" */
+PRIVATE ATTR_NOINLINE NONNULL((1)) bool
+NOTHROW(KCALL try_print_addrname)(pformatprinter printer, void *arg,
+                                  NCX void const *addr, ssize_t *p_result) {
+	REF module_t *mod;
+	if ((mod = module_fromaddr_nx(addr)) != NULL) {
+		di_addr2line_sections_t sections;
+		di_addr2line_dl_sections_t dl_sections;
+		uintptr_t module_relative_ptr = (uintptr_t)addr - module_getloadaddr(mod);
+		if (debug_addr2line_sections_lock(mod, &sections, &dl_sections) == DEBUG_INFO_ERROR_SUCCESS) {
+			di_debug_addr2line_t a2l;
+			if (debug_addr2line(&sections, &a2l, module_relative_ptr,
+			                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
+			                    DEBUG_ADDR2LINE_FNORMAL) == DEBUG_INFO_ERROR_SUCCESS) {
+				if (!a2l.al_rawname)
+					a2l.al_rawname = a2l.al_name;
+				if (a2l.al_rawname && !*a2l.al_rawname)
+					a2l.al_rawname = NULL;
+				if (a2l.al_rawname) {
+					uintptr_t offset = module_relative_ptr - a2l.al_symstart;
+					ssize_t result = (*printer)(arg, a2l.al_rawname, strlen(a2l.al_rawname));
+					if likely(result >= 0 && offset != 0) {
+						ssize_t temp = format_printf(printer, arg, "+%#" PRIxPTR, offset);
+						if unlikely(temp < 0) {
+							result = temp;
+						} else {
+							result += temp;
+						}
+					}
+					debug_addr2line_sections_unlock(&dl_sections);
+					module_decref_unlikely(mod);
+					*p_result = result;
+					return true;
+				}
+			}
+			debug_addr2line_sections_unlock(&dl_sections);
+		}
+		module_decref_unlikely(mod);
+	}
+	return false;
+}
+
 
 /* Touch at least 1 byte from every page within the given address range. */
 PRIVATE void KCALL
@@ -1799,6 +1851,201 @@ badobj:
 }
 
 
+/* Check if "this_one" appears in the chain [start,end) */
+PRIVATE WUNUSED NONNULL((1, 2, 3)) bool KCALL
+sigcon_hascon_before(struct sigcon *start,
+                     struct sigcon *end,
+                     struct sigcon *this_one) {
+	for (; start != end; start = start->sc_next) {
+		if (start == this_one)
+			return true;
+		if (dbg_awaituser())
+			return true;
+	}
+	return false;
+}
+
+#define SIGCON_COUNT_CONNECTIONS_BADSIG ((size_t)-1)
+PRIVATE WUNUSED NONNULL((1, 2, 3)) size_t KCALL
+sigcon_count_connections(struct sigcon *start, struct sig *s,
+                         struct sigcon **p_first_task_connection)
+		THROWS(E_SEGFAULT) {
+	size_t result = 1;
+	struct sigcon *iter;
+	*p_first_task_connection = NULL;
+	for (iter = start;;) {
+		struct sigcon *next;
+		if (*p_first_task_connection == NULL &&
+		    SIGCON_STAT_ISTHREAD(iter->sc_stat))
+			*p_first_task_connection = iter;
+		next = iter->sc_next;
+		if (next->sc_sig != s)
+			goto badobj;
+		if (next->sc_prev != iter)
+			goto badobj;
+		if (!IS_ALIGNED((uintptr_t)next, ALIGNOF_SIGCON))
+			goto badobj;
+		if (dbg_awaituser())
+			goto badobj;
+		if (next == start)
+			break;
+		if (sigcon_hascon_before(start, iter, next))
+			goto badobj;
+		iter = next;
+		++result;
+	}
+	return result;
+badobj:
+	return SIGCON_COUNT_CONNECTIONS_BADSIG;
+}
+
+PRIVATE NONNULL((1, 4)) ssize_t
+NOTHROW(KCALL note_sigcon)(pformatprinter printer, void *arg,
+                           NCX void const *pointer,
+                           unsigned int *__restrict pstatus) {
+	ssize_t temp, result;
+	struct sigcon *me = (struct sigcon *)pointer;
+	struct task *linked_thread = NULL;
+	if (!ADDR_ISKERN(me))
+		goto badobj;
+	if (!IS_ALIGNED((uintptr_t)me, ALIGNOF_SIGCON))
+		goto badobj;
+	TRY {
+		if (SIGCON_STAT_ISTHREAD(me->sc_stat)) {
+			struct taskcons *cons = me->sc_cons;
+			if (!ADDR_ISKERN(cons))
+				goto badobj;
+			linked_thread = cons->tcs_thread;
+			if (!ADDR_ISKERN(linked_thread))
+				goto badobj;
+		}
+	} EXCEPT {
+		goto badobj;
+	}
+	if (linked_thread) {
+		result = note_task(printer, arg, linked_thread, pstatus);
+	} else {
+		/* Print details on the connected completion callback
+		 * (preferably the name  of its completion  function) */
+		struct sigcompcon *comp = (struct sigcompcon *)me;
+		sigcomp_cb_t cb;
+		TRY {
+			cb = comp->scc_cb;
+			if (!ADDR_ISKERN(cb))
+				goto badobj;
+		} EXCEPT {
+			goto badobj;
+		}
+		/* Special case for print more relevant infos when the receiver is an "async" code-snippet */
+		if (cb == &__async_completion) {
+			struct _sigmulticompcon *con = (struct _sigmulticompcon *)comp;
+			struct sigmulticomp *multi;
+			struct async *as;
+			void const *work_cb;
+			TRY {
+				struct async_ops const *ops;
+				multi = con->mr_multcon;
+				if (!ADDR_ISKERN(multi))
+					goto badobj;
+				as = container_of(multi, struct async, a_comp);
+				if (!ADDR_ISKERN(as))
+					goto badobj;
+				ops = as->a_ops;
+				if (!ADDR_ISKERN(ops))
+					goto badobj;
+				work_cb = (void const *)ops->ao_work;
+				if (!ADDR_ISKERN(work_cb))
+					goto badobj;
+				if (work_cb == (void const *)&_async_worker_v_work) {
+					/* Special case when `async_worker_new()' was used to create the async controller */
+					struct async_worker_ops const *aw_ops;
+					aw_ops = (struct async_worker_ops const *)ops;
+					work_cb = (void const *)aw_ops->awo_work;
+					if (!ADDR_ISKERN(work_cb))
+						goto badobj;
+				}
+			} EXCEPT {
+				goto badobj;
+			}
+			result = RAWPRINT("async→");
+			if unlikely(result < 0)
+				goto done;
+			if (try_print_addrname(printer, arg, work_cb, &temp)) {
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+			} else {
+				PRINTF("comp@%p", work_cb);
+			}
+		} else if (try_print_addrname(printer, arg, (void const *)cb, &result)) {
+			/* OK! -- was able to print the name of the completion receiver */
+		} else {
+			result = format_printf(printer, arg, "comp@%p", cb);
+		}
+	}
+done:
+	return result;
+err:
+	return temp;
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+PRIVATE NONNULL((1, 4)) ssize_t
+NOTHROW(KCALL note_sig)(pformatprinter printer, void *arg,
+                        NCX void const *pointer,
+                        unsigned int *__restrict pstatus) {
+	ssize_t temp, result;
+	struct sig *me = (struct sig *)pointer;
+	struct sigcon *firstcon;
+	struct sigcon *display_con;
+	size_t num_connections;
+	TRY {
+		if (!IS_ALIGNED((uintptr_t)me, alignof(struct sig)))
+			goto badobj;
+		if (!ADDR_ISKERN(me))
+			goto badobj;
+		firstcon = me->s_con;
+	} EXCEPT {
+		goto badobj;
+	}
+	if (firstcon == NULL)
+		return RAWPRINT("empty");
+	TRY {
+		if (!ADDR_ISKERN(firstcon))
+			goto badobj;
+		if (!IS_ALIGNED((uintptr_t)firstcon, ALIGNOF_SIGCON))
+			goto badobj;
+		if (firstcon->sc_sig != me)
+			goto badobj;
+		num_connections = sigcon_count_connections(firstcon, me, &display_con);
+		if unlikely(num_connections == SIGCON_COUNT_CONNECTIONS_BADSIG)
+			goto badobj;
+		if (display_con == NULL)
+			display_con = firstcon;
+	} EXCEPT {
+		goto badobj;
+	}
+	result = RAWPRINT("→");
+	if unlikely(result < 0)
+		goto done;
+	DO(note_sigcon(printer, arg, display_con, pstatus));
+	if (*pstatus != OBNOTE_PRINT_STATUS_SUCCESS)
+		goto done;
+	if (num_connections > 1)
+		PRINTF("[+%" PRIuSIZ "]", num_connections - 1);
+done:
+	return result;
+err:
+	return temp;
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+
+
 
 
 
@@ -1873,20 +2120,8 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "ptyslave", &note_mfile },
 	{ "ramfs_dirnode", &note_mfile },
 	{ "ramfs_super", &note_fsuper },
-	/* TODO: sig   (as in: <sched/sig.h>)
-	 * - If no connections:
-	 *   - "empty"
-	 * - If there is at least 1 sigtaskcon:
-	 *   - "→<note_task-of-sigtaskcon>[+<N>]"
-	 *   - "→~<note_task-of-sigtaskcon>[+<N>]"
-	 *   - "note_task" uses the "note_task" function above to print a description of the task
-	 * - else:
-	 *   - "→comp[+<N>]"
-	 *   - "→~comp[+<N>]"
-	 * - Where "[,<N>]" is printed if there are more connections,
-	 *   with  "+<N>" being the number of additional connections.
-	 * - The leading "~" is printed if the associated connection is poll-based
-	 */
+	{ "sig", &note_sig },
+	{ "sigcon", &note_sigcon },
 	{ "task", &note_task },
 	{ "taskpid", &note_taskpid },
 	{ "time_t", &note_time_t },
@@ -1902,6 +2137,8 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "userelf_module", &note_module },
 	{ "userelf_module_section", &note_module_section },
 	{ "videodev", &note_mfile },
+	/* TODO: General solution for all types created by "AWREF", "ARREF" or "AXREF" */
+
 	/* TODO: It would be amazing if we could render a miniature preview of video_buffer-s,
 	 *       but that's probably  impossible. Next-best thing  though: show dimension  and
 	 *       rotation. */
