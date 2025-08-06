@@ -125,22 +125,22 @@
 
 
 #ifdef EXCEPT_REGISTER_STATE_TYPE_IS_TRANSITIVE_UCPUSTATE
-#define __PRIVATE_except_register_state_(name)  ucpustate_##name
+#define __PRIVATE_except_register_state_(name) ucpustate_##name
 #define __PRIVATE__except_register_state(name) name##_ucpustate
 #elif defined(EXCEPT_REGISTER_STATE_TYPE_IS_TRANSITIVE_LCPUSTATE)
-#define __PRIVATE_except_register_state_(name)  lcpustate_##name
+#define __PRIVATE_except_register_state_(name) lcpustate_##name
 #define __PRIVATE__except_register_state(name) name##_lcpustate
 #elif defined(EXCEPT_REGISTER_STATE_TYPE_IS_TRANSITIVE_KCPUSTATE)
-#define __PRIVATE_except_register_state_(name)  kcpustate_##name
+#define __PRIVATE_except_register_state_(name) kcpustate_##name
 #define __PRIVATE__except_register_state(name) name##_kcpustate
 #elif defined(EXCEPT_REGISTER_STATE_TYPE_IS_TRANSITIVE_ICPUSTATE)
-#define __PRIVATE_except_register_state_(name)  icpustate_##name
+#define __PRIVATE_except_register_state_(name) icpustate_##name
 #define __PRIVATE__except_register_state(name) name##_icpustate
 #elif defined(EXCEPT_REGISTER_STATE_TYPE_IS_TRANSITIVE_SCPUSTATE)
-#define __PRIVATE_except_register_state_(name)  scpustate_##name
+#define __PRIVATE_except_register_state_(name) scpustate_##name
 #define __PRIVATE__except_register_state(name) name##_scpustate
 #elif defined(EXCEPT_REGISTER_STATE_TYPE_IS_TRANSITIVE_FCPUSTATE)
-#define __PRIVATE_except_register_state_(name)  fcpustate_##name
+#define __PRIVATE_except_register_state_(name) fcpustate_##name
 #define __PRIVATE__except_register_state(name) name##_fcpustate
 #endif /* !... */
 
@@ -151,6 +151,12 @@
 #ifndef __except_register_state_set_unwind_exception
 #error "Arch did not `#define __except_register_state_set_unwind_exception'"
 #endif /* !__except_register_state_set_unwind_exception */
+#ifndef __except_register_state_get_unwind_switch
+#error "Arch did not `#define __except_register_state_get_unwind_switch'"
+#endif /* !__except_register_state_get_unwind_switch */
+#ifndef __except_register_state_set_unwind_switch
+#error "Arch did not `#define __except_register_state_set_unwind_switch'"
+#endif /* !__except_register_state_set_unwind_switch */
 #endif /* !__DEEMON__ */
 #define except_register_state_get_unwind_exception __except_register_state_get_unwind_exception
 #define except_register_state_set_unwind_exception __except_register_state_set_unwind_exception

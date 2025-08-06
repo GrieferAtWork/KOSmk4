@@ -75,6 +75,8 @@ __DECL_END
 #define __except_register_state_setsp(x, value)                (void)((x)->__ers_sp = (__UINT32_TYPE__)(value))
 #define __except_register_state_get_unwind_exception(x)        ((__BYTE_TYPE__ const *)(x)->__ers_r0) /* TODO: Check if this is correct! */
 #define __except_register_state_set_unwind_exception(x, value) (void)((x)->__ers_r0 = (__UINT32_TYPE__)(value))
+#define __except_register_state_get_unwind_switch(x)           ((__BYTE_TYPE__ const *)(x)->__ers_r1) /* TODO: Check if this is correct! */
+#define __except_register_state_set_unwind_switch(x, value)    (void)((x)->__ers_r1 = (__UINT32_TYPE__)(value))
 #endif /* __CC__ */
 #endif /* !__USE_KOS_KERNEL */
 

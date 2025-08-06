@@ -91,6 +91,8 @@ __DECL_END
 #define __except_register_state_setsp(x, value)                (void)((x)->__ers_psp = (__REGISTER_TYPE__)(value))
 #define __except_register_state_get_unwind_exception(x)        ((__BYTE_TYPE__ const *)(x)->__ers_pax)
 #define __except_register_state_set_unwind_exception(x, value) (void)((x)->__ers_pax = (__REGISTER_TYPE__)(value))
+#define __except_register_state_get_unwind_switch(x)           ((__BYTE_TYPE__ const *)(x)->__ers_pdx)
+#define __except_register_state_set_unwind_switch(x, value)    (void)((x)->__ers_pdx = (__u32)(value))
 #endif /* __CC__ */
 #endif /* !__USE_KOS_KERNEL */
 

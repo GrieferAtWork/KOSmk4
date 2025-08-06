@@ -24,6 +24,8 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <kos/bits/except-register-state-helpers.h>
 #include <kos/bits/except-register-state.h>
 #include <kos/except.h>
@@ -31,6 +33,7 @@
 #include <kos/types.h>
 
 #include <ctype.h>
+#include <dlfcn.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
