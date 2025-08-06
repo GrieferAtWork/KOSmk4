@@ -293,6 +293,53 @@ struct video_gfx_ops {
 	                                 video_offset_t __src_x, video_offset_t __src_y,
 	                                 video_dim_t __src_size_x, video_dim_t __src_size_y);
 
+//TODO:	/* Same as operators above, but using "video_color64_t" instead of "video_color_t" */
+//TODO:	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_IN_T(1) video_color64_t
+//TODO:	(LIBVIDEO_GFX_CC *vgfo_getcolor64)(struct video_gfx const *__restrict __self,
+//TODO:	                                   video_offset_t __x, video_offset_t __y);
+//TODO:	__ATTR_IN_T(1) void
+//TODO:	(LIBVIDEO_GFX_CC *vgfo_putcolor64)(struct video_gfx const *__restrict __self,
+//TODO:	                                   video_offset_t __x, video_offset_t __y,
+//TODO:	                                   video_color64_t __color);
+//TODO:	__ATTR_IN_T(1) void
+//TODO:	(LIBVIDEO_GFX_CC *vgfo_line64)(struct video_gfx const *__restrict __self,
+//TODO:	                               video_offset_t __x1, video_offset_t __y1,
+//TODO:	                               video_offset_t __x2, video_offset_t __y2,
+//TODO:	                               video_color64_t __color);
+//TODO:	__ATTR_IN_T(1) void
+//TODO:	(LIBVIDEO_GFX_CC *vgfo_hline64)(struct video_gfx const *__restrict __self,
+//TODO:	                                video_offset_t __x, video_offset_t __y,
+//TODO:	                                video_dim_t __length, video_color64_t __color);
+//TODO:	__ATTR_IN_T(1) void
+//TODO:	(LIBVIDEO_GFX_CC *vgfo_vline64)(struct video_gfx const *__restrict __self,
+//TODO:	                                video_offset_t __x, video_offset_t __y,
+//TODO:	                                video_dim_t __length, video_color64_t __color);
+//TODO:	__ATTR_IN_T(1) void
+//TODO:	(LIBVIDEO_GFX_CC *vgfo_fill64)(struct video_gfx const *__restrict __self,
+//TODO:	                               video_offset_t __x, video_offset_t __y,
+//TODO:	                               video_dim_t __size_x, video_dim_t __size_y,
+//TODO:	                               video_color64_t __color);
+//TODO:	__ATTR_IN_T(1) void
+//TODO:	(LIBVIDEO_GFX_CC *vgfo_rect64)(struct video_gfx const *__restrict __self,
+//TODO:	                               video_offset_t __x, video_offset_t __y,
+//TODO:	                               video_dim_t __size_x, video_dim_t __size_y,
+//TODO:	                               video_color64_t __color);
+//TODO:	__ATTR_IN_T(1) __ATTR_IN_T(6) void
+//TODO:	(LIBVIDEO_GFX_CC *vgfo_gradient64)(struct video_gfx const *__restrict __self,
+//TODO:	                                   video_offset_t __x, video_offset_t __y,
+//TODO:	                                   video_dim_t __size_x, video_dim_t __size_y,
+//TODO:	                                   video_color64_t const __colors[2][2]);
+//TODO:	__ATTR_IN_T(1) void
+//TODO:	(LIBVIDEO_GFX_CC *vgfo_hgradient64)(struct video_gfx const *__restrict __self,
+//TODO:	                                    video_offset_t __x, video_offset_t __y,
+//TODO:	                                    video_dim_t __size_x, video_dim_t __size_y,
+//TODO:	                                    video_color64_t __locolor, video_color64_t __hicolor);
+//TODO:	__ATTR_IN_T(1) void
+//TODO:	(LIBVIDEO_GFX_CC *vgfo_vgradient64)(struct video_gfx const *__restrict __self,
+//TODO:	                                    video_offset_t __x, video_offset_t __y,
+//TODO:	                                    video_dim_t __size_x, video_dim_t __size_y,
+//TODO:	                                    video_color64_t __locolor, video_color64_t __hicolor);
+
 	/* TODO: Repeats of all above operators, using floats instead of "video_offset_t" */
 
 	/* More driver-specific operators go here... */

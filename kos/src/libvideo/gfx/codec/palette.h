@@ -36,11 +36,6 @@ DECL_BEGIN
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 libvideo_palette_color2pixel_generic(struct video_palette const *__restrict self,
                                      video_pixel_t n_colors, video_color_t color);
-#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t CC
-libvideo_palette_color2pixel64_generic(struct video_palette const *__restrict self,
-                                       video_pixel64_t n_colors, video_color64_t color);
-#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 /* Generic palette object creator (used by ramdomain) */
 INTDEF WUNUSED NONNULL((1)) REF struct video_palette *CC

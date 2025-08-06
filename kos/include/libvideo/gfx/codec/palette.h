@@ -168,7 +168,6 @@ extern __ATTR_NONNULL((1)) void video_palette_decref(/*obj*/struct video_palette
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 #define video_palette_pixel2color64(self, pixel) \
 	VIDEO_COLOR64_FROM_COLOR((self)->vp_pal[pixel])
-/* TODO: There should probably be a "vp_color2pixel64" operator */
 #define video_palette_color2pixel64(self, color) \
 	((*video_palette_asobject(self)->vp_color2pixel)(self, VIDEO_COLOR_FROM_COLOR64(color)))
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
@@ -199,16 +198,6 @@ LIBVIDEO_GFX_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t L
 video_palette_color2pixel_generic(struct video_palette const *__restrict __self,
                                   video_pixel_t __n_colors, video_color_t __color);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
-typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel64_t
-(LIBVIDEO_GFX_CC *PVIDEO_PALETTE_COLOR2PIXEL64_GENERIC)(struct video_palette const *__restrict __self,
-                                                        video_pixel64_t __n_colors, video_color64_t __color);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel64_t LIBVIDEO_GFX_CC
-video_palette_color2pixel64_generic(struct video_palette const *__restrict __self,
-                                    video_pixel64_t __n_colors, video_color64_t __color);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 __DECL_END
 #endif /* __CC__ */

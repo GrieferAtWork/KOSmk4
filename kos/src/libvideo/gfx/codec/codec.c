@@ -3510,9 +3510,9 @@ INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t
 		return video_palette_color2pixel64(pal, color);
 
 	/* Else: must do a slow (fallback) pixel calculation */
-	return libvideo_palette_color2pixel64_generic(pal,
-	                                              video_codec_getpalcolors(video_surface_getcodec(surface)),
-	                                              color);
+	return (video_pixel64_t)libvideo_palette_color2pixel_generic(pal,
+	                                                             video_codec_getpalcolors(video_surface_getcodec(surface)),
+	                                                             VIDEO_COLOR_FROM_COLOR64(color));
 }
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
@@ -5114,7 +5114,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 
 	/* 32bpp HDR codecs */
 	CASE_CODEC_ALn(VIDEO_CODEC_RGBA1010102,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0x000003ff),
@@ -5131,7 +5131,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               rgba1010102_pixel2color, rgba1010102_color2pixel, initconv_from_rgba);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_RGBX1010102,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 30,
 	                /* vcs_rmask */ MASK4_LE(0x000003ff),
@@ -5148,7 +5148,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               rgbx1010102_pixel2color, rgbx1010102_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_ARGB2101010,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0x00000ffc),
@@ -5165,7 +5165,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               argb2101010_pixel2color, argb2101010_color2pixel, initconv_from_rgba);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_XRGB2101010,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 30,
 	                /* vcs_rmask */ MASK4_LE(0x00000ffc),
@@ -5182,7 +5182,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               xrgb2101010_pixel2color, xrgb2101010_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_BGRA1010102,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0x3ff00000),
@@ -5199,7 +5199,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               bgra1010102_pixel2color, bgra1010102_color2pixel, initconv_from_rgba);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_BGRX1010102,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 30,
 	                /* vcs_rmask */ MASK4_LE(0x3ff00000),
@@ -5216,7 +5216,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               bgrx1010102_pixel2color, bgrx1010102_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_ABGR2101010,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0xffc00000),
@@ -5233,7 +5233,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               abgr2101010_pixel2color, abgr2101010_color2pixel, initconv_from_rgba);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_XBGR2101010,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 30,
 	                /* vcs_rmask */ MASK4_LE(0xffc00000),
@@ -5250,7 +5250,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               xbgr2101010_pixel2color, xbgr2101010_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_RGB111110,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0x000007ff), /* 11-bit */
@@ -5267,7 +5267,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               rgb111110_pixel2color, rgb111110_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_RGB111011,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0x000007ff), /* 11-bit */
@@ -5284,7 +5284,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               rgb111011_pixel2color, rgb111011_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_RGB101111,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0x000003ff), /* 10-bit */
@@ -5301,7 +5301,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               rgb101111_pixel2color, rgb101111_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_BGR111110,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0xffc00000), /* 10-bit */
@@ -5318,7 +5318,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               bgr111110_pixel2color, bgr111110_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_BGR111011,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0xffe00000), /* 11-bit */
@@ -5335,7 +5335,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               bgr111011_pixel2color, bgr111011_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_BGR101111,
-	               (VIDEO_CODEC_FLAG_NORMAL,
+	               (VIDEO_CODEC_FLAG_COLOR64,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0xffe00000), /* 11-bit */

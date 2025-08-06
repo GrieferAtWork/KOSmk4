@@ -191,16 +191,6 @@ libvideo_palette_color2pixel_generic(struct video_palette const *__restrict self
 	return winner;
 }
 
-#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
-DEFINE_PUBLIC_ALIAS(video_palette_color2pixel64_generic, libvideo_palette_color2pixel64_generic);
-INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t CC
-libvideo_palette_color2pixel64_generic(struct video_palette const *__restrict self,
-                                       video_pixel64_t n_colors, video_color64_t color) {
-	video_color_t color32 = VIDEO_COLOR_FROM_COLOR64(color);
-	return libvideo_palette_color2pixel_generic(self, (video_pixel_t)n_colors, color32);
-}
-#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
-
 
 
 
