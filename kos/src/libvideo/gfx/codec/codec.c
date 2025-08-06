@@ -72,6 +72,13 @@ DECL_BEGIN
 #define lpixel_t video_pixel_t
 #endif /* !CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
+#ifndef VIDEO_CODEC_FLAG_COLOR64
+#define VIDEO_CODEC_FLAG_COLOR64 0
+#endif /* !VIDEO_CODEC_FLAG_COLOR64 */
+#ifndef VIDEO_CODEC_FLAG_PIXEL64
+#define VIDEO_CODEC_FLAG_PIXEL64 0
+#endif /* !VIDEO_CODEC_FLAG_PIXEL64 */
+
 #ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
 #if defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY) && !defined(__INTELLISENSE__)
 #error "_vc_setpixel3 not supported by compiler, but enabled in features -- rebuild with 'CONFIG_NO_VIDEO_CODEC_HAVE__VC_SETPIXEL3'"
@@ -92,6 +99,13 @@ DECL_BEGIN
 #endif /* ... */
 #endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
+
+union word64 {
+	uint64_t qword;
+	uint32_t dwords[2];
+	uint16_t words[4];
+	byte_t   bytes[8];
+};
 
 union word32 {
 	uint32_t dword;
@@ -317,10 +331,10 @@ rectcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	codec_assert(!(dst_stride & 1));
-	codec_assert(!(src_stride & 1));
-	codec_assert(!((uintptr_t)dst_line & 1));
-	codec_assert(!((uintptr_t)src_line & 1));
+	codec_assert(!(dst_stride & (__ALIGNOF_INT16__ - 1)));
+	codec_assert(!(src_stride & (__ALIGNOF_INT16__ - 1)));
+	codec_assert(!((uintptr_t)dst_line & (__ALIGNOF_INT16__ - 1)));
+	codec_assert(!((uintptr_t)src_line & (__ALIGNOF_INT16__ - 1)));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 #ifndef __OPTIMIZE_SIZE__
 	if (dst_stride == src_stride && dst_stride == (size_x << 1)) {
@@ -346,9 +360,9 @@ rectmove16(byte_t *__restrict dst_line, video_coord_t dst_x,
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	codec_assert(!(stride & 1));
-	codec_assert(!((uintptr_t)dst_line & 1));
-	codec_assert(!((uintptr_t)src_line & 1));
+	codec_assert(!(stride & (__ALIGNOF_INT16__ - 1)));
+	codec_assert(!((uintptr_t)dst_line & (__ALIGNOF_INT16__ - 1)));
+	codec_assert(!((uintptr_t)src_line & (__ALIGNOF_INT16__ - 1)));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 #ifndef __OPTIMIZE_SIZE__
 	if (stride == (size_x << 1)) {
@@ -399,8 +413,8 @@ vertfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
 	line += x << 1;
 	codec_assert(num_pixels > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	codec_assert(!(stride & 1));
-	codec_assert(!((uintptr_t)line & 1));
+	codec_assert(!(stride & (__ALIGNOF_INT16__ - 1)));
+	codec_assert(!((uintptr_t)line & (__ALIGNOF_INT16__ - 1)));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
 		*(uint16_t *)line = (uint16_t)pixel;
@@ -415,8 +429,8 @@ rectfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	codec_assert(!(stride & 1));
-	codec_assert(!((uintptr_t)line & 1));
+	codec_assert(!(stride & (__ALIGNOF_INT16__ - 1)));
+	codec_assert(!((uintptr_t)line & (__ALIGNOF_INT16__ - 1)));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 #ifndef __OPTIMIZE_SIZE__
 	if (stride == (size_x << 1)) {
@@ -1143,8 +1157,8 @@ vertfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
 	line += x << 2;
 	codec_assert(num_pixels > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	codec_assert(!(stride & 3));
-	codec_assert(!((uintptr_t)line & 3));
+	codec_assert(!(stride & (__ALIGNOF_INT32__ - 1)));
+	codec_assert(!((uintptr_t)line & (__ALIGNOF_INT32__ - 1)));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
 		*(uint32_t *)line = (uint32_t)pixel;
@@ -1159,8 +1173,8 @@ rectfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	codec_assert(!(stride & 3));
-	codec_assert(!((uintptr_t)line & 3));
+	codec_assert(!(stride & (__ALIGNOF_INT32__ - 1)));
+	codec_assert(!((uintptr_t)line & (__ALIGNOF_INT32__ - 1)));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 #ifndef __OPTIMIZE_SIZE__
 	if (stride == (size_x << 2)) {
@@ -1184,10 +1198,10 @@ rectcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	codec_assert(!(dst_stride & 3));
-	codec_assert(!(src_stride & 3));
-	codec_assert(!((uintptr_t)dst_line & 3));
-	codec_assert(!((uintptr_t)src_line & 3));
+	codec_assert(!(dst_stride & (__ALIGNOF_INT32__ - 1)));
+	codec_assert(!(src_stride & (__ALIGNOF_INT32__ - 1)));
+	codec_assert(!((uintptr_t)dst_line & (__ALIGNOF_INT32__ - 1)));
+	codec_assert(!((uintptr_t)src_line & (__ALIGNOF_INT32__ - 1)));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 #ifndef __OPTIMIZE_SIZE__
 	if (dst_stride == src_stride && dst_stride == size_x) {
@@ -1213,9 +1227,9 @@ rectmove32(byte_t *__restrict dst_line, video_coord_t dst_x,
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	codec_assert(!(stride & 3));
-	codec_assert(!((uintptr_t)dst_line & 3));
-	codec_assert(!((uintptr_t)src_line & 3));
+	codec_assert(!(stride & (__ALIGNOF_INT32__ - 1)));
+	codec_assert(!((uintptr_t)dst_line & (__ALIGNOF_INT32__ - 1)));
+	codec_assert(!((uintptr_t)src_line & (__ALIGNOF_INT32__ - 1)));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 #ifndef __OPTIMIZE_SIZE__
 	if (stride == (size_x << 2)) {
@@ -1274,7 +1288,7 @@ INTERN NONNULL((1)) void FCC
 unaligned_linefill32(byte_t *__restrict line, video_coord_t x,
                      video_pixel_t pixel, video_dim_t num_pixels) {
 #ifndef __OPTIMIZE_SIZE__
-	if (((uintptr_t)line & 3) == 0) {
+	if (((uintptr_t)line & (__ALIGNOF_INT32__ - 1)) == 0) {
 		linefill32(line, x, pixel, num_pixels);
 	} else
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -3872,6 +3886,917 @@ NOTHROW(FCC buffer32_coord2bytes)(video_coord_t *__restrict p_coord) {
 }
 
 
+/* Pixel I/O for formats with >32bpp (e.g. 64bpp) */
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer40_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                   struct video_rambuffer_requirements *__restrict result) {
+	result->vbs_stride  = size_x * 5;
+	result->vbs_bufsize = size_y * result->vbs_stride;
+}
+
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer48_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                   struct video_rambuffer_requirements *__restrict result) {
+	result->vbs_stride  = size_x * 6;
+	result->vbs_bufsize = size_y * result->vbs_stride;
+}
+
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer56_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                   struct video_rambuffer_requirements *__restrict result) {
+	result->vbs_stride  = size_x * 7;
+	result->vbs_bufsize = size_y * result->vbs_stride;
+}
+
+INTERN ATTR_OUT(3) void
+NOTHROW(FCC buffer64_requirements)(video_dim_t size_x, video_dim_t size_y,
+                                   struct video_rambuffer_requirements *__restrict result) {
+	result->vbs_stride  = size_x * 8;
+	result->vbs_bufsize = size_y * result->vbs_stride;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer40_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord * 5;
+	*p_coord = 0;
+	return result;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer48_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord * 6;
+	*p_coord = 0;
+	return result;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer56_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord * 7;
+	*p_coord = 0;
+	return result;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) size_t
+NOTHROW(FCC buffer64_coord2bytes)(video_coord_t *__restrict p_coord) {
+	size_t result = *p_coord * 8;
+	*p_coord = 0;
+	return result;
+}
+
+INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC
+getpixel40_64(byte_t const *__restrict line, video_coord_t x) {
+	union word64 word;
+	line += x * 5;
+	word.bytes[0] = line[0];
+	word.bytes[1] = line[1];
+	word.bytes[2] = line[2];
+	word.bytes[3] = line[3];
+	word.bytes[4] = line[4];
+	word.bytes[5] = 0;
+	word.bytes[6] = 0;
+	word.bytes[7] = 0;
+	return word.qword;
+}
+
+INTERN NONNULL((1)) void FCC
+setpixel40_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel) {
+	union word64 word;
+	line += x * 5;
+	word.qword = pixel;
+	line[0] = word.bytes[0];
+	line[1] = word.bytes[1];
+	line[2] = word.bytes[2];
+	line[3] = word.bytes[3];
+	line[4] = word.bytes[4];
+}
+
+INTERN NONNULL((1)) void FCC
+linefill40_64(byte_t *__restrict line, video_coord_t x,
+              video_pixel64_t pixel, video_dim_t num_pixels) {
+	union word64 word;
+	line += x * 5;
+	word.qword = pixel;
+	codec_assert(num_pixels > 0);
+	do {
+		*line++ = word.bytes[0];
+		*line++ = word.bytes[1];
+		*line++ = word.bytes[2];
+		*line++ = word.bytes[3];
+		*line++ = word.bytes[4];
+	} while (--num_pixels);
+}
+
+INTERN NONNULL((1)) void FCC
+vertfill40_64(byte_t *__restrict line, video_coord_t x, size_t stride,
+              video_pixel64_t pixel, video_dim_t num_pixels) {
+	union word64 word;
+	line += x * 5;
+	word.qword = pixel;
+	codec_assert(num_pixels > 0);
+	stride -= 5;
+	do {
+		*line++ = word.bytes[0];
+		*line++ = word.bytes[1];
+		*line++ = word.bytes[2];
+		*line++ = word.bytes[3];
+		*line++ = word.bytes[4];
+		line += stride;
+	} while (--num_pixels);
+}
+
+INTERN NONNULL((1)) void FCC
+rectfill40_64(byte_t *__restrict line, video_coord_t x, size_t stride,
+              video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	union word64 word;
+	line += x * 5;
+	word.qword = pixel;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	stride -= size_x * 5;
+	do {
+		video_dim_t iter_x = size_x;
+		do {
+			*line++ = word.bytes[0];
+			*line++ = word.bytes[1];
+			*line++ = word.bytes[2];
+			*line++ = word.bytes[3];
+			*line++ = word.bytes[4];
+		} while (--iter_x);
+		line += stride;
+	} while (--size_y);
+}
+
+INTERN NONNULL((1, 4)) void FCC
+rectcopy40(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
+           byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
+           video_dim_t size_x, video_dim_t size_y) {
+	dst_line += dst_x * 5;
+	src_line += src_x * 5;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	size_x *= 5;
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpy(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpy(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
+}
+
+INTERN NONNULL((1, 3)) void FCC
+rectmove40(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           size_t stride, video_dim_t size_x, video_dim_t size_y) {
+	dst_line += dst_x * 5;
+	src_line += src_x * 5;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	size_x *= 5;
+#ifndef __OPTIMIZE_SIZE__
+	if (stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memmove(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		if (dst_line <= src_line) {
+			do {
+				memmovedown(dst_line, src_line, size_x);
+				dst_line += stride;
+				src_line += stride;
+			} while (--size_y);
+		} else {
+			dst_line += size_y * stride;
+			src_line += size_y * stride;
+			do {
+				dst_line -= stride;
+				src_line -= stride;
+				memmoveup(dst_line, src_line, size_x);
+			} while (--size_y);
+		}
+	}
+}
+
+INTERN NONNULL((1, 3)) void FCC
+linecopy40(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           video_dim_t size_x) {
+	dst_line += dst_x * 5;
+	src_line += src_x * 5;
+	codec_assert(size_x > 0);
+	memcpy(dst_line, src_line, size_x * 5);
+}
+
+
+
+INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC
+getpixel48_64(byte_t const *__restrict line, video_coord_t x) {
+	union word64 word;
+	line += x * 6;
+	word.bytes[0] = line[0];
+	word.bytes[1] = line[1];
+	word.bytes[2] = line[2];
+	word.bytes[3] = line[3];
+	word.bytes[4] = line[4];
+	word.bytes[5] = line[5];
+	word.bytes[6] = 0;
+	word.bytes[7] = 0;
+	return word.qword;
+}
+
+INTERN NONNULL((1)) void FCC
+setpixel48_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel) {
+	union word64 word;
+	line += x * 6;
+	word.qword = pixel;
+	line[0] = word.bytes[0];
+	line[1] = word.bytes[1];
+	line[2] = word.bytes[2];
+	line[3] = word.bytes[3];
+	line[4] = word.bytes[4];
+	line[5] = word.bytes[5];
+}
+
+INTERN NONNULL((1)) void FCC
+linefill48_64(byte_t *__restrict line, video_coord_t x,
+              video_pixel64_t pixel, video_dim_t num_pixels) {
+	union word64 word;
+	line += x * 6;
+	word.qword = pixel;
+	codec_assert(num_pixels > 0);
+	do {
+		*line++ = word.bytes[0];
+		*line++ = word.bytes[1];
+		*line++ = word.bytes[2];
+		*line++ = word.bytes[3];
+		*line++ = word.bytes[4];
+		*line++ = word.bytes[5];
+	} while (--num_pixels);
+}
+
+INTERN NONNULL((1)) void FCC
+vertfill48_64(byte_t *__restrict line, video_coord_t x, size_t stride,
+              video_pixel64_t pixel, video_dim_t num_pixels) {
+	union word64 word;
+	line += x * 6;
+	word.qword = pixel;
+	codec_assert(num_pixels > 0);
+	stride -= 6;
+	do {
+		*line++ = word.bytes[0];
+		*line++ = word.bytes[1];
+		*line++ = word.bytes[2];
+		*line++ = word.bytes[3];
+		*line++ = word.bytes[4];
+		*line++ = word.bytes[5];
+		line += stride;
+	} while (--num_pixels);
+}
+
+INTERN NONNULL((1)) void FCC
+rectfill48_64(byte_t *__restrict line, video_coord_t x, size_t stride,
+              video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	union word64 word;
+	line += x * 6;
+	word.qword = pixel;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	stride -= size_x * 6;
+	do {
+		video_dim_t iter_x = size_x;
+		do {
+			*line++ = word.bytes[0];
+			*line++ = word.bytes[1];
+			*line++ = word.bytes[2];
+			*line++ = word.bytes[3];
+			*line++ = word.bytes[4];
+			*line++ = word.bytes[5];
+		} while (--iter_x);
+		line += stride;
+	} while (--size_y);
+}
+
+INTERN NONNULL((1, 4)) void FCC
+rectcopy48(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
+           byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
+           video_dim_t size_x, video_dim_t size_y) {
+	dst_line += dst_x * 6;
+	src_line += src_x * 6;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	size_x *= 6;
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpy(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpy(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
+}
+
+INTERN NONNULL((1, 3)) void FCC
+rectmove48(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           size_t stride, video_dim_t size_x, video_dim_t size_y) {
+	dst_line += dst_x * 6;
+	src_line += src_x * 6;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	size_x *= 6;
+#ifndef __OPTIMIZE_SIZE__
+	if (stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memmove(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		if (dst_line <= src_line) {
+			do {
+				memmovedown(dst_line, src_line, size_x);
+				dst_line += stride;
+				src_line += stride;
+			} while (--size_y);
+		} else {
+			dst_line += size_y * stride;
+			src_line += size_y * stride;
+			do {
+				dst_line -= stride;
+				src_line -= stride;
+				memmoveup(dst_line, src_line, size_x);
+			} while (--size_y);
+		}
+	}
+}
+
+INTERN NONNULL((1, 3)) void FCC
+linecopy48(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           video_dim_t size_x) {
+	dst_line += dst_x * 6;
+	src_line += src_x * 6;
+	codec_assert(size_x > 0);
+	memcpy(dst_line, src_line, size_x * 6);
+}
+
+
+
+INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC
+getpixel56_64(byte_t const *__restrict line, video_coord_t x) {
+	union word64 word;
+	line += x * 7;
+	word.bytes[0] = line[0];
+	word.bytes[1] = line[1];
+	word.bytes[2] = line[2];
+	word.bytes[3] = line[3];
+	word.bytes[4] = line[4];
+	word.bytes[5] = line[5];
+	word.bytes[6] = line[6];
+	word.bytes[7] = 0;
+	return word.qword;
+}
+
+INTERN NONNULL((1)) void FCC
+setpixel56_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel) {
+	union word64 word;
+	line += x * 6;
+	word.qword = pixel;
+	line[0] = word.bytes[0];
+	line[1] = word.bytes[1];
+	line[2] = word.bytes[2];
+	line[3] = word.bytes[3];
+	line[4] = word.bytes[4];
+	line[5] = word.bytes[5];
+	line[6] = word.bytes[6];
+}
+
+INTERN NONNULL((1)) void FCC
+linefill56_64(byte_t *__restrict line, video_coord_t x,
+              video_pixel64_t pixel, video_dim_t num_pixels) {
+	union word64 word;
+	line += x * 7;
+	word.qword = pixel;
+	codec_assert(num_pixels > 0);
+	do {
+		*line++ = word.bytes[0];
+		*line++ = word.bytes[1];
+		*line++ = word.bytes[2];
+		*line++ = word.bytes[3];
+		*line++ = word.bytes[4];
+		*line++ = word.bytes[5];
+		*line++ = word.bytes[6];
+	} while (--num_pixels);
+}
+
+INTERN NONNULL((1)) void FCC
+vertfill56_64(byte_t *__restrict line, video_coord_t x, size_t stride,
+              video_pixel64_t pixel, video_dim_t num_pixels) {
+	union word64 word;
+	line += x * 7;
+	word.qword = pixel;
+	codec_assert(num_pixels > 0);
+	stride -= 7;
+	do {
+		*line++ = word.bytes[0];
+		*line++ = word.bytes[1];
+		*line++ = word.bytes[2];
+		*line++ = word.bytes[3];
+		*line++ = word.bytes[4];
+		*line++ = word.bytes[5];
+		*line++ = word.bytes[6];
+		line += stride;
+	} while (--num_pixels);
+}
+
+INTERN NONNULL((1)) void FCC
+rectfill56_64(byte_t *__restrict line, video_coord_t x, size_t stride,
+              video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	union word64 word;
+	line += x * 7;
+	word.qword = pixel;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	stride -= size_x * 7;
+	do {
+		video_dim_t iter_x = size_x;
+		do {
+			*line++ = word.bytes[0];
+			*line++ = word.bytes[1];
+			*line++ = word.bytes[2];
+			*line++ = word.bytes[3];
+			*line++ = word.bytes[4];
+			*line++ = word.bytes[5];
+			*line++ = word.bytes[6];
+		} while (--iter_x);
+		line += stride;
+	} while (--size_y);
+}
+
+INTERN NONNULL((1, 4)) void FCC
+rectcopy56(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
+           byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
+           video_dim_t size_x, video_dim_t size_y) {
+	dst_line += dst_x * 7;
+	src_line += src_x * 7;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	size_x *= 7;
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpy(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpy(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
+}
+
+INTERN NONNULL((1, 3)) void FCC
+rectmove56(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           size_t stride, video_dim_t size_x, video_dim_t size_y) {
+	dst_line += dst_x * 7;
+	src_line += src_x * 7;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	size_x *= 7;
+#ifndef __OPTIMIZE_SIZE__
+	if (stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memmove(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		if (dst_line <= src_line) {
+			do {
+				memmovedown(dst_line, src_line, size_x);
+				dst_line += stride;
+				src_line += stride;
+			} while (--size_y);
+		} else {
+			dst_line += size_y * stride;
+			src_line += size_y * stride;
+			do {
+				dst_line -= stride;
+				src_line -= stride;
+				memmoveup(dst_line, src_line, size_x);
+			} while (--size_y);
+		}
+	}
+}
+
+INTERN NONNULL((1, 3)) void FCC
+linecopy56(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           video_dim_t size_x) {
+	dst_line += dst_x * 7;
+	src_line += src_x * 7;
+	codec_assert(size_x > 0);
+	memcpy(dst_line, src_line, size_x * 7);
+}
+
+
+INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC
+getpixel64_64(byte_t const *__restrict line, video_coord_t x) {
+	return ((uint64_t const *)line)[x];
+}
+
+INTERN NONNULL((1)) void FCC
+setpixel64_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel) {
+	((uint64_t *)line)[x] = pixel;
+}
+
+INTERN NONNULL((1)) void FCC
+linefill64_64(byte_t *__restrict line, video_coord_t x,
+              video_pixel64_t pixel, video_dim_t num_pixels) {
+	line += x << 3;
+	codec_assert(num_pixels > 0);
+	memsetq(line, (uint64_t)pixel, num_pixels);
+}
+
+INTERN NONNULL((1)) void FCC
+vertfill64_64(byte_t *__restrict line, video_coord_t x, size_t stride,
+              video_pixel64_t pixel, video_dim_t num_pixels) {
+	line += x << 3;
+	codec_assert(num_pixels > 0);
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	codec_assert(!(stride & (__ALIGNOF_INT64__ - 1)));
+	codec_assert(!((uintptr_t)line & (__ALIGNOF_INT64__ - 1)));
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	do {
+		*(uint64_t *)line = (uint64_t)pixel;
+		line += stride;
+	} while (--num_pixels);
+}
+
+INTERN NONNULL((1)) void FCC
+rectfill64_64(byte_t *__restrict line, video_coord_t x, size_t stride,
+              video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	line += x << 3;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	codec_assert(!(stride & (__ALIGNOF_INT64__ - 1)));
+	codec_assert(!((uintptr_t)line & (__ALIGNOF_INT64__ - 1)));
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#ifndef __OPTIMIZE_SIZE__
+	if (stride == (size_x << 3)) {
+		memsetq(line, (uint64_t)pixel, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memsetq(line, (uint64_t)pixel, size_x);
+			line += stride;
+		} while (--size_y);
+	}
+}
+
+INTERN NONNULL((1, 4)) void FCC
+rectcopy64(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
+           byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
+           video_dim_t size_x, video_dim_t size_y) {
+	dst_line += dst_x << 3;
+	src_line += src_x << 3;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	codec_assert(!(dst_stride & (__ALIGNOF_INT64__ - 1)));
+	codec_assert(!(src_stride & (__ALIGNOF_INT64__ - 1)));
+	codec_assert(!((uintptr_t)dst_line & (__ALIGNOF_INT64__ - 1)));
+	codec_assert(!((uintptr_t)src_line & (__ALIGNOF_INT64__ - 1)));
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpyq(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpyq(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
+}
+
+INTERN NONNULL((1, 3)) void FCC
+rectmove64(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           size_t stride, video_dim_t size_x, video_dim_t size_y) {
+	dst_line += dst_x << 3;
+	src_line += src_x << 3;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	codec_assert(!(stride & (__ALIGNOF_INT64__ - 1)));
+	codec_assert(!((uintptr_t)dst_line & (__ALIGNOF_INT64__ - 1)));
+	codec_assert(!((uintptr_t)src_line & (__ALIGNOF_INT64__ - 1)));
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#ifndef __OPTIMIZE_SIZE__
+	if (stride == (size_x << 3)) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memmoveq(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		if (dst_line <= src_line) {
+			do {
+				memmovedownq(dst_line, src_line, size_x);
+				dst_line += stride;
+				src_line += stride;
+			} while (--size_y);
+		} else {
+			dst_line += size_y * stride;
+			src_line += size_y * stride;
+			do {
+				dst_line -= stride;
+				src_line -= stride;
+				memmoveupq(dst_line, src_line, size_x);
+			} while (--size_y);
+		}
+	}
+}
+
+INTERN NONNULL((1, 3)) void FCC
+linecopy64(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           video_dim_t size_x) {
+	dst_line += dst_x << 3;
+	src_line += src_x << 3;
+	codec_assert(size_x > 0);
+	memcpyq(dst_line, src_line, size_x);
+}
+
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC
+unaligned_getpixel64_64(byte_t const *__restrict line, video_coord_t x) {
+	return UNALIGNED_GET64(&((uint64_t const *)line)[x]);
+}
+
+INTERN NONNULL((1)) void FCC
+unaligned_setpixel64_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel) {
+	UNALIGNED_SET64(&((uint64_t const *)line)[x], pixel);
+}
+
+INTERN NONNULL((1)) void FCC
+unaligned_linefill64_64(byte_t *__restrict line, video_coord_t x,
+                        video_pixel64_t pixel, video_dim_t num_pixels) {
+#ifndef __OPTIMIZE_SIZE__
+	if (((uintptr_t)line & (__ALIGNOF_INT64__ - 1)) == 0) {
+		linefill64_64(line, x, pixel, num_pixels);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		union word64 data;
+		data.qword = (uint64_t)pixel;
+		line += x << 3;
+		do {
+			*line++ = data.bytes[0];
+			*line++ = data.bytes[1];
+			*line++ = data.bytes[2];
+			*line++ = data.bytes[3];
+			*line++ = data.bytes[4];
+			*line++ = data.bytes[5];
+			*line++ = data.bytes[6];
+			*line++ = data.bytes[7];
+		} while (--num_pixels);
+	}
+}
+
+INTERN NONNULL((1)) void FCC
+unaligned_linefill64_64(byte_t *__restrict line, video_coord_t x,
+                        video_pixel64_t pixel, video_dim_t num_pixels) {
+#ifndef __OPTIMIZE_SIZE__
+	if (((uintptr_t)line & (__ALIGNOF_INT64__ - 1)) == 0) {
+		linefill64_64(line, x, pixel, num_pixels);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		union word64 data;
+		data.qword = (uint64_t)pixel;
+		line += x << 3;
+		do {
+			*line++ = data.bytes[0];
+			*line++ = data.bytes[1];
+			*line++ = data.bytes[2];
+			*line++ = data.bytes[3];
+			*line++ = data.bytes[4];
+			*line++ = data.bytes[5];
+			*line++ = data.bytes[6];
+			*line++ = data.bytes[7];
+		} while (--num_pixels);
+	}
+}
+
+INTERN NONNULL((1)) void FCC
+unaligned_vertfill64_64(byte_t *__restrict line, video_coord_t x, size_t stride,
+                        video_pixel64_t pixel, video_dim_t num_pixels) {
+	line += x << 3;
+	codec_assert(num_pixels > 0);
+	do {
+		UNALIGNED_SET64(line, (uint64_t)pixel);
+		line += stride;
+	} while (--num_pixels);
+}
+
+INTERN NONNULL((1)) void FCC
+unaligned_rectfill64_64(byte_t *__restrict line, video_coord_t x, size_t stride,
+                        video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	union word64 data;
+	data.qword = (uint64_t)pixel;
+	line += x << 3;
+	stride -= size_x << 3;
+	do {
+		video_dim_t iter_x = size_x;
+		do {
+			*line++ = data.bytes[0];
+			*line++ = data.bytes[1];
+			*line++ = data.bytes[2];
+			*line++ = data.bytes[3];
+			*line++ = data.bytes[4];
+			*line++ = data.bytes[5];
+			*line++ = data.bytes[6];
+			*line++ = data.bytes[7];
+		} while (--iter_x);
+		line += stride;
+	} while (--size_y);
+}
+
+INTERN NONNULL((1, 4)) void FCC
+unaligned_rectcopy64(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
+                     byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
+                     video_dim_t size_x, video_dim_t size_y) {
+	dst_line += dst_x << 3;
+	src_line += src_x << 3;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	size_x <<= 3;
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpy(dst_line, src_line, dst_stride * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpy(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
+}
+
+INTERN NONNULL((1, 3)) void FCC
+unaligned_rectmove64(byte_t *__restrict dst_line, video_coord_t dst_x,
+                     byte_t const *__restrict src_line, video_coord_t src_x,
+                     size_t stride, video_dim_t size_x, video_dim_t size_y) {
+	dst_line += dst_x << 3;
+	src_line += src_x << 3;
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
+	size_x <<= 3;
+#ifndef __OPTIMIZE_SIZE__
+	if (stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpy(dst_line, src_line, stride * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		if (dst_line <= src_line) {
+			do {
+				memmovedown(dst_line, src_line, size_x);
+				dst_line += stride;
+				src_line += stride;
+			} while (--size_y);
+		} else {
+			dst_line += size_y * stride;
+			src_line += size_y * stride;
+			do {
+				dst_line -= stride;
+				src_line -= stride;
+				memmoveup(dst_line, src_line, size_x);
+			} while (--size_y);
+		}
+	}
+}
+
+INTERN NONNULL((1, 3)) void FCC
+unaligned_linecopy64(byte_t *__restrict dst_line, video_coord_t dst_x,
+                     byte_t const *__restrict src_line, video_coord_t src_x,
+                     video_dim_t size_x) {
+	dst_line += dst_x << 3;
+	src_line += src_x << 3;
+	codec_assert(size_x > 0);
+	memcpy(dst_line, src_line, size_x << 3);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
+
+
+/* Wrapper implementations for RGBA16161616 */
+#define rgba16161616_getpixel_64 getpixel64_64
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+rgba16161616_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = getpixel64_64(line, x);
+	return VIDEO_COLOR_FROM_COLOR64(pixel64);
+}
+
+#define rgba16161616_setpixel_64 setpixel64_64
+PRIVATE NONNULL((1)) void FCC
+rgba16161616_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	setpixel64_64(line, x, VIDEO_COLOR64_FROM_COLOR(pixel));
+}
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_rgba16161616_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	rgba16161616_setpixel(line, x, pixel);
+}
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+
+
+#define rgba16161616_linefill_64 linefill64_64
+PRIVATE NONNULL((1)) void FCC
+rgba16161616_linefill(byte_t *__restrict line, video_coord_t x,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	linefill64_64(line, x, VIDEO_COLOR64_FROM_COLOR(pixel), num_pixels);
+}
+
+#define rgba16161616_vertfill_64 vertfill64_64
+PRIVATE NONNULL((1)) void FCC
+rgba16161616_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	vertfill64_64(line, x, stride, VIDEO_COLOR64_FROM_COLOR(pixel), num_pixels);
+}
+
+#define rgba16161616_rectfill_64 rectfill64_64
+PRIVATE NONNULL((1)) void FCC
+rgba16161616_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	rectfill64_64(line, x, stride, VIDEO_COLOR64_FROM_COLOR(pixel), size_x, size_y);
+}
+
+#define rgba16161616_getpixel_64 getpixel64_64
+#define rgba16161616_setpixel_64 setpixel64_64
+#define rgba16161616_linefill_64 linefill64_64
+#define rgba16161616_vertfill_64 vertfill64_64
+#define rgba16161616_rectfill_64 rectfill64_64
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_rgba16161616_getpixel rgba16161616_getpixel
+#define unaligned_rgba16161616_setpixel rgba16161616_setpixel
+#define unaligned_rgba16161616_linefill rgba16161616_linefill
+#define unaligned_rgba16161616_vertfill rgba16161616_vertfill
+#define unaligned_rgba16161616_rectfill rgba16161616_rectfill
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+unaligned_rgba16161616_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = unaligned_getpixel64_64(line, x);
+	return VIDEO_COLOR_FROM_COLOR64(pixel64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgba16161616_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	unaligned_setpixel64_64(line, x, VIDEO_COLOR64_FROM_COLOR(pixel));
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgba16161616_linefill(byte_t *__restrict line, video_coord_t x,
+                      video_pixel64_t pixel, video_dim_t num_pixels) {
+	unaligned_linefill64_64(line, x, VIDEO_COLOR64_FROM_COLOR(pixel), num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgba16161616_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel64_t pixel, video_dim_t num_pixels) {
+	unaligned_vertfill64_64(line, x, stride, VIDEO_COLOR64_FROM_COLOR(pixel), num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgba16161616_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	unaligned_rectfill64_64(line, x, stride, VIDEO_COLOR64_FROM_COLOR(pixel), size_x, size_y);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
+
+
+
 
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported.
@@ -4247,7 +5172,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00ff),
 	                /* vcs_bmask */ MASK2_LE(0x00ff),
 	                /* vcs_amask */ MASK2_LE(0xff00)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4264,7 +5189,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0xff00),
 	                /* vcs_bmask */ MASK2_LE(0xff00),
 	                /* vcs_amask */ MASK2_LE(0x00ff)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4379,7 +5304,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xffff,
 	                /* vcs_bmask */ 0xffff,
 	                /* vcs_amask */ 0x0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4396,7 +5321,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0xffff0000),
 	                /* vcs_bmask */ MASK4_LE(0xffff0000),
 	                /* vcs_amask */ MASK4_LE(0x0000ffff)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4413,7 +5338,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x0000ffff),
 	                /* vcs_bmask */ MASK4_LE(0x0000ffff),
 	                /* vcs_amask */ MASK4_LE(0xffff0000)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4449,7 +5374,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_bmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_amask */ MASK4_LE(0xff000000)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4466,7 +5391,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_bmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4483,7 +5408,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_bmask */ MASK4_LE(0xff000000),
 	                /* vcs_amask */ MASK4_LE(0x000000ff)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4500,7 +5425,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_bmask */ MASK4_LE(0xff000000),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4517,7 +5442,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_bmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_amask */ MASK4_LE(0x000000ff)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4534,7 +5459,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_bmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4551,7 +5476,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_bmask */ MASK4_LE(0x000000ff),
 	                /* vcs_amask */ MASK4_LE(0xff000000)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4568,7 +5493,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_bmask */ MASK4_LE(0x000000ff),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -4588,7 +5513,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00f0),
 	                /* vcs_bmask */ MASK2_LE(0x0f00),
 	                /* vcs_amask */ MASK2_LE(0xf000)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4605,7 +5530,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00f0),
 	                /* vcs_bmask */ MASK2_LE(0x0f00),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4622,7 +5547,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x0f00),
 	                /* vcs_bmask */ MASK2_LE(0xf000),
 	                /* vcs_amask */ MASK2_LE(0x000f)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4639,7 +5564,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x0f00),
 	                /* vcs_bmask */ MASK2_LE(0xf000),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4656,7 +5581,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x0f00),
 	                /* vcs_bmask */ MASK2_LE(0x00f0),
 	                /* vcs_amask */ MASK2_LE(0x000f)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4673,7 +5598,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x0f00),
 	                /* vcs_bmask */ MASK2_LE(0x00f0),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4690,7 +5615,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00f0),
 	                /* vcs_bmask */ MASK2_LE(0x000f),
 	                /* vcs_amask */ MASK2_LE(0xf000)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4707,7 +5632,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00f0),
 	                /* vcs_bmask */ MASK2_LE(0x000f),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4724,7 +5649,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x03e0),
 	                /* vcs_bmask */ MASK2_LE(0x7c00),
 	                /* vcs_amask */ MASK2_LE(0x8000)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4741,7 +5666,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x03e0),
 	                /* vcs_bmask */ MASK2_LE(0x7c00),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4758,7 +5683,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07c0),
 	                /* vcs_bmask */ MASK2_LE(0xf800),
 	                /* vcs_amask */ MASK2_LE(0x0001)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4775,7 +5700,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07c0),
 	                /* vcs_bmask */ MASK2_LE(0xf800),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4792,7 +5717,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07c0),
 	                /* vcs_bmask */ MASK2_LE(0x003e),
 	                /* vcs_amask */ MASK2_LE(0x0001)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4809,7 +5734,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07c0),
 	                /* vcs_bmask */ MASK2_LE(0x003e),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4826,7 +5751,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x03e0),
 	                /* vcs_bmask */ MASK2_LE(0x001f),
 	                /* vcs_amask */ MASK2_LE(0x8000)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4843,7 +5768,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x03e0),
 	                /* vcs_bmask */ MASK2_LE(0x001f),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4860,7 +5785,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07e0),
 	                /* vcs_bmask */ MASK2_LE(0xf800),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -4877,7 +5802,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x07e0),
 	                /* vcs_bmask */ MASK2_LE(0x001f),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -5121,7 +6046,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x000ffc00),
 	                /* vcs_bmask */ MASK4_LE(0x3ff00000),
 	                /* vcs_amask */ MASK4_LE(0xc0000000)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5138,7 +6063,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x000ffc00),
 	                /* vcs_bmask */ MASK4_LE(0x3ff00000),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5155,7 +6080,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x003ff000),
 	                /* vcs_bmask */ MASK4_LE(0xffc00000),
 	                /* vcs_amask */ MASK4_LE(0x00000003)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5172,7 +6097,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x003ff000),
 	                /* vcs_bmask */ MASK4_LE(0xffc00000),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5189,7 +6114,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x000ffc00),
 	                /* vcs_bmask */ MASK4_LE(0x000003ff),
 	                /* vcs_amask */ MASK4_LE(0xc0000000)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5206,7 +6131,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x000ffc00),
 	                /* vcs_bmask */ MASK4_LE(0x000003ff),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5223,7 +6148,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x003ff000),
 	                /* vcs_bmask */ MASK4_LE(0x00000ffc),
 	                /* vcs_amask */ MASK4_LE(0x00000003)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5240,7 +6165,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x003ff000),
 	                /* vcs_bmask */ MASK4_LE(0x00000ffc),
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5257,7 +6182,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x003ff800), /* 11-bit */
 	                /* vcs_bmask */ MASK4_LE(0xffc00000), /* 10-bit */
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5274,7 +6199,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x001ff800), /* 10-bit */
 	                /* vcs_bmask */ MASK4_LE(0xffe00000), /* 11-bit */
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5291,7 +6216,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x001ffc00), /* 11-bit */
 	                /* vcs_bmask */ MASK4_LE(0xffe00000), /* 11-bit */
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5308,7 +6233,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x003ff800), /* 11-bit */
 	                /* vcs_bmask */ MASK4_LE(0x000007ff), /* 11-bit */
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5325,7 +6250,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x001ff800), /* 10-bit */
 	                /* vcs_bmask */ MASK4_LE(0x000007ff), /* 11-bit */
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5342,7 +6267,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x001ffc00), /* 11-bit */
 	                /* vcs_bmask */ MASK4_LE(0x000003ff), /* 10-bit */
 	                /* vcs_amask */ 0),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5351,6 +6276,28 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
 	               bgr101111_pixel2color, bgr101111_color2pixel, initconv_from_rgb);
 
+
+
+
+	/* 64bpp direct color */
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
+	CASE_CODEC_ALn(VIDEO_CODEC_RGBA16161616,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64,
+	                /* vcs_bpp   */ 64,
+	                /* vcs_cbits */ 64,
+	                /* vcs_rmask */ MASK8_LE(0x000000000000ffff),
+	                /* vcs_gmask */ MASK8_LE(0x00000000ffff0000),
+	                /* vcs_bmask */ MASK8_LE(0x0000ffff00000000),
+	                /* vcs_amask */ MASK8_LE(0xffff000000000000)),
+	               __ALIGNOF_INT64__, buffer64_requirements, buffer64_coord2bytes,
+	               rgba16161616_getpixel, rgba16161616_setpixel,
+	               rectcopy64, rectmove64, linecopy64,
+	               rgba16161616_linefill, rgba16161616_vertfill, rgba16161616_rectfill,
+	               unaligned_rgba16161616_getpixel, unaligned_rgba16161616_setpixel,
+	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
+	               unaligned_rgba16161616_linefill, unaligned_rgba16161616_vertfill, unaligned_rgba16161616_rectfill,
+	               identity_pixel2color, identity_color2pixel, initconv_from_rgb);
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 
 
@@ -5685,7 +6632,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x00ff),
 	                /* vcs_bmask */ MASK2_LE(0x00ff),
 	                /* vcs_amask */ MASK2_LE(0xff00)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -5702,7 +6649,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0xff00),
 	                /* vcs_bmask */ MASK2_LE(0xff00),
 	                /* vcs_amask */ MASK2_LE(0x00ff)),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -5719,7 +6666,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ 0xffff,
 	                /* vcs_bmask */ 0xffff,
 	                /* vcs_amask */ 0x0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -5736,7 +6683,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0xffff0000),
 	                /* vcs_bmask */ MASK4_LE(0xffff0000),
 	                /* vcs_amask */ MASK4_LE(0x0000ffff)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5753,7 +6700,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK4_LE(0x0000ffff),
 	                /* vcs_bmask */ MASK4_LE(0x0000ffff),
 	                /* vcs_amask */ MASK4_LE(0xffff0000)),
-	               4, buffer32_requirements, buffer32_coord2bytes,
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
 	               getpixel32, setpixel32,
 	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
@@ -5781,7 +6728,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_gmask */ MASK2_LE(0x0f00),
 	                /* vcs_bmask */ MASK2_LE(0xf000),
 	                /* vcs_amask */ 0),
-	               2, buffer16_requirements, buffer16_coord2bytes,
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
 	               getpixel16, setpixel16,
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
@@ -6537,7 +7484,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		break;
 
 	case 16:
-		self->vc_align = 2;
+		self->vc_align = __ALIGNOF_INT16__;
 		self->vc_rambuffer_requirements = &buffer16_requirements;
 		self->vc_coord2bytes            = &buffer16_coord2bytes;
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
@@ -6579,7 +7526,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		break;
 
 	case 32:
-		self->vc_align = 4;
+		self->vc_align = __ALIGNOF_INT32__;
 		self->vc_rambuffer_requirements = &buffer32_requirements;
 		self->vc_coord2bytes            = &buffer32_coord2bytes;
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
@@ -6607,7 +7554,79 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		break;
 
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
-	/* TODO: 40bpp, 48bpp, 56bpp, 64bpp */
+	case 40:
+		self->vc_align = 1;
+		self->vc_rambuffer_requirements = &buffer40_requirements;
+		self->vc_coord2bytes            = &buffer40_coord2bytes;
+		self->vc_getpixel64 = &getpixel40_64;
+		self->vc_setpixel64 = &setpixel40_64;
+		self->vc_linefill64 = &linefill40_64;
+		self->vc_vertfill64 = &vertfill40_64;
+		self->vc_rectfill64 = &rectfill40_64;
+		self->vc_rectcopy = &rectcopy40;
+		self->vc_rectmove = &rectmove40;
+		self->vc_linecopy = &linecopy40;
+		self->vc_specs.vcs_flags |= VIDEO_CODEC_FLAG_PIXEL64;
+		break;
+
+	case 48:
+		self->vc_align = 1;
+		self->vc_rambuffer_requirements = &buffer48_requirements;
+		self->vc_coord2bytes            = &buffer48_coord2bytes;
+		self->vc_getpixel64 = &getpixel48_64;
+		self->vc_setpixel64 = &setpixel48_64;
+		self->vc_linefill64 = &linefill48_64;
+		self->vc_vertfill64 = &vertfill48_64;
+		self->vc_rectfill64 = &rectfill48_64;
+		self->vc_rectcopy = &rectcopy48;
+		self->vc_rectmove = &rectmove48;
+		self->vc_linecopy = &linecopy48;
+		self->vc_specs.vcs_flags |= VIDEO_CODEC_FLAG_PIXEL64;
+		break;
+
+	case 56:
+		self->vc_align = 1;
+		self->vc_rambuffer_requirements = &buffer56_requirements;
+		self->vc_coord2bytes            = &buffer56_coord2bytes;
+		self->vc_getpixel64 = &getpixel56_64;
+		self->vc_setpixel64 = &setpixel56_64;
+		self->vc_linefill64 = &linefill56_64;
+		self->vc_vertfill64 = &vertfill56_64;
+		self->vc_rectfill64 = &rectfill56_64;
+		self->vc_rectcopy = &rectcopy56;
+		self->vc_rectmove = &rectmove56;
+		self->vc_linecopy = &linecopy56;
+		self->vc_specs.vcs_flags |= VIDEO_CODEC_FLAG_PIXEL64;
+		break;
+
+	case 64:
+		self->vc_align = __ALIGNOF_INT64__;
+		self->vc_rambuffer_requirements = &buffer64_requirements;
+		self->vc_coord2bytes            = &buffer64_coord2bytes;
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+		if (populate_noalign) {
+			self->vc_getpixel64 = &unaligned_getpixel64_64;
+			self->vc_setpixel64 = &unaligned_setpixel64_64;
+			self->vc_linefill64 = &unaligned_linefill64_64;
+			self->vc_vertfill64 = &unaligned_vertfill64_64;
+			self->vc_rectfill64 = &unaligned_rectfill64_64;
+			self->vc_rectcopy = &unaligned_rectcopy64;
+			self->vc_rectmove = &unaligned_rectmove64;
+			self->vc_linecopy = &unaligned_linecopy64;
+		} else
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		{
+			self->vc_getpixel64 = &getpixel64_64;
+			self->vc_setpixel64 = &setpixel64_64;
+			self->vc_linefill64 = &linefill64_64;
+			self->vc_vertfill64 = &vertfill64_64;
+			self->vc_rectfill64 = &rectfill64_64;
+			self->vc_rectcopy = &rectcopy64;
+			self->vc_rectmove = &rectmove64;
+			self->vc_linecopy = &linecopy64;
+		}
+		self->vc_specs.vcs_flags |= VIDEO_CODEC_FLAG_PIXEL64;
+		break;
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 	default:
@@ -6627,7 +7646,11 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	 * away since there would be no way to store them anyways. */
 	{
 		lpixel_t cmask;
+#if 1 /* Special handling needed to deal with "vcs_bpp == BITSOF(lpixel_t)" */
+		lpixel_t bpp_mask = (((lpixel_t)1 << (self->vc_specs.vcs_bpp - 1)) << 1) - 1;
+#else
 		lpixel_t bpp_mask = ((lpixel_t)1 << self->vc_specs.vcs_bpp) - 1;
+#endif
 		self->vc_specs.vcs_rmask &= bpp_mask;
 		self->vc_specs.vcs_gmask &= bpp_mask;
 		self->vc_specs.vcs_bmask &= bpp_mask;
@@ -6649,28 +7672,38 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 		if (cmask > UINT32_C(0xffffffff)) {
-			/* TODO: 64-bit codec */
-			/* TODO: BPP > 32 */
-			/* TODO: In this mode, the regular pixel2color  / color2pixel are just the  identity
-			 *       function, since *actual* pixel values  can't be encoded. Instead, only  the
-			 *       pixel2color64 / color2pixel64 function actually do anything, and the non-64
-			 *       line/vert/rect-fill function have to do the actual pixel encoding...
-			 * XXX: But that won't work for custom codecs since those operators don't take the
-			 *      video_surface as argument, meaning there'd need to be 1 function for every
-			 *      possible format, and we want to support arbitrary formats...
-			 * FIXME: Figure out a way to compress/uncompress 32/64-bit pixels in this case.
-			 *        It should be possible, since we know  that there will only be at  most
-			 *        32 bits of color information,  and all *we* need  is a limited set  of
-			 *        functions to expand those 32 bits  of color from video_pixel_t into  a
-			 *        larger video_pixel64_t (at that point we won't even need to deal  with
-			 *        reordering  bits,  since  that  can  still  happen  in  "color2pixel")
-			 *        (hmm...  but now that I think about it, there might still be *way* too
-			 *        many possible constellations of pixel expansion)
-			 * Solution: The only real solution here is to have a set of upscaling functions
-			 *           for operators like vc_linefill, and  when being given a codec  that
-			 *           doesn't  support any of these, we need to dynamically generate code
-			 *           that **does** support this.
+			/* TODO: 64-bit codec  (BPP > 32) */
+			/* TODO: In this mode, the following is done:
+			 * - vc_pixel2color = &identity_pixel2color;
+			 * - vc_color2pixel = &identity_color2pixel;
+			 * - These operators needs are generated dynamically:
+			 *   - vc_getpixel
+			 *   - vc_setpixel
+			 *   - _vc_setpixel3
+			 *   - vc_linefill
+			 *   - vc_vertfill
+			 *   - vc_rectfill
+			 *   The impls for each of these must then look like:
+			 *   >> video_pixel_t vc_getpixel_with_getpixel64_wrapper(byte_t const *__restrict line, video_coord_t x) {
+			 *   >>     struct video_surface dummy = INIT_DUMMY_CODEC_SURFACE(<MY_CODEC>);
+			 *   >>     video_pixel64_t pixel64 = (*<MY_CODEC>->vc_getpixel64)(line, x);
+			 *   >>     video_color64_t color64 = (*<MY_CODEC>->vc_pixel2color64)(&dummy, pixel64);
+			 *   >>     video_color_t color = VIDEO_COLOR_FROM_COLOR64(color64);
+			 *   >>     return (video_pixel_t)color; // 32-bit pixels are just colors
+			 *   >> }
+			 *   >> void vc_foo_with_foo64_wrapper(..., video_pixel_t pixel) {
+			 *   >>     struct video_surface dummy = INIT_DUMMY_CODEC_SURFACE(<MY_CODEC>);
+			 *   >>     video_color_t color = (video_color_t)pixel; // 32-bit pixels are just colors
+			 *   >>     video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(color);
+			 *   >>     video_pixel64_t pixel64 = (*<MY_CODEC>->vc_color2pixel64)(&dummy, color64);
+			 *   >>     (*<MY_CODEC>->vc_foo64)(..., pixel64);
+			 *   >> }
+			 *   Because "<MY_CODEC>"  cannot  be  determined  from  arguments,
+			 *   these wrappers have to be generated dynamically (~ala libffi).
+			 * - The `vc_*64' operators then form the *actual* impl for the codec
 			 */
+			self->vc_color2pixel = &identity_color2pixel;
+			self->vc_pixel2color = &identity_pixel2color;
 			return false;
 		}
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */

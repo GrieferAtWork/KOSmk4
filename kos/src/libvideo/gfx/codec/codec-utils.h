@@ -548,16 +548,32 @@ DECL_BEGIN
 
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define MASK8_BE(x) __hybrid_bswap64_c(__UINT64_C(x))
+#define MASK7_BE(x) (__hybrid_bswap64_c(__UINT64_C(x)) >> 8)
+#define MASK6_BE(x) (__hybrid_bswap64_c(__UINT64_C(x)) >> 16)
+#define MASK5_BE(x) (__hybrid_bswap64_c(__UINT64_C(x)) >> 24)
 #define MASK4_BE(x) __hybrid_bswap32_c(__UINT32_C(x))
 #define MASK3_BE(x) (__hybrid_bswap32_c(__UINT32_C(x)) >> 8)
 #define MASK2_BE(x) __hybrid_bswap16_c(__UINT16_C(x))
+#define MASK8_LE(x) __UINT64_C(x)
+#define MASK7_LE(x) __UINT64_C(x)
+#define MASK6_LE(x) __UINT64_C(x)
+#define MASK5_LE(x) __UINT64_C(x)
 #define MASK4_LE(x) __UINT32_C(x)
 #define MASK3_LE(x) __UINT32_C(x)
 #define MASK2_LE(x) __UINT16_C(x)
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define MASK8_BE(x) __UINT64_C(x)
+#define MASK7_BE(x) __UINT64_C(x)
+#define MASK6_BE(x) __UINT64_C(x)
+#define MASK5_BE(x) __UINT64_C(x)
 #define MASK4_BE(x) __UINT32_C(x)
 #define MASK3_BE(x) __UINT32_C(x)
 #define MASK2_BE(x) __UINT16_C(x)
+#define MASK8_LE(x) __hybrid_bswap64_c(__UINT64_C(x))
+#define MASK7_LE(x) (__hybrid_bswap64_c(__UINT64_C(x)) >> 8)
+#define MASK6_LE(x) (__hybrid_bswap64_c(__UINT64_C(x)) >> 16)
+#define MASK5_LE(x) (__hybrid_bswap64_c(__UINT64_C(x)) >> 24)
 #define MASK4_LE(x) __hybrid_bswap32_c(__UINT32_C(x))
 #define MASK3_LE(x) (__hybrid_bswap32_c(__UINT32_C(x)) >> 8)
 #define MASK2_LE(x) __hybrid_bswap16_c(__UINT16_C(x))
@@ -850,6 +866,76 @@ INTDEF NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC rp3_unaligned_setpixel16(byte_
 INTDEF NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC rp3_unaligned_setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 #endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+
+
+/* Pixel I/O for formats with >32bpp (e.g. 64bpp) */
+#ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer40_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer48_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer56_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF ATTR_OUT(3) void NOTHROW(FCC buffer64_requirements)(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer40_coord2bytes)(video_coord_t *__restrict p_coord);
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer48_coord2bytes)(video_coord_t *__restrict p_coord);
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer56_coord2bytes)(video_coord_t *__restrict p_coord);
+INTDEF WUNUSED ATTR_INOUT(1) size_t NOTHROW(FCC buffer64_coord2bytes)(video_coord_t *__restrict p_coord);
+
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC getpixel40_64(byte_t const *__restrict line, video_coord_t x);
+INTDEF NONNULL((1)) void FCC setpixel40_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel);
+INTDEF NONNULL((1)) void FCC linefill40_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel, video_dim_t num_pixels);
+INTDEF NONNULL((1)) void FCC vertfill40_64(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel64_t pixel, video_dim_t num_pixels);
+INTDEF NONNULL((1)) void FCC rectfill40_64(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 4)) void FCC rectcopy40(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 3)) void FCC rectmove40(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 3)) void FCC linecopy40(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+
+/* TODO: pixel48 can have a 2-byte aligned version that does 3*16-bit accesses */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC getpixel48_64(byte_t const *__restrict line, video_coord_t x);
+INTDEF NONNULL((1)) void FCC setpixel48_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel);
+INTDEF NONNULL((1)) void FCC linefill48_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel, video_dim_t num_pixels);
+INTDEF NONNULL((1)) void FCC vertfill48_64(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel64_t pixel, video_dim_t num_pixels);
+INTDEF NONNULL((1)) void FCC rectfill48_64(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 4)) void FCC rectcopy48(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 3)) void FCC rectmove48(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 3)) void FCC linecopy48(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC getpixel56_64(byte_t const *__restrict line, video_coord_t x);
+INTDEF NONNULL((1)) void FCC setpixel56_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel);
+INTDEF NONNULL((1)) void FCC linefill56_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel, video_dim_t num_pixels);
+INTDEF NONNULL((1)) void FCC vertfill56_64(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel64_t pixel, video_dim_t num_pixels);
+INTDEF NONNULL((1)) void FCC rectfill56_64(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 4)) void FCC rectcopy56(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 3)) void FCC rectmove56(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 3)) void FCC linecopy56(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC getpixel64_64(byte_t const *__restrict line, video_coord_t x);
+INTDEF NONNULL((1)) void FCC setpixel64_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel);
+INTDEF NONNULL((1)) void FCC linefill64_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel, video_dim_t num_pixels);
+INTDEF NONNULL((1)) void FCC vertfill64_64(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel64_t pixel, video_dim_t num_pixels);
+INTDEF NONNULL((1)) void FCC rectfill64_64(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 4)) void FCC rectcopy64(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 3)) void FCC rectmove64(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 3)) void FCC linecopy64(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_getpixel64_64 getpixel64_64
+#define unaligned_setpixel64_64 setpixel64_64
+#define unaligned_linefill64_64 linefill64_64
+#define unaligned_vertfill64_64 vertfill64_64
+#define unaligned_rectfill64_64 rectfill64_64
+#define unaligned_rectcopy64    rectcopy64
+#define unaligned_rectmove64    rectmove64
+#define unaligned_linecopy64    linecopy64
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC unaligned_getpixel64_64(byte_t const *__restrict line, video_coord_t x);
+INTDEF NONNULL((1)) void FCC unaligned_setpixel64_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel);
+INTDEF NONNULL((1)) void FCC unaligned_linefill64_64(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel, video_dim_t num_pixels);
+INTDEF NONNULL((1)) void FCC unaligned_vertfill64_64(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel64_t pixel, video_dim_t num_pixels);
+INTDEF NONNULL((1)) void FCC unaligned_rectfill64_64(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 4)) void FCC unaligned_rectcopy64(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 3)) void FCC unaligned_rectmove64(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+INTDEF NONNULL((1, 3)) void FCC unaligned_linecopy64(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 DECL_END
 
