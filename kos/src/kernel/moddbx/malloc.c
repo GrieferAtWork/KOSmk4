@@ -496,8 +496,19 @@ PRIVATE void NOTHROW(KCALL reset_heap)(void) {
 }
 
 PRIVATE void NOTHROW(KCALL clear_heap)(void) {
+#if 0 /* Sadly, this still needs to happen even if the kernel was poisoned:
+       * - If at least 1 extension "mnode" from the DBX heap was  injected
+       *   into the kernel mman, then we **have** to unlink that node here
+       *   if an assertion fails while already within the debugger
+       * - This isn't about reclaiming memory!
+       * - If we didn't do this, then our caller would still call `reset_heap()',
+       *   which would 0xcc-fill the header of the static heap, which would still
+       *   have  its mnode stored  within the kernel's mman,  which in turn would
+       *   cause the kernel mman to become corrupted.
+       */
 	if (kernel_poisoned())
 		return; /* Don't touch the kernel MMan after poison */
+#endif
 
 	/* Unmap all dynamically mapped heap nodes. */
 	while (SLIST_NEXT(&static_heap, sh_link)) {
