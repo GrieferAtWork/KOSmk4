@@ -206,10 +206,10 @@ size_of_encoded_value(unsigned char encoding) {
  */
 LOCAL SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE NONNULL((1)) bool FCALL
 kos_exceptfilter_matches_current_exception(char const *cxx_typename) {
-	static char const common_prefix[] = "N3kos6except";
-	static char const class_filter_prefix[] = "12class_filterIL" _CXX_TEMPLATE_ARG_Un(__SIZEOF_EXCEPT_CLASS_T__);
-	static char const code_filter_prefix[] = "11code_filterIL" _CXX_TEMPLATE_ARG_Un(__SIZEOF_EXCEPT_CODE_T__);
-	static char const common_suffix[] = "EEE";
+	static SECTION_EXCEPT_RODATA char const common_prefix[] = "N3kos6except";
+	static SECTION_EXCEPT_RODATA char const class_filter_prefix[] = "12class_filterIL" _CXX_TEMPLATE_ARG_Un(__SIZEOF_EXCEPT_CLASS_T__);
+	static SECTION_EXCEPT_RODATA char const code_filter_prefix[] = "11code_filterIL" _CXX_TEMPLATE_ARG_Un(__SIZEOF_EXCEPT_CODE_T__);
+	static SECTION_EXCEPT_RODATA char const common_suffix[] = "EEE";
 	if (bcmp(cxx_typename, common_prefix,
 	         COMPILER_STRLEN(common_prefix), sizeof(char)) != 0)
 		return false;
@@ -419,9 +419,11 @@ libc_get_next_gxx_personality_v0__uncached(void) {
 	 * order.
 	 *
 	 * iow: when libstdc++ was loaded **AFTER** libc, this will return it's impl. */
-	void *result = dlsym(RTLD_NEXT, "__gxx_personality_v0");
+	static SECTION_EXCEPT_RODATA char const name___gxx_personality_v0[] = "__gxx_personality_v0";
+	static SECTION_EXCEPT_RODATA char const name___gcc_personality_v0[] = "__gcc_personality_v0";
+	void *result = dlsym(RTLD_NEXT, name___gxx_personality_v0);
 	if (result == NULL)
-		result = dlsym(RTLD_NEXT, "__gcc_personality_v0");
+		result = dlsym(RTLD_NEXT, name___gcc_personality_v0);
 	return (_Unwind_Personality_Fn)result;
 }
 
