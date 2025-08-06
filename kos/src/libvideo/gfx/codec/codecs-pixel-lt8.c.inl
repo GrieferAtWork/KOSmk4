@@ -139,7 +139,7 @@ DECL_BEGIN
 /************************************************************************/
 /* PIXEL GETTER                                                         */
 /************************************************************************/
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 LOCAL_FUNC(getpixel)(byte_t const *__restrict line, video_coord_t x) {
 	line += x >> LOCAL_PIXELS_PER_BYTE_LOG2;
 #ifdef DEFINE_LSB
@@ -159,7 +159,7 @@ LOCAL_FUNC(getpixel)(byte_t const *__restrict line, video_coord_t x) {
 /************************************************************************/
 /* PIXEL SETTER                                                         */
 /************************************************************************/
-PRIVATE NONNULL((1)) void FCC
+INTERN NONNULL((1)) void FCC
 LOCAL_FUNC(setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	byte_t value;
 	shift_t shift;
@@ -180,7 +180,7 @@ LOCAL_FUNC(setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel_t pix
 }
 
 #ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
-PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+INTERN NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
 LOCAL_FUNC(rp3_setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	byte_t value;
 	shift_t shift;
@@ -206,7 +206,7 @@ LOCAL_FUNC(rp3_setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel_t
 /************************************************************************/
 /* LINE FILL                                                            */
 /************************************************************************/
-PRIVATE NONNULL((1)) void FCC
+INTERN NONNULL((1)) void FCC
 LOCAL_FUNC(linefill)(byte_t *__restrict line, video_coord_t x,
                      video_pixel_t pixel, video_dim_t num_pixels) {
 	byte_t word = (byte_t)LOCAL_PIXELS_MUL * (byte_t)(pixel & LOCAL_PIXELS_MASK);
@@ -278,7 +278,7 @@ LOCAL_FUNC(linefill)(byte_t *__restrict line, video_coord_t x,
 /************************************************************************/
 /* VERTICAL FILL                                                        */
 /************************************************************************/
-PRIVATE NONNULL((1)) void FCC
+INTERN NONNULL((1)) void FCC
 LOCAL_FUNC(vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
                      video_pixel_t pixel, video_dim_t num_pixels) {
 	byte_t mask, word;
@@ -307,7 +307,7 @@ LOCAL_FUNC(vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
 /************************************************************************/
 /* RECTANGLE FILL                                                       */
 /************************************************************************/
-PRIVATE NONNULL((1)) void FCC
+INTERN NONNULL((1)) void FCC
 LOCAL_FUNC(rectfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
 	byte_t word = (byte_t)LOCAL_PIXELS_MUL * (byte_t)(pixel & LOCAL_PIXELS_MASK);
@@ -571,7 +571,7 @@ LOCAL_FUNC(rectcopy_bitwise)(byte_t *__restrict dst_line, shift_t dst_head_skip,
 	} while (--size_y);
 }
 
-PRIVATE NONNULL((1, 4)) void FCC
+INTERN NONNULL((1, 4)) void FCC
 LOCAL_FUNC(rectcopy)(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
                      byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
                      video_dim_t size_x, video_dim_t size_y) {
@@ -704,7 +704,7 @@ LOCAL_FUNC(rectcopy_bitwise__rev)(byte_t *__restrict dst_line, shift_t dst_head_
 	} while (--size_y);
 }
 
-PRIVATE NONNULL((1, 3)) void FCC
+INTERN NONNULL((1, 3)) void FCC
 LOCAL_FUNC(rectmove)(byte_t *__restrict dst_line, video_coord_t dst_x,
                      byte_t const *__restrict src_line, video_coord_t src_x,
                      size_t stride, video_dim_t size_x, video_dim_t size_y) {
@@ -844,7 +844,7 @@ LOCAL_FUNC(linecopy_bitwise)(byte_t *__restrict dst_line, shift_t dst_head_skip,
 	} while (++x < size_x);
 }
 
-PRIVATE NONNULL((1, 3)) void FCC
+INTERN NONNULL((1, 3)) void FCC
 LOCAL_FUNC(linecopy)(byte_t *__restrict dst_line, video_coord_t dst_x,
                      byte_t const *__restrict src_line, video_coord_t src_x,
                      video_dim_t size_x) {

@@ -78,20 +78,20 @@ NOTHROW(FCC x_vbe16_requirements)(video_dim_t size_x, video_dim_t size_y,
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTDEF WUNUSED ATTR_INOUT(1) size_t
+PRIVATE WUNUSED ATTR_INOUT(1) size_t
 NOTHROW(FCC x_vbe16_coord2bytes)(video_coord_t *__restrict p_coord) {
 	size_t result = ((*p_coord >> 3) << 2);
 	*p_coord = (*p_coord & 7);
 	return result;
 }
 
-DEFINE_GENERIC_linefill__with__setpixel(x_vbe16_linefill, x_vbe16_setpixel)
-DEFINE_GENERIC_vertfill__with__setpixel(x_vbe16_vertfill, x_vbe16_setpixel)
-DEFINE_GENERIC_rectfill__with__linefill(x_vbe16_rectfill, x_vbe16_linefill)
-DEFINE_GENERIC_rectcopy__with__getpixel__and__setpixel(x_vbe16_rectcopy, x_vbe16_getpixel, x_vbe16_setpixel)
-DEFINE_GENERIC_rectmove__with__getpixel__and__setpixel(x_vbe16_rectmove, x_vbe16_getpixel, x_vbe16_setpixel)
-DEFINE_GENERIC_linecopy__with__getpixel__and__setpixel(x_vbe16_linecopy, x_vbe16_getpixel, x_vbe16_setpixel)
-DEFINE_GENERIC_setpixel3__with__setpixel(rp3_x_vbe16_setpixel, x_vbe16_setpixel)
+DEFINE_GENERIC_linefill__with__setpixel(PRIVATE, x_vbe16_linefill, x_vbe16_setpixel)
+DEFINE_GENERIC_vertfill__with__setpixel(PRIVATE, x_vbe16_vertfill, x_vbe16_setpixel)
+DEFINE_GENERIC_rectfill__with__linefill(PRIVATE, x_vbe16_rectfill, x_vbe16_linefill)
+DEFINE_GENERIC_rectcopy__with__getpixel__and__setpixel(PRIVATE, x_vbe16_rectcopy, x_vbe16_getpixel, x_vbe16_setpixel)
+DEFINE_GENERIC_rectmove__with__getpixel__and__setpixel(PRIVATE, x_vbe16_rectmove, x_vbe16_getpixel, x_vbe16_setpixel)
+DEFINE_GENERIC_linecopy__with__getpixel__and__setpixel(PRIVATE, x_vbe16_linecopy, x_vbe16_getpixel, x_vbe16_setpixel)
+DEFINE_GENERIC_setpixel3__with__setpixel(PRIVATE, rp3_x_vbe16_setpixel, x_vbe16_setpixel)
 DEFINE_PIXEL64_IO_WRAPPERS__WITH_PREFIX(PRIVATE, x_vbe16_)
 
 #define unaligned_x_vbe16_getpixel x_vbe16_getpixel
