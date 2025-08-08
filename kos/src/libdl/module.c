@@ -444,8 +444,8 @@ NOTHROW_NCX(CC DlModule_ElfGetShstrtab)(DlModule *self)
 	return result;
 err_read_shstrtab:
 	dl_seterrorf("%q: Failed to read contents of "
-	             "`e_shstrndx=%" PRIuN(__SIZEOF_ELFW(HALF__)) "' ("
-	             "`sh_offset=%" PRIuN(__SIZEOF_ELFW(OFF__)) "'): %s",
+	             /**/ "`e_shstrndx=%" PRIuN(__SIZEOF_ELFW(HALF__)) "' ("
+	             /**/ "`sh_offset=%" PRIuN(__SIZEOF_ELFW(OFF__)) "'): %s",
 	             self->dm_filename,
 	             self->dm_elf.de_shstrndx,
 	             shdrs->sh_offset,
@@ -559,9 +559,6 @@ NOTHROW_NCX(CC DlModule_ElfGetSection)(NCX DlModule *self,
 err:
 	return NULL;
 }
-
-
-
 
 DECL_END
 

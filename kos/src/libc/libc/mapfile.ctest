@@ -118,9 +118,7 @@ DEFINE_TEST(mapfile) {
 	EQ(6, mf.mf_size);
 	assert(!mapfile_usesmmap(&mf)); /* Should have used malloc! */
 	EQ(0, unmapfile(&mf));
-
 }
-
 
 DECL_END
 

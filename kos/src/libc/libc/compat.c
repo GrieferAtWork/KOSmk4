@@ -305,8 +305,8 @@ static_assert(sizeof(struct IO_FILE_84) == SIZEOF_IO_FILE_84);
 #error "Need FILE_HAVE_UOFFSET when sizeof(void *) == 4"
 #endif /* !FILE_HAVE_UOFFSET */
 INTERN ATTR_SECTION(".data.crt.FILE.std_files") ptrdiff_t file_uoffset = 0;
-INTERN WUNUSED ATTR_SECTION(".text.crt.FILE.std_files") FILE *__FCALL
-file_calloc(size_t extsize) {
+INTERN WUNUSED ATTR_SECTION(".text.crt.FILE.std_files")
+FILE *FCALL file_calloc(size_t extsize) {
 	FILE *result;
 	result = (FILE *)calloc(1, file_uoffset + sizeof(FILE) + extsize);
 	if likely(result)
@@ -343,8 +343,7 @@ NOTHROW(CC get_mainapp_std_stream_addr)(void *__restrict mainapp,
 	/* Initialize the user-program STD stream. (This right here
 	 * emulates the R_*_COPY relocation which was no doubt  the
 	 * reason why we got here in the first place) */
-	memcpy(result, fallback, SIZEOF_IO_FILE_84);
-	return (FILE *)result;
+	return (FILE *)memcpy(result, fallback, SIZEOF_IO_FILE_84);
 }
 
 INTERN ATTR_SECTION(".text.crt.compat.linux.stdio") void

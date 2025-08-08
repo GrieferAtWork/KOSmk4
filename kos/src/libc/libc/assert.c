@@ -161,8 +161,8 @@ maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
 	bzero(&sc_info, sizeof(sc_info));
 	sc_info.rsi_sysno = SYS_rt_tgsigqueueinfo;
 	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_OTHER | RPC_SYSCALL_INFO_FEXCEPT |
-	                    RPC_SYSCALL_INFO_FREGVALID(1) | RPC_SYSCALL_INFO_FREGVALID(2) |
-	                    RPC_SYSCALL_INFO_FREGVALID(3) | RPC_SYSCALL_INFO_FREGVALID(4);
+	                    RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) |
+	                    RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3);
 	sc_info.rsi_regs[0] = (syscall_ulong_t)getpid();
 	sc_info.rsi_regs[1] = (syscall_ulong_t)gettid();
 	sc_info.rsi_regs[2] = (syscall_ulong_t)si.si_signo;

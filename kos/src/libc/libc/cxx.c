@@ -111,8 +111,8 @@ PRIVATE ATTR_NORETURN void throw_bad_alloc(size_t num_bytes) {
 	THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes);
 }
 
-ATTR_SECTION(".text.crt.compat.cxx.malloc")
-PRIVATE void call_new_handler_or_throw_bad_alloc(size_t num_bytes) {
+PRIVATE ATTR_SECTION(".text.crt.compat.cxx.malloc") void LIBCCALL
+call_new_handler_or_throw_bad_alloc(size_t num_bytes) {
 	cxx_new_handler_t handler = dynsym(_ZSt15get_new_handlerv)();
 	if (!handler)
 		throw_bad_alloc(num_bytes);

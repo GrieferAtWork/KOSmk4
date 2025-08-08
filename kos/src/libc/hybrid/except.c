@@ -140,9 +140,9 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 #endif /* !__KERNEL__ */
 #if defined(__KERNEL__) && 0
 	x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
-	                  "__cxa_begin_catch [%#" PRIx8 "] [error=%s ("
-	                  "%.4" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
-	                  "%.4" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__) ")]\n",
+	                  /**/ "__cxa_begin_catch [%#" PRIx8 "] [error=%s ("
+	                  /**/ "%.4" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
+	                  /**/ "%.4" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__) ")]\n",
 	                  __builtin_return_address(0),
 	                  __builtin_return_address(0),
 	                  THIS_TASK,
@@ -188,9 +188,9 @@ libc_cxa_end_catch(void) {
 	info = except_info();
 #if defined(__KERNEL__) && 0
 	x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
-	                  "__cxa_end_catch%s [%#Ix] [error=%s ("
-	                  "%.4" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
-	                  "%.4" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__) ")]\n",
+	                  /**/ "__cxa_end_catch%s [%#Ix] [error=%s ("
+	                  /**/ "%.4" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
+	                  /**/ "%.4" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__) ")]\n",
 	                  __builtin_return_address(0),
 	                  __builtin_return_address(0),
 	                  THIS_TASK,
@@ -262,11 +262,11 @@ NOTHROW(FCALL libc_except_badusage_throw_inside_catch)(except_register_state_t c
 	*endp = '\0';
 	assert_failf_at(state, "THROW(...)",
 	                "THROW(%s%s) ("
-	                "%.4" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
-	                "%.4" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__) ""
-	                ") inside of catch-block\n"
+	                /**/ "%.4" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
+	                /**/ "%.4" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__) ""
+	                /**/ ") inside of catch-block\n"
 	                "Consider adding/changing a surrounding `TRY' between "
-	                "here and the nearest `EXCEPT' to `NESTED_TRY'",
+	                /**/ "here and the nearest `EXCEPT' to `NESTED_TRY'",
 	                except_name(code),
 	                args_buf,
 	                EXCEPT_CLASS(code),

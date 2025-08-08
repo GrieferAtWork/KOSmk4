@@ -133,7 +133,6 @@ DEFINE_TEST(math_rounding) {
 #undef EQFLT
 }
 
-
 DECL_END
 
 #endif /* !GUARD_LIBC_LIBC_MATH_CTEST */

@@ -26,12 +26,13 @@
 #include <kernel/except.h>
 #include <kernel/syscall.h>
 
-#include <cfi.h>
+#include <asm/instr/compat.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
 #include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <cfi.h>
 
 /************************************************************************/
 /* SYSRET-OPTIMIZED IRET                                                */
@@ -120,7 +121,9 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	 * XXX: This assumes that I never end up adding support for mapping  VIO
 	 *      at non-canonical addresses (I had planned this at one point, but
 	 *      decided against it because it would add unnecessary overhead  to
-	 *      the VM node-tree management). */
+	 *      the VM node-tree management).
+	 * XXX: Since the re-write to use an RBTREE, said "overhead" actually no
+	 *      longer  exists,  so  that  argument  is  no  longer  validd   ;) */
 .Lsysret64_probe_begin:
 	ttest  mask=0, loc=0(%rcx)
 .Lsysret64_probe_end:
@@ -159,7 +162,7 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	/* Clear the current exception (else the kernel might panic because
 	 * it  would  think  that  we  didn't  nest  exceptions   properly) */
 	EXTERN(this_exception_code)
-	movq   $(EXCEPT_CODEOF(E_OK)), %gs:this_exception_code
+	movq   $(EXCEPT_CODEOF(E_OK)), %segtls:this_exception_code
 .Lsysret64_probe_begin2:
 	ttest  mask=0, loc=0(%rcx)
 .Lsysret64_probe_end2:
@@ -171,10 +174,11 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	 * the next system call might think that exceptions were  being
 	 * nested) */
 	EXTERN(this_exception_code)
-	movq   $(EXCEPT_CODEOF(E_OK)), %gs:this_exception_code
+	movq   $(EXCEPT_CODEOF(E_OK)), %segtls:this_exception_code
 
 .Ldo_iret:
 	.cfi_restore_state
+	/* Interrupts must always already be disabled at this point! */
 	swapgs_if_user_iret
 	iretq
 	.cfi_endproc
