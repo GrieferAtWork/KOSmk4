@@ -4267,24 +4267,28 @@ PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBCCALL pthread_rwlock_acquirewrite)(pthread_rwlock_t *__restrict self,
                                                   struct timespec64 const *timeout,
                                                   syscall_ulong_t timeout_flags) {
+	uint32_t lockword;
 again:
-	if (atomic_cmpxch(&self->rw_lock, 0, (uint32_t)-1)) {
+	lockword = atomic_cmpxch_val(&self->rw_lock, 0, (uint32_t)-1);
+	if (lockword == 0) {
 		/* Success */
 		self->rw_writer = gettid();
 		return EOK;
 	}
 
-	/* Check for recursive write-locks */
-	if (self->rw_flags && self->rw_writer == gettid()) {
-		if unlikely(self->rw_nr_writers == (uint32_t)-1)
-			return EAGAIN;     /* Not documented, but mirror what `pthread_rwlock_tryrdlock()' does */
-		++self->rw_nr_writers; /* Recursive write-lock! */
-		return EOK;
-	}
+	if (self->rw_flags) {
+		/* Check for recursive write-locks */
+		if (lockword == (uint32_t)-1 && self->rw_writer == gettid()) {
+			if unlikely(self->rw_nr_writers == (uint32_t)-1)
+				return EAGAIN;     /* Not documented, but mirror what `pthread_rwlock_tryrdlock()' does */
+			++self->rw_nr_writers; /* Recursive write-lock! */
+			return EOK;
+		}
 
-	/* Someone is holding a read-lock. If it's us, that's a EDEADLK */
-	if unlikely(self->rw_flags && pthread_rwlock_isreading(self))
-		return EDEADLK;
+		/* Someone is holding a read-lock. If it's us, that's a EDEADLK */
+		if unlikely(pthread_rwlock_isreading(self))
+			return EDEADLK;
+	}
 
 	/* Indicate that we are waiting for a write-lock */
 	atomic_write(&self->rw_writer_wakeup, 1);
