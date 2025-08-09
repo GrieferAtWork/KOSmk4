@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa804d353 */
+/* HASH CRC-32:0x7f25e772 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4149,8 +4149,8 @@ DEFINE_PUBLIC_ALIAS(sys_nanosleep64, libc_sys_nanosleep64)
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
  * 
  * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
+ * a no-op (semantically speaking, it does nothing). But when enabled,
+ * it  is really only usable in conjunction with the userprocmask. The
  * exact usage can be seen in `chkuserprocmask(3)'.
  * 
  * @return: 0 : Always, unconditionally returned. */
@@ -8603,8 +8603,8 @@ DEFINE_PUBLIC_ALIAS(sys_Xnanosleep64, libc_sys_Xnanosleep64)
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
  * 
  * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
+ * a no-op (semantically speaking, it does nothing). But when enabled,
+ * it  is really only usable in conjunction with the userprocmask. The
  * exact usage can be seen in `chkuserprocmask(3)'.
  * 
  * @return: 0 : Always, unconditionally returned. */

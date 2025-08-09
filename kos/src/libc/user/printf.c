@@ -28,6 +28,9 @@ gcc_opt.append("-Os"); // Optimize for size (don't want to bloat libc too much w
 #include "../api.h"
 /**/
 
+#include <features.h>
+#include <hybrid/compiler.h>
+
 #include <hybrid/__alloca.h> /* Dependency of `#include <libc/template/format-printf.h>' */
 #include <hybrid/__assert.h> /* Dependency of `#include <libc/template/format-printf.h>' */
 #include <hybrid/align.h>
@@ -36,17 +39,26 @@ gcc_opt.append("-Os"); // Optimize for size (don't want to bloat libc too much w
 #include <bits/math-constants.h>
 #include <bits/types.h> /* Dependency of `#include <libc/template/format-printf.h>' */
 #include <kos/exec/idata.h>
+#include <kos/sched/shared-recursive-rwlock.h>
 #include <kos/sched/shared-rwlock.h>
+#include <kos/types.h>
 #include <parts/uchar/format-printer.h>
 #include <parts/wchar/format-printer.h>
 #include <sys/mman.h>
 #include <sys/param.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <err.h>
+#include <errno.h>
 #include <format-printer.h>
 #include <malloc.h>
+#include <printf.h>
 #include <pthread.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <unicode.h>
 
 #include <libc/parts.uchar.string.h>

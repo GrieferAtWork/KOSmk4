@@ -2749,7 +2749,7 @@ __end:
 		__result += __temp;
 	}
 #ifdef __PRINTF_HOOKS
-	__do_return_result:
+__do_return_result:
 	specsup_printf_endread();
 	return __result;
 __err:

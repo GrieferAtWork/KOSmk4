@@ -27,6 +27,8 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <asm/intrin.h>
 #include <kos/coredump.h>
 #include <kos/debugtrap.h>
@@ -34,17 +36,20 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/rpc.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
 #include <sys/ioctl.h>
+#include <sys/syscall.h>
 #include <sys/syslog.h>
 
 #include <ctype.h>
+#include <errno.h>
 #include <format-printer.h>
 #include <signal.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <syscall.h>
 #include <termio.h>
 #include <uchar.h>
 #include <unistd.h>
@@ -54,7 +59,6 @@
 #include "assert.h"
 #include "globals.h"
 #include "sigreturn.h"
-
 
 DECL_BEGIN
 

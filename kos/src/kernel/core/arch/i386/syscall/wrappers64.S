@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4546995b */
+/* HASH CRC-32:0x33c37d33 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11789,8 +11789,8 @@ END(__x86_asm64_syscall_get_exception_handler)
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
  * 
  * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
+ * a no-op (semantically speaking, it does nothing). But when enabled,
+ * it  is really only usable in conjunction with the userprocmask. The
  * exact usage can be seen in `chkuserprocmask(3)'.
  * 
  * @return: 0 : Always, unconditionally returned. */
@@ -24948,8 +24948,8 @@ END(__x86_asm32_int80_nanosleep64)
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
  * 
  * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
+ * a no-op (semantically speaking, it does nothing). But when enabled,
+ * it  is really only usable in conjunction with the userprocmask. The
  * exact usage can be seen in `chkuserprocmask(3)'.
  * 
  * @return: 0 : Always, unconditionally returned. */
@@ -30268,8 +30268,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_nanosleep64, __x86_asm32_int80_nan
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
  * 
  * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
+ * a no-op (semantically speaking, it does nothing). But when enabled,
+ * it  is really only usable in conjunction with the userprocmask. The
  * exact usage can be seen in `chkuserprocmask(3)'.
  * 
  * @return: 0 : Always, unconditionally returned. */
@@ -36547,8 +36547,8 @@ END(__x86_asm32_sysrun32_nanosleep64)
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
  * 
  * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
+ * a no-op (semantically speaking, it does nothing). But when enabled,
+ * it  is really only usable in conjunction with the userprocmask. The
  * exact usage can be seen in `chkuserprocmask(3)'.
  * 
  * @return: 0 : Always, unconditionally returned. */

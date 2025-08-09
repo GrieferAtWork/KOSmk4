@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9254400 */
+/* HASH CRC-32:0x269723a3 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17800,8 +17800,8 @@ END(__x86_asm32_int80_nanosleep64)
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
  * 
  * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
+ * a no-op (semantically speaking, it does nothing). But when enabled,
+ * it  is really only usable in conjunction with the userprocmask. The
  * exact usage can be seen in `chkuserprocmask(3)'.
  * 
  * @return: 0 : Always, unconditionally returned. */
@@ -37421,8 +37421,8 @@ END(__x86_asm32_sysenter_nanosleep64)
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
  * 
  * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
+ * a no-op (semantically speaking, it does nothing). But when enabled,
+ * it  is really only usable in conjunction with the userprocmask. The
  * exact usage can be seen in `chkuserprocmask(3)'.
  * 
  * @return: 0 : Always, unconditionally returned. */
