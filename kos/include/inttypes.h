@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88f18d85 */
+/* HASH CRC-32:0x6cd1da08 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -470,7 +470,7 @@ __NAMESPACE_STD_USING(wcstoumax)
 #define PRIMAXu        PRIMAXuN(__SIZEOF_INT__)           /* "%u" */
 #define PRIMAXx        PRIMAXxN(__SIZEOF_INT__)           /* "%x" */
 #define PRIMAXX        PRIMAXXN(__SIZEOF_INT__)           /* "%X" */
-#define PRIMAXb        PRIMAXbN(__SIZEOF_INT__)           /* "%X" *b
+#define PRIMAXb        PRIMAXbN(__SIZEOF_INT__)           /* "%X" */
 #define PRIMAXdSIZ     PRIMAXdN(__SIZEOF_SIZE_T__)        /* "%" PRIdSIZ */
 #define PRIMAXiSIZ     PRIMAXiN(__SIZEOF_SIZE_T__)        /* "%" PRIiSIZ */
 #define PRIMAXoSIZ     PRIMAXoN(__SIZEOF_SIZE_T__)        /* "%" PRIoSIZ */

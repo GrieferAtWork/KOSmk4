@@ -459,7 +459,7 @@
 #define PRIMAXu        PRIMAXuN(__SIZEOF_INT__)           /* "%u" */
 #define PRIMAXx        PRIMAXxN(__SIZEOF_INT__)           /* "%x" */
 #define PRIMAXX        PRIMAXXN(__SIZEOF_INT__)           /* "%X" */
-#define PRIMAXb        PRIMAXbN(__SIZEOF_INT__)           /* "%X" *b
+#define PRIMAXb        PRIMAXbN(__SIZEOF_INT__)           /* "%X" */
 #define PRIMAXdSIZ     PRIMAXdN(__SIZEOF_SIZE_T__)        /* "%" PRIdSIZ */
 #define PRIMAXiSIZ     PRIMAXiN(__SIZEOF_SIZE_T__)        /* "%" PRIiSIZ */
 #define PRIMAXoSIZ     PRIMAXoN(__SIZEOF_SIZE_T__)        /* "%" PRIoSIZ */
