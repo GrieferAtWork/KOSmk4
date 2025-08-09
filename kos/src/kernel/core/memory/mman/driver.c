@@ -5015,11 +5015,11 @@ driver_create(NCX byte_t const *base, size_t num_bytes,
 	}
 
 	/* Search for the .dynamic section.
-	 * We  need find this section first, because it contains the DT_SONAME
-	 * tag which we need to determine the driver's name, which is used for
-	 * matching the driver against other, already-loaded drivers in  order
-	 * to prevent  unnecessary work  when it  comes to  ensuring that  any
-	 * driver is only loaded once! */
+	 * We need to find this section first, because it contains the DT_SONAME
+	 * tag  which we need to determine the  driver's name, which is used for
+	 * matching the driver against other, already-loaded drivers in order to
+	 * prevent unnecessary work when it comes to ensuring that any driver is
+	 * only loaded once! */
 	for (phidx = 0;; ++phidx) {
 		if (phidx >= phnum)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC);
@@ -5093,8 +5093,8 @@ done_dynhdr_for_soname:
 				continue;
 			p_filesz = read_once(&phdrv[phidx].p_filesz);
 
-			/* Technically p_memsz, but any pointer above would
-			 * always  be an empty string, which isn't allowed! */
+			/* Technically `p_memsz', but any pointer above `p_filesz'
+			 * would always be an  empty string, which isn't  allowed! */
 			if (p_vaddr + p_filesz <= dynstr_vla)
 				continue;
 
@@ -5490,9 +5490,9 @@ again_acquire_mman_lock:
 						goto again_get_driver_loadlist;
 					}
 
-					/* With everything initialized and double-check for consistency, we
-					 * can  finally release our lock from the kernel mman, knowing that
-					 * the new driver has been safely loaded into the kernel. */
+					/* With everything initialized and double-checked for consistency,
+					 * we can finally release our  lock from the kernel mman,  knowing
+					 * that the new driver has been safely loaded into the kernel. */
 					mman_lock_release(&mman_kernel);
 				} EXCEPT {
 					kfree(new_ll);
@@ -5631,7 +5631,7 @@ driver_loadmod_filename(NCX char const *driver_filename,
 
 struct path_segment {
 	NCX char const *ps_base; /* Segment base */
-	size_t                   ps_size; /* Segment length */
+	size_t          ps_size; /* Segment length */
 };
 
 /* Extract the last segment from `path', and update

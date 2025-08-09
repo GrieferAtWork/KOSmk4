@@ -343,7 +343,7 @@ DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
 again_lock_mman:
 		mman_lock_acquire(mm);
 
-		/* Figure out the lock address that we'll end up using. */
+		/* Figure out the load address that we'll end up using. */
 		result = mman_getunmapped_mbuilder_or_unlock(mm, (uintptr_t)addr,
 		                                             &builder, flags, NULL);
 		if (result == (uintptr_t)MAP_FAILED)

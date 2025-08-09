@@ -23,8 +23,8 @@
 #include <kernel/compiler.h>
 
 #include <kernel/mman/map.h>
-#include <kernel/mman/unmapped.h>
 #include <kernel/mman/mnode.h> /* __ALIGNOF_MNODE */
+#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
@@ -32,6 +32,7 @@
 #include <hybrid/__pointer.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
+#include <hybrid/typecore.h>
 
 #define __ALIGNOF_MBNODE __ALIGNOF_INT64__
 #if __ALIGNOF_MBNODE > __ALIGNOF_MNODE
@@ -299,7 +300,7 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self);
  * This function does:
  *  - assert(fmnode->mbn_part != NULL);
  *  - assert(fmnode->mbn_file != NULL);
- *  - fmnode->mbn_filnxt = NULL;       // Only  single-nde   initial   mappings   are   supported.
+ *  - fmnode->mbn_filnxt = NULL;       // Only   single-node   initial  mappings   are  supported.
  *                                     // Additional  required nodes are added lazily if necessary
  *                                     // via the re-flow mechanism that is done as part of a call
  *                                     // to `mbuilder_partlocks_acquire_or_unlock()'

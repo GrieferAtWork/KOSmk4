@@ -26,29 +26,41 @@
 #include "../api.h"
 /**/
 
+#include <features.h>
+#include <hybrid/compiler.h>
+
 #include <hybrid/align.h>
 #include <hybrid/sched/atomic-once.h>
 #include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/exec/idata.h>
 #include <kos/exec/peb.h>
+#include <kos/kernel/types.h>
 #include <kos/syscalls.h>
-#include <sys/auxv.h>
-#include <sys/wait.h>
+#include <kos/types.h>
+#include <parts/uchar/string.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <atomic.h>
+#include <crtdefs.h>
 #include <ctype.h>
 #include <direct.h>
+#include <dlfcn.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <malloc.h>
 #include <malloca.h>
+#include <process.h>
 #include <pthread.h>
 #include <sched.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
@@ -62,7 +74,6 @@
 #include "../libc/init.h"
 #include "malloc.h"
 #include "stdlib.h"
-
 
 DECL_BEGIN
 

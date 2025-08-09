@@ -87,6 +87,13 @@ DECL_BEGIN
  * time, meaning that any packet decoding errors must be considered the same
  * as having fully wrapped around the buffer. */
 PUBLIC ATTR_BSS ATTR_ALIGNED(1) byte_t dmesg_buffer[CONFIG_KERNEL_DMESG_BUFFER_SIZE] = {};
+/* TODO: Instead of statically allocating this buffer:
+ * - It should be allocated dynamically during kernel boot
+ * - It should be **WAY** larger by default. How about: "max(16384, min(16*1024*1024, TOTAL_RAM / 100))"
+ *   iow: at least 16K, at most 16M, at most 1% of available physical RAM.
+ * - Its size should be dynamic and overwritable via the kernel commandline
+ * - There should also be a sys_ksysctl to change its size
+ */
 
 /* Base-line seconds for all cached dmesg packets. */
 PUBLIC ATTR_BSS time_t dmesg_secondsbase = 0;

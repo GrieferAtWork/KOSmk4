@@ -360,7 +360,7 @@ DEFINE_SYSCALL3(errno_t, tgkill,
                 pid_t, pid, pid_t, tid,
                 signo_t, signo) {
 	REF struct task *target;
-	if unlikely(!sigvalid(signo)) {
+	if unlikely(!sigvalid(signo) && signo != 0) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      signo);
@@ -399,7 +399,7 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 #ifdef __ARCH_WANT_SYSCALL_TKILL
 DEFINE_SYSCALL2(errno_t, tkill, pid_t, tid, signo_t, signo) {
 	REF struct task *target;
-	if unlikely(!sigvalid(signo)) {
+	if unlikely(!sigvalid(signo) && signo != 0) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      signo);

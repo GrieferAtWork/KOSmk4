@@ -186,7 +186,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 #if defined(__i386__) || defined(__x86_64__)
 	/* TODO: PR_GET_TSC */
 	/* TODO: PR_GEPR_SET_TSCT_TSC */
-#endif /* !__USE_KOS_PURE || __i386__ || __x86_64__ */
+#endif /* __i386__ || __x86_64__ */
 
 	case PR_GET_SECUREBITS: {
 		struct cred *mycred = FORTASK(me, this_cred);

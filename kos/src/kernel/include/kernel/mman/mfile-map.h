@@ -251,7 +251,7 @@ _mfile_map_init_and_acquire_or_reserved(struct mfile_map *__restrict self)
 #define _mfile_map_init_or_reserved(self) \
 	(_mfile_map_init_and_acquire_or_reserved(self), mfile_map_release_or_reserved(self))
 #define mfile_map_acquire_or_reserved(self) \
-	do {                        \
+	do {                                    \
 	} while (!mfile_map_acquire_or_unlock_or_reserved(self, __NULLPTR))
 #define mfile_map_release_or_reserved(self) \
 	(void)(mfile_map_isreserved(self) || (mfile_map_release(self), 1))

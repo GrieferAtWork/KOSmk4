@@ -22,6 +22,63 @@
 
 #include <kernel/compiler.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types.h>
+
+#ifdef __CC__
+DECL_BEGIN
+
+/* Low-level physical memory access helpers. */
+
+#ifdef NO_PHYS_IDENTITY
+#define IF_HAVE_PHYS_IDENTITY(...)               /* nothing */
+#define IF_PHYS_IDENTITY(addr, num_bytes, ...)   (void)0
+#define IF_PHYS_IDENTITY_PAGE(addr_of_page, ...) (void)0
+#else /* NO_PHYS_IDENTITY */
+#define IF_HAVE_PHYS_IDENTITY(...) __VA_ARGS__
+#define IF_PHYS_IDENTITY(addr, num_bytes, ...) \
+	do {                                       \
+		if ((addr) || (num_bytes)) {           \
+			__VA_ARGS__;                       \
+		}                                      \
+	}	__WHILE0
+#define IF_PHYS_IDENTITY_PAGE(addr_of_page, ...) \
+	do {                                         \
+		if (addr_of_page) {                      \
+			__VA_ARGS__;                         \
+		}                                        \
+	}	__WHILE0
+#endif /* !NO_PHYS_IDENTITY */
+
+/* Declare variables needed by macros below. */
+#define PHYS_VARS         \
+	__byte_t *trampoline; \
+	int __pv_pp_oldval
+
+/* Save the calling thread's trampoline mapping and re-map it to `addr_of_page'
+ * @return: * : The base address of the calling thread's trampoline (== vaddr of `addr_of_page') */
+#define phys_pushpage(addr_of_page) \
+	(trampoline = (__byte_t *)1, __pv_pp_oldval = 42, trampoline)
+
+/* Re-map the calling thread's trampoline to `addr_of_page'
+ * @return: * : The base address of the calling thread's trampoline (== vaddr of `addr_of_page') */
+#define phys_loadpage(addr_of_page) \
+	((addr_of_page) + 1, trampoline)
+
+/* Same as `phys_pushpage' / `phys_loadpage', but map the page containing a given address
+ * @return: * : The  virtual address at which `addr' can be found. Not at the size of this
+ *              mapping spans until the next page-boundary (though at least 1 byte will be
+ *              available) */
+#define phys_pushaddr(addr) (phys_pushpage((addr) & ~4095) + (uintptr_t)((addr) & 4095))
+#define phys_loadaddr(addr) (phys_loadpage((addr) & ~4095) + (uintptr_t)((addr) & 4095))
+
+/* Re-map the calling thread's trampoline to `addr_of_page' */
+#define phys_pop() (void)(trampoline, __pv_pp_oldval)
+
+DECL_END
+#endif /* __CC__ */
+#else /* __INTELLISENSE__ */
+
 #include <kernel/arch/paging.h> /* `pagedir_pushval_t' */
 #include <kernel/memory.h>      /* `physpage2addr()' */
 #include <kernel/mman/phys.h>
@@ -89,5 +146,6 @@ DECL_BEGIN
 
 DECL_END
 #endif /* __CC__ */
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_PHYS_ACCESS_H */

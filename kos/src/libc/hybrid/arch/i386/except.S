@@ -75,7 +75,7 @@ IU(	call   libc_except_info)
 	jne    libc__except_badusage_no_nesting /* ERROR: Illegal TRY-nesting */
 	ret
 INTERN_FUNCTION(libc__except_badusage_no_nesting)
-	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R
+	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R /* FIXME: User-space call to "libc_except_info()" clobbered a bunch of registers already */
 	movP   %Psp, %R_fcall0P
 	EXTERN(libc_except_badusage_no_nesting)
 	call   libc_except_badusage_no_nesting

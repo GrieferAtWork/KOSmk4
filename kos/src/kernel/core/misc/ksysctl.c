@@ -269,6 +269,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			fd_node = read_once(&data->im_file.f_node);
 			fd_path = read_once(&data->im_file.f_path);
 			fd_dent = read_once(&data->im_file.f_dentry);
+			/* require(CAP_SYS_MODULE); -- Already done in `load_driver_from_file_handles()' */
 			drv = load_driver_from_file_handles(fd_node, fd_path, fd_dent,
 			                                    commandline, &new_driver_loaded,
 			                                    insmod_flags);
@@ -574,6 +575,7 @@ DEFINE_SYSCALL3(errno_t, finit_module, fd_t, fd,
 	REF struct driver *drv;
 	(void)flags; /* Ignored... (for now) */
 	validate_readable(uargs, 1);
+	/* require(CAP_SYS_MODULE); -- Already done in `load_driver_from_file_handles()' */
 	drv = load_driver_from_file_handles(fd, -1, -1, uargs, NULL,
 	                                    KSYSCTL_DRIVER_INSMOD_FNORMAL);
 	decref_unlikely(drv);

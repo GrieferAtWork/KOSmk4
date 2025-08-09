@@ -86,7 +86,7 @@ NOTHROW(FCALL maybe_clear_tid_address)(struct task *__restrict caller) {
 	TRY {
 		/* Special case for vfork when the kernel supports userprocmask. */
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
-		uintptr_t my_flags = PERTASK_GET(this_task.t_flags);
+		uintptr_t my_flags = FORTASK(caller, this_task.t_flags);
 		if (my_flags & TASK_FVFORK) {
 			if unlikely(my_flags & TASK_FUSERPROCMASK_AFTER_VFORK) {
 				NCX struct userprocmask *um;
@@ -231,7 +231,9 @@ NOTHROW(FCALL process_exit)(uint16_t w_status) {
 					/* This write is repeated in `task_exit()', but that's OK.
 					 * It also has to  be done here, so  that the RPC will  be
 					 * able  to talk to  our thread in  order to determine the
-					 * exit status that should be propagated. */
+					 * exit status that should be propagated, and it has to be
+					 * written here, in case the main thread processes our RPC
+					 * before the second write happens in `task_exit()'. */
 					atomic_write(&pid->tp_status, w_status);
 
 					/* Inherited by `propagate_thread_exit_status()' */

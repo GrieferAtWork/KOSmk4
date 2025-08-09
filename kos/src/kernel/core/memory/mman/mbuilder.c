@@ -752,7 +752,7 @@ mbuilder_getunmapped(struct mbuilder_norpc *__restrict self, void *addr,
  * This function does:
  *  - assert(fmnode->mbn_part != NULL);
  *  - assert(fmnode->mbn_file != NULL);
- *  - fmnode->mbn_filnxt = NULL;       // Only  single-nde   initial   mappings   are   supported.
+ *  - fmnode->mbn_filnxt = NULL;       // Only   single-node   initial  mappings   are  supported.
  *                                     // Additional  required nodes are added lazily if necessary
  *                                     // via the re-flow mechanism that is done as part of a call
  *                                     // to `mbuilder_partlocks_acquire_or_unlock()'
@@ -773,13 +773,13 @@ mbuilder_getunmapped(struct mbuilder_norpc *__restrict self, void *addr,
 PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder_norpc *__restrict self,
                                       struct mbnode *__restrict fmnode) {
+	struct mbnode_list *list;
 	assert(fmnode->mbn_part != NULL);
 	assert(fmnode->mbn_file != NULL);
 	fmnode->mbn_filnxt = NULL;
 	SLIST_INSERT(&self->mb_files, fmnode, mbn_nxtfile);
-	LIST_INSERT_HEAD(mbnode_partset_listof(&self->mb_uparts,
-	                                       fmnode->mbn_part),
-	                 fmnode, mbn_nxtuprt);
+	list = mbnode_partset_listof(&self->mb_uparts, fmnode->mbn_part);
+	LIST_INSERT_HEAD(list, fmnode, mbn_nxtuprt);
 	mbnode_tree_insert(&self->mb_mappings, fmnode);
 }
 
@@ -800,7 +800,6 @@ NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder_norpc *__restrict self,
 	DBG_memset(&fmnode->mbn_nxtuprt, 0xcc, sizeof(fmnode->mbn_nxtuprt));
 	DBG_memset(&fmnode->mbn_nxtfile, 0xcc, sizeof(fmnode->mbn_nxtfile));
 }
-
 
 DECL_END
 
