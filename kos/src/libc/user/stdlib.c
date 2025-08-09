@@ -797,6 +797,8 @@ NOTHROW(CC libd_dos_fsroot_changed)(void) {
 		char *old_root = (char *)libd_dos_fsroot;
 		libd_dos_fsroot = NULL;
 		free(old_root);
+	} else {
+		libd_dos_fsroot = NULL;
 	}
 }
 
