@@ -31,8 +31,6 @@
 #ifdef CONFIG_LIBVIDEO_HAVE_RAMFD
 #include <hybrid/compiler.h>
 
-#include <hybrid/overflow.h>
-
 #include <kos/anno.h>
 #include <kos/fd.h>
 #include <kos/io.h>
@@ -249,7 +247,7 @@ ramfdbuffer_subregion_rem__subregion(struct video_surface const *__restrict self
 }
 
 /* LOCK */
-INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
+INTERN WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC
 ramfdbuffer_subregion_rem__lockregion(struct video_buffer *__restrict self,
                                       struct video_regionlock *__restrict lock) {
 	struct video_ramfdbuffer_subregion_rem *me;

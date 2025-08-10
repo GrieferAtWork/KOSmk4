@@ -40,6 +40,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/color.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/buffer/rle.h>
 #include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/codec/converter.h>
 #include <libvideo/gfx/gfx.h>
@@ -126,6 +127,8 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	if (video_gfx_getxdim(src_gfx) == 0 || video_gfx_getydim(src_gfx) == 0) {
 		ctx->vbt_ops = &libvideo_emptyblitter_ops;
 	} else {
+		/* TODO: RLE optimization? */
+
 #define CK(tt, ff) (video_gfx_hascolorkey(src_gfx) ? tt : ff)
 #define LN(f)      ((video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) ? f##_l : f##_n)
 		if (src_buffer == dst_buffer) {

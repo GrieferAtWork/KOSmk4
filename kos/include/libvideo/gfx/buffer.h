@@ -63,6 +63,9 @@ struct video_codec;
 struct video_palette;
 struct video_surface;
 struct video_rect;
+#ifdef CONFIG_LIBVIDEO_HAVE_RLE
+struct video_buffer_rlekey;
+#endif /* CONFIG_LIBVIDEO_HAVE_RLE */
 #ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
 struct video_buffer_fdinfo;
 struct video_deserializer_io;
@@ -628,6 +631,12 @@ struct video_buffer_ops {
 	 * @return: * : Always re-returns `__self' */
 	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_buffer *
 	__NOTHROW_T(LIBVIDEO_GFX_FCC *vi_revoke)(struct video_buffer *__restrict __self);
+
+#ifdef CONFIG_LIBVIDEO_HAVE_RLE
+	/* [0..1] Return RLE-encoded pixel data described by `__self' */
+	__ATTR_WUNUSED_T __ATTR_IN_T(1) __byte_t const *
+	__NOTHROW_T(LIBVIDEO_GFX_FCC *vi_getrle)(struct video_buffer_rlekey const *__restrict __self);
+#endif /* CONFIG_LIBVIDEO_HAVE_RLE */
 };
 
 

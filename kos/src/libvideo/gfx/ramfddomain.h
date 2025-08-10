@@ -70,7 +70,7 @@ INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC ramfdbuffer__s
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) REF struct video_buffer *FCC ramfdbuffer_subregion_rem__subregion(struct video_surface const *__restrict self, struct video_crect const *__restrict rect);
 
 /* LOCK */
-INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC ramfdbuffer_subregion_rem__lockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
+INTDEF WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC ramfdbuffer_subregion_rem__lockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
 
 /* GFX */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC ramfdbuffer_subregion_rem__initgfx(struct video_gfx *__restrict self);

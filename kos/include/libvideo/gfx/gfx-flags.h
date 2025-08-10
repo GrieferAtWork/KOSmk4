@@ -40,6 +40,9 @@
 #define VIDEO_GFX_F_NEAREST  0x0000 /* Use nearest interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
 #define VIDEO_GFX_F_LINEAR   0x0040 /* Use linear interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
 #define VIDEO_GFX_F_PALOBJ   0x0080 /* The palette being used is non-NULL and object-based */
+#ifdef CONFIG_LIBVIDEO_HAVE_RLE
+#define VIDEO_GFX_F_RLE      0x0100 /* If supported, use+enable RLE optimization for this buffer */
+#endif /* CONFIG_LIBVIDEO_HAVE_RLE */
 
 
 

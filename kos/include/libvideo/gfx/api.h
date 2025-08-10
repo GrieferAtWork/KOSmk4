@@ -29,6 +29,7 @@
 #define CONFIG_LIBVIDEO_HAVE_PIXEL64       /* Feature flag: are 64-bit pixel formats supported? */
 #define CONFIG_LIBVIDEO_HAVE_RAMFD         /* Feature flag: support video_ramfddomain() */
 #define CONFIG_LIBVIDEO_HAVE_SERIALIZATION /* Feature flag: support video_domain_deserialize() (and everything that implies) */
+//TODO:#define CONFIG_LIBVIDEO_HAVE_RLE           /* Feature flag: support RLE blit optimizations */
 
 
 #if defined(__i386__) && !defined(__x86_64__)
