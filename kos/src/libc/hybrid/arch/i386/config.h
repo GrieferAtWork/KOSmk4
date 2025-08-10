@@ -248,8 +248,8 @@ NOTHROW(libc_sys_sigreturn)(struct ucpustate const *restore_cpu,
                             struct sigset_with_size const *restore_sigmask,
                             struct rpc_syscall_info const *restart_sc_info) {
 #ifdef __x86_64__
-	__register __syscall_ulong_t __r12 __asm__("%r12") = (__syscall_ulong_t)restore_sigmask;
-	__register __syscall_ulong_t __r13 __asm__("%r13") = (__syscall_ulong_t)restart_sc_info;
+	__register_var(__syscall_ulong_t, __r12, "%r12") = (__syscall_ulong_t)restore_sigmask;
+	__register_var(__syscall_ulong_t, __r13, "%r13") = (__syscall_ulong_t)restart_sc_info;
 	__asm__ __volatile__("movq %q1, %%rbp\n\t"
 	                     "syscall"
 	                     :

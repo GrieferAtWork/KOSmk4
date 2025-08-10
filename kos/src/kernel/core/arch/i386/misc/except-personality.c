@@ -207,7 +207,7 @@ extern void ASMCALL _x86_xintr_userexcept_unwind(void);
 #ifdef __x86_64__
 #define x86_xintr1_userexcept_unwind(st, lsda)                  \
 	do {                                                        \
-		__register void const *r12 __asm__("%r12") = (lsda);    \
+		__register_var(void const *, r12, "%r12") = (lsda);     \
 		__asm__ __volatile__("jmp _x86_xintr_userexcept_unwind" \
 		                     :                                  \
 		                     : "r"                (r12)         \
@@ -216,7 +216,7 @@ extern void ASMCALL _x86_xintr_userexcept_unwind(void);
 	}	__WHILE0
 #define x86_xintr2_userexcept_unwind(st, lsda, ecode)           \
 	do {                                                        \
-		__register void const *r12 __asm__("%r12") = (lsda);    \
+		__register_var(void const *, r12, "%r12") = (lsda);     \
 		__asm__ __volatile__("jmp _x86_xintr_userexcept_unwind" \
 		                     :                                  \
 		                     : "r"                (r12)         \
@@ -226,7 +226,7 @@ extern void ASMCALL _x86_xintr_userexcept_unwind(void);
 	}	__WHILE0
 #define x86_xintr3_userexcept_unwind(st, lsda, ecode, addr)     \
 	do {                                                        \
-		__register void const *r12 __asm__("%r12") = (lsda);    \
+		__register_var(void const *, r12, "%r12") = (lsda);     \
 		__asm__ __volatile__("movq %%rax, %%rbp\n\t"            \
 		                     "jmp _x86_xintr_userexcept_unwind" \
 		                     :                                  \
@@ -268,28 +268,40 @@ extern void ASMCALL _x86_xintr3_userexcept_unwind(void);
 	}	__WHILE0
 #endif /* !__x86_64__ */
 
+#include <kernel/printk.h>
+
 INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) _Unwind_Reason_Code
 NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr1_userexcept_personality)(struct _Unwind_Context *__restrict context) {
 	struct icpustate *st;
+	void *return_addr = (void *)_Unwind_GetLanguageSpecificData(context);
+	assertf(ADDR_ISKERN(return_addr),
+	        "x86_xintr1_userexcept_personality: LSDA %p does not point into kernel",
+	        return_addr);
 	st = (struct icpustate *)context->uc_state->kcs_gpregs.gp_Psp;
 	if (!icpustate_isuser(st))
 		return _URC_CONTINUE_UNWIND;
 	/* Unwind into user-space. */
 	PREEMPTION_ENABLE();
-	x86_xintr1_userexcept_unwind(st, (void *)_Unwind_GetLanguageSpecificData(context));
+	printk(KERN_DEBUG "x86_xintr1_userexcept_personality: %p\n", return_addr);
+	x86_xintr1_userexcept_unwind(st, return_addr);
 }
 
 INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) _Unwind_Reason_Code
 NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr2_userexcept_personality)(struct _Unwind_Context *__restrict context) {
 	struct icpustate *st;
 	uintptr_t ecode;
+	void *return_addr = (void *)_Unwind_GetLanguageSpecificData(context);
+	assertf(ADDR_ISKERN(return_addr),
+	        "x86_xintr2_userexcept_personality: LSDA %p does not point into kernel",
+	        return_addr);
 	st = (struct icpustate *)context->uc_state->kcs_gpregs.gp_Psp;
 	if (!icpustate_isuser(st))
 		return _URC_CONTINUE_UNWIND;
 	/* Unwind into user-space. */
 	PREEMPTION_ENABLE();
 	ecode = context->uc_state->kcs_gpregs.gp_Pbx;
-	x86_xintr2_userexcept_unwind(st, (void *)_Unwind_GetLanguageSpecificData(context), ecode);
+	printk(KERN_DEBUG "x86_xintr2_userexcept_personality: %p\n", return_addr);
+	x86_xintr2_userexcept_unwind(st, return_addr, ecode);
 }
 
 INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) _Unwind_Reason_Code
@@ -297,6 +309,10 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct _Unwind_
 	struct icpustate *st;
 	uintptr_t ecode;
 	void *addr;
+	void *return_addr = (void *)_Unwind_GetLanguageSpecificData(context);
+	assertf(ADDR_ISKERN(return_addr),
+	        "x86_xintr3_userexcept_personality: LSDA %p does not point into kernel",
+	        return_addr);
 #ifdef __x86_64__
 	st = (struct icpustate *)context->uc_state->kcs_gpregs.gp_Psp;
 #else /* __x86_64__ */
@@ -308,7 +324,8 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct _Unwind_
 	PREEMPTION_ENABLE();
 	addr  = (void *)context->uc_state->kcs_gpregs.gp_Pbp;
 	ecode = context->uc_state->kcs_gpregs.gp_Pbx;
-	x86_xintr3_userexcept_unwind(st, (void *)_Unwind_GetLanguageSpecificData(context), ecode, addr);
+	printk(KERN_DEBUG "x86_xintr3_userexcept_personality: %p\n", return_addr);
+	x86_xintr3_userexcept_unwind(st, return_addr, ecode, addr);
 }
 /************************************************************************/
 
@@ -333,6 +350,9 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct _Unwind_Context
 	struct x86_asm_except_entry const *ent;
 	ent = (struct x86_asm_except_entry const *)_Unwind_GetLanguageSpecificData(context);
 	if (ent) {
+		assertf(ADDR_ISKERN(ent),
+		        "x86_asm_except_personality: LSDA %p does not point into kernel",
+		        ent);
 		for (; ent->ee_entry != 0; ++ent) {
 			if (context->uc_adjpc >= ent->ee_start && context->uc_adjpc < ent->ee_end) {
 				if (ent->ee_mask != (uintptr_t)-1) {
