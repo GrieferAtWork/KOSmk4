@@ -793,6 +793,22 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 		++dst_y;                                                         \
 		++src_y;                                                         \
 	} while (--size_y)
+#define GFX_BLIT_FOREACH_SIMPLE(dst_x, src_x, size_x, size_y, \
+                                cb /*(dst_x, src_x)*/,        \
+                                dst_row_start /*()*/,         \
+                                dst_row_end /*()*/)           \
+	do {                                                      \
+		video_coord_t _used_dst_x = dst_x;                    \
+		video_coord_t _used_src_x = src_x;                    \
+		video_dim_t _iter_size_x  = size_x;                   \
+		dst_row_start();                                      \
+		do {                                                  \
+			cb(_used_dst_x, _used_src_x);                     \
+			++_used_dst_x;                                    \
+			++_used_src_x;                                    \
+		} while (--_iter_size_x);                             \
+		dst_row_end();                                        \
+	} while (--size_y)
 
 /* Same as `GFX_BLIT_FOREACH()', but pixels are iterated in reverse order */
 #define GFX_BLIT_FOREACH_REV(dst_x, dst_y, src_x, src_y, size_x, size_y, cb,                  \
@@ -813,6 +829,26 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 			} while (_iter_size_x);                                                           \
 			dst_row_end(_used_dst_y, _used_src_y);                                            \
 		}                                                                                     \
+	} while (size_y)
+
+/* Same as `GFX_BLIT_FOREACH_SIMPLE()', but pixels are iterated in reverse order */
+#define GFX_BLIT_FOREACH_REV_SIMPLE(dst_x, src_x, size_x, size_y,   \
+                                    cb /*(dst_x, src_x)*/,          \
+                                    dst_row_start /*()*/,           \
+                                    dst_row_end /*()*/)             \
+	do {                                                            \
+		--size_y;                                                   \
+		{                                                           \
+			video_dim_t _iter_size_x = size_x;                      \
+			dst_row_start();                                        \
+			do {                                                    \
+				--_iter_size_x;                                     \
+				{                                                   \
+					cb(dst_x + _iter_size_x, src_x + _iter_size_x); \
+				}                                                   \
+			} while (_iter_size_x);                                 \
+			dst_row_end();                                          \
+		}                                                           \
 	} while (size_y)
 
 /* Invoke:

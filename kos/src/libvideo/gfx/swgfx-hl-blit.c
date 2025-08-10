@@ -41,6 +41,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/converter.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/surface.h>
 
@@ -124,89 +125,75 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	/* Check for special case: source and target buffers are the same */
 	if (video_gfx_getxdim(src_gfx) == 0 || video_gfx_getydim(src_gfx) == 0) {
 		ctx->vbt_ops = &libvideo_emptyblitter_ops;
-	} else if (src_buffer == dst_buffer) {
-		if (video_gfx_hascolorkey(src_gfx)) {
-			/* TODO */
-		}
-		if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
-			drv->bsw_stretch         = &libvideo_swblitter_samebuf__stretch_l;
-			drv->bsw_stretch_imatrix = &libvideo_swblitter_samebuf__stretch_imatrix_l;
-		} else {
-			drv->bsw_stretch         = &libvideo_swblitter_samebuf__stretch_n;
-			drv->bsw_stretch_imatrix = &libvideo_swblitter_samebuf__stretch_imatrix_n;
-		}
-		if (libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
-			drv->bsw_blit         = &libvideo_swblitter_noblend_samebuf__blit;
-			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samebuf__blit_imatrix;
-		} else {
-			/* Need to use different impls here that essentially do a "memmove"-style blit,
-			 * rather  than the usual  "memcpy"-style one (since in  this case, writing new
-			 * pixels in an  incorrect order might  clobber other pixels  that have yet  to
-			 * be read) */
-			drv->bsw_blit         = &libvideo_swblitter_samebuf__blit;
-			drv->bsw_blit_imatrix = &libvideo_swblitter_samebuf__blit_imatrix;
-		}
-	} else if (libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
-		if (video_gfx_hascolorkey(src_gfx)) {
-			/* TODO */
-		}
-		if (noblend_blit_compatible(video_buffer_getcodec(dst_buffer),
-		                            video_buffer_getcodec(src_buffer)) &&
-			video_gfx_getpalette(src_gfx) == video_gfx_getpalette(dst_gfx)) {
-			/* Special optimization when not doing any blending, and both GFX contexts
-			 * share the same codec: in this case,  we can try to directly copy  pixel
-			 * data, either through video locks, or by directly reading/writing pixels */
-			drv->bsw_blit         = &libvideo_swblitter_noblend_samefmt__blit;
-			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samefmt__blit_imatrix;
-			if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
-				if (video_buffer_getcodec(src_buffer)->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
-					drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt_interp8888__stretch_l;
-					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt_interp8888__stretch_imatrix_l;
-				} else {
-					drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt__stretch_l;
-					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt__stretch_imatrix_l;
-				}
-			} else {
-				drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt__stretch_n;
-				drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt__stretch_imatrix_n;
-			}
-		} else {
-			/* Special optimization when not doing any blending, and both GFX contexts
-			 * share the same codec: in this case,  we can try to directly copy  pixel
-			 * data, either through video locks, or by directly reading/writing pixels */
-			video_converter_init(libvideo_swblitter_generic__conv(ctx),
-			                     video_gfx_assurface(src_gfx),
-			                     video_gfx_assurface(dst_gfx));
-			drv->bsw_blit         = &libvideo_swblitter_noblend_difffmt__blit;
-			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_difffmt__blit_imatrix;
-			if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
-				if (video_buffer_getcodec(src_buffer)->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
-					drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt_interp8888__stretch_l;
-					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt_interp8888__stretch_imatrix_l;
-				} else {
-					drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt__stretch_l;
-					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt__stretch_imatrix_l;
-				}
-			} else {
-				drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt__stretch_n;
-				drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt__stretch_imatrix_n;
-			}
-		}
 	} else {
-		/* TODO: Dedicated optimization when "src_buffer" uses P1_MSB (for TLFT font rendering) */
-
-		if (video_gfx_hascolorkey(src_gfx)) {
-			/* TODO */
-		}
-		drv->bsw_blit         = &libvideo_swblitter_generic__blit;
-		drv->bsw_blit_imatrix = &libvideo_swblitter_generic__blit_imatrix;
-		if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
-			drv->bsw_stretch         = &libvideo_swblitter_generic__stretch_l;
-			drv->bsw_stretch_imatrix = &libvideo_swblitter_generic__stretch_imatrix_l;
+#define CK(tt, ff) (video_gfx_hascolorkey(src_gfx) ? tt : ff)
+#define LN(f)      ((video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) ? f##_l : f##_n)
+		if (src_buffer == dst_buffer) {
+			drv->bsw_stretch         = CK(LN(&libvideo_swblitter_samebuf_ckey__stretch), LN(&libvideo_swblitter_samebuf__stretch));
+			drv->bsw_stretch_imatrix = CK(LN(&libvideo_swblitter_samebuf_ckey__stretch_imatrix), LN(&libvideo_swblitter_samebuf__stretch_imatrix));
+			if (libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
+				drv->bsw_blit         = CK(&libvideo_swblitter_noblend_samebuf_ckey__blit, &libvideo_swblitter_noblend_samebuf__blit);
+				drv->bsw_blit_imatrix = CK(&libvideo_swblitter_noblend_samebuf_ckey__blit_imatrix, &libvideo_swblitter_noblend_samebuf__blit_imatrix);
+			} else {
+				/* Need to use different impls here that essentially do a "memmove"-style blit,
+				 * rather  than the usual  "memcpy"-style one (since in  this case, writing new
+				 * pixels in an  incorrect order might  clobber other pixels  that have yet  to
+				 * be read) */
+				drv->bsw_blit         = CK(&libvideo_swblitter_samebuf_ckey__blit, &libvideo_swblitter_samebuf__blit);
+				drv->bsw_blit_imatrix = CK(&libvideo_swblitter_samebuf_ckey__blit_imatrix, &libvideo_swblitter_samebuf__blit_imatrix);
+			}
+		} else if (libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
+			if (noblend_blit_compatible(video_buffer_getcodec(dst_buffer),
+			                            video_buffer_getcodec(src_buffer)) &&
+			    video_gfx_getpalette(src_gfx) == video_gfx_getpalette(dst_gfx)) {
+				/* Special optimization when not doing any blending, and both GFX contexts
+				 * share the same codec: in this case,  we can try to directly copy  pixel
+				 * data, either through video locks, or by directly reading/writing pixels */
+				drv->bsw_blit         = CK(&libvideo_swblitter_noblend_samefmt_ckey__blit, &libvideo_swblitter_noblend_samefmt__blit);
+				drv->bsw_blit_imatrix = CK(&libvideo_swblitter_noblend_samefmt_ckey__blit_imatrix, &libvideo_swblitter_noblend_samefmt__blit_imatrix);
+				if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
+					if (video_buffer_getcodec(src_buffer)->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+						drv->bsw_stretch         = CK(&libvideo_swblitter_noblend_samefmt_ckey_interp8888__stretch_l, &libvideo_swblitter_noblend_samefmt_interp8888__stretch_l);
+						drv->bsw_stretch_imatrix = CK(&libvideo_swblitter_noblend_samefmt_ckey_interp8888__stretch_imatrix_l, &libvideo_swblitter_noblend_samefmt_interp8888__stretch_imatrix_l);
+					} else {
+						drv->bsw_stretch         = CK(&libvideo_swblitter_noblend_samefmt_ckey__stretch_l, &libvideo_swblitter_noblend_samefmt__stretch_l);
+						drv->bsw_stretch_imatrix = CK(&libvideo_swblitter_noblend_samefmt_ckey__stretch_imatrix_l, &libvideo_swblitter_noblend_samefmt__stretch_imatrix_l);
+					}
+				} else {
+					drv->bsw_stretch         = CK(&libvideo_swblitter_noblend_samefmt_ckey__stretch_n, &libvideo_swblitter_noblend_samefmt__stretch_n);
+					drv->bsw_stretch_imatrix = CK(&libvideo_swblitter_noblend_samefmt_ckey__stretch_imatrix_n, &libvideo_swblitter_noblend_samefmt__stretch_imatrix_n);
+				}
+			} else {
+				/* Special optimization when not doing any blending, and both GFX contexts
+				 * share the same codec: in this case,  we can try to directly copy  pixel
+				 * data, either through video locks, or by directly reading/writing pixels */
+				video_converter_init(libvideo_swblitter_generic__conv(ctx),
+				                     video_gfx_assurface(src_gfx),
+				                     video_gfx_assurface(dst_gfx));
+				drv->bsw_blit         = CK(&libvideo_swblitter_noblend_difffmt_ckey__blit, &libvideo_swblitter_noblend_difffmt__blit);
+				drv->bsw_blit_imatrix = CK(&libvideo_swblitter_noblend_difffmt_ckey__blit_imatrix, &libvideo_swblitter_noblend_difffmt__blit_imatrix);
+				if (video_gfx_getflags(src_gfx) & VIDEO_GFX_F_LINEAR) {
+					if (video_buffer_getcodec(src_buffer)->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+						drv->bsw_stretch         = CK(&libvideo_swblitter_noblend_difffmt_ckey_interp8888__stretch_l, &libvideo_swblitter_noblend_difffmt_interp8888__stretch_l);
+						drv->bsw_stretch_imatrix = CK(&libvideo_swblitter_noblend_difffmt_ckey_interp8888__stretch_imatrix_l, &libvideo_swblitter_noblend_difffmt_interp8888__stretch_imatrix_l);
+					} else {
+						drv->bsw_stretch         = CK(&libvideo_swblitter_noblend_difffmt_ckey__stretch_l, &libvideo_swblitter_noblend_difffmt__stretch_l);
+						drv->bsw_stretch_imatrix = CK(&libvideo_swblitter_noblend_difffmt_ckey__stretch_imatrix_l, &libvideo_swblitter_noblend_difffmt__stretch_imatrix_l);
+					}
+				} else {
+					drv->bsw_stretch         = CK(&libvideo_swblitter_noblend_difffmt_ckey__stretch_n, &libvideo_swblitter_noblend_difffmt__stretch_n);
+					drv->bsw_stretch_imatrix = CK(&libvideo_swblitter_noblend_difffmt_ckey__stretch_imatrix_n, &libvideo_swblitter_noblend_difffmt__stretch_imatrix_n);
+				}
+			}
 		} else {
-			drv->bsw_stretch         = &libvideo_swblitter_generic__stretch_n;
-			drv->bsw_stretch_imatrix = &libvideo_swblitter_generic__stretch_imatrix_n;
+			/* TODO: Dedicated optimization when "src_buffer" uses P1_MSB (for TLFT font rendering) */
+			drv->bsw_blit            = CK(&libvideo_swblitter_ckey__blit, &libvideo_swblitter_generic__blit);
+			drv->bsw_blit_imatrix    = CK(&libvideo_swblitter_ckey__blit_imatrix, &libvideo_swblitter_generic__blit_imatrix);
+			drv->bsw_stretch         = CK(LN(&libvideo_swblitter_ckey__stretch), LN(&libvideo_swblitter_generic__stretch));
+			drv->bsw_stretch_imatrix = CK(LN(&libvideo_swblitter_ckey__stretch_imatrix), LN(&libvideo_swblitter_generic__stretch_imatrix));
 		}
+#undef LN
+#undef CK
 	}
 	return ctx;
 }
