@@ -34,17 +34,24 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include "../api.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <hybrid/host.h>
 #include <hybrid/sched/atomic-once.h>
 
 #include <asm/pagesize.h>
+#include <bits/crt/dos/corecrt_startup.h>
+#include <kos/compat/linux-dirent.h>
+#include <kos/compat/linux-dirent64.h>
 #include <kos/except.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/idata.h>
 #include <kos/exec/ifunc.h>
 #include <kos/exec/peb.h>
+#include <kos/kernel/types.h>
 #include <kos/malloc.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
 #include <linux/net.h>
 #include <nt/errhandlingapi.h>
 #include <nt/handleapi.h>
@@ -53,20 +60,28 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <nt/synchapi.h>
 #include <nt/sysinfoapi.h>
 #include <nt/types.h>
+#include <sys/socket.h>
 #include <sys/types.h>
 
 #include <assert.h>
 #include <atomic.h>
+#include <dlfcn.h>
 #include <elf.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <locale.h>
+#include <malloc.h>
 #include <math.h>
 #include <paths.h>
 #include <pthread.h>
 #include <pthread_np.h>
 #include <siginfo.h>
 #include <signal.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
 #include <syscall.h>
@@ -78,7 +93,9 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <libcmdline/encode.h>
 #include <libiconv/api.h>
 
+#include "../auto/stdlib.h"
 #include "../user/corecrt_startup.h"
+#include "../user/process.h"
 #include "../user/stdio-api.h"
 #include "../user/stdlib.h"
 #include "compat.h"
