@@ -560,10 +560,10 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver *NOTHROW(FCALL driver_from
 extern "C++" {
 FUNDEF WUNUSED REF struct driver *FCALL
 driver_fromname(NCX char const *driver_name, size_t driver_name_len)
-	THROWS(E_SEGFAULT) ASMNAME("driver_fromname_with_len");
+		THROWS(E_SEGFAULT) ASMNAME("driver_fromname_with_len");
 FUNDEF WUNUSED REF struct driver *FCALL
 driver_fromfilename(NCX char const *driver_filename, size_t driver_name_len)
-	THROWS(E_SEGFAULT) ASMNAME("driver_fromfilename_with_len");
+		THROWS(E_SEGFAULT) ASMNAME("driver_fromfilename_with_len");
 } /* extern "C++" */
 #endif /* __cplusplus */
 
@@ -590,12 +590,12 @@ driver_getfile(struct driver *__restrict self)
 /************************************************************************/
 
 struct driver_syminfo {
-	uint32_t                 dsi_elfhash; /* [in|out] ELF symbol name hash. */
-	uint32_t                 dsi_gnuhash; /* [in|out] GNU symbol name hash. */
+	uint32_t        dsi_elfhash; /* [in|out] ELF symbol name hash. */
+	uint32_t        dsi_gnuhash; /* [in|out] GNU symbol name hash. */
 	NCX char const *dsi_name;    /* [1..1][in] Symbol name */
-	void                    *dsi_addr;    /* [out] Symbol address. (absolute) */
-	size_t                   dsi_size;    /* [out] Symbol size. */
-	unsigned char            dsi_bind;    /* [out] Symbol binding (one of `STB_GLOBAL' or `STB_WEAK') */
+	void           *dsi_addr;    /* [out] Symbol address. (absolute) */
+	size_t          dsi_size;    /* [out] Symbol size. */
+	unsigned char   dsi_bind;    /* [out] Symbol binding (one of `STB_GLOBAL' or `STB_WEAK') */
 };
 
 /* Initialize a given driver symbol info descriptor. */

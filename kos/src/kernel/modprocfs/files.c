@@ -31,10 +31,13 @@
 #include <kernel/fs/filehandle.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/fs.h>
+#include <kernel/fs/node.h>
 #include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/notify.h>
 #include <kernel/fs/null.h>
 #include <kernel/fs/path.h>
+#include <kernel/fs/printnode.h>
+#include <kernel/fs/regnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
@@ -45,16 +48,23 @@
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/fault.h>
 #include <kernel/mman/futexfd.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/stat.h>
 #include <kernel/mman/unmapped.h>
+#include <kernel/paging.h>
 #include <kernel/pipe.h>
+#include <kernel/types.h>
 #include <kernel/uname.h>
 #include <kernel/user.h>
+#include <sched/atomic64.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/scheduler.h>
 #include <sched/task.h> /* task_start_default_flags */
 #include <sched/tsc.h>
@@ -63,13 +73,23 @@
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
 
+#include <asm/cpu-flags.h>
+#include <asm/os/utsname.h>
+#include <kos/aref.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/exec/elf.h>
+#include <kos/io.h>
 #include <kos/ioctl/leaks.h>
+#include <kos/kernel/handle.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 #include <network/socket.h>
+#include <sys/ioctl.h>
 
 #include <assert.h>
 #include <atomic.h>
@@ -84,7 +104,10 @@
 #include <time.h>
 #include <unicode.h>
 
+#include <libbuffer/ringbuffer.h>
+#include <libc/local/string/strmode.h>
 #include <libcmdline/encode.h>
+#include <libvio/api.h>
 
 #if defined(__x86_64__) || defined(__i386__)
 #include <sched/x86/iopl.h>
@@ -115,19 +138,19 @@ NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self);
 /* Create forward declarations. (Prevent declaration errors below) */
 #define MKDIR_BEGIN(symbol_name, perm) \
 	INTDEF struct constdir symbol_name;
-#define MKREG_RO(symbol_name, perm, printer)                                          \
+#define MKREG_RO(symbol_name, perm, printer)                                         \
 	INTDEF void KCALL printer(pformatprinter printer, void *arg, pos_t offset_hint); \
 	INTDEF struct procfs_regfile symbol_name;
-#define MKREG_RW(symbol_name, perm, printer, writer)                                  \
+#define MKREG_RW(symbol_name, perm, printer, writer)                                 \
 	INTDEF void KCALL printer(pformatprinter printer, void *arg, pos_t offset_hint); \
-	INTDEF void KCALL writer(NCX void const *buf, size_t bufsize);           \
+	INTDEF void KCALL writer(NCX void const *buf, size_t bufsize);                   \
 	INTDEF struct procfs_regfile symbol_name;
 #define MKREG_CONSTSTR(symbol_name, perm, string_ptr) \
 	INTDEF struct procfs_txtfile symbol_name;
 #define MKLNK(symbol_name, perm, readlink)            \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL          \
 	readlink(struct flnknode *__restrict self,        \
-	         NCX /*utf-8*/ char *buf,        \
+	         NCX /*utf-8*/ char *buf,                 \
 	         size_t bufsize) THROWS(E_SEGFAULT, ...); \
 	INTDEF struct flnknode symbol_name;
 #include "procfs.def"
@@ -270,7 +293,7 @@ procfs_modules_printer(pformatprinter printer, void *arg,
 			continue;
 		FINALLY_DECREF_UNLIKELY(drv);
 		printf("%s %" PRIuSIZ " %" PRIuPTR " ",
-		       drv->d_name,
+		       driver_getname(drv),
 		       (size_t)(drv->md_loadmax - drv->md_loadmin) + 1,
 		       /* Subtract 1 from refcnt because we're holding one ourselves! */
 		       atomic_read(&drv->md_refcnt) - 1);
@@ -285,7 +308,7 @@ procfs_modules_printer(pformatprinter printer, void *arg,
 			if (!driver_depends_on(other, drv))
 				continue;
 			/* Found a driver which `drv' is a dependency of */
-			printf("%s,", other->d_name);
+			printf("%s,", driver_getname(other));
 			got_something = true;
 		}
 		if (drv == &kernel_driver) {

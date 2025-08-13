@@ -333,7 +333,7 @@ NOTHROW(FCALL driver_section_destroy)(struct driver_section *__restrict self) {
 
 		/* Replace a pointer to `self' with `NULL'.
 		 * There is the (very) unlikely case that someone reloaded
-		 * the section before we were able to delete out  pointer,
+		 * the section before we were able to delete our  pointer,
 		 * in which case that new section already took our spot! */
 		awref_cmpxch(&drv->d_sections[myindex], self, NULL);
 		decref_unlikely(drv);

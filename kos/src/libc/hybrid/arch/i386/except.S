@@ -209,19 +209,17 @@ DEFINE_PUBLIC_WEAK_ALIAS(__cxa_rethrow, libc_except_rethrow)
 INTERN_FUNCTION(libc_Unwind_Resume)
 	.cfi_startproc
 	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R
+#define SP_OFFSET (SIZEOF_KCPUSTATE - SIZEOF_POINTER)
 #ifdef __KERNEL__
 	goto_Ldo_unwind_Psp
 #else /* __KERNEL__ */
-#ifdef __x86_64__
-	movP   %R_sysvabi0P,           %R_fcall1P /* struct _Unwind_Exception *__restrict exception_object */
-#else /* __x86_64__ */
-	movP   SIZEOF_KCPUSTATE(%Psp), %R_fcall1P /* struct _Unwind_Exception *__restrict exception_object */
-#endif /* !__x86_64__ */
-	movP   %Psp,                   %R_fcall0P /* except_register_state_t *__restrict state */
+	movP   L_ccall0P(SP_OFFSET), %R_fcall1P /* struct _Unwind_Exception *__restrict exception_object */
+	movP   %Psp,                 %R_fcall0P /* except_register_state_t *__restrict state */
 	INTERN(libc_Unwind_Resume_impl)
 	call   libc_Unwind_Resume_impl
 	jmp    .Lload_kcpustate_Pax
 #endif /* !__KERNEL__ */
+#undef SP_OFFSET
 	.cfi_endproc
 END(libc_Unwind_Resume)
 DEFINE_PUBLIC_ALIAS(_Unwind_Resume, libc_Unwind_Resume)
@@ -232,15 +230,13 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Resume, libc_Unwind_Resume)
 INTERN_FUNCTION(libc_Unwind_RaiseException)
 	.cfi_startproc
 	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R
-#ifdef __x86_64__
-	movP   %R_sysvabi0P,           %R_fcall1P /* struct _Unwind_Exception *__restrict exception_object */
-#else /* __x86_64__ */
-	movP   SIZEOF_KCPUSTATE(%Psp), %R_fcall1P /* struct _Unwind_Exception *__restrict exception_object */
-#endif /* !__x86_64__ */
-	movP   %Psp,                   %R_fcall0P /* except_register_state_t *__restrict state */
+#define SP_OFFSET (SIZEOF_KCPUSTATE - SIZEOF_POINTER)
+	movP   L_ccall0P(SP_OFFSET), %R_fcall1P /* struct _Unwind_Exception *__restrict exception_object */
+	movP   %Psp,                 %R_fcall0P /* except_register_state_t *__restrict state */
 	INTERN(libc_Unwind_RaiseException_impl)
 	call   libc_Unwind_RaiseException_impl
 	jmp    .Lload_kcpustate_Pax
+#undef SP_OFFSET
 	.cfi_endproc
 END(libc_Unwind_RaiseException)
 DEFINE_PUBLIC_ALIAS(_Unwind_RaiseException, libc_Unwind_RaiseException)
@@ -249,15 +245,13 @@ DEFINE_PUBLIC_ALIAS(_Unwind_RaiseException, libc_Unwind_RaiseException)
 INTERN_FUNCTION(libc_Unwind_Resume_or_Rethrow)
 	.cfi_startproc
 	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R
-#ifdef __x86_64__
-	movP   %R_sysvabi0P,           %R_fcall1P /* struct _Unwind_Exception *__restrict exception_object */
-#else /* __x86_64__ */
-	movP   SIZEOF_KCPUSTATE(%Psp), %R_fcall1P /* struct _Unwind_Exception *__restrict exception_object */
-#endif /* !__x86_64__ */
-	movP   %Psp,                   %R_fcall0P /* except_register_state_t *__restrict state */
+#define SP_OFFSET (SIZEOF_KCPUSTATE - SIZEOF_POINTER)
+	movP   L_ccall0P(SP_OFFSET), %R_fcall1P /* struct _Unwind_Exception *__restrict exception_object */
+	movP   %Psp,                 %R_fcall0P /* except_register_state_t *__restrict state */
 	INTERN(libc_Unwind_Resume_or_Rethrow_impl)
 	call   libc_Unwind_Resume_or_Rethrow_impl
 	jmp    .Lload_kcpustate_Pax
+#undef SP_OFFSET
 	.cfi_endproc
 END(libc_Unwind_Resume_or_Rethrow)
 DEFINE_PUBLIC_ALIAS(_Unwind_Resume_or_Rethrow, libc_Unwind_Resume_or_Rethrow)

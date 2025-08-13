@@ -446,6 +446,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	/* Calculate (and verify) scanline */
 	if (OVERFLOW_UMUL(biWidth, CEILDIV(biBitCount, NBBY), &dwPixelScanline))
 		Egoto(badfmt);
+
 	/* From Wikipedia: """The size of each row is rounded up to a multiple of 4 bytes""" */
 	dwPixelScanline = CEIL_ALIGN(dwPixelScanline, 4);
 	if (OVERFLOW_UMUL(dwPixelScanline, (ULONG)biHeight, &szPixelDataSize))
@@ -462,6 +463,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	/* Build output buffer codec specs. */
 	if (biClrUsed) {
 		struct video_palette *palette;
+
 		/* Palette-driven format */
 		if (biBitCount > 255)
 			Egoto(badfmt);
@@ -649,8 +651,8 @@ libvideo_surface_save_bmp(struct video_surface const *__restrict self,
 	     ? (codec->vc_specs.vcs_bpp > 8 || codec->vc_specs.vcs_amask)
 	     : (codec->vc_specs.vcs_bpp <= 8)) ||
 	    (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_SPECIAL)) {
-		/* Codecs with BPP <= 8 **MUST** use a palette (or the emulated grayscale palette).
-		 * If that isn't the case  for "self", then we must  convert to a different  codec. */
+		/* Codecs with BPP <= 8 **MUST** use a palette (or an emulated grayscale palette).
+		 * If  that isn't the case for "self", then  we must convert to a different codec. */
 		int result;
 		REF struct video_buffer *converted_buffer;
 		video_codec_t preferred_codec_id;

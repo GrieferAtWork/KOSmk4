@@ -140,6 +140,71 @@
 #define R_msabi3q r9
 #define R_msabi3P r9
 
+/* First argument for LIBCCALL (platform default calling convention) functions */
+#ifdef __PE__
+#define L_ccall0b(sp_offset) %R_msabi0b
+#define L_ccall0w(sp_offset) %R_msabi0w
+#define L_ccall0l(sp_offset) %R_msabi0l
+#define L_ccall0q(sp_offset) %R_msabi0q
+#define L_ccall0P(sp_offset) %R_msabi0P
+#define L_ccall1b(sp_offset) %R_msabi1b
+#define L_ccall1w(sp_offset) %R_msabi1w
+#define L_ccall1l(sp_offset) %R_msabi1l
+#define L_ccall1q(sp_offset) %R_msabi1q
+#define L_ccall1P(sp_offset) %R_msabi1P
+#define L_ccall2b(sp_offset) %R_msabi2b
+#define L_ccall2w(sp_offset) %R_msabi2w
+#define L_ccall2l(sp_offset) %R_msabi2l
+#define L_ccall2q(sp_offset) %R_msabi2q
+#define L_ccall2P(sp_offset) %R_msabi2P
+#define L_ccall3b(sp_offset) %R_msabi3b
+#define L_ccall3w(sp_offset) %R_msabi3w
+#define L_ccall3l(sp_offset) %R_msabi3l
+#define L_ccall3q(sp_offset) %R_msabi3q
+#define L_ccall3P(sp_offset) %R_msabi3P
+#define L_ccall4b            L_ccall4P
+#define L_ccall4w            L_ccall4P
+#define L_ccall4l            L_ccall4P
+#define L_ccall4q            L_ccall4P
+#define L_ccall4P(sp_offset) 8+sp_offset(%rsp)
+#define L_ccall5b            L_ccall5P
+#define L_ccall5w            L_ccall5P
+#define L_ccall5l            L_ccall5P
+#define L_ccall5q            L_ccall5P
+#define L_ccall5P(sp_offset) 16+sp_offset(%rsp)
+#else /* __PE__ */
+#define L_ccall0b(sp_offset) %R_sysvabi0b
+#define L_ccall0w(sp_offset) %R_sysvabi0w
+#define L_ccall0l(sp_offset) %R_sysvabi0l
+#define L_ccall0q(sp_offset) %R_sysvabi0q
+#define L_ccall0P(sp_offset) %R_sysvabi0P
+#define L_ccall1b(sp_offset) %R_sysvabi1b
+#define L_ccall1w(sp_offset) %R_sysvabi1w
+#define L_ccall1l(sp_offset) %R_sysvabi1l
+#define L_ccall1q(sp_offset) %R_sysvabi1q
+#define L_ccall1P(sp_offset) %R_sysvabi1P
+#define L_ccall2b(sp_offset) %R_sysvabi2b
+#define L_ccall2w(sp_offset) %R_sysvabi2w
+#define L_ccall2l(sp_offset) %R_sysvabi2l
+#define L_ccall2q(sp_offset) %R_sysvabi2q
+#define L_ccall2P(sp_offset) %R_sysvabi2P
+#define L_ccall3b(sp_offset) %R_sysvabi3b
+#define L_ccall3w(sp_offset) %R_sysvabi3w
+#define L_ccall3l(sp_offset) %R_sysvabi3l
+#define L_ccall3q(sp_offset) %R_sysvabi3q
+#define L_ccall3P(sp_offset) %R_sysvabi3P
+#define L_ccall4b(sp_offset) %R_sysvabi4b
+#define L_ccall4w(sp_offset) %R_sysvabi4w
+#define L_ccall4l(sp_offset) %R_sysvabi4l
+#define L_ccall4q(sp_offset) %R_sysvabi4q
+#define L_ccall4P(sp_offset) %R_sysvabi4P
+#define L_ccall5b(sp_offset) %R_sysvabi5b
+#define L_ccall5w(sp_offset) %R_sysvabi5w
+#define L_ccall5l(sp_offset) %R_sysvabi5l
+#define L_ccall5q(sp_offset) %R_sysvabi5q
+#define L_ccall5P(sp_offset) %R_sysvabi5P
+#endif /* !__PE__ */
+
 /* Instructions */
 #define movsbP       movsbq
 #define movswP       movswq
@@ -302,6 +367,32 @@
 #define R_syscall5w bp
 #define R_syscall5l ebp
 #define R_syscall5P ebp
+
+/* First argument for LIBCCALL (platform default calling convention) functions */
+#define L_ccall0P(sp_offset) 4+sp_offset(%esp)
+#define L_ccall1P(sp_offset) 8+sp_offset(%esp)
+#define L_ccall2P(sp_offset) 12+sp_offset(%esp)
+#define L_ccall3P(sp_offset) 16+sp_offset(%esp)
+#define L_ccall4P(sp_offset) 20+sp_offset(%esp)
+#define L_ccall5P(sp_offset) 24+sp_offset(%esp)
+#define L_ccall0b L_ccall0P
+#define L_ccall0w L_ccall0P
+#define L_ccall0l L_ccall0P
+#define L_ccall1b L_ccall1P
+#define L_ccall1w L_ccall1P
+#define L_ccall1l L_ccall1P
+#define L_ccall2b L_ccall2P
+#define L_ccall2w L_ccall2P
+#define L_ccall2l L_ccall2P
+#define L_ccall3b L_ccall3P
+#define L_ccall3w L_ccall3P
+#define L_ccall3l L_ccall3P
+#define L_ccall4b L_ccall4P
+#define L_ccall4w L_ccall4P
+#define L_ccall4l L_ccall4P
+#define L_ccall5b L_ccall5P
+#define L_ccall5w L_ccall5P
+#define L_ccall5l L_ccall5P
 
 /* Instructions */
 #define movzbP       movzbl

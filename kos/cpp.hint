@@ -113,18 +113,18 @@
 #define STATIC_ASSERT_MSG(...)
 #define __STATIC_ASSERT_MSG(...)
 
-#define DEFINE_PRIVATE_ALIAS(n,o) int n(){}
-#define __DEFINE_PRIVATE_ALIAS(n,o) int n(){}
-#define DEFINE_PUBLIC_ALIAS(n,o) int n(){}
-#define __DEFINE_PUBLIC_ALIAS(n,o) int n(){}
-#define DEFINE_INTERN_ALIAS(n,o) int n(){}
-#define __DEFINE_INTERN_ALIAS(n,o) int n(){}
-#define DEFINE_PRIVATE_WEAK_ALIAS(n,o) int n(){}
-#define __DEFINE_PRIVATE_WEAK_ALIAS(n,o) int n(){}
-#define DEFINE_PUBLIC_WEAK_ALIAS(n,o) int n(){}
-#define __DEFINE_PUBLIC_WEAK_ALIAS(n,o) int n(){}
-#define DEFINE_INTERN_WEAK_ALIAS(n,o) int n(){}
-#define __DEFINE_INTERN_WEAK_ALIAS(n,o) int n(){}
+#define DEFINE_PRIVATE_ALIAS(n,o)        ;int n(){}
+#define __DEFINE_PRIVATE_ALIAS(n,o)      ;int n(){}
+#define DEFINE_PUBLIC_ALIAS(n,o)         ;int n(){}
+#define __DEFINE_PUBLIC_ALIAS(n,o)       ;int n(){}
+#define DEFINE_INTERN_ALIAS(n,o)         ;int n(){}
+#define __DEFINE_INTERN_ALIAS(n,o)       ;int n(){}
+#define DEFINE_PRIVATE_WEAK_ALIAS(n,o)   ;int n(){}
+#define __DEFINE_PRIVATE_WEAK_ALIAS(n,o) ;int n(){}
+#define DEFINE_PUBLIC_WEAK_ALIAS(n,o)    ;int n(){}
+#define __DEFINE_PUBLIC_WEAK_ALIAS(n,o)  ;int n(){}
+#define DEFINE_INTERN_WEAK_ALIAS(n,o)    ;int n(){}
+#define __DEFINE_INTERN_WEAK_ALIAS(n,o)  ;int n(){}
 
 #define __COMPILER_SREDIRECT(decl,attr,T,name,asmname) extern T name;
 #define __COMPILER_SREDIRECT2(decl,attr,Tdecl,name,asmname) extern Tdecl;

@@ -40,11 +40,7 @@ INTERN_FUNCTION(libc_alloca)
 	.cfi_startproc
 	popP_cfi %Pcx              /* return address */
 	.cfi_register %Pip, %Pcx
-#ifdef __x86_64__
-	subP   %R_sysvabi0P, %Psp  /* Allocate stack memory */
-#else /* __x86_64__ */
-	subP   0(%Psp), %Psp       /* Allocate stack memory */
-#endif /* !__x86_64__ */
+	subP   L_ccall0P(0), %Psp  /* Allocate stack memory */
 .Lalloca_dos_join:
 	andP   $(~(SIZEOF_POINTER - 1)), %Psp /* Re-align stack */
 	.cfi_same_value %Psp
