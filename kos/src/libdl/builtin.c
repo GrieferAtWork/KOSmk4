@@ -575,6 +575,56 @@ struct dl_symbol {
 };
 
 
+typedef ElfW(Addr) (*dl_indirect_resolver_t)(void);
+
+PRIVATE ATTR_NOINLINE WUNUSED ATTR_OUT(2) NONNULL((1, 3)) int CC
+dl_symbol_resolve_indirect(struct dl_symbol const *__restrict symbol,
+                           ElfW(Addr) *__restrict p_result,
+                           dl_indirect_resolver_t resolver) {
+	/* TODO: Remember saved value?
+	 *
+	 * Note that ".dynsym" is generally read-only, meaning we can't just do what
+	 * the kernel's module ELF loader  does, and override the ".dynsym"  entries
+	 * with STT_FUNC/STT_OBJECT entries!
+	 *
+	 * There needs to be a lookup table of indirect symbols and their known
+	 * resolve addresses. */
+	(void)symbol;
+	*p_result = (*resolver)();
+	return 0;
+}
+
+PRIVATE WUNUSED ATTR_OUT(2) NONNULL((1)) int CC
+dl_symbol_resolve(struct dl_symbol const *__restrict symbol,
+                  ElfW(Addr) *__restrict p_result) {
+	ElfW(Sym) const *esym = symbol->ds_sym;
+	ElfW(Addr) result = esym->st_value;
+	switch (ELFW(ST_TYPE)(esym->st_info)) {
+
+	case STT_TLS: {
+		void *tlsbase = libdl_dltlsaddr(symbol->ds_mod);
+		if unlikely(!tlsbase)
+			goto err;
+		result += (ElfW(Addr))tlsbase;
+	}	break;
+
+	case STT_GNU_IFUNC:
+	case STT_KOS_IDATA:
+		if (esym->st_shndx != SHN_ABS)
+			result += symbol->ds_mod->dm_loadaddr;
+		return dl_symbol_resolve_indirect(symbol, p_result, (dl_indirect_resolver_t)result);
+
+	default:
+		if (esym->st_shndx != SHN_ABS)
+			result += symbol->ds_mod->dm_loadaddr;
+		break;
+	}
+	*p_result = result;
+	return 0;
+err:
+	return -1;
+}
+
 
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NOT_FOUND 0
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND     1
@@ -658,22 +708,8 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
 					*pweak_symbol = symbol;
 			} else {
 				/* Found the real, actual symbol! */
-				ElfW(Addr) result;
-				result = symbol.ds_sym->st_value;
-				if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_TLS) {
-					void *tlsbase;
-					tlsbase = libdl_dltlsaddr(symbol.ds_mod);
-					if unlikely(!tlsbase)
-						return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_ERROR;
-					result += (ElfW(Addr))tlsbase;
-				} else {
-					if (symbol.ds_sym->st_shndx != SHN_ABS)
-						result += symbol.ds_mod->dm_loadaddr;
-					if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
-					    ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_KOS_IDATA)
-						result = (*(ElfW(Addr)(*)(void))(void *)result)();
-				}
-				*presult = result;
+				if unlikely(dl_symbol_resolve(&symbol, presult))
+					return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_ERROR;
 				return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND;
 			}
 		}
@@ -790,27 +826,9 @@ again_search_globals_module:
 						/* Found the symbol! */
 						if (weak_symbol.ds_mod)
 							decref(weak_symbol.ds_mod);
-						result = symbol.ds_sym->st_value;
-						if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_TLS) {
-							void *tlsbase;
-							tlsbase = libdl_dltlsaddr(symbol.ds_mod);
-							if unlikely(!tlsbase)
-								goto err_symbol_mod;
-							result += (ElfW(Addr))tlsbase;
-						} else {
-							if (symbol.ds_sym->st_shndx != SHN_ABS)
-								result += symbol.ds_mod->dm_loadaddr;
-							if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
-							    ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_KOS_IDATA) {
-								TRY {
-									result = (*(ElfW(Addr)(*)(void))(void *)result)();
-								} EXCEPT {
-									decref(symbol.ds_mod);
-									RETHROW();
-								}
-							}
-						}
-						decref(symbol.ds_mod);
+						RAII_FINALLY { decref(symbol.ds_mod); };
+						if unlikely(dl_symbol_resolve(&symbol, &result))
+							goto err;
 						goto done;
 					}
 				}
@@ -828,31 +846,13 @@ again_search_globals_module:
 		}
 		/* Check if we found a weak symbol at one point! */
 		if likely(weak_symbol.ds_mod) {
+			RAII_FINALLY { decref(weak_symbol.ds_mod); };
 			if (weak_symbol.ds_mod->dm_ops) {
 				result = (ElfW(Addr))weak_symbol.ds_sym;
 			} else {
-				result = weak_symbol.ds_sym->st_value;
-				if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_TLS) {
-					void *tlsbase;
-					tlsbase = libdl_dltlsaddr(weak_symbol.ds_mod);
-					if unlikely(!tlsbase)
-						goto err_weak_symbol_mod;
-					result += (ElfW(Addr))tlsbase;
-				} else {
-					if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
-						result += weak_symbol.ds_mod->dm_loadaddr;
-					if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
-					    ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_KOS_IDATA) {
-						TRY {
-							result = (*(ElfW(Addr)(*)(void))(void *)result)();
-						} EXCEPT {
-							decref(weak_symbol.ds_mod);
-							RETHROW();
-						}
-					}
-				}
+				if unlikely(dl_symbol_resolve(&weak_symbol, &result))
+					goto err;
 			}
-			decref(weak_symbol.ds_mod);
 			goto done;
 		}
 		if unlikely(self == RTLD_NEXT) {
@@ -917,26 +917,13 @@ again_search_globals_module:
 				                                           &hash_elf,
 				                                           &hash_gnu);
 				/* Most likely case: The symbol is already apart of the specified module! */
-				if likely(symbol.ds_sym &&
-				          symbol.ds_sym->st_shndx != SHN_ABS) {
+				if likely(symbol.ds_sym && symbol.ds_sym->st_shndx != SHN_ABS) {
+					symbol.ds_mod = self;
 					if (ELFW(ST_BIND)(symbol.ds_sym->st_info) == STB_WEAK) {
-						weak_symbol.ds_mod = self;
-						weak_symbol.ds_sym = symbol.ds_sym;
+						weak_symbol = symbol;
 					} else {
-						result = symbol.ds_sym->st_value;
-						if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_TLS) {
-							void *tlsbase;
-							tlsbase = libdl_dltlsaddr(self);
-							if unlikely(!tlsbase)
-								goto err;
-							result += (ElfW(Addr))tlsbase;
-						} else {
-							if (symbol.ds_sym->st_shndx != SHN_ABS)
-								result += self->dm_loadaddr;
-							if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
-							    ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_KOS_IDATA)
-								result = (*(ElfW(Addr)(*)(void))(void *)result)();
-						}
+						if unlikely(dl_symbol_resolve(&symbol, &result))
+							goto err;
 done:
 						return (void *)result;
 					}
@@ -968,20 +955,8 @@ done:
 				if (weak_symbol.ds_mod->dm_ops) {
 					result = (ElfW(Addr))weak_symbol.ds_sym;
 				} else {
-					result = weak_symbol.ds_sym->st_value;
-					if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_TLS) {
-						void *tlsbase;
-						tlsbase = libdl_dltlsaddr(weak_symbol.ds_mod);
-						if unlikely(!tlsbase)
-							goto err;
-						result += (ElfW(Addr))tlsbase;
-					} else {
-						if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
-							result += weak_symbol.ds_mod->dm_loadaddr;
-						if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
-						    ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_KOS_IDATA)
-							result = (*(ElfW(Addr)(*)(void))(void *)result)();
-					}
+					if unlikely(dl_symbol_resolve(&weak_symbol, &result))
+						goto err;
 				}
 				goto done;
 			}
@@ -991,12 +966,6 @@ done:
 	}
 err:
 	return NULL;
-err_symbol_mod:
-	decref(symbol.ds_mod);
-	goto err;
-err_weak_symbol_mod:
-	decref(weak_symbol.ds_mod);
-	goto err;
 err_rtld_next_no_base:
 	dl_seterror_nosym_next_badcaller(symbol_name);
 	goto err;
@@ -3252,33 +3221,21 @@ done_add_finalizer:
 	}	break;
 
 	case DLAUXCTRL_ELF_SYMADDR: {
-		NCX ElfW(Sym) const *symbol;
+		struct dl_symbol sym;
 		/* Check that this is an ELF module. */
 		if unlikely(self->dm_ops)
 			goto err_notelf;
-		symbol = va_arg(args, NCX ElfW(Sym) const *);
-		if (symbol == NULL || symbol->st_shndx == SHN_UNDEF) {
+		sym.ds_mod = self;
+		sym.ds_sym = va_arg(args, NCX ElfW(Sym) const *);
+		if (sym.ds_sym == NULL || sym.ds_sym->st_shndx == SHN_UNDEF) {
 			result = NULL;
 		} else {
-			result = (void *)symbol->st_value;
-			if (ELFW(ST_TYPE)(symbol->st_info) == STT_TLS) {
-				void *tlsbase;
-				tlsbase = libdl_dltlsaddr(self);
-				if unlikely(!tlsbase)
+			TRY {
+				if unlikely(dl_symbol_resolve(&sym, (ElfW(Addr) *)&result))
 					goto err;
-				result = (void *)((ElfW(Addr))result + (ElfW(Addr))tlsbase);
-			} else {
-				if (symbol->st_shndx != SHN_ABS)
-					result = (void *)((ElfW(Addr))result + self->dm_loadaddr);
-				if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC ||
-				    ELFW(ST_TYPE)(symbol->st_info) == STT_KOS_IDATA) {
-					TRY {
-						result = (void *)((*(ElfW(Addr)(*)(void))(void *)result)());
-					} EXCEPT {
-						va_end(args);
-						RETHROW();
-					}
-				}
+			} EXCEPT {
+				va_end(args);
+				RETHROW();
 			}
 		}
 	}	break;
