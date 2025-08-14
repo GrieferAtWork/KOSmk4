@@ -31,6 +31,7 @@
 
 #include <kos/anno.h>
 #include <kos/types.h>
+#include <sys/mman.h>
 #include <sys/syslog.h>
 
 #include <dlfcn.h>
@@ -71,6 +72,9 @@ DECL_BEGIN
 #endif /* !LIBPNG_LIBPNG_VER_STRING */
 
 #define LIBPNG_INFO_tRNS 0x0010U
+#ifdef LIBPNG_APNG_SUPPORTED
+#define LIBPNG_INFO_acTL 0x100000U
+#endif /* LIBPNG_APNG_SUPPORTED */
 
 #define LIBPNG_COLOR_MASK_PALETTE    1
 #define LIBPNG_COLOR_MASK_COLOR      2
@@ -83,7 +87,7 @@ DECL_BEGIN
 #define LIBPNG_COLOR_TYPE_RGBA       LIBPNG_COLOR_TYPE_RGB_ALPHA
 #define LIBPNG_COLOR_TYPE_GA         LIBPNG_COLOR_TYPE_GRAY_ALPHA
 
-
+typedef __UINT16_TYPE__ libpng_uint_16;
 typedef __UINT32_TYPE__ libpng_uint_32;
 typedef struct libpng_struct_def libpng_struct;
 typedef libpng_struct const *libpng_const_structp;
@@ -118,7 +122,7 @@ typedef libpng_color **libpng_colorpp;
 
 
 #define DEFINE_LIBPNG_API(Treturn, name, params) \
-	typedef Treturn(LIBPNGAPI *P##name) params;            \
+	typedef Treturn (LIBPNGAPI *P##name) params; \
 	PRIVATE P##name pdyn_##name = NULL
 /* "libpng_image"  doesn't offer access  to the *true* bitdepth  of the image. As
  * such, don't use the "simplified" API, and instead use "png_create_read_struct" */
@@ -142,9 +146,31 @@ DEFINE_LIBPNG_API(libpng_uint_32, png_get_PLTE, (libpng_const_structrp png_ptr, 
 //DEFINE_LIBPNG_API(void, png_read_end, (libpng_structrp png_ptr, libpng_inforp info_ptr));
 DEFINE_LIBPNG_API(int, png_set_interlace_handling, (libpng_structrp png_ptr));
 DEFINE_LIBPNG_API(void, png_read_row, (libpng_structrp png_ptr, libpng_bytep row, libpng_bytep display_row));
+#ifdef LIBPNG_APNG_SUPPORTED
+DEFINE_LIBPNG_API(libpng_uint_32, png_get_acTL, (libpng_structp png_ptr, libpng_infop info_ptr, libpng_uint_32 *num_frames, libpng_uint_32 *num_plays));
+DEFINE_LIBPNG_API(libpng_byte, png_get_first_frame_is_hidden, (libpng_structp png_ptr, libpng_infop info_ptr));
+DEFINE_LIBPNG_API(libpng_uint_32, png_get_next_frame_fcTL, (libpng_structp png_ptr, libpng_infop info_ptr, libpng_uint_32 *width, libpng_uint_32 *height, libpng_uint_32 *x_offset, libpng_uint_32 *y_offset, libpng_uint_16 *delay_num, libpng_uint_16 *delay_den, libpng_byte *dispose_op, libpng_byte *blend_op));
+#endif /* LIBPNG_APNG_SUPPORTED */
 #undef DEFINE_LIBPNG_API
 
-PRIVATE void __LIBCCALL libpng_loadapi_impl(void) {
+#ifdef LIBPNG_APNG_SUPPORTED
+PRIVATE void libpng_loadapng_impl(void *libpng_so) {
+	Ppng_get_acTL used_png_get_acTL;
+	Ppng_get_first_frame_is_hidden used_png_get_first_frame_is_hidden;
+	Ppng_get_next_frame_fcTL used_png_get_next_frame_fcTL;
+	*(void **)&used_png_get_acTL = dlsym(libpng_so, "png_get_acTL");
+	*(void **)&used_png_get_first_frame_is_hidden = dlsym(libpng_so, "png_get_first_frame_is_hidden");
+	*(void **)&used_png_get_next_frame_fcTL = dlsym(libpng_so, "png_get_next_frame_fcTL");
+	if (used_png_get_acTL && used_png_get_first_frame_is_hidden &&
+	    used_png_get_next_frame_fcTL) {
+		pdyn_png_get_acTL                  = used_png_get_acTL;
+		pdyn_png_get_first_frame_is_hidden = used_png_get_first_frame_is_hidden;
+		pdyn_png_get_next_frame_fcTL       = used_png_get_next_frame_fcTL;
+	}
+}
+#endif /* LIBPNG_APNG_SUPPORTED */
+
+PRIVATE void libpng_loadapi_impl(void) {
 	void *libpng_so = dlopen("libpng16.so.16", RTLD_LOCAL);
 	if unlikely(!libpng_so)
 		return;
@@ -176,6 +202,9 @@ PRIVATE void __LIBCCALL libpng_loadapi_impl(void) {
 	LOADSYM(png_read_row);
 	COMPILER_WRITE_BARRIER();
 	LOADSYM(png_create_read_struct);
+#ifdef LIBPNG_APNG_SUPPORTED
+	libpng_loadapng_impl(libpng_so);
+#endif /* LIBPNG_APNG_SUPPORTED */
 #undef LOADSYM
 #undef LOADSYM2
 	return;
@@ -211,9 +240,29 @@ libpng_mem_reader_cb(libpng_structp png_ptr, libpng_bytep p, size_t n) {
 }
 
 
+#ifdef LIBPNG_APNG_SUPPORTED
+struct apng_anim: video_anim {
+	libpng_structp apa_png_ptr;  /* [owned] ... */
+	libpng_infop   apa_info_ptr; /* [owned] ... */
+	struct mapfile apa_file;     /* [const][owned] Underlying file mapping */
+};
+#endif /* LIBPNG_APNG_SUPPORTED */
+
+
+
+#ifdef LIBPNG_APNG_SUPPORTED
+#define LIBVIDEO_BUFFER_OPEN_PNG_IMPL__ISANIM ((REF struct video_buffer *)-2)
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_open_png_impl(struct video_domain const *__restrict domain_hint,
+                              void const *blob, size_t blob_size,
+                              struct mapfile *p_mapfile,
+                              REF struct video_anim **p_anim)
+#else /* LIBPNG_APNG_SUPPORTED */
 INTERN WUNUSED NONNULL((1)) REF struct video_buffer *CC
 libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
-                         void const *blob, size_t blob_size) {
+                         void const *blob, size_t blob_size)
+#endif /* !LIBPNG_APNG_SUPPORTED */
+{
 	libpng_structp png_ptr;
 	libpng_infop info_ptr;
 	struct libpng_mem_reader_data rdat;
@@ -293,6 +342,7 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 			case 4: result_codec_id = VIDEO_CODEC_PA44; break;
 			default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
 			case 8: result_codec_id = VIDEO_CODEC_PA88; break;
+			case 16: result_codec_id = VIDEO_CODEC_PA1616; break;
 			}
 		} else {
 			switch (bit_depth) {
@@ -301,6 +351,7 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 			case 4: result_codec_id = VIDEO_CODEC_P4_MSB; break;
 			default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
 			case 8: result_codec_id = VIDEO_CODEC_P8; break;
+			case 16: result_codec_id = VIDEO_CODEC_P16; break;
 			}
 		}
 
@@ -332,6 +383,7 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 			case 4: result_codec_id = VIDEO_CODEC_LA44; break;
 			default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
 			case 8: result_codec_id = VIDEO_CODEC_LA88; break;
+			case 16: result_codec_id = VIDEO_CODEC_LA1616; break;
 			}
 		} else {
 			switch (bit_depth) {
@@ -340,6 +392,7 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 			case 4: result_codec_id = VIDEO_CODEC_L4_MSB; break;
 			default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
 			case 8: result_codec_id = VIDEO_CODEC_L8; break;
+			case 16: result_codec_id = VIDEO_CODEC_L16; break;
 			}
 		}
 	} else {
@@ -367,6 +420,19 @@ do_rgb_format:
 	/* Lookup needed codec. */
 	result_format.vbf_codec = libvideo_codec_lookup(result_codec_id);
 	assertf(result_format.vbf_codec, "Built-in codec should have been recognized");
+
+#ifdef LIBPNG_APNG_SUPPORTED
+	if (p_anim) {
+		assert(pdyn_png_get_acTL);
+		libpng_uint_32 num_frames, num_plays;
+		if ((*pdyn_png_get_acTL)(png_ptr, info_ptr, &num_frames, &num_plays) && num_frames >= 2) {
+			/* TODO */
+			syslog(LOG_DEBUG, "pdyn_png_get_acTL -> num_frames: %I32u\n", num_frames);
+			*p_anim = NULL;
+			(void)p_mapfile;
+		}
+	}
+#endif /* LIBPNG_APNG_SUPPORTED */
 
 	/* Allocate result video buffer. */
 	result = _video_domain_newbuffer(domain_hint, &result_format,
@@ -460,6 +526,42 @@ libvideo_surface_save_png(struct video_surface const *__restrict self,
 }
 
 
+#ifdef LIBPNG_APNG_SUPPORTED
+
+INTERN WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
+                         void const *blob, size_t blob_size) {
+	return libvideo_buffer_open_png_impl(domain_hint, blob, blob_size, NULL, NULL);
+}
+
+PRIVATE WUNUSED NONNULL((1)) REF struct video_anim *CC
+libvideo_anim_open_png_impl(struct video_domain const *__restrict domain,
+                            void const *blob, size_t blob_size,
+                            struct mapfile *p_mapfile) {
+	REF struct video_anim *anim;
+	REF struct video_buffer *buffer;
+	buffer = libvideo_buffer_open_png_impl(domain, blob, blob_size, p_mapfile, &anim);
+	if (buffer == LIBVIDEO_BUFFER_OPEN_PNG_IMPL__ISANIM)
+		return anim;
+	if (buffer && buffer != VIDEO_BUFFER_WRONG_FMT)
+		buffer = convert_to_wanted_domain(domain, buffer);
+	return frame2anim(buffer);
+}
+
+INTERN WUNUSED NONNULL((1)) REF struct video_anim *CC
+libvideo_anim_open_png(struct video_domain const *__restrict domain,
+                       void const *blob, size_t blob_size,
+                       struct mapfile *p_mapfile) {
+	if (libpng_loadapi() && pdyn_png_get_acTL)
+		return libvideo_anim_open_png_impl(domain, blob, blob_size, p_mapfile);
+	(void)domain;
+	(void)blob;
+	(void)blob_size;
+	(void)p_mapfile;
+	return VIDEO_ANIM_NOTSUPP;
+}
+#endif /* LIBPNG_APNG_SUPPORTED */
+
 
 
 /* Assert that bindings above match those from the relevant 3rd party header. */
@@ -468,7 +570,28 @@ DECL_END
 #include <libpng/png.h>
 DECL_BEGIN
 
-/* TODO */
+static_assert(LIBPNG_INFO_tRNS == PNG_INFO_tRNS);
+#ifdef LIBPNG_APNG_SUPPORTED
+#ifdef PNG_INFO_tRNS
+static_assert(LIBPNG_INFO_tRNS == PNG_INFO_tRNS);
+#endif /* PNG_INFO_tRNS */
+#endif /* LIBPNG_APNG_SUPPORTED */
+static_assert(LIBPNG_COLOR_MASK_PALETTE == PNG_COLOR_MASK_PALETTE);
+static_assert(LIBPNG_COLOR_MASK_COLOR == PNG_COLOR_MASK_COLOR);
+static_assert(LIBPNG_COLOR_MASK_ALPHA == PNG_COLOR_MASK_ALPHA);
+static_assert(LIBPNG_COLOR_TYPE_GRAY == PNG_COLOR_TYPE_GRAY);
+static_assert(LIBPNG_COLOR_TYPE_PALETTE == PNG_COLOR_TYPE_PALETTE);
+static_assert(LIBPNG_COLOR_TYPE_RGB == PNG_COLOR_TYPE_RGB);
+static_assert(LIBPNG_COLOR_TYPE_RGB_ALPHA == PNG_COLOR_TYPE_RGB_ALPHA);
+static_assert(LIBPNG_COLOR_TYPE_GRAY_ALPHA == PNG_COLOR_TYPE_GRAY_ALPHA);
+static_assert(LIBPNG_COLOR_TYPE_RGBA == PNG_COLOR_TYPE_RGBA);
+static_assert(LIBPNG_COLOR_TYPE_GA == PNG_COLOR_TYPE_GA);
+static_assert(sizeof(libpng_uint_16) == sizeof(png_uint_16));
+static_assert(sizeof(libpng_uint_32) == sizeof(png_uint_32));
+static_assert(sizeof(libpng_color) == sizeof(png_color));
+static_assert(offsetof(libpng_color, red) == offsetof(png_color, red));
+static_assert(offsetof(libpng_color, green) == offsetof(png_color, green));
+static_assert(offsetof(libpng_color, blue) == offsetof(png_color, blue));
 #endif /* __has_include(<libpng/png.h>) */
 
 DECL_END

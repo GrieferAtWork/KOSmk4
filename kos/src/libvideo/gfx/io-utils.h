@@ -36,11 +36,19 @@
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/buffer.h>
 
+#include "anim.h"
+
 DECL_BEGIN
+
+#if 0 /* TODO */
+#define LIBPNG_APNG_SUPPORTED
+#endif
+
 
 /* Returned by `libvideo_buffer_open_*' when the blob doesn't match the specified format. */
 #define VIDEO_BUFFER_WRONG_FMT ((REF struct video_buffer *)-1)
 #define VIDEO_ANIM_WRONG_FMT   ((REF struct video_anim *)-1)
+#define VIDEO_ANIM_NOTSUPP     ((REF struct video_anim *)-2) /* Only returned by "libvideo_anim_open_png" */
 
 
 
@@ -57,6 +65,12 @@ libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
 INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_surface_save_lodepng(struct video_surface const *__restrict self,
                               FILE *stream, char const *options);
+#ifdef LIBPNG_APNG_SUPPORTED
+INTDEF WUNUSED NONNULL((1)) REF struct video_anim *CC
+libvideo_anim_open_png(struct video_domain const *__restrict domain,
+                       void const *blob, size_t blob_size,
+                       struct mapfile *p_mapfile);
+#endif /* LIBPNG_APNG_SUPPORTED */
 
 
 
@@ -113,6 +127,32 @@ libvideo_io_getoptl(char const *options, char const *name, long defval) {
 		}
 	}
 	return defval;
+}
+
+PRIVATE REF struct video_anim *CC
+frame2anim(REF struct video_buffer *frame) {
+	REF struct video_anim *result;
+	if (!frame || frame == VIDEO_BUFFER_WRONG_FMT)
+		return (REF struct video_anim *)frame;
+	result = libvideo_anim_fromframe(frame);
+	video_buffer_decref(frame);
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+convert_to_wanted_domain(struct video_domain const *__restrict domain,
+                         /*inherit(always)*/ REF struct video_buffer *__restrict self) {
+	if unlikely(video_buffer_getdomain(self) != domain) {
+		REF struct video_buffer *converted;
+		struct video_buffer_format result_format;
+		struct video_surface const *surf = video_buffer_assurface(self);
+		video_buffer_getformat(self, &result_format);
+		result_format.vbf_codec = video_domain_supported_codec(domain, result_format.vbf_codec);
+		converted = libvideo_surface_convert(surf, domain, &result_format);
+		video_buffer_decref(self);
+		self = converted;
+	}
+	return self;
 }
 
 DECL_END

@@ -1,7 +1,7 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
-gcc_opt.removeif(x -> x.startswith("-O"));
-gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
+//gcc_opt.removeif(x -> x.startswith("-O"));
+//gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
 ]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
@@ -119,31 +119,6 @@ err_anim:
 	return NULL;
 }
 
-PRIVATE REF struct video_anim *CC
-frame2anim(REF struct video_buffer *frame) {
-	REF struct video_anim *result;
-	if (!frame || frame == VIDEO_BUFFER_WRONG_FMT)
-		return (REF struct video_anim *)frame;
-	result = libvideo_anim_fromframe(frame);
-	video_buffer_decref(frame);
-	return result;
-}
-
-PRIVATE WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
-convert_to_wanted_domain(struct video_domain const *__restrict domain,
-                         /*inherit(always)*/ REF struct video_buffer *__restrict self) {
-	if unlikely(video_buffer_getdomain(self) != domain) {
-		REF struct video_buffer *converted;
-		struct video_buffer_format result_format;
-		video_buffer_getformat(self, &result_format);
-		result_format.vbf_codec = video_domain_supported_codec(domain, result_format.vbf_codec);
-		converted = libvideo_surface_convert(video_buffer_assurface(self), domain, &result_format);
-		video_buffer_decref(self);
-		self = converted;
-	}
-	return self;
-}
-
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) ATTR_INS(2, 3) REF struct video_buffer *CC
 libvideo_buffer_open_fmt(struct video_domain const *__restrict domain,
                          void const *blob, size_t blob_size,
@@ -177,10 +152,16 @@ libvideo_anim_open_fmt(struct video_domain const *__restrict domain,
                        struct mapfile *p_mapfile, enum filefmt fmt) {
 	REF struct video_buffer *result;
 	switch (fmt) {
-	case FMT_PNG:
-		/* TODO: Use the (now-apng-patched) libpng to support animated PNG files */
+	case FMT_PNG: {
+		/* Use the (now-apng-patched) libpng to support animated PNG files */
+#ifdef LIBPNG_APNG_SUPPORTED
+		REF struct video_anim *anim;
+		anim = libvideo_anim_open_png(domain, blob, blob_size, p_mapfile);
+		if (anim != VIDEO_ANIM_NOTSUPP)
+			return anim;
+#endif /* LIBPNG_APNG_SUPPORTED */
 		result = libvideo_buffer_open_png(domain, blob, blob_size);
-		break;
+	}	break;
 	case FMT_JPG:
 		result = libvideo_buffer_open_jpg(domain, blob, blob_size);
 		break;
