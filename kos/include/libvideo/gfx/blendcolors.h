@@ -35,9 +35,11 @@ __DECL_BEGIN
 
 #if 0 /*< Define as 1 to have the blender round upwards. */
 #define _gfx_div256(x) (video_channel_t)(((x) + VIDEO_CHANNEL_MAX - 1) / VIDEO_CHANNEL_MAX)
-#else
+#elif __SIZEOF_REGISTER__ >= 4 /* Division is slow, but this does the */
+#define _gfx_div256(x) (video_channel_t)((((__UINT32_TYPE__)(x) + 1) * 257) >> 16)
+#else /*...  */
 #define _gfx_div256(x) (video_channel_t)((x) / VIDEO_CHANNEL_MAX)
-#endif
+#endif /* !...  */
 #define _gfx_mul256(a, b) _gfx_div256((video_twochannels_t)a * b)
 #define _gfx_1minus(x)    (0xff - x)
 
@@ -119,16 +121,31 @@ __DECL_BEGIN
 #define _gfx_blendfunc_subtract(a, b)         a - b
 #define _gfx_blendfunc_reverse_subtract(a, b) b - a
 #define _gfx_blendfunc_mul(a, b)              (a * b) / 0xff
-#define _GFX_BLENDFUNC_SWITCH(kind, callback)                                                  \
-	do {                                                                                       \
-		switch (kind) {                                                                        \
-		case GFX_BLENDFUNC_SUBTRACT:         callback(_gfx_blendfunc_subtract); break;         \
-		case GFX_BLENDFUNC_REVERSE_SUBTRACT: callback(_gfx_blendfunc_reverse_subtract); break; \
-		case GFX_BLENDFUNC_MIN:              callback(__hybrid_min2); break;                   \
-		case GFX_BLENDFUNC_MAX:              callback(__hybrid_max2); break;                   \
-		case GFX_BLENDFUNC_MUL:              callback(_gfx_blendfunc_mul); break;              \
-		default:                             callback(_gfx_blendfunc_add); break;              \
-		}                                                                                      \
+#define _GFX_BLENDFUNC_SWITCH(kind, callback, clamp_pos, clamp_neg) \
+	do {                                                            \
+		switch (kind) {                                             \
+		case GFX_BLENDFUNC_SUBTRACT:                                \
+			callback(_gfx_blendfunc_subtract);                      \
+			__IF0 {                                                 \
+		case GFX_BLENDFUNC_REVERSE_SUBTRACT:                        \
+				callback(_gfx_blendfunc_reverse_subtract);          \
+			}                                                       \
+			clamp_neg();                                            \
+			break;                                                  \
+		case GFX_BLENDFUNC_MIN:                                     \
+			callback(__hybrid_min2);                                \
+			break;                                                  \
+		case GFX_BLENDFUNC_MAX:                                     \
+			callback(__hybrid_max2);                                \
+			break;                                                  \
+		case GFX_BLENDFUNC_MUL:                                     \
+			callback(_gfx_blendfunc_mul);                           \
+			break;                                                  \
+		default:                                                    \
+			callback(_gfx_blendfunc_add);                           \
+			clamp_pos();                                            \
+			break;                                                  \
+		}                                                           \
 	}	__WHILE0
 
 
@@ -188,58 +205,26 @@ gfx_blendcolors_constant(video_color_t dst, video_color_t src,
 	{                                      \
 		res_a = fun(new_lhs_a, new_rhs_a); \
 	}
-	_GFX_BLENDFUNC_SWITCH(GFX_BLENDMODE_GET_FUNRGB(mode), _gfx_blend_rgb);
-	_GFX_BLENDFUNC_SWITCH(GFX_BLENDMODE_GET_FUNA(mode), _gfx_blend_a);
+
+	/* Helpers for channel clamping */
+#define _gfx_clamp_pos(x)     if (x > 0xff) x = 0xff
+#define _gfx_clamp_neg(x)     if (x < 0x00) x = 0x00
+#define _gfx_clamp_pos_rgb(x) _gfx_clamp_pos(res_r); _gfx_clamp_pos(res_g); _gfx_clamp_pos(res_b)
+#define _gfx_clamp_pos_a(x)   _gfx_clamp_pos(res_a)
+#define _gfx_clamp_neg_rgb(x) _gfx_clamp_neg(res_r); _gfx_clamp_neg(res_g); _gfx_clamp_neg(res_b)
+#define _gfx_clamp_neg_a(x)   _gfx_clamp_neg(res_a)
+	_GFX_BLENDFUNC_SWITCH(GFX_BLENDMODE_GET_FUNRGB(mode), _gfx_blend_rgb, _gfx_clamp_pos_rgb, _gfx_clamp_neg_rgb);
+	_GFX_BLENDFUNC_SWITCH(GFX_BLENDMODE_GET_FUNA(mode), _gfx_blend_a, _gfx_clamp_pos_a, _gfx_clamp_neg_a);
+#undef _gfx_clamp_neg_a
+#undef _gfx_clamp_neg_rgb
+#undef _gfx_clamp_pos_a
+#undef _gfx_clamp_pos_rgb
+#undef _gfx_clamp_neg
+#undef _gfx_clamp_pos
 #undef _gfx_blend_a
 #undef _gfx_blend_rgb
 
-	/* Deal with channel clamping */
-#define _gfx_clamp_pos(x) if (x > 0xff) x = 0xff
-#define _gfx_clamp_neg(x) if (x < 0x00) x = 0x00
-#define _gfx_clamp(x)     _gfx_clamp_neg(x); else _gfx_clamp_pos(x)
-#ifndef __NO_builtin_constant_p
-	if (__builtin_constant_p(mode)) {
-		if (GFX_BLENDMODE_GET_FUNRGB(mode) == GFX_BLENDFUNC_MIN ||
-		    GFX_BLENDMODE_GET_FUNRGB(mode) == GFX_BLENDFUNC_MAX ||
-		    GFX_BLENDMODE_GET_FUNRGB(mode) == GFX_BLENDFUNC_MUL) {
-			/* These blending modes can never produce results outside [0,0xff] */
-		} else if (GFX_BLENDMODE_GET_FUNRGB(mode) == GFX_BLENDFUNC_ADD) {
-			if (_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDMODE_GET_SRCRGB(mode)) == GFX_BLENDMODE_GET_DSTRGB(mode)) {
-				/* When operands being the 1- of each other, no need to clamp */
-			} else {
-				/* During additive blending, only need to do positive clamping */
-				_gfx_clamp_pos(res_r);
-				_gfx_clamp_pos(res_g);
-				_gfx_clamp_pos(res_b);
-			}
-		} else if (GFX_BLENDMODE_GET_FUNRGB(mode) == GFX_BLENDFUNC_SUBTRACT ||
-		           GFX_BLENDMODE_GET_FUNRGB(mode) == GFX_BLENDFUNC_REVERSE_SUBTRACT) {
-			/* During subtractive blending, only need to do negative clamping */
-			_gfx_clamp_neg(res_r);
-			_gfx_clamp_neg(res_g);
-			_gfx_clamp_neg(res_b);
-		} else {
-			/* Fallback: do full clamping */
-			_gfx_clamp(res_r);
-			_gfx_clamp(res_g);
-			_gfx_clamp(res_b);
-		}
-	} else
-#endif /* !__NO_builtin_constant_p */
-	{
-		/* Blending mode isn't known at compile-time: do full clamping */
-		/* TODO: Even when blend mode isn't known, only certain cases of
-		 *       "_GFX_BLENDFUNC_SWITCH" actually need to clamp  (`min',
-		 *       `max', `mul' never need to be clamped) */
-		_gfx_clamp(res_r);
-		_gfx_clamp(res_g);
-		_gfx_clamp(res_b);
-		_gfx_clamp(res_a);
-	}
-#undef _gfx_clamp
-#undef _gfx_clamp_neg
-#undef _gfx_clamp_pos
-
+	/* Pack together resulting color */
 	return VIDEO_COLOR_RGBA((video_channel_t)res_r,
 	                        (video_channel_t)res_g,
 	                        (video_channel_t)res_b,

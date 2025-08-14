@@ -307,6 +307,10 @@ do_showpic(struct video_buffer *screen,
 	                  video_gfx_getxdim(&image_gfx),
 	                  video_gfx_getydim(&image_gfx));
 #elif 0
+	video_gfx_bitblit(&screen_gfx, blit_x, blit_y,
+	                  &image_gfx, 0, 0,
+	                  blit_w, blit_h);
+#elif 0
 	{
 		static REF struct video_buffer *mask_buffer = NULL;
 		if (!mask_buffer) {
@@ -408,26 +412,22 @@ do_showpic(struct video_buffer *screen,
 	/* With MIN, this is like that pencil-sketching filter from VLC :D
 	 * With MAX, it looks like a  blur that also brightens the  image. */
 	int delta = 2;
+	gfx_blendmode_t omode = video_gfx_getblend(&screen_gfx);
+	video_gfx_setblend(&screen_gfx, GFX_BLENDMODE_EX(
+	                                /*RGB=*/ONE, MAX, ONE,
+	                                /*A  =*/ONE, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA,
+	                                0xff, 0, 0, 0xff));
+//	video_gfx_hmirror(&image_gfx);
 	for (int x = -delta; x <= delta; ++x)
 	for (int y = -delta; y <= delta; ++y)
 	{
-		gfx_blendmode_t omode = video_gfx_getblend(&screen_gfx);
-		video_gfx_setblend(&screen_gfx, GFX_BLENDMODE_EX(
-		                                /*RGB=*/ONE, MAX, ONE,
-		                                /*A  =*/ONE, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA,
-		                                0xff, 0, 0, 0xff));
-//		video_gfx_hmirror(&image_gfx);
 		video_gfx_stretch(&screen_gfx, blit_x + x, blit_y + y, blit_w, blit_h,
 		                  &image_gfx, 0, 0,
 		                  video_gfx_getxdim(&image_gfx),
 		                  video_gfx_getydim(&image_gfx));
-//		video_gfx_hmirror(&image_gfx);
-		video_gfx_setblend(&screen_gfx, omode);
 	}
-#elif 0
-	video_gfx_bitblit(&screen_gfx, blit_x, blit_y,
-	                  &image_gfx, 0, 0,
-	                  blit_w, blit_h);
+//	video_gfx_hmirror(&image_gfx);
+	video_gfx_setblend(&screen_gfx, omode);
 #else
 	/* Enable read-tiling in X and Y for the image */
 	video_gfx_setflags(&image_gfx,
