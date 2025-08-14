@@ -44,6 +44,33 @@ DECL_BEGIN
 static_assert(sizeof(struct gfx_swdrv) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)),
               "sizeof(struct gfx_swdrv) too large for '_VIDEO_GFX_N_DRIVER'");
 
+/* Populate/update generic SW-GFX operators of `self'.
+ * - `video_swgfx_populate(self)' is identical to `video_swgfx_update(self, VIDEO_GFX_UPDATE_ALL)'
+ * - Use `video_swgfx_populate()' to initialize SW-GFX operators from `vi_initgfx'
+ * - `video_swgfx_populate()' will initialize *ALL* fields of `video_swgfx_getdrv(self)',
+ *   except   for  the   following,  which  have   to  be  initialized   by  the  caller:
+ *   - video_swgfx_getdrv(self)->xsw_getpixel
+ *   - video_swgfx_getdrv(self)->xsw_setpixel
+ * - Additionally,  `self->vg_surf' and `self->vg_blend' need to be initialized
+ *   already, though this should already be the case if used from `vi_initgfx'.
+ * - `video_swgfx_update()' should be called from `vi_updategfx'
+ * @param: self: The GFX context to initialize/update for use with SW-GFX operators
+ * @param: what: What it is about the GFX context that changed
+ * @return: * : Always re-returns `self' */
+DEFINE_PUBLIC_ALIAS(video_swgfx_populate, libvideo_swgfx_populate_impl);
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_swgfx_populate_impl(struct video_gfx *__restrict self) {
+	libvideo_swgfx_populate(self);
+	return self;
+}
+
+DEFINE_PUBLIC_ALIAS(video_swgfx_update, libvideo_swgfx_update_impl);
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_swgfx_update_impl(struct video_gfx *__restrict self, unsigned int what) {
+	libvideo_swgfx_update(self, what);
+	return self;
+}
+
 DECL_END
 
 #ifndef __INTELLISENSE__

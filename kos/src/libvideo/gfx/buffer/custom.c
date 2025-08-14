@@ -517,55 +517,55 @@ custom_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
 
 INTERN ATTR_IN(1) video_pixel_t CC
 custom_gfx__getpixel(struct video_gfx const *__restrict self,
-                     video_coord_t abs_x, video_coord_t abs_y) {
+                     video_coord_t x, video_coord_t y) {
 	video_pixel_t result;
 	struct custom_buffer_common *me = (struct custom_buffer_common *)video_gfx_getbuffer(self);
 	video_buffer_custom_getpixel_t getpixel;
 	atomic_inc(&me->cbc_inuse);
 	getpixel = atomic_read(&me->cbc_getpixel);
-	result = (*getpixel)(me->cbc_cookie, abs_x, abs_y);
+	result = (*getpixel)(me->cbc_cookie, x, y);
 	atomic_dec(&me->cbc_inuse);
 	return result;
 }
 
 INTERN ATTR_IN(1) void CC
 custom_gfx__setpixel(struct video_gfx const *__restrict self,
-                     video_coord_t abs_x, video_coord_t abs_y,
+                     video_coord_t x, video_coord_t y,
                      video_pixel_t pixel) {
 	struct custom_buffer_common *me = (struct custom_buffer_common *)video_gfx_getbuffer(self);
 	video_buffer_custom_setpixel_t setpixel;
 	atomic_inc(&me->cbc_inuse);
 	setpixel = atomic_read(&me->cbc_setpixel);
-	(*setpixel)(me->cbc_cookie, abs_x, abs_y, pixel);
+	(*setpixel)(me->cbc_cookie, x, y, pixel);
 	atomic_dec(&me->cbc_inuse);
 }
 
 INTERN ATTR_IN(1) video_pixel_t CC
 custom_gfx_subregion__getpixel(struct video_gfx const *__restrict self,
-                               video_coord_t abs_x, video_coord_t abs_y) {
+                               video_coord_t x, video_coord_t y) {
 	video_pixel_t result;
 	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)video_gfx_getbuffer(self);
 	video_buffer_custom_getpixel_t getpixel;
-	abs_x += me->cbsr_xoff;
-	abs_y += me->cbsr_yoff;
+	x += me->cbsr_xoff;
+	y += me->cbsr_yoff;
 	atomic_inc(&me->cbc_inuse);
 	getpixel = atomic_read(&me->cbc_getpixel);
-	result = (*getpixel)(me->cbc_cookie, abs_x, abs_y);
+	result = (*getpixel)(me->cbc_cookie, x, y);
 	atomic_dec(&me->cbc_inuse);
 	return result;
 }
 
 INTERN ATTR_IN(1) void CC
 custom_gfx_subregion__setpixel(struct video_gfx const *__restrict self,
-                               video_coord_t abs_x, video_coord_t abs_y,
+                               video_coord_t x, video_coord_t y,
                                video_pixel_t pixel) {
 	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)video_gfx_getbuffer(self);
 	video_buffer_custom_setpixel_t setpixel;
-	abs_x += me->cbsr_xoff;
-	abs_y += me->cbsr_yoff;
+	x += me->cbsr_xoff;
+	y += me->cbsr_yoff;
 	atomic_inc(&me->cbc_inuse);
 	setpixel = atomic_read(&me->cbc_setpixel);
-	(*setpixel)(me->cbc_cookie, abs_x, abs_y, pixel);
+	(*setpixel)(me->cbc_cookie, x, y, pixel);
 	atomic_dec(&me->cbc_inuse);
 }
 

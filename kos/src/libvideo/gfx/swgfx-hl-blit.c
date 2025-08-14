@@ -52,10 +52,10 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 DECL_BEGIN
 
-static_assert(sizeof(struct blt_swdrv) <= (_VIDEO_BLITTER_N_DRIVER * sizeof(void (*)(void))),
-              "sizeof(struct blt_swdrv) too large for '_VIDEO_BLITTER_N_DRIVER'");
-static_assert(sizeof(struct blt3_swdrv) <= (_VIDEO_BLITTER3_N_DRIVER * sizeof(void (*)(void))),
-              "sizeof(struct blt3_swdrv) too large for '_VIDEO_BLITTER3_N_DRIVER'");
+static_assert(sizeof(struct blitter_swdrv) <= (_VIDEO_BLITTER_N_DRIVER * sizeof(void (*)(void))),
+              "sizeof(struct blitter_swdrv) too large for '_VIDEO_BLITTER_N_DRIVER'");
+static_assert(sizeof(struct blitter3_swdrv) <= (_VIDEO_BLITTER3_N_DRIVER * sizeof(void (*)(void))),
+              "sizeof(struct blitter3_swdrv) too large for '_VIDEO_BLITTER3_N_DRIVER'");
 
 /************************************************************************/
 /* BLITTER INITIALIZATION                                               */
@@ -120,7 +120,7 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	struct video_gfx const *dst_gfx = ctx->vbt_dst;
 	struct video_buffer const *src_buffer = src_gfx->vg_surf.vs_buffer;
 	struct video_buffer const *dst_buffer = dst_gfx->vg_surf.vs_buffer;
-	struct blt_swdrv *drv = video_swblitter_getdrv(ctx);
+	struct blitter_swdrv *drv = video_swblitter_getdrv(ctx);
 	video_swblitter_setops(ctx);
 
 	/* Check for special case: source and target buffers are the same */
@@ -207,7 +207,7 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 	struct video_gfx const *src_gfx = ctx->vbt3_src;
 	struct video_gfx const *rddst_gfx = ctx->vbt3_rddst;
 	struct video_gfx const *wrdst_gfx = ctx->vbt3_wrdst;
-	struct blt3_swdrv *drv = video_swblitter3_getdrv(ctx);
+	struct blitter3_swdrv *drv = video_swblitter3_getdrv(ctx);
 	video_swblitter3_setops(ctx);
 	(void)wrdst_gfx;
 	assert(video_gfx_getxdim(wrdst_gfx) != 0);

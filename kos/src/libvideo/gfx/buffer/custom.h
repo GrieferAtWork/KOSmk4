@@ -121,10 +121,10 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC custom_buffer_subregi
 
 
 /* GFX operators (built on-top of "SWGFX") */
-INTDEF ATTR_IN(1) video_pixel_t CC custom_gfx__getpixel(struct video_gfx const *__restrict self, video_coord_t abs_x, video_coord_t abs_y);
-INTDEF ATTR_IN(1) void CC custom_gfx__setpixel(struct video_gfx const *__restrict self, video_coord_t abs_x, video_coord_t abs_y, video_pixel_t pixel);
-INTDEF ATTR_IN(1) video_pixel_t CC custom_gfx_subregion__getpixel(struct video_gfx const *__restrict self, video_coord_t abs_x, video_coord_t abs_y);
-INTDEF ATTR_IN(1) void CC custom_gfx_subregion__setpixel(struct video_gfx const *__restrict self, video_coord_t abs_x, video_coord_t abs_y, video_pixel_t pixel);
+INTDEF ATTR_IN(1) video_pixel_t CC custom_gfx__getpixel(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF ATTR_IN(1) void CC custom_gfx__setpixel(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_pixel_t pixel);
+INTDEF ATTR_IN(1) video_pixel_t CC custom_gfx_subregion__getpixel(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF ATTR_IN(1) void CC custom_gfx_subregion__setpixel(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_pixel_t pixel);
 
 
 

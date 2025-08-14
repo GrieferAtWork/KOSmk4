@@ -48,18 +48,18 @@ DECL_BEGIN
 /* GENERIC 3-WAY BLIT OPERATORS                                         */
 /************************************************************************/
 
-static_assert(sizeof(struct blt3_swdrv) <= (_VIDEO_BLITTER3_N_DRIVER * sizeof(void (*)(void))),
-              "sizeof(struct blt3_swdrv) too large for '_VIDEO_BLITTER3_N_DRIVER'");
+static_assert(sizeof(struct blitter3_swdrv) <= (_VIDEO_BLITTER3_N_DRIVER * sizeof(void (*)(void))),
+              "sizeof(struct blitter3_swdrv) too large for '_VIDEO_BLITTER3_N_DRIVER'");
 
-INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t BLT3_SWDRV_BLEND_CC
+INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t BLITTER3_SWDRV_BLEND_CC
 libvideo_swblitter3__blend(struct video_blitter3 const *__restrict self,
                            video_color_t dst, video_color_t src) {
-	struct blt3_swdrv const *drv = video_swblitter3_getcdrv(self);
+	struct blitter3_swdrv const *drv = video_swblitter3_getcdrv(self);
 	return gfx_blendcolors(dst, src, drv->bsw3_blendmode);
 }
 
 #define DEFINE_libvideo_swblitter3__blend_FOO(name, mode)                           \
-	INTERN ATTR_CONST WUNUSED ATTR_IN(1) video_color_t BLT3_SWDRV_BLEND_CC          \
+	INTERN ATTR_CONST WUNUSED ATTR_IN(1) video_color_t BLITTER3_SWDRV_BLEND_CC      \
 	libvideo_swblitter3__blend_##name(struct video_blitter3 const *__restrict self, \
 	                                  video_color_t dst, video_color_t src) {       \
 		(void)self;                                                                 \
@@ -69,10 +69,10 @@ GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_swblitter3__blend_FOO)
 #undef DEFINE_libvideo_swblitter3__blend_FOO
 
 #define DEFINE_libvideo_swblitter3__blend_FOO(name, mode)                           \
-	INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t BLT3_SWDRV_BLEND_CC           \
+	INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t BLITTER3_SWDRV_BLEND_CC       \
 	libvideo_swblitter3__blend_##name(struct video_blitter3 const *__restrict self, \
 	                                  video_color_t dst, video_color_t src) {       \
-		struct blt3_swdrv const *drv = video_swblitter3_getcdrv(self);              \
+		struct blitter3_swdrv const *drv = video_swblitter3_getcdrv(self);          \
 		video_color_t c = GFX_BLENDMODE_GET_COLOR(drv->bsw3_blendmode);             \
 		return gfx_blendcolors_constant(dst, src, mode, c);                         \
 	}
@@ -97,7 +97,7 @@ libvideo_swblitter3__blit__generic__bypixel(struct video_blitter3 const *__restr
 	struct video_gfx const *out = self->vbt3_wrdst;
 	struct video_gfx const *dst = self->vbt3_rddst;
 	struct video_gfx const *src = self->vbt3_src;
-	blt3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
+	blitter3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
 	GFX_BLIT_FOREACH3(out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y,
 	                  BLIT_PIXEL, GFX_ROW_NOOP, GFX_ROW_NOOP);
 }
@@ -113,7 +113,7 @@ libvideo_swblitter3__blit_imatrix__generic__bypixel(struct video_blitter3 const 
 	struct video_gfx const *out = self->vbt3_wrdst;
 	struct video_gfx const *dst = self->vbt3_rddst;
 	struct video_gfx const *src = self->vbt3_src;
-	blt3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
+	blitter3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
 	GFX_BLIT_FOREACH3_IMATRIX(out_x, out_y, dst_x, dst_y, dst_matrix,
 	                          src_x, src_y, size_x, size_y, src_matrix,
 	                          BLIT_PIXEL, GFX_ROW_NOOP, GFX_ROW_NOOP);
@@ -129,7 +129,7 @@ libvideo_swblitter3__stretch__generic_n__bypixel(struct video_blitter3 const *__
 	struct video_gfx const *out = self->vbt3_wrdst;
 	struct video_gfx const *dst = self->vbt3_rddst;
 	struct video_gfx const *src = self->vbt3_src;
-	blt3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
+	blitter3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
 	GFX_NEAREST_STRETCH3(out_x, out_y,
 	                     dst_x, dst_y, dst_size_x, dst_size_y,
 	                     src_x, src_y, src_size_x, src_size_y,
@@ -148,7 +148,7 @@ libvideo_swblitter3__stretch_imatrix__generic_n__bypixel(struct video_blitter3 c
 	struct video_gfx const *out = self->vbt3_wrdst;
 	struct video_gfx const *dst = self->vbt3_rddst;
 	struct video_gfx const *src = self->vbt3_src;
-	blt3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
+	blitter3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
 	gfx_assert_imatrix2d(&dst_matrix);
 	gfx_assert_imatrix2d(&src_matrix);
 	GFX_NEAREST_STRETCH3_IMATRIX(out_x, out_y,
@@ -388,7 +388,6 @@ libvideo_swblitter3__blit__blend1(struct video_blitter3 const *__restrict self,
 	struct video_gfx const *out = self->vbt3_wrdst;
 	struct video_gfx const *dst = self->vbt3_rddst;
 	struct video_gfx const *src = self->vbt3_src;
-	blt3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
 
 	TRACE_START("swblitter3__blit__blend1("
 	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -415,6 +414,7 @@ libvideo_swblitter3__blit__blend1(struct video_blitter3 const *__restrict self,
 				video_codec_pixel2color_t dst_pixel2color = video_surface_getcodec(dst_surface)->vc_pixel2color;
 				video_codec_setpixel_t out_setpixel       = video_surface_getcodec(out_surface)->vc_setpixel;
 				video_codec_color2pixel_t out_color2pixel = video_surface_getcodec(out_surface)->vc_color2pixel;
+				blitter3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
 				do {
 					video_coord_t x;
 					x = 0;
