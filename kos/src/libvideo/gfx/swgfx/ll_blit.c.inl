@@ -123,7 +123,7 @@ libvideo_swblitter_generic__stretch_l(struct video_blitter const *__restrict sel
 #define pixel_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y) \
 	{                                                                             \
 		video_color_t out = LL_getcolor(src, src_x, src_y);                       \
-		LL_absfill(dst, dst_x, dst_y, dst_size_x, dst_size_y, out);               \
+		LL_fill(dst, dst_x, dst_y, dst_size_x, dst_size_y, out);                  \
 	}
 
 #define pixel_blend_ymax pixel_blend_ymin
@@ -132,7 +132,7 @@ libvideo_swblitter_generic__stretch_l(struct video_blitter const *__restrict sel
 		video_color_t src_y0_x0 = LL_getcolor(src, src_x0, src_y);                          \
 		video_color_t src_y0_x1 = LL_getcolor(src, src_x1, src_y);                          \
 		video_color_t out       = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);   \
-		LL_absline_v(dst, dst_x, dst_y, dst_size_y, out);                                   \
+		LL_line_v(dst, dst_x, dst_y, dst_size_y, out);                                      \
 	}
 
 #define pixel_blend_xmax pixel_blend_xmin
@@ -141,7 +141,7 @@ libvideo_swblitter_generic__stretch_l(struct video_blitter const *__restrict sel
 		video_color_t src_y0_x0 = LL_getcolor(src, src_x, src_y0);                          \
 		video_color_t src_y1_x0 = LL_getcolor(src, src_x, src_y1);                          \
 		video_color_t out       = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);   \
-		LL_absline_h(dst, dst_x, dst_y, dst_size_x, out);                                   \
+		LL_line_h(dst, dst_x, dst_y, dst_size_x, out);                                      \
 	}
 
 #define pixel_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
@@ -150,10 +150,10 @@ libvideo_swblitter_generic__stretch_l(struct video_blitter const *__restrict sel
 		video_color_t src_y0_x1 = LL_getcolor(src, src_x1, src_y0);                                   \
 		video_color_t src_y1_x0 = LL_getcolor(src, src_x0, src_y1);                                   \
 		video_color_t src_y1_x1 = LL_getcolor(src, src_x1, src_y1);                                   \
-		video_color_t out = interpolate_2d(src_y0_x0, src_y0_x1,                                      \
-		                                   src_y1_x0, src_y1_x1,                                      \
-		                                   frac_x0, frac_x1,                                          \
-		                                   frac_y0, frac_y1);                                         \
+		video_color_t out       = interpolate_2d(src_y0_x0, src_y0_x1,                                \
+		                                         src_y1_x0, src_y1_x1,                                \
+		                                         frac_x0, frac_x1,                                    \
+		                                         frac_y0, frac_y1);                                   \
 		LL_putcolor(dst, dst_x, dst_y, out);                                                          \
 	}
 
@@ -218,7 +218,7 @@ libvideo_swblitter_generic__stretch_imatrix_l(struct video_blitter const *__rest
 #define pixel_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y) \
 	{                                                                             \
 		video_color_t out = LOCAL_getcolor(src_x, src_y);                         \
-		LL_absfill(dst, dst_x, dst_y, dst_size_x, dst_size_y, out);               \
+		LL_fill(dst, dst_x, dst_y, dst_size_x, dst_size_y, out);                  \
 	}
 
 #define pixel_blend_ymax pixel_blend_ymin
@@ -227,7 +227,7 @@ libvideo_swblitter_generic__stretch_imatrix_l(struct video_blitter const *__rest
 		video_color_t src_y0_x0 = LOCAL_getcolor(src_x0, src_y);                            \
 		video_color_t src_y0_x1 = LOCAL_getcolor(src_x1, src_y);                            \
 		video_color_t out       = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);   \
-		LL_absline_v(dst, dst_x, dst_y, dst_size_y, out);                                   \
+		LL_line_v(dst, dst_x, dst_y, dst_size_y, out);                                      \
 	}
 
 #define pixel_blend_xmax pixel_blend_xmin
@@ -236,7 +236,7 @@ libvideo_swblitter_generic__stretch_imatrix_l(struct video_blitter const *__rest
 		video_color_t src_y0_x0 = LOCAL_getcolor(src_x, src_y0);                            \
 		video_color_t src_y1_x0 = LOCAL_getcolor(src_x, src_y1);                            \
 		video_color_t out       = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);   \
-		LL_absline_h(dst, dst_x, dst_y, dst_size_x, out);                                   \
+		LL_line_h(dst, dst_x, dst_y, dst_size_x, out);                                      \
 	}
 
 #define pixel_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
@@ -245,10 +245,10 @@ libvideo_swblitter_generic__stretch_imatrix_l(struct video_blitter const *__rest
 		video_color_t src_y0_x1 = LOCAL_getcolor(src_x1, src_y0);                                     \
 		video_color_t src_y1_x0 = LOCAL_getcolor(src_x0, src_y1);                                     \
 		video_color_t src_y1_x1 = LOCAL_getcolor(src_x1, src_y1);                                     \
-		video_color_t out = interpolate_2d(src_y0_x0, src_y0_x1,                                      \
-		                                   src_y1_x0, src_y1_x1,                                      \
-		                                   frac_x0, frac_x1,                                          \
-		                                   frac_y0, frac_y1);                                         \
+		video_color_t out       = interpolate_2d(src_y0_x0, src_y0_x1,                                \
+		                                         src_y1_x0, src_y1_x1,                                \
+		                                         frac_x0, frac_x1,                                    \
+		                                         frac_y0, frac_y1);                                   \
 		LL_putcolor(dst, dst_x, dst_y, out);                                                          \
 	}
 	TRACE_START("swblitter_generic__stretch_imatrix_l("
@@ -623,34 +623,34 @@ libvideo_swblitter_ckey__stretch_l(struct video_blitter const *__restrict self,
 		video_pixel_t p_out = LL_getpixel(src, src_x, src_y);                     \
 		if (p_out != src_colorkey) {                                              \
 			video_color_t c_out = ckey_pixel2color(p_out);                        \
-			LL_absfill(dst, dst_x, dst_y, dst_size_x, dst_size_y, c_out);         \
+			LL_fill(dst, dst_x, dst_y, dst_size_x, dst_size_y, c_out);         \
 		}                                                                         \
 	}
 
 #define pixel_blend_ymax pixel_blend_ymin
-#define pixel_blend_ymin(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1) \
-	{                                                                                       \
-		video_pixel_t p_src_y0_x0 = LL_getpixel(src, src_x0, src_y);                        \
-		video_pixel_t p_src_y0_x1 = LL_getpixel(src, src_x1, src_y);                        \
-		if (p_src_y0_x0 != src_colorkey || p_src_y0_x1 != src_colorkey) {                   \
-			video_pixel_t c_src_y0_x0 = ckey_pixel2color_opt(p_src_y0_x0);                  \
-			video_pixel_t c_src_y0_x1 = ckey_pixel2color_opt(p_src_y0_x1);                  \
-			video_color_t out = interpolate_1d(c_src_y0_x0, c_src_y0_x1, frac_x0, frac_x1); \
-			LL_absline_v(dst, dst_x, dst_y, dst_size_y, out);                               \
-		}                                                                                   \
+#define pixel_blend_ymin(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1)         \
+	{                                                                                               \
+		video_pixel_t p_src_y0_x0 = LL_getpixel(src, src_x0, src_y);                                \
+		video_pixel_t p_src_y0_x1 = LL_getpixel(src, src_x1, src_y);                                \
+		if (p_src_y0_x0 != src_colorkey || p_src_y0_x1 != src_colorkey) {                           \
+			video_pixel_t c_src_y0_x0 = ckey_pixel2color_opt(p_src_y0_x0);                          \
+			video_pixel_t c_src_y0_x1 = ckey_pixel2color_opt(p_src_y0_x1);                          \
+			video_color_t out         = interpolate_1d(c_src_y0_x0, c_src_y0_x1, frac_x0, frac_x1); \
+			LL_line_v(dst, dst_x, dst_y, dst_size_y, out);                                          \
+		}                                                                                           \
 	}
 
 #define pixel_blend_xmax pixel_blend_xmin
-#define pixel_blend_xmin(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1) \
-	{                                                                                       \
-		video_pixel_t p_src_y0_x0 = LL_getpixel(src, src_x, src_y0);                        \
-		video_pixel_t p_src_y1_x0 = LL_getpixel(src, src_x, src_y1);                        \
-		if (p_src_y0_x0 != src_colorkey || p_src_y1_x0 != src_colorkey) {                   \
-			video_pixel_t c_src_y0_x0 = ckey_pixel2color_opt(p_src_y0_x0);                  \
-			video_pixel_t c_src_y1_x0 = ckey_pixel2color_opt(p_src_y1_x0);                  \
-			video_color_t out = interpolate_1d(c_src_y0_x0, c_src_y1_x0, frac_y0, frac_y1); \
-			LL_absline_h(dst, dst_x, dst_y, dst_size_x, out);                               \
-		}                                                                                   \
+#define pixel_blend_xmin(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1)         \
+	{                                                                                               \
+		video_pixel_t p_src_y0_x0 = LL_getpixel(src, src_x, src_y0);                                \
+		video_pixel_t p_src_y1_x0 = LL_getpixel(src, src_x, src_y1);                                \
+		if (p_src_y0_x0 != src_colorkey || p_src_y1_x0 != src_colorkey) {                           \
+			video_pixel_t c_src_y0_x0 = ckey_pixel2color_opt(p_src_y0_x0);                          \
+			video_pixel_t c_src_y1_x0 = ckey_pixel2color_opt(p_src_y1_x0);                          \
+			video_color_t out         = interpolate_1d(c_src_y0_x0, c_src_y1_x0, frac_y0, frac_y1); \
+			LL_line_h(dst, dst_x, dst_y, dst_size_x, out);                                          \
+		}                                                                                           \
 	}
 
 #define pixel_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
@@ -665,10 +665,10 @@ libvideo_swblitter_ckey__stretch_l(struct video_blitter const *__restrict self,
 			video_pixel_t c_src_y0_x1 = ckey_pixel2color_opt(p_src_y0_x1);                            \
 			video_pixel_t c_src_y1_x0 = ckey_pixel2color_opt(p_src_y1_x0);                            \
 			video_pixel_t c_src_y1_x1 = ckey_pixel2color_opt(p_src_y1_x1);                            \
-			video_color_t out = interpolate_2d(c_src_y0_x0, c_src_y0_x1,                              \
-			                                   c_src_y1_x0, c_src_y1_x1,                              \
-			                                   frac_x0, frac_x1,                                      \
-			                                   frac_y0, frac_y1);                                     \
+			video_color_t out         = interpolate_2d(c_src_y0_x0, c_src_y0_x1,                      \
+			                                           c_src_y1_x0, c_src_y1_x1,                      \
+			                                           frac_x0, frac_x1,                              \
+			                                           frac_y0, frac_y1);                             \
 			LL_putcolor(dst, dst_x, dst_y, out);                                                      \
 		}                                                                                             \
 	}
@@ -791,34 +791,34 @@ libvideo_swblitter_ckey__stretch_imatrix_l(struct video_blitter const *__restric
 		video_pixel_t p_out = LOCAL_getpixel(src_x, src_y);                       \
 		if (p_out != src_colorkey) {                                              \
 			video_color_t c_out = ckey_pixel2color(p_out);                        \
-			LL_absfill(dst, dst_x, dst_y, dst_size_x, dst_size_y, c_out);         \
+			LL_fill(dst, dst_x, dst_y, dst_size_x, dst_size_y, c_out);            \
 		}                                                                         \
 	}
 
 #define pixel_blend_ymax pixel_blend_ymin
-#define pixel_blend_ymin(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1) \
-	{                                                                                       \
-		video_pixel_t p_src_y0_x0 = LOCAL_getpixel(src_x0, src_y);                          \
-		video_pixel_t p_src_y0_x1 = LOCAL_getpixel(src_x1, src_y);                          \
-		if (p_src_y0_x0 != src_colorkey || p_src_y0_x1 != src_colorkey) {                   \
-			video_pixel_t c_src_y0_x0 = ckey_pixel2color_opt(p_src_y0_x0);                  \
-			video_pixel_t c_src_y0_x1 = ckey_pixel2color_opt(p_src_y0_x1);                  \
-			video_color_t out = interpolate_1d(c_src_y0_x0, c_src_y0_x1, frac_x0, frac_x1); \
-			LL_absline_v(dst, dst_x, dst_y, dst_size_y, out);                               \
-		}                                                                                   \
+#define pixel_blend_ymin(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1)         \
+	{                                                                                               \
+		video_pixel_t p_src_y0_x0 = LOCAL_getpixel(src_x0, src_y);                                  \
+		video_pixel_t p_src_y0_x1 = LOCAL_getpixel(src_x1, src_y);                                  \
+		if (p_src_y0_x0 != src_colorkey || p_src_y0_x1 != src_colorkey) {                           \
+			video_pixel_t c_src_y0_x0 = ckey_pixel2color_opt(p_src_y0_x0);                          \
+			video_pixel_t c_src_y0_x1 = ckey_pixel2color_opt(p_src_y0_x1);                          \
+			video_color_t out         = interpolate_1d(c_src_y0_x0, c_src_y0_x1, frac_x0, frac_x1); \
+			LL_line_v(dst, dst_x, dst_y, dst_size_y, out);                                          \
+		}                                                                                           \
 	}
 
 #define pixel_blend_xmax pixel_blend_xmin
-#define pixel_blend_xmin(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1) \
-	{                                                                                       \
-		video_pixel_t p_src_y0_x0 = LOCAL_getpixel(src_x, src_y0);                          \
-		video_pixel_t p_src_y1_x0 = LOCAL_getpixel(src_x, src_y1);                          \
-		if (p_src_y0_x0 != src_colorkey || p_src_y1_x0 != src_colorkey) {                   \
-			video_pixel_t c_src_y0_x0 = ckey_pixel2color_opt(p_src_y0_x0);                  \
-			video_pixel_t c_src_y1_x0 = ckey_pixel2color_opt(p_src_y1_x0);                  \
-			video_color_t out = interpolate_1d(c_src_y0_x0, c_src_y1_x0, frac_y0, frac_y1); \
-			LL_absline_h(dst, dst_x, dst_y, dst_size_x, out);                               \
-		}                                                                                   \
+#define pixel_blend_xmin(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1)         \
+	{                                                                                               \
+		video_pixel_t p_src_y0_x0 = LOCAL_getpixel(src_x, src_y0);                                  \
+		video_pixel_t p_src_y1_x0 = LOCAL_getpixel(src_x, src_y1);                                  \
+		if (p_src_y0_x0 != src_colorkey || p_src_y1_x0 != src_colorkey) {                           \
+			video_pixel_t c_src_y0_x0 = ckey_pixel2color_opt(p_src_y0_x0);                          \
+			video_pixel_t c_src_y1_x0 = ckey_pixel2color_opt(p_src_y1_x0);                          \
+			video_color_t out         = interpolate_1d(c_src_y0_x0, c_src_y1_x0, frac_y0, frac_y1); \
+			LL_line_h(dst, dst_x, dst_y, dst_size_x, out);                                          \
+		}                                                                                           \
 	}
 
 #define pixel_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
@@ -833,10 +833,10 @@ libvideo_swblitter_ckey__stretch_imatrix_l(struct video_blitter const *__restric
 			video_pixel_t c_src_y0_x1 = ckey_pixel2color_opt(p_src_y0_x1);                            \
 			video_pixel_t c_src_y1_x0 = ckey_pixel2color_opt(p_src_y1_x0);                            \
 			video_pixel_t c_src_y1_x1 = ckey_pixel2color_opt(p_src_y1_x1);                            \
-			video_color_t out = interpolate_2d(c_src_y0_x0, c_src_y0_x1,                              \
-			                                   c_src_y1_x0, c_src_y1_x1,                              \
-			                                   frac_x0, frac_x1,                                      \
-			                                   frac_y0, frac_y1);                                     \
+			video_color_t out         = interpolate_2d(c_src_y0_x0, c_src_y0_x1,                      \
+			                                           c_src_y1_x0, c_src_y1_x1,                      \
+			                                           frac_x0, frac_x1,                              \
+			                                           frac_y0, frac_y1);                             \
 			LL_putcolor(dst, dst_x, dst_y, out);                                                      \
 		}                                                                                             \
 	}

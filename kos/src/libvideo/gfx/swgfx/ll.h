@@ -31,19 +31,19 @@
 
 /* When  low-level  GFX  functions want  to  call other
  * low-level GFX functions, these macros should be used */
-#define _LL_getcolor      _video_swgfx_x_getcolor
-#define _LL_putcolor      _video_swgfx_x_putcolor
-#define _LL_putcolor_p    _video_swgfx_x_putcolor_p
-#define _LL_getpixel      _video_swgfx_x_getpixel
-#define _LL_setpixel      _video_swgfx_x_setpixel
-#define _LL_absline_llhh  _video_swgfx_x_absline_llhh
-#define _LL_absline_lhhl  _video_swgfx_x_absline_lhhl
-#define _LL_absline_h     _video_swgfx_x_absline_h
-#define _LL_absline_v     _video_swgfx_x_absline_v
-#define _LL_absfill       _video_swgfx_x_absfill
-#define _LL_absgradient   _video_swgfx_x_absgradient
-#define _LL_absgradient_h _video_swgfx_x_absgradient_h
-#define _LL_absgradient_v _video_swgfx_x_absgradient_v
+#define _LL_getcolor   _video_swgfx_x_getcolor
+#define _LL_putcolor   _video_swgfx_x_putcolor
+#define _LL_putcolor_p _video_swgfx_x_putcolor_p
+#define _LL_getpixel   _video_swgfx_x_getpixel
+#define _LL_setpixel   _video_swgfx_x_setpixel
+#define _LL_line_llhh  _video_swgfx_x_line_llhh
+#define _LL_line_lhhl  _video_swgfx_x_line_lhhl
+#define _LL_line_h     _video_swgfx_x_line_h
+#define _LL_line_v     _video_swgfx_x_line_v
+#define _LL_fill       _video_swgfx_x_fill
+#define _LL_gradient   _video_swgfx_x_gradient
+#define _LL_gradient_h _video_swgfx_x_gradient_h
+#define _LL_gradient_v _video_swgfx_x_gradient_v
 
 #define LL_assert_x(self, x)                                           \
 	gfx_assertf((x) < video_buffer_getxdim(video_gfx_getbuffer(self)), \
@@ -78,26 +78,26 @@
 	(LL_assert_xy(self, x, y), _LL_getpixel(self, x, y))
 #define LL_setpixel(self, x, y, pixel) \
 	(LL_assert_xy(self, x, y), _LL_setpixel(self, x, y, pixel))
-#define LL_absline_llhh(self, x, y, size_x, size_y, color) \
-	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_absline_llhh(self, x, y, size_x, size_y, color))
-#define LL_absline_lhhl(self, x, y, size_x, size_y, color)                                \
+#define LL_line_llhh(self, x, y, size_x, size_y, color) \
+	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_line_llhh(self, x, y, size_x, size_y, color))
+#define LL_line_lhhl(self, x, y, size_x, size_y, color)                                   \
 	(LL_assert_sx(self, x, size_x), gfx_assert(size_y), LL_assert_y(self, y),             \
 	 gfx_assertf((y) >= (size_y) - 1,                                                     \
 	             "Line escapes to the top (start-y: %" PRIuCRD ", size-y: %" PRIuDIM ")", \
 	             (y), size_y),                                                            \
-	 _LL_absline_lhhl(self, x, y, size_x, size_y, color))
-#define LL_absline_h(self, x, y, length, color) \
-	(LL_assert_sx(self, x, length), LL_assert_y(self, y), _LL_absline_h(self, x, y, length, color))
-#define LL_absline_v(self, x, y, length, color) \
-	(LL_assert_x(self, x), LL_assert_sy(self, y, length), _LL_absline_v(self, x, y, length, color))
-#define LL_absfill(self, x, y, size_x, size_y, color) \
-	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_absfill(self, x, y, size_x, size_y, color))
-#define LL_absgradient(self, x, y, size_x, size_y, colors) \
-	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_absgradient(self, x, y, size_x, size_y, colors))
-#define LL_absgradient_h(self, x, y, size_x, size_y, locolor, hicolor) \
-	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_absgradient_h(self, x, y, size_x, size_y, locolor, hicolor))
-#define LL_absgradient_v(self, x, y, size_x, size_y, locolor, hicolor) \
-	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_absgradient_v(self, x, y, size_x, size_y, locolor, hicolor))
+	 _LL_line_lhhl(self, x, y, size_x, size_y, color))
+#define LL_line_h(self, x, y, length, color) \
+	(LL_assert_sx(self, x, length), LL_assert_y(self, y), _LL_line_h(self, x, y, length, color))
+#define LL_line_v(self, x, y, length, color) \
+	(LL_assert_x(self, x), LL_assert_sy(self, y, length), _LL_line_v(self, x, y, length, color))
+#define LL_fill(self, x, y, size_x, size_y, color) \
+	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_fill(self, x, y, size_x, size_y, color))
+#define LL_gradient(self, x, y, size_x, size_y, colors) \
+	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_gradient(self, x, y, size_x, size_y, colors))
+#define LL_gradient_h(self, x, y, size_x, size_y, locolor, hicolor) \
+	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_gradient_h(self, x, y, size_x, size_y, locolor, hicolor))
+#define LL_gradient_v(self, x, y, size_x, size_y, locolor, hicolor) \
+	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_gradient_v(self, x, y, size_x, size_y, locolor, hicolor))
 
 
 /* Helpers for acquiring video region locks */

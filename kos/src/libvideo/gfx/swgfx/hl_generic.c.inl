@@ -87,31 +87,31 @@ DECL_BEGIN
 #define LOCAL_libvideo_swgfx_vgradient_wrap   LOCAL_FUNC(libvideo_swgfx_vgradient_wrap)
 #define LOCAL_libvideo_swgfx_vgradient_mirror LOCAL_FUNC(libvideo_swgfx_vgradient_mirror)
 
-#define LOCAL__video_swgfx_x_getcolor      LOCAL_FUNC(_video_swgfx_x_getcolor)
-#define LOCAL__video_swgfx_x_putcolor      LOCAL_FUNC(_video_swgfx_x_putcolor)
-#define LOCAL__video_swgfx_x_getpixel      LOCAL_FUNC(_video_swgfx_x_getpixel)
-#define LOCAL__video_swgfx_x_setpixel      LOCAL_FUNC(_video_swgfx_x_setpixel)
-#define LOCAL__video_swgfx_x_absline_llhh  LOCAL_FUNC(_video_swgfx_x_absline_llhh)
-#define LOCAL__video_swgfx_x_absline_lhhl  LOCAL_FUNC(_video_swgfx_x_absline_lhhl)
-#define LOCAL__video_swgfx_x_absline_h     LOCAL_FUNC(_video_swgfx_x_absline_h)
-#define LOCAL__video_swgfx_x_absline_v     LOCAL_FUNC(_video_swgfx_x_absline_v)
-#define LOCAL__video_swgfx_x_absfill       LOCAL_FUNC(_video_swgfx_x_absfill)
-#define LOCAL__video_swgfx_x_absgradient   LOCAL_FUNC(_video_swgfx_x_absgradient)
-#define LOCAL__video_swgfx_x_absgradient_h LOCAL_FUNC(_video_swgfx_x_absgradient_h)
-#define LOCAL__video_swgfx_x_absgradient_v LOCAL_FUNC(_video_swgfx_x_absgradient_v)
+#define LOCAL__video_swgfx_x_getcolor   LOCAL_FUNC(_video_swgfx_x_getcolor)
+#define LOCAL__video_swgfx_x_putcolor   LOCAL_FUNC(_video_swgfx_x_putcolor)
+#define LOCAL__video_swgfx_x_getpixel   LOCAL_FUNC(_video_swgfx_x_getpixel)
+#define LOCAL__video_swgfx_x_setpixel   LOCAL_FUNC(_video_swgfx_x_setpixel)
+#define LOCAL__video_swgfx_x_line_llhh  LOCAL_FUNC(_video_swgfx_x_line_llhh)
+#define LOCAL__video_swgfx_x_line_lhhl  LOCAL_FUNC(_video_swgfx_x_line_lhhl)
+#define LOCAL__video_swgfx_x_line_h     LOCAL_FUNC(_video_swgfx_x_line_h)
+#define LOCAL__video_swgfx_x_line_v     LOCAL_FUNC(_video_swgfx_x_line_v)
+#define LOCAL__video_swgfx_x_fill       LOCAL_FUNC(_video_swgfx_x_fill)
+#define LOCAL__video_swgfx_x_gradient   LOCAL_FUNC(_video_swgfx_x_gradient)
+#define LOCAL__video_swgfx_x_gradient_h LOCAL_FUNC(_video_swgfx_x_gradient_h)
+#define LOCAL__video_swgfx_x_gradient_v LOCAL_FUNC(_video_swgfx_x_gradient_v)
 
-#define LOCAL_video_swgfx_x_getcolor      LOCAL_FUNC(video_swgfx_x_getcolor)
-#define LOCAL_video_swgfx_x_putcolor      LOCAL_FUNC(video_swgfx_x_putcolor)
-#define LOCAL_video_swgfx_x_getpixel      LOCAL_FUNC(video_swgfx_x_getpixel)
-#define LOCAL_video_swgfx_x_setpixel      LOCAL_FUNC(video_swgfx_x_setpixel)
-#define LOCAL_video_swgfx_x_absline_llhh  LOCAL_FUNC(video_swgfx_x_absline_llhh)
-#define LOCAL_video_swgfx_x_absline_lhhl  LOCAL_FUNC(video_swgfx_x_absline_lhhl)
-#define LOCAL_video_swgfx_x_absline_h     LOCAL_FUNC(video_swgfx_x_absline_h)
-#define LOCAL_video_swgfx_x_absline_v     LOCAL_FUNC(video_swgfx_x_absline_v)
-#define LOCAL_video_swgfx_x_absfill       LOCAL_FUNC(video_swgfx_x_absfill)
-#define LOCAL_video_swgfx_x_absgradient   LOCAL_FUNC(video_swgfx_x_absgradient)
-#define LOCAL_video_swgfx_x_absgradient_h LOCAL_FUNC(video_swgfx_x_absgradient_h)
-#define LOCAL_video_swgfx_x_absgradient_v LOCAL_FUNC(video_swgfx_x_absgradient_v)
+#define LOCAL_video_swgfx_x_getcolor   LOCAL_FUNC(video_swgfx_x_getcolor)
+#define LOCAL_video_swgfx_x_putcolor   LOCAL_FUNC(video_swgfx_x_putcolor)
+#define LOCAL_video_swgfx_x_getpixel   LOCAL_FUNC(video_swgfx_x_getpixel)
+#define LOCAL_video_swgfx_x_setpixel   LOCAL_FUNC(video_swgfx_x_setpixel)
+#define LOCAL_video_swgfx_x_line_llhh  LOCAL_FUNC(video_swgfx_x_line_llhh)
+#define LOCAL_video_swgfx_x_line_lhhl  LOCAL_FUNC(video_swgfx_x_line_lhhl)
+#define LOCAL_video_swgfx_x_line_h     LOCAL_FUNC(video_swgfx_x_line_h)
+#define LOCAL_video_swgfx_x_line_v     LOCAL_FUNC(video_swgfx_x_line_v)
+#define LOCAL_video_swgfx_x_fill       LOCAL_FUNC(video_swgfx_x_fill)
+#define LOCAL_video_swgfx_x_gradient   LOCAL_FUNC(video_swgfx_x_gradient)
+#define LOCAL_video_swgfx_x_gradient_h LOCAL_FUNC(video_swgfx_x_gradient_h)
+#define LOCAL_video_swgfx_x_gradient_v LOCAL_FUNC(video_swgfx_x_gradient_v)
 
 #define LOCAL_libvideo_swgfx_ops         LOCAL_FUNC(libvideo_swgfx_ops)
 #define LOCAL_libvideo_swgfx_ops_wrap    LOCAL_FUNC(libvideo_swgfx_ops_wrap)
@@ -278,23 +278,23 @@ LOCAL_libvideo_swgfx_line(struct video_gfx const *__restrict self,
 			LOCAL_video_swgfx_x_putcolor(self, (video_coord_t)x1, (video_coord_t)y1, color);
 			return;
 		}
-		LOCAL_video_swgfx_x_absline_v(self, (video_coord_t)x1, (video_coord_t)y1,
-		                              (video_dim_t)((video_coord_t)y2 - (video_coord_t)y1) + 1,
-		                              color);
+		LOCAL_video_swgfx_x_line_v(self, (video_coord_t)x1, (video_coord_t)y1,
+		                           (video_dim_t)((video_coord_t)y2 - (video_coord_t)y1) + 1,
+		                           color);
 		return;
 	}
 	gfx_assert(x2 > x1);
 	if (y2 > y1) {
 		video_dim_t sx = (video_dim_t)((video_coord_t)x2 - (video_coord_t)x1) + 1;
 		video_dim_t sy = (video_dim_t)((video_coord_t)y2 - (video_coord_t)y1) + 1;
-		LOCAL_video_swgfx_x_absline_llhh(self, (video_coord_t)x1, (video_coord_t)y1, sx, sy, color);
+		LOCAL_video_swgfx_x_line_llhh(self, (video_coord_t)x1, (video_coord_t)y1, sx, sy, color);
 	} else if (y2 < y1) {
 		video_dim_t sx = (video_dim_t)((video_coord_t)x2 - (video_coord_t)x1) + 1;
 		video_dim_t sy = (video_dim_t)((video_coord_t)y1 - (video_coord_t)y2) + 1;
-		LOCAL_video_swgfx_x_absline_lhhl(self, (video_coord_t)x1, (video_coord_t)y1, sx, sy, color);
+		LOCAL_video_swgfx_x_line_lhhl(self, (video_coord_t)x1, (video_coord_t)y1, sx, sy, color);
 	} else {
 		video_dim_t length = (video_dim_t)((video_coord_t)x2 - (video_coord_t)x1) + 1;
-		LOCAL_video_swgfx_x_absline_h(self, (video_coord_t)x1, (video_coord_t)y1, length, color);
+		LOCAL_video_swgfx_x_line_h(self, (video_coord_t)x1, (video_coord_t)y1, length, color);
 	}
 #undef COHSUTH_COMPUTEOUTCODE
 #undef COHSUTH_INSIDE
@@ -361,7 +361,7 @@ LOCAL_libvideo_swgfx_hline(struct video_gfx const *__restrict self,
 		length = GFX_BXEND - (video_coord_t)x;
 	}
 
-	LOCAL_video_swgfx_x_absline_h(self, (video_coord_t)x, (video_coord_t)y, length, color);
+	LOCAL_video_swgfx_x_line_h(self, (video_coord_t)x, (video_coord_t)y, length, color);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -422,7 +422,7 @@ LOCAL_libvideo_swgfx_vline(struct video_gfx const *__restrict self,
 			return;
 		length = GFX_BYEND - (video_coord_t)y;
 	}
-	LOCAL_video_swgfx_x_absline_v(self, (video_coord_t)x, (video_coord_t)y, length, color);
+	LOCAL_video_swgfx_x_line_v(self, (video_coord_t)x, (video_coord_t)y, length, color);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -494,8 +494,8 @@ LOCAL_libvideo_swgfx_fill(struct video_gfx const *__restrict self,
 			return;
 		size_y = GFX_BYEND - (video_coord_t)y;
 	}
-	LOCAL_video_swgfx_x_absfill(self, (video_coord_t)x, (video_coord_t)y,
-	                            size_x, size_y, color);
+	LOCAL_video_swgfx_x_fill(self, (video_coord_t)x, (video_coord_t)y,
+	                         size_x, size_y, color);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -599,8 +599,8 @@ LOCAL_libvideo_swgfx_rect(struct video_gfx const *__restrict self,
 		size_y = GFX_BYEND - (video_coord_t)y;
 		draw_lines &= ~LINE_YMAX;
 	}
-#define HLINE(x, y, length) LOCAL_video_swgfx_x_absline_h(self, x, y, length, color)
-#define VLINE(x, y, length) LOCAL_video_swgfx_x_absline_v(self, x, y, length, color)
+#define HLINE(x, y, length) LOCAL_video_swgfx_x_line_h(self, x, y, length, color)
+#define VLINE(x, y, length) LOCAL_video_swgfx_x_line_v(self, x, y, length, color)
 	switch (draw_lines) {
 
 		/* All 4 lines */
@@ -823,8 +823,8 @@ LOCAL_libvideo_swgfx_gradient(struct video_gfx const *__restrict self,
 		fixed_colors[1][0] = interpolate_1d(fixed_colors[0][0], fixed_colors[1][0], frac1, frac0);
 		fixed_colors[1][1] = interpolate_1d(fixed_colors[0][1], fixed_colors[1][1], frac1, frac0);
 	}
-	LOCAL_video_swgfx_x_absgradient(self, (video_coord_t)x, (video_coord_t)y,
-	                                    size_x, size_y, colors);
+	LOCAL_video_swgfx_x_gradient(self, (video_coord_t)x, (video_coord_t)y,
+	                             size_x, size_y, colors);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -983,8 +983,8 @@ LOCAL_libvideo_swgfx_hgradient(struct video_gfx const *__restrict self,
 			return;
 		size_y = GFX_BYEND - (video_coord_t)y;
 	}
-	LOCAL_video_swgfx_x_absgradient_h(self, (video_coord_t)x, (video_coord_t)y,
-	                                      size_x, size_y, locolor, hicolor);
+	LOCAL_video_swgfx_x_gradient_h(self, (video_coord_t)x, (video_coord_t)y,
+	                               size_x, size_y, locolor, hicolor);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -1106,8 +1106,8 @@ LOCAL_libvideo_swgfx_vgradient(struct video_gfx const *__restrict self,
 		size_y = GFX_BYEND - (video_coord_t)y;
 		hicolor = interpolate_1d(locolor, hicolor, frac1, frac0);
 	}
-	LOCAL_video_swgfx_x_absgradient_v(self, (video_coord_t)x, (video_coord_t)y,
-	                                  size_x, size_y, locolor, hicolor);
+	LOCAL_video_swgfx_x_gradient_v(self, (video_coord_t)x, (video_coord_t)y,
+	                               size_x, size_y, locolor, hicolor);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -1310,27 +1310,27 @@ LOCAL__libvideo_swgfx_ops_mirror(void) {
 #undef LOCAL__video_swgfx_x_putcolor
 #undef LOCAL__video_swgfx_x_getpixel
 #undef LOCAL__video_swgfx_x_setpixel
-#undef LOCAL__video_swgfx_x_absline_llhh
-#undef LOCAL__video_swgfx_x_absline_lhhl
-#undef LOCAL__video_swgfx_x_absline_h
-#undef LOCAL__video_swgfx_x_absline_v
-#undef LOCAL__video_swgfx_x_absfill
-#undef LOCAL__video_swgfx_x_absgradient
-#undef LOCAL__video_swgfx_x_absgradient_h
-#undef LOCAL__video_swgfx_x_absgradient_v
+#undef LOCAL__video_swgfx_x_line_llhh
+#undef LOCAL__video_swgfx_x_line_lhhl
+#undef LOCAL__video_swgfx_x_line_h
+#undef LOCAL__video_swgfx_x_line_v
+#undef LOCAL__video_swgfx_x_fill
+#undef LOCAL__video_swgfx_x_gradient
+#undef LOCAL__video_swgfx_x_gradient_h
+#undef LOCAL__video_swgfx_x_gradient_v
 
 #undef LOCAL_video_swgfx_x_getcolor
 #undef LOCAL_video_swgfx_x_putcolor
 #undef LOCAL_video_swgfx_x_getpixel
 #undef LOCAL_video_swgfx_x_setpixel
-#undef LOCAL_video_swgfx_x_absline_llhh
-#undef LOCAL_video_swgfx_x_absline_lhhl
-#undef LOCAL_video_swgfx_x_absline_h
-#undef LOCAL_video_swgfx_x_absline_v
-#undef LOCAL_video_swgfx_x_absfill
-#undef LOCAL_video_swgfx_x_absgradient
-#undef LOCAL_video_swgfx_x_absgradient_h
-#undef LOCAL_video_swgfx_x_absgradient_v
+#undef LOCAL_video_swgfx_x_line_llhh
+#undef LOCAL_video_swgfx_x_line_lhhl
+#undef LOCAL_video_swgfx_x_line_h
+#undef LOCAL_video_swgfx_x_line_v
+#undef LOCAL_video_swgfx_x_fill
+#undef LOCAL_video_swgfx_x_gradient
+#undef LOCAL_video_swgfx_x_gradient_h
+#undef LOCAL_video_swgfx_x_gradient_v
 
 #undef LOCAL_libvideo_swgfx_ops
 #undef LOCAL_libvideo_swgfx_ops_wrap
