@@ -51,7 +51,8 @@ struct video_serializer_io {
 	 * @return: 0 : Success
 	 * @return: -1: I/O error trying to send packet. */
 	int (LIBVIDEO_COMPOSITOR_CC *vsrio_writepacket)(struct video_serializer_io *__restrict self,
-	                                                void const *__buf, __size_t __num_bytes, __fd_t __fd);
+	                                                void const *__buf, __size_t __num_bytes,
+	                                                __fd_t __fd, video_serial_token_t __token);
 	/* [1..1] Called by the associated video_serializer when it is destroyed */
 	void (LIBVIDEO_COMPOSITOR_CC *vsrio_destroy)(struct video_serializer_io *__restrict self);
 };
@@ -70,7 +71,8 @@ struct video_serializer {
 	 * @return: 0 : Success
 	 * @return: -1: I/O error when trying to respond to packet */
 	int (LIBVIDEO_COMPOSITOR_CC *vsr_packet)(struct video_serializer *__restrict self,
-	                                         void const *__buf, __size_t __num_bytes);
+	                                         void const *__buf, __size_t __num_bytes,
+	                                         video_serial_token_t __token);
 };
 
 /* TODO: Macro wrappers for invoking operators of `struct video_serializer' */

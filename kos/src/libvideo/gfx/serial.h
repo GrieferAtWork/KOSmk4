@@ -35,7 +35,7 @@ DECL_BEGIN
 
 /* General-purpose video deserializer. */
 INTDEF WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
-libvideo_generic_deserialize(struct video_domain const *__restrict self,
+libvideo_generic_deserialize(struct video_domain const *__restrict domain,
                              /*inherit(on_success)*/ struct video_deserializer_io *__restrict io,
                              video_serial_proto_t proto);
 
