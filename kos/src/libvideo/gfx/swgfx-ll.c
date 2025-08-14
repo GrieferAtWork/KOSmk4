@@ -25,13 +25,125 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #ifndef GUARD_LIBVIDEO_GFX_SWGFX_LL_C
 #define GUARD_LIBVIDEO_GFX_SWGFX_LL_C 1
 #define __VIDEO_BUFFER_const /* nothing */
+#define _KOS_SOURCE 1
 
 #include "api.h"
 /**/
 
+#include "swgfx.h"
+
 /************************************************************************/
 /* LOW-LEVEL, GENERIC SW-GFX OPERATOR IMPLS                             */
 /************************************************************************/
+
+DECL_BEGIN
+
+/* Shape rendering operator groups */
+#define DEFINE_GFX_SWDRV_SHAPEOPS(name,                                                \
+                                  xsws_absline_llhh_,                                  \
+                                  xsws_absline_lhhl_,                                  \
+                                  xsws_absline_h_,                                     \
+                                  xsws_absline_v_,                                     \
+                                  xsws_absfill_,                                       \
+                                  xsws_absgradient_,                                   \
+                                  xsws_absgradient_h_,                                 \
+                                  xsws_absgradient_v_)                                 \
+	PRIVATE struct gfx_swdrv_shapeops name = {};                                       \
+	INTERN ATTR_RETNONNULL WUNUSED struct gfx_swdrv_shapeops const *CC _##name(void) { \
+		if (!name.xsws_absline_llhh) {                                                 \
+			name.xsws_absgradient_v = xsws_absgradient_v_;                             \
+			name.xsws_absgradient_h = xsws_absgradient_h_;                             \
+			name.xsws_absgradient   = xsws_absgradient_;                               \
+			name.xsws_absfill       = xsws_absfill_;                                   \
+			name.xsws_absline_v     = xsws_absline_v_;                                 \
+			name.xsws_absline_h     = xsws_absline_h_;                                 \
+			name.xsws_absline_lhhl  = xsws_absline_lhhl_;                              \
+			COMPILER_WRITE_BARRIER();                                                  \
+			name.xsws_absline_llhh = xsws_absline_llhh_;                               \
+			COMPILER_WRITE_BARRIER();                                                  \
+		}                                                                              \
+		return &name;                                                                  \
+	}
+
+DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__noblend,
+                          libvideo_swgfx_noblend__absline_llhh,
+                          libvideo_swgfx_noblend__absline_lhhl,
+                          libvideo_swgfx_noblend__absline_h,
+                          libvideo_swgfx_noblend__absline_v,
+                          libvideo_swgfx_noblend__absfill,
+                          libvideo_swgfx_generic__absgradient,
+                          libvideo_swgfx_generic__absgradient_h,
+                          libvideo_swgfx_generic__absgradient_v);
+DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__noblend_l,
+                          libvideo_swgfx_noblend__absline_llhh_l,
+                          libvideo_swgfx_noblend__absline_lhhl_l,
+                          libvideo_swgfx_noblend__absline_h,
+                          libvideo_swgfx_noblend__absline_v,
+                          libvideo_swgfx_noblend__absfill,
+                          libvideo_swgfx_generic__absgradient,
+                          libvideo_swgfx_generic__absgradient_h,
+                          libvideo_swgfx_generic__absgradient_v);
+DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__noblend_interp8888,
+                          libvideo_swgfx_noblend__absline_llhh,
+                          libvideo_swgfx_noblend__absline_lhhl,
+                          libvideo_swgfx_noblend__absline_h,
+                          libvideo_swgfx_noblend__absline_v,
+                          libvideo_swgfx_noblend__absfill,
+                          libvideo_swgfx_noblend_interp8888__absgradient,
+                          libvideo_swgfx_noblend_interp8888__absgradient_h,
+                          libvideo_swgfx_noblend_interp8888__absgradient_v);
+DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__noblend_interp8888_l,
+                          libvideo_swgfx_noblend__absline_llhh_l,
+                          libvideo_swgfx_noblend__absline_lhhl_l,
+                          libvideo_swgfx_noblend__absline_h,
+                          libvideo_swgfx_noblend__absline_v,
+                          libvideo_swgfx_noblend__absfill,
+                          libvideo_swgfx_noblend_interp8888__absgradient,
+                          libvideo_swgfx_noblend_interp8888__absgradient_h,
+                          libvideo_swgfx_noblend_interp8888__absgradient_v);
+
+#define DEFINE_libvideo_swgfx_shapeops__preblend_FOO(name, mode, preblend_name, preblend) \
+	DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__preblend_##name,                   \
+	                          libvideo_swgfx_preblend__absline_llhh__##name,              \
+	                          libvideo_swgfx_preblend__absline_lhhl__##name,              \
+	                          libvideo_swgfx_preblend__absline_h__##name,                 \
+	                          libvideo_swgfx_preblend__absline_v__##name,                 \
+	                          libvideo_swgfx_preblend__absfill__##name,                   \
+	                          libvideo_swgfx_preblend__absgradient__##name,               \
+	                          libvideo_swgfx_preblend__absgradient_h__##name,             \
+	                          libvideo_swgfx_preblend__absgradient_v__##name);            \
+	DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__preblend_##name##_l,               \
+	                          libvideo_swgfx_preblend__absline_llhh_l__##name,            \
+	                          libvideo_swgfx_preblend__absline_lhhl_l__##name,            \
+	                          libvideo_swgfx_preblend__absline_h__##name,                 \
+	                          libvideo_swgfx_preblend__absline_v__##name,                 \
+	                          libvideo_swgfx_preblend__absfill__##name,                   \
+	                          libvideo_swgfx_preblend__absgradient__##name,               \
+	                          libvideo_swgfx_preblend__absgradient_h__##name,             \
+	                          libvideo_swgfx_preblend__absgradient_v__##name);
+GFX_FOREACH_DEDICATED_PREBLENDMODE(DEFINE_libvideo_swgfx_shapeops__preblend_FOO)
+#undef DEFINE_libvideo_swgfx_shapeops__preblend_FOO
+
+DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__generic,
+                          libvideo_swgfx_generic__absline_llhh,
+                          libvideo_swgfx_generic__absline_lhhl,
+                          libvideo_swgfx_generic__absline_h,
+                          libvideo_swgfx_generic__absline_v,
+                          libvideo_swgfx_generic__absfill,
+                          libvideo_swgfx_generic__absgradient,
+                          libvideo_swgfx_generic__absgradient_h,
+                          libvideo_swgfx_generic__absgradient_v);
+DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__generic_l,
+                          libvideo_swgfx_generic__absline_llhh_l,
+                          libvideo_swgfx_generic__absline_lhhl_l,
+                          libvideo_swgfx_generic__absline_h,
+                          libvideo_swgfx_generic__absline_v,
+                          libvideo_swgfx_generic__absfill,
+                          libvideo_swgfx_generic__absgradient,
+                          libvideo_swgfx_generic__absgradient_h,
+                          libvideo_swgfx_generic__absgradient_v);
+
+DECL_END
 
 #ifndef __INTELLISENSE__
 #include "swgfx/ll_generic.c.inl"
