@@ -713,6 +713,7 @@ _err_vdlck_libsvgadrv:
 		result->vd_formem          = ramdomain->vd_formem;
 		result->vd_supported_codec = ramdomain->vd_supported_codec;
 		result->vd_newpalette      = ramdomain->vd_newpalette;
+		result->vd_newpolygon      = ramdomain->vd_newpolygon;
 #ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
 		result->vd_deserialize = ramdomain->vd_deserialize;
 #endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */

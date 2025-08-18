@@ -41,25 +41,25 @@ struct video_crect {
 	video_dim_t   vcr_ydim; /* Rect size in Y */
 };
 
-#define VIDEO_CRECT_INIT(xmin, xmax, xdim, ydim) { xmin, xmax, xdim, ydim }
+#define VIDEO_CRECT_INIT(xmin, ymin, xdim, ydim) { xmin, ymin, xdim, ydim }
 #define VIDEO_CRECT_INIT_FULL VIDEO_CRECT_INIT(0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX)
 
 #ifdef __INTELLISENSE__
 /* Getters for properties of `struct video_crect' */
-extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_crect_getxmin(struct video_crect const *__restrict __self);
-extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_crect_getymin(struct video_crect const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_crect_getxmin(struct video_crect const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_crect_getymin(struct video_crect const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_crect_getxdim(struct video_crect const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t video_crect_getydim(struct video_crect const *__restrict __self);
-extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_crect_getxend(struct video_crect const *__restrict __self);
-extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t video_crect_getyend(struct video_crect const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_crect_getxend(struct video_crect const *__restrict __self);
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_coord_t video_crect_getyend(struct video_crect const *__restrict __self);
 
 /* Setters for properties of `struct video_crect' */
-extern __ATTR_INOUT(1) void video_crect_setxmin(struct video_crect *__restrict __self, video_offset_t __v);
-extern __ATTR_INOUT(1) void video_crect_setymin(struct video_crect *__restrict __self, video_offset_t __v);
+extern __ATTR_INOUT(1) void video_crect_setxmin(struct video_crect *__restrict __self, video_coord_t __v);
+extern __ATTR_INOUT(1) void video_crect_setymin(struct video_crect *__restrict __self, video_coord_t __v);
 extern __ATTR_INOUT(1) void video_crect_setxdim(struct video_crect *__restrict __self, video_dim_t __v);
 extern __ATTR_INOUT(1) void video_crect_setydim(struct video_crect *__restrict __self, video_dim_t __v);
-extern __ATTR_INOUT(1) void video_crect_setxend(struct video_crect *__restrict __self, video_offset_t __v);
-extern __ATTR_INOUT(1) void video_crect_setyend(struct video_crect *__restrict __self, video_offset_t __v);
+extern __ATTR_INOUT(1) void video_crect_setxend(struct video_crect *__restrict __self, video_coord_t __v);
+extern __ATTR_INOUT(1) void video_crect_setyend(struct video_crect *__restrict __self, video_coord_t __v);
 
 /* Add an X or Y delta offset of `__self' */
 extern __ATTR_INOUT(1) void video_crect_addx(struct video_crect *__restrict __self, video_offset_t __v);
@@ -71,12 +71,12 @@ extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL video_crect_isempty(struct
 /* Check if {__x,__y} is contained within "__self" */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL
 video_crect_contains(struct video_crect const *__restrict __self,
-                    video_offset_t __x, video_offset_t __y);
+                     video_coord_t __x, video_coord_t __y);
 
 /* Check if 2 rects overlap (`video_crect_intersect()' would return true) */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __BOOL
 video_crect_intersects(struct video_crect const *__a,
-                      struct video_crect const *__b);
+                       struct video_crect const *__b);
 #else /* __INTELLISENSE__ */
 #define video_crect_getxmin(self)    (self)->vcr_xmin
 #define video_crect_getymin(self)    (self)->vcr_ymin

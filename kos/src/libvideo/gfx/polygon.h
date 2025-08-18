@@ -17,41 +17,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIDEO_TYPES_H
-#define _LIBVIDEO_TYPES_H 1
+#ifndef GUARD_LIBVIDEO_GFX_POLYGON_H
+#define GUARD_LIBVIDEO_GFX_POLYGON_H 1
 
-#include <__stdinc.h>
+#include "api.h"
+/**/
 
-#include <hybrid/limitcore.h>
-#include <hybrid/typecore.h>
+#include <hybrid/compiler.h>
 
-/* Sizes of video types. */
-#define __SIZEOF_VIDEO_OFFSET_T__  4
-#define __SIZEOF_VIDEO_COORD_T__   4
-#define __SIZEOF_VIDEO_DIM_T__     4
-#define __ALIGNOF_VIDEO_OFFSET_T__ __ALIGNOF_INT32__
-#define __ALIGNOF_VIDEO_COORD_T__  __ALIGNOF_INT32__
-#define __ALIGNOF_VIDEO_DIM_T__    __ALIGNOF_INT32__
+#include <kos/anno.h>
 
-/* The max possible value for a graphics dimension.
- *
- * This value should  be used as  "size_x" /  "size_y"
- * argument in graphics operations, when the operation
- * should reach the  right/bottom edge  of the  active
- * clip region. */
-#define VIDEO_DIM_MAX    __UINT32_MAX__
-#define VIDEO_COORD_MAX  __UINT32_MAX__
-#define VIDEO_OFFSET_MAX __INT32_MAX__
-#define VIDEO_OFFSET_MIN __INT32_MIN__
+#include <stddef.h>
 
-#ifdef __CC__
-__DECL_BEGIN
+DECL_BEGIN
 
-typedef __INT32_TYPE__ video_offset_t; /* Pixel offset (usually relative to some GFX context) */
-typedef __UINT32_TYPE__ video_coord_t; /* Pixel coordinate (usually absolute) */
-typedef __UINT32_TYPE__ video_dim_t;   /* Graphic dimension (in pixels) */
+struct video_domain;
+struct video_polygon;
+struct video_point;
 
-__DECL_END
-#endif /* __CC__ */
+/* Generic polygon object creator (used by ramdomain) */
+INTDEF WUNUSED NONNULL((1)) ATTR_INS(2, 3) REF struct video_polygon *CC
+libvideo_generic_polygon_create(struct video_domain const *__restrict self,
+                                struct video_point const *points, size_t npoints);
 
-#endif /* !_LIBVIDEO_TYPES_H */
+
+DECL_END
+
+#endif /* !GUARD_LIBVIDEO_GFX_POLYGON_H */

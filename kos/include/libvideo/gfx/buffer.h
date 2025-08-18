@@ -69,6 +69,8 @@ struct video_buffer_rlekey;
 #ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
 struct video_buffer_fdinfo;
 struct video_deserializer_io;
+struct video_polygon;
+struct video_point;
 
 /* Video serialization type ID (one of `VIDEO_SERIAL_PROTO_*') */
 typedef __uintptr_t video_serial_proto_t;
@@ -192,10 +194,23 @@ struct video_domain {
 	 * to encode color values more quickly).
 	 *
 	 * @return: * :   The newly created palette
-	 * @return: NULL: Out of memory */
+	 * @return: NULL: [errno=ENOMEM] Out of memory
+	 * @return: NULL: [errno=*] Failed to create palette */
 	__ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __REF struct video_palette *
 	(LIBVIDEO_GFX_CC *vd_newpalette)(struct video_domain const *__restrict __self,
 	                                 video_pixel_t __count);
+
+	/* Create a new  polygon shape consisting  of a set  of lines along  the
+	 * edges formed by `__npoints' specified by `__points'. You must specify
+	 * at least 3 points for this function to not return an error.
+	 *
+	 * @return: * :   The newly created polygon
+	 * @return: NULL: [errno=EINVAL] Too few points specified
+	 * @return: NULL: [errno=ENOMEM] Out of memory
+	 * @return: NULL: [errno=*] Failed to create polygon */
+	__ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ATTR_INS_T(2, 3) __REF struct video_polygon *
+	(LIBVIDEO_GFX_CC *vd_newpolygon)(struct video_domain const *__restrict __self,
+	                                 struct video_point const *__points, __size_t __npoints);
 
 #ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
 	/* Given  a deserialization `__proto' and I/O operators `__io', construct a client-side
@@ -227,7 +242,7 @@ struct video_domain {
 	/* TODO: Function for getting memory usage (for the ram-domain,
 	 *       just return regular ram usage info as per `sysinfo(2)) */
 
-	void (*_vd_pad2[11])(void); /* Reserved for future expansion */
+	void (*_vd_pad2[10])(void); /* Reserved for future expansion */
 };
 
 
@@ -388,6 +403,18 @@ extern __ATTR_WUNUSED __ATTR_NONNULL((1)) __REF struct video_palette *
 video_domain_newpalette(struct video_domain const *__restrict __self,
                         video_pixel_t __count);
 
+/* Create a new  polygon shape consisting  of a set  of lines along  the
+ * edges formed by `__npoints' specified by `__points'. You must specify
+ * at least 3 points for this function to not return an error.
+ *
+ * @return: * :   The newly created polygon
+ * @return: NULL: [errno=EINVAL] Too few points specified
+ * @return: NULL: [errno=ENOMEM] Out of memory
+ * @return: NULL: [errno=*] Failed to create polygon */
+extern __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_INS(2, 3) __REF struct video_polygon *
+video_domain_newpolygon(struct video_domain const *__restrict __self,
+                        struct video_point const *__points, __size_t __npoints);
+
 #ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
 /* Given  a deserialization `__proto' and I/O operators `__io', construct a client-side
  * `video_buffer* for `__self' that uses `__io' to communicate with a server-side video
@@ -428,6 +455,8 @@ video_domain_deserialize(struct video_domain const *__restrict __self,
 	(*(self)->vd_supported_codec)(self, codec)
 #define video_domain_newpalette(self, count) \
 	(*(self)->vd_newpalette)(self, count)
+#define video_domain_newpolygon(self, points, npoints) \
+	(*(self)->vd_newpolygon)(self, points, npoints)
 #ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
 #define video_domain_deserialize(self, io, proto) \
 	(*(self)->vd_deserialize)(self, io, proto)

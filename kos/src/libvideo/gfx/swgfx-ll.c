@@ -45,6 +45,7 @@ DECL_BEGIN
                                   xsws_line_h_,                                        \
                                   xsws_line_v_,                                        \
                                   xsws_fill_,                                          \
+                                  xsws_fillpoly_,                                      \
                                   xsws_gradient_,                                      \
                                   xsws_gradient_h_,                                    \
                                   xsws_gradient_v_)                                    \
@@ -55,6 +56,7 @@ DECL_BEGIN
 			name.xsws_gradient_h = xsws_gradient_h_;                                   \
 			name.xsws_gradient   = xsws_gradient_;                                     \
 			name.xsws_fill       = xsws_fill_;                                         \
+			name.xsws_fillpoly   = xsws_fillpoly_;                                     \
 			name.xsws_line_v     = xsws_line_v_;                                       \
 			name.xsws_line_h     = xsws_line_h_;                                       \
 			name.xsws_line_lhhl  = xsws_line_lhhl_;                                    \
@@ -71,6 +73,7 @@ DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__noblend,
                           libvideo_swgfx_noblend__line_h,
                           libvideo_swgfx_noblend__line_v,
                           libvideo_swgfx_noblend__fill,
+                          libvideo_swgfx_noblend__fillpoly,
                           libvideo_swgfx_generic__gradient,
                           libvideo_swgfx_generic__gradient_h,
                           libvideo_swgfx_generic__gradient_v);
@@ -80,6 +83,7 @@ DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__noblend_l,
                           libvideo_swgfx_noblend__line_h,
                           libvideo_swgfx_noblend__line_v,
                           libvideo_swgfx_noblend__fill,
+                          libvideo_swgfx_generic__fillpoly_l,
                           libvideo_swgfx_generic__gradient,
                           libvideo_swgfx_generic__gradient_h,
                           libvideo_swgfx_generic__gradient_v);
@@ -89,6 +93,7 @@ DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__noblend_interp8888,
                           libvideo_swgfx_noblend__line_h,
                           libvideo_swgfx_noblend__line_v,
                           libvideo_swgfx_noblend__fill,
+                          libvideo_swgfx_noblend__fillpoly,
                           libvideo_swgfx_noblend_interp8888__gradient,
                           libvideo_swgfx_noblend_interp8888__gradient_h,
                           libvideo_swgfx_noblend_interp8888__gradient_v);
@@ -98,6 +103,7 @@ DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__noblend_interp8888_l,
                           libvideo_swgfx_noblend__line_h,
                           libvideo_swgfx_noblend__line_v,
                           libvideo_swgfx_noblend__fill,
+                          libvideo_swgfx_generic__fillpoly_l,
                           libvideo_swgfx_noblend_interp8888__gradient,
                           libvideo_swgfx_noblend_interp8888__gradient_h,
                           libvideo_swgfx_noblend_interp8888__gradient_v);
@@ -109,6 +115,7 @@ DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__noblend_interp8888_l,
 	                          libvideo_swgfx_preblend__line_h__##name,                    \
 	                          libvideo_swgfx_preblend__line_v__##name,                    \
 	                          libvideo_swgfx_preblend__fill__##name,                      \
+	                          libvideo_swgfx_preblend__fillpoly__##name,                  \
 	                          libvideo_swgfx_preblend__gradient__##name,                  \
 	                          libvideo_swgfx_preblend__gradient_h__##name,                \
 	                          libvideo_swgfx_preblend__gradient_v__##name);               \
@@ -118,6 +125,7 @@ DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__noblend_interp8888_l,
 	                          libvideo_swgfx_preblend__line_h__##name,                    \
 	                          libvideo_swgfx_preblend__line_v__##name,                    \
 	                          libvideo_swgfx_preblend__fill__##name,                      \
+	                          libvideo_swgfx_preblend__fillpoly_l__##name,                \
 	                          libvideo_swgfx_preblend__gradient__##name,                  \
 	                          libvideo_swgfx_preblend__gradient_h__##name,                \
 	                          libvideo_swgfx_preblend__gradient_v__##name);
@@ -130,6 +138,7 @@ DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__generic,
                           libvideo_swgfx_generic__line_h,
                           libvideo_swgfx_generic__line_v,
                           libvideo_swgfx_generic__fill,
+                          libvideo_swgfx_generic__fillpoly,
                           libvideo_swgfx_generic__gradient,
                           libvideo_swgfx_generic__gradient_h,
                           libvideo_swgfx_generic__gradient_v);
@@ -139,6 +148,7 @@ DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__generic_l,
                           libvideo_swgfx_generic__line_h,
                           libvideo_swgfx_generic__line_v,
                           libvideo_swgfx_generic__fill,
+                          libvideo_swgfx_generic__fillpoly_l,
                           libvideo_swgfx_generic__gradient,
                           libvideo_swgfx_generic__gradient_h,
                           libvideo_swgfx_generic__gradient_v);

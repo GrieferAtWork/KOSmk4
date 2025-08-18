@@ -55,6 +55,12 @@ typedef __INT_FAST32_TYPE__ video_imatrix2d_t;
 #define VIDEO_IMATRIX2D_INIT(_00, _01, _10, _11)                                                    \
 	(((video_imatrix2d_t)(__UINT8_TYPE__)(_00)) | ((video_imatrix2d_t)(__UINT8_TYPE__)(_01) << 8) | \
 	 ((video_imatrix2d_t)(__UINT8_TYPE__)(_10) << 16) | ((video_imatrix2d_t)(__UINT8_TYPE__)(_11) << 24))
+#define _video_imatrix2d_xyswap(self)           \
+	((((self) & __UINT32_C(0x00ff00ff)) << 8) | \
+	 (((self) & __UINT32_C(0xff00ff00)) >> 8))
+#define video_imatrix2d_mapx(self, x, y) (((x) * video_imatrix2d_get(self, 0, 0)) + ((y) * video_imatrix2d_get(self, 0, 1)))
+#define video_imatrix2d_mapy(self, x, y) (((x) * video_imatrix2d_get(self, 1, 0)) + ((y) * video_imatrix2d_get(self, 1, 1)))
+
 #define video_imatrix2d_swap(self, y1, x1, y2, x2)                            \
 	do {                                                                      \
 		__INT_FAST8_TYPE__ _temp = video_imatrix2d_get(self, y1, x1);         \
@@ -333,6 +339,7 @@ struct blitter3_swdrv {
 /* SW-GFX                                                               */
 /************************************************************************/
 
+struct video_cpolygon;
 struct gfx_swdrv_shapeops {
 	/* Diagonal line from top-left -> bottom-right
 	 * LLHH -> Low Low High High
@@ -388,6 +395,24 @@ struct gfx_swdrv_shapeops {
 	                             video_coord_t __x, video_coord_t __y,
 	                             video_dim_t __size_x, video_dim_t __size_y,
 	                             video_color_t __color);
+
+	/* Fill  pixels covered by the given `__poly'. The caller is responsible
+	 * to ensure that coords are always in-bounds. Polygon coords are mapped
+	 * to buffer coords as follows:
+	 * >> video_coord_t poly_x = __poly->vcp_edges[*].vcpe_edge.vcl_p{1|2}.vcp_x;
+	 * >> video_coord_t poly_y = __poly->vcp_edges[*].vcpe_edge.vcl_p{1|2}.vcp_y;
+	 * >> video_coord_t buffer_x = __xoff + ((poly_x * video_imatrix2d_get(&__matrix, 0, 0)) +
+	 * >>                                    (poly_y * video_imatrix2d_get(&__matrix, 0, 1)));
+	 * >> video_coord_t buffer_y = __yoff + ((poly_x * video_imatrix2d_get(&__matrix, 1, 0)) +
+	 * >>                                    (poly_y * video_imatrix2d_get(&__matrix, 1, 1)));
+	 *
+	 * @param: __method: One of `VIDEO_GFX_FILLPOLY_METHOD_*' */
+	__ATTR_IN_T(1) __ATTR_NONNULL_T((4)) void
+	(LIBVIDEO_GFX_CC *xsws_fillpoly)(struct video_gfx const *__restrict __self,
+	                                 video_offset_t __xoff, video_offset_t __yoff,
+	                                 struct video_cpolygon *__restrict __poly,
+	                                 video_color_t __color, video_imatrix2d_t __matrix,
+	                                 unsigned int __method);
 
 	/* Same as `xsws_fill', but do  so via gradient with __colors[__y][__x]  being
 	 * used to essentially do a VIDEO_GFX_F_LINEAR stretch-blit into the specified
@@ -467,6 +492,7 @@ struct gfx_swdrv {
 #define _video_swgfx_x_line_h(self, x, y, length, color)                        (*video_swgfx_getcdrvshape(self)->xsws_line_h)(self, x, y, length, color)
 #define _video_swgfx_x_line_v(self, x, y, length, color)                        (*video_swgfx_getcdrvshape(self)->xsws_line_v)(self, x, y, length, color)
 #define _video_swgfx_x_fill(self, x, y, size_x, size_y, color)                  (*video_swgfx_getcdrvshape(self)->xsws_fill)(self, x, y, size_x, size_y, color)
+#define _video_swgfx_x_fillpoly(self, xoff, yoff, poly, color, matrix, method)  (*video_swgfx_getcdrvshape(self)->xsws_fillpoly)(self, xoff, yoff, poly, color, matrix, method)
 #define _video_swgfx_x_gradient(self, x, y, size_x, size_y, colors)             (*video_swgfx_getcdrvshape(self)->xsws_gradient)(self, x, y, size_x, size_y, colors)
 #define _video_swgfx_x_gradient_h(self, x, y, size_x, size_y, locolor, hicolor) (*video_swgfx_getcdrvshape(self)->xsws_gradient_h)(self, x, y, size_x, size_y, locolor, hicolor)
 #define _video_swgfx_x_gradient_v(self, x, y, size_x, size_y, locolor, hicolor) (*video_swgfx_getcdrvshape(self)->xsws_gradient_v)(self, x, y, size_x, size_y, locolor, hicolor)
@@ -481,6 +507,7 @@ struct gfx_swdrv {
 #define _video_swgfx_x_line_h_xyswap(self, x, y, length, color)                        _video_swgfx_x_line_h(self, y, x, length, color)
 #define _video_swgfx_x_line_v_xyswap(self, x, y, length, color)                        _video_swgfx_x_line_v(self, y, x, length, color)
 #define _video_swgfx_x_fill_xyswap(self, x, y, size_x, size_y, color)                  _video_swgfx_x_fill(self, y, x, size_y, size_x, color)
+#define _video_swgfx_x_fillpoly_xyswap(self, xoff, yoff, poly, color, matrix, method)  _video_swgfx_x_fillpoly(self, yoff, xoff, poly, color, _video_imatrix2d_xyswap(matrix), method)
 #define _video_swgfx_x_gradient_xyswap(self, x, y, size_x, size_y, colors)             _video_swgfx_x_gradient(self, y, x, size_y, size_x, colors)
 #define _video_swgfx_x_gradient_h_xyswap(self, x, y, size_x, size_y, locolor, hicolor) _video_swgfx_x_gradient_h(self, y, x, size_y, size_x, locolor, hicolor)
 #define _video_swgfx_x_gradient_v_xyswap(self, x, y, size_x, size_y, locolor, hicolor) _video_swgfx_x_gradient_v(self, y, x, size_y, size_x, locolor, hicolor)

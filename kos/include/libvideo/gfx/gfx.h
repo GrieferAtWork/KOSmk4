@@ -61,6 +61,12 @@
 	 VIDEO_GFX_UPDATE_COLORKEY | \
 	 VIDEO_GFX_UPDATE_PALETTE)
 
+
+/* Possible values for `video_gfx_fillpoly()::method' */
+#define VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD 0 /* Fill pixels of self-intersecting polygons where "(N_EDGES & 1) != 0" */
+#define VIDEO_GFX_FILLPOLY_METHOD_NON_ZERO 1 /* Fill pixels of self-intersecting polygons where "N_EDGES > 0" */
+#define VIDEO_GFX_FILLPOLY_METHOD_COUNT    2 /* # of polygon fill methods */
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -72,6 +78,7 @@ struct video_crect;
 struct video_blitter;
 struct video_blitter3;
 struct video_regionlock;
+struct video_polygon;
 
 struct video_blitter_ops {
 	/* Blit the contents of another video buffer into this one. */
@@ -228,6 +235,13 @@ struct video_gfx_ops {
 	                             video_offset_t __x, video_offset_t __y,
 	                             video_dim_t __size_x, video_dim_t __size_y,
 	                             video_color_t __color);
+
+	/* Fill an area described by a polygon with a solid color. */
+	__ATTR_IN_T(1) __ATTR_NONNULL((4)) void
+	(LIBVIDEO_GFX_CC *vgfo_fillpoly)(struct video_gfx const *__restrict __self,
+	                                 video_offset_t __x, video_offset_t __y,
+	                                 struct video_polygon *__restrict __poly,
+	                                 video_color_t __color, unsigned int __method);
 
 	/* Outline an area with a rectangle. */
 	__ATTR_IN_T(1) void
@@ -859,6 +873,20 @@ video_gfx_fill(struct video_gfx const *__restrict __self,
                video_dim_t __size_x, video_dim_t __size_y,
                video_color_t __color);
 
+/* Fill an area described by a polygon with a solid color. */
+extern __ATTR_IN(1) __ATTR_NONNULL((4)) void
+video_gfx_fillpoly(struct video_gfx const *__restrict __self,
+                   video_offset_t __x, video_offset_t __y,
+                   struct video_polygon *__restrict __poly,
+                   video_color_t __color, unsigned int __method);
+
+/* Fill an area with a solid color. */
+extern __ATTR_IN(1) void
+video_gfx_fill(struct video_gfx const *__restrict __self,
+               video_offset_t __x, video_offset_t __y,
+               video_dim_t __size_x, video_dim_t __size_y,
+               video_color_t __color);
+
 /* Fill the entire clip-area with a solid color. */
 extern __ATTR_IN(1) void
 video_gfx_fillall(struct video_gfx const *__restrict __self,
@@ -1147,6 +1175,8 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 	(*(self)->vg_clip.vgc_ops->vgfo_vline)(self, x, y, length, color)
 #define video_gfx_fill(self, x, y, size_x, size_y, color) \
 	(*(self)->vg_clip.vgc_ops->vgfo_fill)(self, x, y, size_x, size_y, color)
+#define video_gfx_fillpoly(self, x, y, poly, color, method) \
+	(*(self)->vg_clip.vgc_ops->vgfo_fillpoly)(self, x, y, poly, color, method)
 #define video_gfx_fillall(self, color) \
 	video_gfx_fill(self, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX, color)
 #define video_gfx_rect(self, x, y, size_x, size_y, color) \

@@ -71,6 +71,8 @@ DECL_BEGIN
 #define video_swgfx_x_fill(self, x, y, size_x, size_y, color) \
 	(gfx_assert_absbounds_sxy(self, x, y, size_x, size_y),    \
 	 _video_swgfx_x_fill(self, x, y, size_x, size_y, color))
+#define video_swgfx_x_fillpoly(self, xoff, yoff, poly, color, matrix, method) \
+	_video_swgfx_x_fillpoly(self, xoff, yoff, poly, color, matrix, method)
 #define video_swgfx_x_gradient(self, x, y, size_x, size_y, colors) \
 	(gfx_assert_absbounds_sxy(self, x, y, size_x, size_y),         \
 	 _video_swgfx_x_gradient(self, x, y, size_x, size_y, colors))
@@ -112,6 +114,8 @@ DECL_BEGIN
 #define video_swgfx_x_fill_xyswap(self, x, y, size_x, size_y, color) \
 	(gfx_assert_absbounds_sxy(self, x, y, size_x, size_y),           \
 	 _video_swgfx_x_fill_xyswap(self, x, y, size_x, size_y, color))
+#define video_swgfx_x_fillpoly_xyswap(self, xoff, yoff, poly, color, matrix, method) \
+	_video_swgfx_x_fillpoly_xyswap(self, xoff, yoff, poly, color, matrix, method)
 #define video_swgfx_x_gradient_xyswap(self, x, y, size_x, size_y, colors) \
 	(gfx_assert_absbounds_sxy(self, x, y, size_x, size_y),                \
 	 _video_swgfx_x_gradient_xyswap(self, x, y, size_x, size_y, colors))
@@ -196,6 +200,8 @@ INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__line_lhhl_l(struct video_gfx c
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__line_h(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__line_v(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__fill(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) NONNULL((4)) void CC libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self, video_offset_t xoff, video_offset_t yoff, struct video_cpolygon *__restrict poly, video_color_t color, video_imatrix2d_t matrix, unsigned int method);
+INTDEF ATTR_IN(1) NONNULL((4)) void CC libvideo_swgfx_generic__fillpoly_l(struct video_gfx const *__restrict self, video_offset_t xoff, video_offset_t yoff, struct video_cpolygon *__restrict poly, video_color_t color, video_imatrix2d_t matrix, unsigned int method);
 INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_swgfx_generic__gradient(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__gradient_h(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__gradient_v(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
@@ -208,6 +214,7 @@ INTDEF ATTR_IN(1) void CC libvideo_swgfx_noblend__line_lhhl(struct video_gfx con
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_noblend__line_h(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_noblend__line_v(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_noblend__fill(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+#define libvideo_swgfx_noblend__fillpoly libvideo_swgfx_generic__fillpoly /* TODO */
 INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_swgfx_noblend_interp8888__gradient(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_noblend_interp8888__gradient_h(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_noblend_interp8888__gradient_v(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
@@ -221,6 +228,8 @@ INTDEF ATTR_IN(1) void CC libvideo_swgfx_noblend_interp8888__gradient_v(struct v
 	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__line_h__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);                                                  \
 	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__line_v__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);                                                  \
 	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__fill__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);                                \
+	INTDEF ATTR_IN(1) NONNULL((4)) void CC libvideo_swgfx_preblend__fillpoly__##name(struct video_gfx const *__restrict self, video_offset_t xoff, video_offset_t yoff, struct video_cpolygon *__restrict poly, video_color_t color, video_imatrix2d_t matrix, unsigned int method); \
+	INTDEF ATTR_IN(1) NONNULL((4)) void CC libvideo_swgfx_preblend__fillpoly_l__##name(struct video_gfx const *__restrict self, video_offset_t xoff, video_offset_t yoff, struct video_cpolygon *__restrict poly, video_color_t color, video_imatrix2d_t matrix, unsigned int method); \
 	INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_swgfx_preblend__gradient__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);    \
 	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__gradient_h__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor); \
 	INTDEF ATTR_IN(1) void CC libvideo_swgfx_preblend__gradient_v__##name(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
@@ -379,6 +388,12 @@ INTDEF ATTR_IN(1) void CC libvideo_swgfx_fill_wrap(struct video_gfx const *__res
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_fill_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_fill_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_fill_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) NONNULL((4)) void CC libvideo_swgfx_fillpoly(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, struct video_polygon *__restrict poly, video_color_t color, unsigned int method);
+INTDEF ATTR_IN(1) NONNULL((4)) void CC libvideo_swgfx_fillpoly_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, struct video_polygon *__restrict poly, video_color_t color, unsigned int method);
+INTDEF ATTR_IN(1) NONNULL((4)) void CC libvideo_swgfx_fillpoly_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, struct video_polygon *__restrict poly, video_color_t color, unsigned int method);
+INTDEF ATTR_IN(1) NONNULL((4)) void CC libvideo_swgfx_fillpoly_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, struct video_polygon *__restrict poly, video_color_t color, unsigned int method);
+INTDEF ATTR_IN(1) NONNULL((4)) void CC libvideo_swgfx_fillpoly_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, struct video_polygon *__restrict poly, video_color_t color, unsigned int method);
+INTDEF ATTR_IN(1) NONNULL((4)) void CC libvideo_swgfx_fillpoly_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, struct video_polygon *__restrict poly, video_color_t color, unsigned int method);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_rect(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_rect_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_rect_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);

@@ -40,6 +40,7 @@
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/blendcolors.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/gfx/swgfx.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 

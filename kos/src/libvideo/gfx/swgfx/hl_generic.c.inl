@@ -36,6 +36,7 @@
 
 #include <libvideo/color.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/polygon.h>
 #include <libvideo/types.h>
 
 #include "../gfx-debug.h"
@@ -74,6 +75,9 @@ DECL_BEGIN
 #define LOCAL_libvideo_swgfx_fill             LOCAL_FUNC(libvideo_swgfx_fill)
 #define LOCAL_libvideo_swgfx_fill_wrap        LOCAL_FUNC(libvideo_swgfx_fill_wrap)
 #define LOCAL_libvideo_swgfx_fill_mirror      LOCAL_FUNC(libvideo_swgfx_fill_mirror)
+#define LOCAL_libvideo_swgfx_fillpoly         LOCAL_FUNC(libvideo_swgfx_fillpoly)
+#define LOCAL_libvideo_swgfx_fillpoly_wrap    LOCAL_FUNC(libvideo_swgfx_fillpoly_wrap)
+#define LOCAL_libvideo_swgfx_fillpoly_mirror  LOCAL_FUNC(libvideo_swgfx_fillpoly_mirror)
 #define LOCAL_libvideo_swgfx_rect             LOCAL_FUNC(libvideo_swgfx_rect)
 #define LOCAL_libvideo_swgfx_rect_wrap        LOCAL_FUNC(libvideo_swgfx_rect_wrap)
 #define LOCAL_libvideo_swgfx_rect_mirror      LOCAL_FUNC(libvideo_swgfx_rect_mirror)
@@ -96,6 +100,7 @@ DECL_BEGIN
 #define LOCAL__video_swgfx_x_line_h     LOCAL_FUNC(_video_swgfx_x_line_h)
 #define LOCAL__video_swgfx_x_line_v     LOCAL_FUNC(_video_swgfx_x_line_v)
 #define LOCAL__video_swgfx_x_fill       LOCAL_FUNC(_video_swgfx_x_fill)
+#define LOCAL__video_swgfx_x_fillpoly   LOCAL_FUNC(_video_swgfx_x_fillpoly)
 #define LOCAL__video_swgfx_x_gradient   LOCAL_FUNC(_video_swgfx_x_gradient)
 #define LOCAL__video_swgfx_x_gradient_h LOCAL_FUNC(_video_swgfx_x_gradient_h)
 #define LOCAL__video_swgfx_x_gradient_v LOCAL_FUNC(_video_swgfx_x_gradient_v)
@@ -109,6 +114,7 @@ DECL_BEGIN
 #define LOCAL_video_swgfx_x_line_h     LOCAL_FUNC(video_swgfx_x_line_h)
 #define LOCAL_video_swgfx_x_line_v     LOCAL_FUNC(video_swgfx_x_line_v)
 #define LOCAL_video_swgfx_x_fill       LOCAL_FUNC(video_swgfx_x_fill)
+#define LOCAL_video_swgfx_x_fillpoly   LOCAL_FUNC(video_swgfx_x_fillpoly)
 #define LOCAL_video_swgfx_x_gradient   LOCAL_FUNC(video_swgfx_x_gradient)
 #define LOCAL_video_swgfx_x_gradient_h LOCAL_FUNC(video_swgfx_x_gradient_h)
 #define LOCAL_video_swgfx_x_gradient_v LOCAL_FUNC(video_swgfx_x_gradient_v)
@@ -548,6 +554,105 @@ LOCAL_libvideo_swgfx_fill_mirror(struct video_gfx const *__restrict self,
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
 		y = (self->vg_clip.vgc_cydim - size_y) - y;
 	LOCAL_libvideo_swgfx_fill_wrap(self, x, y, size_x, size_y, color);
+}
+
+
+
+/************************************************************************/
+/* FILLPOLY()                                                           */
+/************************************************************************/
+INTERN ATTR_IN(1) void CC
+LOCAL_libvideo_swgfx_fillpoly(struct video_gfx const *__restrict self,
+                              video_offset_t x, video_offset_t y,
+                              struct video_polygon *__restrict poly,
+                              video_color_t color, unsigned int method) {
+//	video_coord_t temp;
+	x += self->vg_clip.vgc_cxoff;
+	y += self->vg_clip.vgc_cyoff;
+#if 0 /* TODO */
+	if unlikely(x < (video_offset_t)GFX_BXMIN) {
+		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BXMIN - x);
+		if unlikely(size_x <= off)
+			return;
+		size_x -= off;
+		x = (video_offset_t)GFX_BXMIN;
+	}
+	if unlikely(y < (video_offset_t)GFX_BYMIN) {
+		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BYMIN - y);
+		if unlikely(size_y <= off)
+			return;
+		size_y -= off;
+		y = (video_offset_t)GFX_BYMIN;
+	}
+	if unlikely(OVERFLOW_UADD((video_coord_t)x, size_x, &temp) || temp > GFX_BXEND) {
+		if unlikely((video_coord_t)x >= GFX_BXEND)
+			return;
+		size_x = GFX_BXEND - (video_coord_t)x;
+	}
+	if unlikely(OVERFLOW_UADD((video_coord_t)y, size_y, &temp) || temp > GFX_BYEND) {
+		if unlikely((video_coord_t)y >= GFX_BYEND)
+			return;
+		size_y = GFX_BYEND - (video_coord_t)y;
+	}
+#endif
+	LOCAL_video_swgfx_x_fillpoly(self, x, y, video_polygon_ascpoly(poly), color,
+	                             VIDEO_IMATRIX2D_INIT(1, 0, 0, 1), method);
+}
+
+INTERN ATTR_IN(1) NONNULL((4)) void CC
+LOCAL_libvideo_swgfx_fillpoly_wrap(struct video_gfx const *__restrict self,
+                                   video_offset_t x, video_offset_t y,
+                                   struct video_polygon *__restrict poly,
+                                   video_color_t color, unsigned int method) {
+#if 0 /* TODO */
+	video_dim_t xwrap = 0;
+	video_dim_t ywrap = 0;
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
+		video_coord_t cxend;
+		x = wrap(x, self->vg_clip.vgc_cxdim);
+		if (OVERFLOW_UADD((video_coord_t)x, size_x, &cxend) || size_x >= self->vg_clip.vgc_cxdim) {
+			x = 0;
+			size_x = self->vg_clip.vgc_cxdim;
+		} else {
+			/* # of pixels that go beyond the right clip-edge */
+			if (OVERFLOW_USUB(cxend, self->vg_clip.vgc_cxdim, &xwrap))
+				xwrap = 0;
+		}
+	}
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
+		video_coord_t cyend;
+		y = wrap(y, self->vg_clip.vgc_cydim);
+		if (OVERFLOW_UADD((video_coord_t)y, size_y, &cyend) || size_y >= self->vg_clip.vgc_cydim) {
+			y = 0;
+			size_y = self->vg_clip.vgc_cydim;
+		} else {
+			/* # of pixels that go beyond the bottom clip-edge */
+			if (OVERFLOW_USUB(cyend, self->vg_clip.vgc_cydim, &ywrap))
+				ywrap = 0;
+		}
+	}
+	if (xwrap && ywrap) /* Must do a partial fill at the top-left */
+		LOCAL_libvideo_swgfx_fillpoly(self, 0, 0, xwrap, ywrap, color);
+	if (xwrap) /* Must do a partial fill at the left */
+		LOCAL_libvideo_swgfx_fillpoly(self, 0, y, xwrap, size_y, color);
+	if (ywrap) /* Must do a partial fill at the top */
+		LOCAL_libvideo_swgfx_fillpoly(self, x, 0, size_x, ywrap, color);
+#endif
+	LOCAL_libvideo_swgfx_fillpoly(self, x, y, poly, color, method);
+}
+
+INTERN ATTR_IN(1) void CC
+LOCAL_libvideo_swgfx_fillpoly_mirror(struct video_gfx const *__restrict self,
+                                     video_offset_t x, video_offset_t y,
+                                     struct video_polygon *__restrict poly,
+                                     video_color_t color, unsigned int method) {
+#if 0 /* TODO */
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
+		x = (self->vg_clip.vgc_cxdim - size_x) - x;
+	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
+		y = (self->vg_clip.vgc_cydim - size_y) - y;
+#endif
+	LOCAL_libvideo_swgfx_fillpoly_wrap(self, x, y, poly, color, method);
 }
 
 
@@ -1218,6 +1323,7 @@ LOCAL__libvideo_swgfx_ops(void) {
 		LOCAL_libvideo_swgfx_ops.vgfo_gradient  = &LOCAL_libvideo_swgfx_gradient;
 		LOCAL_libvideo_swgfx_ops.vgfo_rect      = &LOCAL_libvideo_swgfx_rect;
 		LOCAL_libvideo_swgfx_ops.vgfo_fill      = &LOCAL_libvideo_swgfx_fill;
+		LOCAL_libvideo_swgfx_ops.vgfo_fillpoly  = &LOCAL_libvideo_swgfx_fillpoly;
 		LOCAL_libvideo_swgfx_ops.vgfo_vline     = &LOCAL_libvideo_swgfx_vline;
 		LOCAL_libvideo_swgfx_ops.vgfo_hline     = &LOCAL_libvideo_swgfx_hline;
 		LOCAL_libvideo_swgfx_ops.vgfo_line      = &LOCAL_libvideo_swgfx_line;
@@ -1238,6 +1344,7 @@ LOCAL__libvideo_swgfx_ops_wrap(void) {
 		LOCAL_libvideo_swgfx_ops_wrap.vgfo_gradient  = &LOCAL_libvideo_swgfx_gradient_wrap;
 		LOCAL_libvideo_swgfx_ops_wrap.vgfo_rect      = &LOCAL_libvideo_swgfx_rect_wrap;
 		LOCAL_libvideo_swgfx_ops_wrap.vgfo_fill      = &LOCAL_libvideo_swgfx_fill_wrap;
+		LOCAL_libvideo_swgfx_ops_wrap.vgfo_fillpoly  = &LOCAL_libvideo_swgfx_fillpoly_wrap;
 		LOCAL_libvideo_swgfx_ops_wrap.vgfo_vline     = &LOCAL_libvideo_swgfx_vline_wrap;
 		LOCAL_libvideo_swgfx_ops_wrap.vgfo_hline     = &LOCAL_libvideo_swgfx_hline_wrap;
 		LOCAL_libvideo_swgfx_ops_wrap.vgfo_line      = &LOCAL_libvideo_swgfx_line_wrap;
@@ -1258,6 +1365,7 @@ LOCAL__libvideo_swgfx_ops_mirror(void) {
 		LOCAL_libvideo_swgfx_ops_mirror.vgfo_gradient  = &LOCAL_libvideo_swgfx_gradient_mirror;
 		LOCAL_libvideo_swgfx_ops_mirror.vgfo_rect      = &LOCAL_libvideo_swgfx_rect_mirror;
 		LOCAL_libvideo_swgfx_ops_mirror.vgfo_fill      = &LOCAL_libvideo_swgfx_fill_mirror;
+		LOCAL_libvideo_swgfx_ops_mirror.vgfo_fillpoly  = &LOCAL_libvideo_swgfx_fillpoly_mirror;
 		LOCAL_libvideo_swgfx_ops_mirror.vgfo_vline     = &LOCAL_libvideo_swgfx_vline_mirror;
 		LOCAL_libvideo_swgfx_ops_mirror.vgfo_hline     = &LOCAL_libvideo_swgfx_hline_mirror;
 		LOCAL_libvideo_swgfx_ops_mirror.vgfo_line      = &LOCAL_libvideo_swgfx_line_mirror;
@@ -1293,6 +1401,9 @@ LOCAL__libvideo_swgfx_ops_mirror(void) {
 #undef LOCAL_libvideo_swgfx_fill
 #undef LOCAL_libvideo_swgfx_fill_wrap
 #undef LOCAL_libvideo_swgfx_fill_mirror
+#undef LOCAL_libvideo_swgfx_fillpoly
+#undef LOCAL_libvideo_swgfx_fillpoly_wrap
+#undef LOCAL_libvideo_swgfx_fillpoly_mirror
 #undef LOCAL_libvideo_swgfx_rect
 #undef LOCAL_libvideo_swgfx_rect_wrap
 #undef LOCAL_libvideo_swgfx_rect_mirror
@@ -1315,6 +1426,7 @@ LOCAL__libvideo_swgfx_ops_mirror(void) {
 #undef LOCAL__video_swgfx_x_line_h
 #undef LOCAL__video_swgfx_x_line_v
 #undef LOCAL__video_swgfx_x_fill
+#undef LOCAL__video_swgfx_x_fillpoly
 #undef LOCAL__video_swgfx_x_gradient
 #undef LOCAL__video_swgfx_x_gradient_h
 #undef LOCAL__video_swgfx_x_gradient_v
@@ -1328,6 +1440,7 @@ LOCAL__libvideo_swgfx_ops_mirror(void) {
 #undef LOCAL_video_swgfx_x_line_h
 #undef LOCAL_video_swgfx_x_line_v
 #undef LOCAL_video_swgfx_x_fill
+#undef LOCAL_video_swgfx_x_fillpoly
 #undef LOCAL_video_swgfx_x_gradient
 #undef LOCAL_video_swgfx_x_gradient_h
 #undef LOCAL_video_swgfx_x_gradient_v

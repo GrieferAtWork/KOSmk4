@@ -50,6 +50,7 @@
 #include "buffer.h"
 #include "buffer/empty.h"
 #include "codec/palette.h"
+#include "polygon.h"
 #include "ramdomain.h"
 #include "serial.h"
 
@@ -331,6 +332,7 @@ INTERN /*ATTR_CONST*/ ATTR_RETNONNULL WUNUSED
 struct video_domain const *CC _libvideo_ramdomain(void) {
 	if unlikely(!libvideo_ramdomain.vd_newbuffer) {
 		libvideo_ramdomain.vd_newpalette      = &libvideo_generic_palette_create;
+		libvideo_ramdomain.vd_newpolygon      = &libvideo_generic_polygon_create;
 		libvideo_ramdomain.vd_supported_codec = &libvideo_ramdomain_supported_codec;
 		libvideo_ramdomain.vd_formem          = &libvideo_ramdomain_formem;
 #ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION

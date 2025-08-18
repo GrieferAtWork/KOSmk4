@@ -48,7 +48,9 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/polygon.h>
 #include <libvideo/gfx/surface.h>
+#include <libvideo/point.h>
 #include <libvideo/rect.h>
 
 DECL_BEGIN
@@ -199,14 +201,16 @@ again_font:
 		goto again_font;
 	}
 
+#if 0
 	fcntl(STDIN_FILENO, F_SETFL,
 	      fcntl(STDIN_FILENO, F_GETFL) |
 	      O_NONBLOCK);
+#endif
 
-	gfx.clip(-16,
+	/*gfx.clip(-16,
 	         -16,
 	         video_gfx_getxdim(&gfx) + 32,
-	         video_gfx_getydim(&gfx) + 32);
+	         video_gfx_getydim(&gfx) + 32);*/
 
 	for (;;) {
 		unsigned int action;
@@ -291,7 +295,7 @@ again_font:
 		if (is_blocking)
 			continue;
 random_step:
-		action = rand() % 8;
+		action = rand() % 7;
 step:
 		color = rand_color();
 		switch (action) {
@@ -355,6 +359,31 @@ step:
 			video_color_t locolor = rand_color();
 			video_color_t hicolor = rand_color();
 			gfx.vgradient(x, y, size_x, size_y, locolor, hicolor);
+		}	break;
+
+		case 6: {
+			static const struct video_point points[] = {
+				VIDEO_POINT_INIT(0, 100),
+				VIDEO_POINT_INIT(200, 0),
+				VIDEO_POINT_INIT(250, 300),
+				VIDEO_POINT_INIT(400, 200),
+				VIDEO_POINT_INIT(500, 400),
+				VIDEO_POINT_INIT(400, 500),
+				VIDEO_POINT_INIT(50, 300),
+				VIDEO_POINT_INIT(150, 80),
+			};
+			REF struct video_polygon *poly;
+			poly = video_domain_newpolygon(video_gfx_getdomain(&gfx),
+			                               points, lengthof(points));
+			if likely(poly) {
+				video_gfx_fillpoly(&gfx,
+				                   rand() % (video_gfx_getxdim(&gfx) - poly->vp_xend),
+				                   rand() % (video_gfx_getydim(&gfx) - poly->vp_yend),
+				                   poly, color,
+								   VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD
+								   /*rand() % VIDEO_GFX_FILLPOLY_METHOD_COUNT*/);
+				video_polygon_decref(poly);
+			}
 		}	break;
 
 		default:
