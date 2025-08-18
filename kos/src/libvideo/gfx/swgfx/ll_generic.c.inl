@@ -35,6 +35,8 @@
 
 #include <inttypes.h>
 #include <stddef.h>
+#include <math.h>
+#include <stdlib.h>
 #include <stdint.h>
 
 #include <libvideo/color.h>
@@ -212,8 +214,8 @@ libvideo_swgfx_generic__line_llhh_l(struct video_gfx const *__restrict self,
 	            "color: %#" PRIxCOL ")\n",
 	            dst_x, dst_y, size_x, size_y, color);
 	if (size_x > size_y) {
-		sstretch_fp_t fp_start;
-		stretch_fp_t fp_step;
+		video_foffset_t fp_start;
+		video_fcoord_t fp_step;
 		video_dim_t pad_min;
 		video_dim_t pad_max;
 		calc_linear_stretch_dim(size_y, size_x, &fp_start,
@@ -227,7 +229,7 @@ libvideo_swgfx_generic__line_llhh_l(struct video_gfx const *__restrict self,
 		for (size_x -= pad_max; size_x; --size_x, ++dst_x, fp_start += fp_step) {
 			linear_fp_blend_t frac_y0 = STRETCH_FP_BLEND_FRAC(fp_start);
 			linear_fp_blend_t frac_y1 = LINEAR_FP_BLEND(1) - frac_y0;
-			video_coord_t dst_y0 = dst_y + STRETCH_FP_WHOLE(fp_start);
+			video_coord_t dst_y0 = dst_y + VIDEO_FCOORD_WHOLE(fp_start);
 			video_coord_t dst_y1 = dst_y0 + 1;
 			video_color_t cy0 = LL_getcolor(self, dst_x, dst_y0);
 			video_color_t cy1 = LL_getcolor(self, dst_x, dst_y1);
@@ -239,8 +241,8 @@ libvideo_swgfx_generic__line_llhh_l(struct video_gfx const *__restrict self,
 		if (pad_max)
 			libvideo_swgfx_generic__line_h(self, dst_x, dst_y + (size_y - 1), pad_max, color);
 	} else if (size_x < size_y) {
-		sstretch_fp_t fp_start;
-		stretch_fp_t fp_step;
+		video_foffset_t fp_start;
+		video_fcoord_t fp_step;
 		video_dim_t pad_min;
 		video_dim_t pad_max;
 		calc_linear_stretch_dim(size_x, size_y, &fp_start,
@@ -254,7 +256,7 @@ libvideo_swgfx_generic__line_llhh_l(struct video_gfx const *__restrict self,
 		for (size_y -= pad_max; size_y; --size_y, ++dst_y, fp_start += fp_step) {
 			linear_fp_blend_t frac_x0 = STRETCH_FP_BLEND_FRAC(fp_start);
 			linear_fp_blend_t frac_x1 = LINEAR_FP_BLEND(1) - frac_x0;
-			video_coord_t dst_x0 = dst_x + STRETCH_FP_WHOLE(fp_start);
+			video_coord_t dst_x0 = dst_x + VIDEO_FCOORD_WHOLE(fp_start);
 			video_coord_t dst_x1 = dst_x0 + 1;
 			video_color_t cx0 = LL_getcolor(self, dst_x0, dst_y);
 			video_color_t cx1 = LL_getcolor(self, dst_x1, dst_y);
@@ -286,8 +288,8 @@ libvideo_swgfx_generic__line_lhhl_l(struct video_gfx const *__restrict self,
 	            "color: %#" PRIxCOL ")\n",
 	            dst_x, dst_y, size_x, size_y, color);
 	if (size_x > size_y) {
-		sstretch_fp_t fp_start;
-		stretch_fp_t fp_step;
+		video_foffset_t fp_start;
+		video_fcoord_t fp_step;
 		video_dim_t pad_min;
 		video_dim_t pad_max;
 		calc_linear_stretch_dim(size_y, size_x, &fp_start,
@@ -301,7 +303,7 @@ libvideo_swgfx_generic__line_lhhl_l(struct video_gfx const *__restrict self,
 		for (size_x -= pad_max; size_x; --size_x, ++dst_x, fp_start += fp_step) {
 			linear_fp_blend_t frac_y0 = STRETCH_FP_BLEND_FRAC(fp_start);
 			linear_fp_blend_t frac_y1 = LINEAR_FP_BLEND(1) - frac_y0;
-			video_coord_t dst_y0 = dst_y - STRETCH_FP_WHOLE(fp_start);
+			video_coord_t dst_y0 = dst_y - VIDEO_FCOORD_WHOLE(fp_start);
 			video_coord_t dst_y1 = dst_y0 - 1;
 			video_color_t cy0 = LL_getcolor(self, dst_x, dst_y0);
 			video_color_t cy1 = LL_getcolor(self, dst_x, dst_y1);
@@ -313,8 +315,8 @@ libvideo_swgfx_generic__line_lhhl_l(struct video_gfx const *__restrict self,
 		if (pad_max)
 			libvideo_swgfx_generic__line_h(self, dst_x, dst_y - (size_y - 1), pad_max, color);
 	} else if (size_x < size_y) {
-		sstretch_fp_t fp_start;
-		stretch_fp_t fp_step;
+		video_foffset_t fp_start;
+		video_fcoord_t fp_step;
 		video_dim_t pad_min;
 		video_dim_t pad_max;
 		calc_linear_stretch_dim(size_x, size_y, &fp_start,
@@ -328,7 +330,7 @@ libvideo_swgfx_generic__line_lhhl_l(struct video_gfx const *__restrict self,
 		for (size_y -= pad_max; size_y; --size_y, --dst_y, fp_start += fp_step) {
 			linear_fp_blend_t frac_x0 = STRETCH_FP_BLEND_FRAC(fp_start);
 			linear_fp_blend_t frac_x1 = LINEAR_FP_BLEND(1) - frac_x0;
-			video_coord_t dst_x0 = dst_x + STRETCH_FP_WHOLE(fp_start);
+			video_coord_t dst_x0 = dst_x + VIDEO_FCOORD_WHOLE(fp_start);
 			video_coord_t dst_x1 = dst_x0 + 1;
 			video_color_t cx0 = LL_getcolor(self, dst_x0, dst_y);
 			video_color_t cx1 = LL_getcolor(self, dst_x1, dst_y);
@@ -474,8 +476,8 @@ libvideo_swgfx_generic__gradient_h(struct video_gfx const *__restrict self,
                                    video_dim_t size_x, video_dim_t size_y,
                                    video_color_t locolor, video_color_t hicolor) {
 	video_dim_t pad_xmin, pad_xmax;
-	sstretch_fp_t fp_src_x;
-	stretch_fp_t fp_step_x;
+	video_foffset_t fp_src_x;
+	video_fcoord_t fp_step_x;
 
 	/* Check for special case: not actually a gradient */
 	if (locolor == hicolor) {
@@ -514,8 +516,8 @@ libvideo_swgfx_generic__gradient_v(struct video_gfx const *__restrict self,
                                    video_dim_t size_x, video_dim_t size_y,
                                    video_color_t locolor, video_color_t hicolor) {
 	video_dim_t pad_ymin, pad_ymax;
-	sstretch_fp_t fp_src_y;
-	stretch_fp_t fp_step_y;
+	video_foffset_t fp_src_y;
+	video_fcoord_t fp_step_y;
 
 	/* Check for special case: not actually a gradient */
 	if (locolor == hicolor) {

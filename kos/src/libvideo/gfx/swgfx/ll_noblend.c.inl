@@ -531,7 +531,7 @@ libvideo_swgfx_noblend_interp8888__gradient_h__bypixel(struct video_gfx const *_
                                                        video_dim_t size_x, video_dim_t size_y,
                                                        video_pixel_t lopixel, video_pixel_t hipixel,
                                                        video_dim_t pad_xmin, video_dim_t pad_xmax,
-                                                       sstretch_fp_t fp_src_x, stretch_fp_t fp_step_x) {
+                                                       video_foffset_t fp_src_x, video_fcoord_t fp_step_x) {
 	if (pad_xmin) {
 		libvideo_swgfx_noblend__fill__bypixel(self, dst_x, dst_y, pad_xmin, size_y, lopixel);
 		dst_x += pad_xmin;
@@ -557,8 +557,8 @@ libvideo_swgfx_noblend_interp8888__gradient_h(struct video_gfx const *__restrict
                                               video_color_t locolor, video_color_t hicolor) {
 	struct video_regionlock lock;
 	video_dim_t pad_xmin, pad_xmax;
-	sstretch_fp_t fp_src_x;
-	stretch_fp_t fp_step_x;
+	video_foffset_t fp_src_x;
+	video_fcoord_t fp_step_x;
 	struct video_surface const *surface;
 	struct video_buffer *buffer;
 	video_pixel_t lopixel;
@@ -620,7 +620,7 @@ libvideo_swgfx_noblend_interp8888__gradient_v__bypixel(struct video_gfx const *_
                                                        video_dim_t size_x, video_dim_t size_y,
                                                        video_pixel_t lopixel, video_pixel_t hipixel,
                                                        video_dim_t pad_ymin, video_dim_t pad_ymax,
-                                                       sstretch_fp_t fp_src_y, stretch_fp_t fp_step_y) {
+                                                       video_foffset_t fp_src_y, video_fcoord_t fp_step_y) {
 	if (pad_ymin) {
 		libvideo_swgfx_noblend__fill__bypixel(self, dst_x, dst_y, size_x, pad_ymin, lopixel);
 		dst_y += pad_ymin;
@@ -646,8 +646,8 @@ libvideo_swgfx_noblend_interp8888__gradient_v(struct video_gfx const *__restrict
                                               video_color_t locolor, video_color_t hicolor) {
 	struct video_regionlock lock;
 	video_dim_t pad_ymin, pad_ymax;
-	sstretch_fp_t fp_src_y;
-	stretch_fp_t fp_step_y;
+	video_foffset_t fp_src_y;
+	video_fcoord_t fp_step_y;
 	struct video_surface const *surface;
 	struct video_buffer *buffer;
 	video_pixel_t lopixel;

@@ -36,6 +36,7 @@
 #include <stdint.h>
 
 #include <libvideo/color.h>
+#include <libvideo/float.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/blendcolors.h>
 #include <libvideo/gfx/gfx.h>
@@ -295,28 +296,14 @@ libvideo_gfx_allow_noblend_blit3(struct video_gfx const *wrdst,
 /************************************************************************/
 /* LINEAR BLITTING HELPERS                                              */
 /************************************************************************/
-
-/* # of bits to use for the fractional part of the fixed-
- * point  numbers used during nearest stretch operations. */
-#define STRETCH_FP_NFRAC 16
-typedef uint_fast64_t stretch_fp_t;      /* uint_fast{BITSOF(video_coord_t) + STRETCH_FP_NFRAC}_t */
-typedef int_fast64_t sstretch_fp_t;      /* int_fast{BITSOF(video_coord_t) + STRETCH_FP_NFRAC}_t */
-typedef uint_fast16_t stretch_fp_frac_t; /* uint_fast{STRETCH_FP_NFRAC}_t */
-#define STRETCH_FP(whole)    ((stretch_fp_t)(whole) << STRETCH_FP_NFRAC)
-#define STRETCH_FP_WHOLE(fp) ((video_coord_t)(fp) >> STRETCH_FP_NFRAC)
-#define STRETCH_FP_FRAC(fp)  ((stretch_fp_frac_t)(fp) & (stretch_fp_frac_t)(STRETCH_FP(1) - 1))
-
-
-
-
 typedef video_channel_t channel_t;
 typedef video_twochannels_t twochannels_t;
 #define CHANNEL_MIN VIDEO_CHANNEL_MIN
 #define CHANNEL_MAX VIDEO_CHANNEL_MAX
 
 #define BITSOF(x) (sizeof(x) * NBBY)
-static_assert(BITSOF(stretch_fp_t) >= BITSOF(video_coord_t) + STRETCH_FP_NFRAC,
-              "stretch_fp_t is too small to hold arbitrary video coords + a fractional part");
+static_assert(BITSOF(video_fcoord_t) >= BITSOF(video_coord_t) + VIDEO_FCOORD_NFRAC,
+              "video_fcoord_t is too small to hold arbitrary video coords + a fractional part");
 static_assert(BITSOF(twochannels_t) >= (BITSOF(channel_t) * 2));
 
 
@@ -325,8 +312,8 @@ static_assert(BITSOF(twochannels_t) >= (BITSOF(channel_t) * 2));
 /* s.a. SDL:/src/video/SDL_stretch.c:scale_mat                          */
 /************************************************************************/
 
-/* # of  leading bits  of "STRETCH_FP_NFRAC"  actually used  during
- * linear interpolation. Allowed to be less than "STRETCH_FP_NFRAC"
+/* # of  leading bits  of "VIDEO_FCOORD_NFRAC"  actually used  during
+ * linear interpolation. Allowed to be less than "VIDEO_FCOORD_NFRAC"
  * since no as much precision is still needed at that point.
  *
  * Specifically, we need at most "BITSOF(channel_t)" bots of precision,
@@ -346,21 +333,21 @@ typedef uint_fast16_t linear_fp_twoblend_t; /* uint_fast{(LINEAR_FP_BLEND_NFRAC+
 #define LINEAR_FP_BLEND(whole)    ((linear_fp_blend_t)(whole) << LINEAR_FP_BLEND_NFRAC)
 #define LINEAR_FP_BLEND_WHOLE(fp) ((linear_fp_twoblend_t)(fp) >> LINEAR_FP_BLEND_NFRAC)
 
-/* Return the blend-fraction of a gfx-stretch fixed-point (stretch_fp_t) "fp" value */
+/* Return the blend-fraction of a gfx-stretch fixed-point (video_fcoord_t) "fp" value */
 #define STRETCH_FP_BLEND_FRAC(fp) \
-	((linear_fp_blend_t)((uint32_t)((fp) >> (STRETCH_FP_NFRAC - LINEAR_FP_BLEND_NFRAC)) & ((1 << LINEAR_FP_BLEND_NFRAC) - 1)))
-static_assert(LINEAR_FP_BLEND_NFRAC <= STRETCH_FP_NFRAC);
+	((linear_fp_blend_t)((uint32_t)((fp) >> (VIDEO_FCOORD_NFRAC - LINEAR_FP_BLEND_NFRAC)) & ((1 << LINEAR_FP_BLEND_NFRAC) - 1)))
+static_assert(LINEAR_FP_BLEND_NFRAC <= VIDEO_FCOORD_NFRAC);
 
 
 LOCAL ATTR_OUT(3) ATTR_OUT(4) ATTR_OUT(5) ATTR_OUT(6) void CC
-calc_linear_stretch_dim(video_dim_t src_dim,     /* in: "src" dimension */
-                        video_dim_t dst_dim,     /* in: "dst" dimension */
-                        sstretch_fp_t *fp_start, /* out: FP start value for "src" (still includes `*pad_min') */
-                        stretch_fp_t *fp_step,   /* out: FP-delta in "src" to add for each pixel */
-                        video_dim_t *pad_min,    /* out: # of leading pixels of padding in "dst" */
-                        video_dim_t *pad_max) {  /* out: # of trailing pixels of padding in "dst" */
-	stretch_fp_t fp_ratio; /* # of "src" pixels for each "dst" pixel */
-	sstretch_fp_t fp_iter; /* Must be signed because *pad_min can result in negative values */
+calc_linear_stretch_dim(video_dim_t src_dim,       /* in: "src" dimension */
+                        video_dim_t dst_dim,       /* in: "dst" dimension */
+                        video_foffset_t *fp_start, /* out: FP start value for "src" (still includes `*pad_min') */
+                        video_fcoord_t *fp_step,   /* out: FP-delta in "src" to add for each pixel */
+                        video_dim_t *pad_min,      /* out: # of leading pixels of padding in "dst" */
+                        video_dim_t *pad_max) {    /* out: # of trailing pixels of padding in "dst" */
+	video_fcoord_t fp_ratio; /* # of "src" pixels for each "dst" pixel */
+	video_foffset_t fp_iter; /* Must be signed because *pad_min can result in negative values */
 	gfx_assert(src_dim >= 1);
 	gfx_assert(dst_dim >= 1);
 
@@ -375,11 +362,11 @@ calc_linear_stretch_dim(video_dim_t src_dim,     /* in: "src" dimension */
 		return;
 	}
 
-	fp_ratio = STRETCH_FP(src_dim) / dst_dim;
+	fp_ratio = VIDEO_FCOORD(src_dim, 0) / dst_dim;
 
-	fp_iter = fp_ratio * STRETCH_FP_FRAC(STRETCH_FP(1) / 2);
-	fp_iter = STRETCH_FP_WHOLE(fp_iter + (STRETCH_FP(1) / 2));
-	fp_iter -= STRETCH_FP(1) / 2; /* Start in the middle of pixels (this is also the reason why "*pad_min" is needed) */
+	fp_iter = fp_ratio * VIDEO_FCOORD_FRAC(VIDEO_FCOORD(1, 0) / 2);
+	fp_iter = VIDEO_FCOORD_WHOLE(fp_iter + (VIDEO_FCOORD(1, 0) / 2));
+	fp_iter -= VIDEO_FCOORD(1, 0) / 2; /* Start in the middle of pixels (this is also the reason why "*pad_min" is needed) */
 
 	*fp_start = fp_iter;
 	*fp_step  = fp_ratio;
@@ -389,7 +376,7 @@ calc_linear_stretch_dim(video_dim_t src_dim,     /* in: "src" dimension */
 		if (fp_iter < 0) {
 			*pad_min += 1;
 		} else {
-			video_coord_t index = STRETCH_FP_WHOLE(fp_iter);
+			video_coord_t index = VIDEO_FCOORD_WHOLE(fp_iter);
 			if (index > src_dim - 2) {
 				*pad_max += 1;
 			}
@@ -486,10 +473,10 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 		video_coord_t _rel_dst_y; /* Relative destination Y coord [0,dst_size_y) */                                                \
 		video_dim_t _pad_xmin, _pad_xmax;                                                                                          \
 		video_dim_t _pad_ymin, _pad_ymax;                                                                                          \
-		sstretch_fp_t _fp_src_x;                                                                                                   \
-		sstretch_fp_t _fp_src_y;                                                                                                   \
-		stretch_fp_t _fp_step_x;                                                                                                   \
-		stretch_fp_t _fp_step_y;                                                                                                   \
+		video_foffset_t _fp_src_x;                                                                                                 \
+		video_foffset_t _fp_src_y;                                                                                                 \
+		video_fcoord_t _fp_step_x;                                                                                                 \
+		video_fcoord_t _fp_step_y;                                                                                                 \
 		video_dim_t _nopad_dst_x; /* # of horizontal pixels that can be written w/o padding */                                     \
 		calc_linear_stretch_dim(src_size_x, dst_size_x, &_fp_src_x, &_fp_step_x, &_pad_xmin, &_pad_xmax);                          \
 		calc_linear_stretch_dim(src_size_y, dst_size_y, &_fp_src_y, &_fp_step_y, &_pad_ymin, &_pad_ymax);                          \
@@ -500,14 +487,14 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 		if (_pad_ymin) {                                                                                                           \
 			video_coord_t _used_dst_x = dst_x;                                                                                     \
 			video_dim_t _middle;                                                                                                   \
-			sstretch_fp_t _row_fp_src_x;                                                                                           \
+			video_foffset_t _row_fp_src_x;                                                                                         \
 			if (_pad_xmin) {                                                                                                       \
 				blend_xmin_ymin(_used_dst_x, dst_y, _pad_xmin, _pad_ymin, src_x, src_y);                                           \
 				_used_dst_x += _pad_xmin;                                                                                          \
 			}                                                                                                                      \
 			for (_middle = _nopad_dst_x, _row_fp_src_x = _fp_src_x;                                                                \
 			     _middle; --_middle, ++_used_dst_x, _row_fp_src_x += _fp_step_x) {                                                 \
-				video_coord_t _used_src_x  = src_x + STRETCH_FP_WHOLE(_row_fp_src_x);                                              \
+				video_coord_t _used_src_x  = src_x + VIDEO_FCOORD_WHOLE(_row_fp_src_x);                                            \
 				linear_fp_blend_t _frac_x0 = STRETCH_FP_BLEND_FRAC(_row_fp_src_x);                                                 \
 				linear_fp_blend_t _frac_x1 = LINEAR_FP_BLEND(1) - _frac_x0;                                                        \
 				blend_ymin(_used_dst_x, dst_y, _pad_ymin, _used_src_x, src_y, (_used_src_x + 1), _frac_x0, _frac_x1);              \
@@ -528,8 +515,8 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 			linear_fp_blend_t _frac_y0, _frac_y1;                                                                                  \
 			video_dim_t _middle;                                                                                                   \
 			video_coord_t _used_src_y0, _used_src_y1;                                                                              \
-			sstretch_fp_t _row_fp_src_x;                                                                                           \
-			_rel_src_y = STRETCH_FP_WHOLE(_fp_src_y);                                                                              \
+			video_foffset_t _row_fp_src_x;                                                                                         \
+			_rel_src_y = VIDEO_FCOORD_WHOLE(_fp_src_y);                                                                            \
 			_frac_y0   = STRETCH_FP_BLEND_FRAC(_fp_src_y);                                                                         \
 			_frac_y1   = LINEAR_FP_BLEND(1) - _frac_y0;                                                                            \
 			                                                                                                                       \
@@ -542,7 +529,7 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 			}                                                                                                                      \
 			for (_middle = _nopad_dst_x, _row_fp_src_x = _fp_src_x;                                                                \
 			     _middle; --_middle, ++_used_dst_x, _row_fp_src_x += _fp_step_x) {                                                 \
-				video_coord_t _used_src_x  = src_x + STRETCH_FP_WHOLE(_row_fp_src_x);                                              \
+				video_coord_t _used_src_x  = src_x + VIDEO_FCOORD_WHOLE(_row_fp_src_x);                                            \
 				linear_fp_blend_t _frac_x0 = STRETCH_FP_BLEND_FRAC(_row_fp_src_x);                                                 \
 				linear_fp_blend_t _frac_x1 = LINEAR_FP_BLEND(1) - _frac_x0;                                                        \
 				blend(_used_dst_x, _used_dst_y, _used_src_x, _used_src_y0, (_used_src_x + 1), _used_src_y1,                        \
@@ -561,7 +548,7 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 			video_coord_t _used_dst_x = dst_x;                                                                                     \
 			video_dim_t _middle;                                                                                                   \
 			video_coord_t _used_src_y = src_y + src_size_y - 1;                                                                    \
-			sstretch_fp_t _row_fp_src_x;                                                                                           \
+			video_foffset_t _row_fp_src_x;                                                                                         \
 			                                                                                                                       \
 			if (_pad_xmin) {                                                                                                       \
 				blend_xmin_ymin(_used_dst_x, _used_dst_y, _pad_xmin, _pad_ymax, src_x, _used_src_y);                               \
@@ -569,7 +556,7 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 			}                                                                                                                      \
 			for (_middle = _nopad_dst_x, _row_fp_src_x = _fp_src_x;                                                                \
 			     _middle; --_middle, ++_used_dst_x, _row_fp_src_x += _fp_step_x) {                                                 \
-				video_coord_t _used_src_x  = src_x + STRETCH_FP_WHOLE(_row_fp_src_x);                                              \
+				video_coord_t _used_src_x  = src_x + VIDEO_FCOORD_WHOLE(_row_fp_src_x);                                            \
 				linear_fp_blend_t _frac_x0 = STRETCH_FP_BLEND_FRAC(_row_fp_src_x);                                                 \
 				linear_fp_blend_t _frac_x1 = LINEAR_FP_BLEND(1) - _frac_x0;                                                        \
 				blend_ymin(_used_dst_x, _used_dst_y, _pad_ymax, _used_src_x, _used_src_y, (_used_src_x + 1), _frac_x0, _frac_x1);  \
@@ -601,22 +588,22 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
                             dst_row_start /*(dst_y, src_y)*/,                       \
                             dst_row_end /*(dst_y, src_y)*/)                         \
 	do {                                                                            \
-		stretch_fp_t _step_x = STRETCH_FP(src_size_x) / dst_size_x;                 \
-		stretch_fp_t _step_y = STRETCH_FP(src_size_y) / dst_size_y;                 \
+		video_fcoord_t _step_x = VIDEO_FCOORD(src_size_x, 0) / dst_size_x;          \
+		video_fcoord_t _step_y = VIDEO_FCOORD(src_size_y, 0) / dst_size_y;          \
 		/* Start half-a-step ahead, thus rounding by 0.5 pixels */                  \
-		stretch_fp_t _src_pos_y = _step_y >> 1;                                     \
+		video_fcoord_t _src_pos_y = _step_y >> 1;                                   \
 		video_coord_t _iter_y = 0;                                                  \
 		do {                                                                        \
 			video_coord_t _row_dst_y = dst_y + _iter_y;                             \
-			video_coord_t _row_src_y = src_y + STRETCH_FP_WHOLE(_src_pos_y);        \
+			video_coord_t _row_src_y = src_y + VIDEO_FCOORD_WHOLE(_src_pos_y);      \
 			/* Start half-a-step ahead, thus rounding by 0.5 pixels */              \
-			stretch_fp_t _src_pos_x = _step_x >> 1;                                 \
+			video_fcoord_t _src_pos_x = _step_x >> 1;                               \
 			video_coord_t _iter_x = 0;                                              \
-			_src_pos_x += STRETCH_FP(src_x);                                        \
+			_src_pos_x += VIDEO_FCOORD(src_x, 0);                                   \
 			{                                                                       \
 				dst_row_start(_row_dst_y, _row_src_y);                              \
 				do {                                                                \
-					video_coord_t row_src_x = STRETCH_FP_WHOLE(_src_pos_x);         \
+					video_coord_t row_src_x = VIDEO_FCOORD_WHOLE(_src_pos_x);       \
 					copy_pixel(dst_x + _iter_x, _row_dst_y, row_src_x, _row_src_y); \
 					_src_pos_x += _step_x;                                          \
 				} while (++_iter_x < dst_size_x);                                   \
@@ -632,22 +619,22 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
                                     dst_row_start /*(dst_y)*/,                                                  \
                                     dst_row_end /*(dst_y)*/)                                                    \
 	do {                                                                                                        \
-		stretch_fp_t _step_x = STRETCH_FP(src_size_x) / dst_size_x;                                             \
-		stretch_fp_t _step_y = STRETCH_FP(src_size_y) / dst_size_y;                                             \
+		video_fcoord_t _step_x = VIDEO_FCOORD(src_size_x, 0) / dst_size_x;                                      \
+		video_fcoord_t _step_y = VIDEO_FCOORD(src_size_y, 0) / dst_size_y;                                      \
 		/* Start half-a-step ahead, thus rounding by 0.5 pixels */                                              \
-		stretch_fp_t _src_pos_y = _step_y >> 1;                                                                 \
+		video_fcoord_t _src_pos_y = _step_y >> 1;                                                               \
 		video_coord_t _iter_y = 0;                                                                              \
 		do {                                                                                                    \
 			video_coord_t _row_dst_y = dst_y + _iter_y;                                                         \
-			video_coord_t _row_src_y = STRETCH_FP_WHOLE(_src_pos_y);                                            \
+			video_coord_t _row_src_y = VIDEO_FCOORD_WHOLE(_src_pos_y);                                          \
 			/* Start half-a-step ahead, thus rounding by 0.5 pixels */                                          \
-			stretch_fp_t _src_pos_x = _step_x >> 1;                                                             \
+			video_fcoord_t _src_pos_x = _step_x >> 1;                                                           \
 			video_offset_t _delta_src_x = src_x + video_imatrix2d_get(&src_matrix, 0, 1) * _row_src_y;          \
 			video_offset_t _delta_src_y = src_y + video_imatrix2d_get(&src_matrix, 1, 1) * _row_src_y;          \
 			video_dim_t _iter_x = 0;                                                                            \
 			dst_row_start(_row_dst_y);                                                                          \
 			do {                                                                                                \
-				video_coord_t _row_src_x  = STRETCH_FP_WHOLE(_src_pos_x);                                       \
+				video_coord_t _row_src_x  = VIDEO_FCOORD_WHOLE(_src_pos_x);                                     \
 				video_coord_t _used_src_x = _delta_src_x + video_imatrix2d_get(&src_matrix, 0, 0) * _row_src_x; \
 				video_coord_t _used_src_y = _delta_src_y + video_imatrix2d_get(&src_matrix, 1, 0) * _row_src_x; \
 				copy_pixel(dst_x + _iter_x, _row_dst_y, _used_src_x, _used_src_y);                              \
@@ -663,22 +650,22 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
                                 dst_row_start /*(dst_y, src_y)*/,            \
                                 dst_row_end /*(dst_y, src_y)*/)              \
 	do {                                                                     \
-		stretch_fp_t _step_x = STRETCH_FP(src_size_x) / dst_size_x;          \
-		stretch_fp_t _step_y = STRETCH_FP(src_size_y) / dst_size_y;          \
+		video_fcoord_t _step_x = VIDEO_FCOORD(src_size_x, 0) / dst_size_x;   \
+		video_fcoord_t _step_y = VIDEO_FCOORD(src_size_y, 0) / dst_size_y;   \
 		/* Start half-a-step ahead, thus rounding by 0.5 pixels */           \
-		stretch_fp_t _src_pos_y = (_step_y >> 1) + (dst_size_y * _step_y);   \
+		video_fcoord_t _src_pos_y = (_step_y >> 1) + (dst_size_y * _step_y); \
 		do {                                                                 \
 			video_coord_t _row_dst_y;                                        \
 			video_coord_t _row_src_y;                                        \
-			stretch_fp_t _src_pos_x;                                         \
+			video_fcoord_t _src_pos_x;                                       \
 			video_coord_t _iter_x;                                           \
 			--dst_size_y;                                                    \
 			_src_pos_y -= _step_y;                                           \
 			_row_dst_y = dst_y + dst_size_y;                                 \
-			_row_src_y = src_y + STRETCH_FP_WHOLE(_src_pos_y);               \
+			_row_src_y = src_y + VIDEO_FCOORD_WHOLE(_src_pos_y);             \
 			/* Start half-a-step ahead, thus rounding by 0.5 pixels */       \
 			_src_pos_x = _step_x >> 1;                                       \
-			_src_pos_x += STRETCH_FP(src_x);                                 \
+			_src_pos_x += VIDEO_FCOORD(src_x, 0);                            \
 			_src_pos_x += dst_size_x * _step_x;                              \
 			_iter_x = dst_size_x;                                            \
 			{                                                                \
@@ -687,7 +674,7 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 					video_coord_t _row_src_x;                                \
 					--_iter_x;                                               \
 					_src_pos_x -= _step_x;                                   \
-					_row_src_x = STRETCH_FP_WHOLE(_src_pos_x);               \
+					_row_src_x = VIDEO_FCOORD_WHOLE(_src_pos_x);             \
 					copy_pixel(dst_x + _iter_x, _row_dst_y,                  \
 					           _row_src_x, _row_src_y);                      \
 				} while (_iter_x);                                           \
@@ -702,23 +689,23 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
                              out_row_start /*(out_y, dst_y, src_y)*/,                   \
                              out_row_end /*(out_y, dst_y, src_y)*/)                     \
 	do {                                                                                \
-		stretch_fp_t _step_x = STRETCH_FP(src_size_x) / dst_size_x;                     \
-		stretch_fp_t _step_y = STRETCH_FP(src_size_y) / dst_size_y;                     \
+		video_fcoord_t _step_x = VIDEO_FCOORD(src_size_x, 0) / dst_size_x;              \
+		video_fcoord_t _step_y = VIDEO_FCOORD(src_size_y, 0) / dst_size_y;              \
 		/* Start half-a-step ahead, thus rounding by 0.5 pixels */                      \
-		stretch_fp_t _src_pos_y = _step_y >> 1;                                         \
+		video_fcoord_t _src_pos_y = _step_y >> 1;                                       \
 		video_coord_t _iter_y = 0;                                                      \
 		do {                                                                            \
 			video_coord_t _row_dst_y = dst_y + _iter_y;                                 \
 			video_coord_t _row_out_y = out_y + _iter_y;                                 \
-			video_coord_t _row_src_y = src_y + STRETCH_FP_WHOLE(_src_pos_y);            \
+			video_coord_t _row_src_y = src_y + VIDEO_FCOORD_WHOLE(_src_pos_y);          \
 			/* Start half-a-step ahead, thus rounding by 0.5 pixels */                  \
-			stretch_fp_t _src_pos_x = _step_x >> 1;                                     \
+			video_fcoord_t _src_pos_x = _step_x >> 1;                                   \
 			video_coord_t _iter_x = 0;                                                  \
-			_src_pos_x += STRETCH_FP(src_x);                                            \
+			_src_pos_x += VIDEO_FCOORD(src_x, 0);                                       \
 			{                                                                           \
 				out_row_start(_row_out_y, _row_dst_y, _row_src_y);                      \
 				do {                                                                    \
-					video_coord_t row_src_x = STRETCH_FP_WHOLE(_src_pos_x);             \
+					video_coord_t row_src_x = VIDEO_FCOORD_WHOLE(_src_pos_x);           \
 					copy_pixel(out_x + _iter_x, _row_out_y,                             \
 					           dst_x + _iter_x, _row_dst_y,                             \
 					           row_src_x, _row_src_y);                                  \
@@ -736,16 +723,16 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
                                      out_row_start /*(out_y)*/,                                                \
                                      out_row_end /*(out_y)*/)                                                  \
 	do {                                                                                                       \
-		stretch_fp_t _step_x = STRETCH_FP(src_size_x) / dst_size_x;                                            \
-		stretch_fp_t _step_y = STRETCH_FP(src_size_y) / dst_size_y;                                            \
+		video_fcoord_t _step_x = VIDEO_FCOORD(src_size_x, 0) / dst_size_x;                                     \
+		video_fcoord_t _step_y = VIDEO_FCOORD(src_size_y, 0) / dst_size_y;                                     \
 		/* Start half-a-step ahead, thus rounding by 0.5 pixels */                                             \
-		stretch_fp_t _src_pos_y = _step_y >> 1;                                                                \
+		video_fcoord_t _src_pos_y = _step_y >> 1;                                                              \
 		video_coord_t _iter_y   = 0;                                                                           \
 		do {                                                                                                   \
 			video_coord_t _row_out_y = out_y + _iter_y;                                                        \
-			video_coord_t _row_src_y = STRETCH_FP_WHOLE(_src_pos_y);                                           \
+			video_coord_t _row_src_y = VIDEO_FCOORD_WHOLE(_src_pos_y);                                         \
 			/* Start half-a-step ahead, thus rounding by 0.5 pixels */                                         \
-			stretch_fp_t _src_pos_x = _step_x >> 1;                                                            \
+			video_fcoord_t _src_pos_x = _step_x >> 1;                                                          \
 			video_coord_t _base_src_x = src_x + video_imatrix2d_get(&src_matrix, 0, 1) * _row_src_y;           \
 			video_coord_t _base_src_y = src_y + video_imatrix2d_get(&src_matrix, 1, 1) * _row_src_y;           \
 			video_coord_t _used_dst_x = dst_x;                                                                 \
@@ -753,7 +740,7 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 			video_dim_t _iter_x = 0;                                                                           \
 			out_row_start(_row_out_y);                                                                         \
 			do {                                                                                               \
-				video_coord_t _row_src_x  = STRETCH_FP_WHOLE(_src_pos_x);                                      \
+				video_coord_t _row_src_x  = VIDEO_FCOORD_WHOLE(_src_pos_x);                                    \
 				video_coord_t _used_src_x = _base_src_x + video_imatrix2d_get(&src_matrix, 0, 0) * _row_src_x; \
 				video_coord_t _used_src_y = _base_src_y + video_imatrix2d_get(&src_matrix, 1, 0) * _row_src_x; \
 				copy_pixel(out_x + _iter_x, _row_out_y, _used_dst_x, _used_dst_y, _used_src_x, _used_src_y);   \
