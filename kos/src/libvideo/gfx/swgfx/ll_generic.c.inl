@@ -547,7 +547,7 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 				edge     = SLIST_NEXT(edge, _vcpe_active);
 				gfx_assert(edge);
 				in_shape += edge->vcpe_dir;
-				while (in_shape > 0) {
+				while (in_shape != 0) {
 					edge = SLIST_NEXT(edge, _vcpe_active);
 					gfx_assert(edge);
 					in_shape += edge->vcpe_dir;

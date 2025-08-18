@@ -363,6 +363,13 @@ step:
 
 		case 6: {
 			static const struct video_point points[] = {
+#if 1
+				VIDEO_POINT_INIT(250, 0),
+				VIDEO_POINT_INIT(400, 500),
+				VIDEO_POINT_INIT(0, 250),
+				VIDEO_POINT_INIT(500, 250),
+				VIDEO_POINT_INIT(0, 400),
+#else
 				VIDEO_POINT_INIT(0, 100),
 				VIDEO_POINT_INIT(200, 0),
 				VIDEO_POINT_INIT(250, 300),
@@ -371,6 +378,7 @@ step:
 				VIDEO_POINT_INIT(400, 500),
 				VIDEO_POINT_INIT(50, 300),
 				VIDEO_POINT_INIT(150, 80),
+#endif
 			};
 			REF struct video_polygon *poly;
 			poly = video_domain_newpolygon(video_gfx_getdomain(&gfx),
@@ -380,8 +388,8 @@ step:
 				                   rand() % (video_gfx_getxdim(&gfx) - poly->vp_xend),
 				                   rand() % (video_gfx_getydim(&gfx) - poly->vp_yend),
 				                   poly, color,
-								   VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD
-								   /*rand() % VIDEO_GFX_FILLPOLY_METHOD_COUNT*/);
+				                   /*VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD*/
+				                   rand() % VIDEO_GFX_FILLPOLY_METHOD_COUNT);
 				video_polygon_decref(poly);
 			}
 		}	break;
