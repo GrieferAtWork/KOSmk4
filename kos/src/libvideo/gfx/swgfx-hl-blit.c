@@ -46,7 +46,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/surface.h>
 
-#include "gfx-empty.h"
+#include "buffer/empty.h"
 #include "gfx-utils.h"
 #include "swgfx.h"
 
@@ -121,12 +121,12 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	struct video_buffer const *src_buffer = src_gfx->vg_surf.vs_buffer;
 	struct video_buffer const *dst_buffer = dst_gfx->vg_surf.vs_buffer;
 	struct blitter_swdrv *drv = video_swblitter_getdrv(ctx);
-	video_swblitter_setops(ctx);
 
 	/* Check for special case: source and target buffers are the same */
-	if (video_gfx_getxdim(src_gfx) == 0 || video_gfx_getydim(src_gfx) == 0) {
-		ctx->vbt_ops = &libvideo_emptyblitter_ops;
+	if unlikely(video_gfx_getxdim(src_gfx) == 0 || video_gfx_getydim(src_gfx) == 0) {
+		ctx->vbt_ops = _libvideo_emptyblitter_ops();
 	} else {
+		video_swblitter_setops(ctx);
 		/* TODO: RLE optimization? */
 
 #define CK(tt, ff) (video_gfx_hascolorkey(src_gfx) ? tt : ff)
@@ -208,14 +208,14 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 	struct video_gfx const *rddst_gfx = ctx->vbt3_rddst;
 	struct video_gfx const *wrdst_gfx = ctx->vbt3_wrdst;
 	struct blitter3_swdrv *drv = video_swblitter3_getdrv(ctx);
-	video_swblitter3_setops(ctx);
 	(void)wrdst_gfx;
 	assert(video_gfx_getxdim(wrdst_gfx) != 0);
 	assert(video_gfx_getydim(wrdst_gfx) != 0);
-	if (video_gfx_getxdim(src_gfx) == 0 || video_gfx_getydim(src_gfx) == 0 ||
-	    video_gfx_getxdim(rddst_gfx) == 0 || video_gfx_getydim(rddst_gfx) == 0) {
-		ctx->vbt3_ops = &libvideo_emptyblitter3_ops;
+	if unlikely(video_gfx_getxdim(src_gfx) == 0 || video_gfx_getydim(src_gfx) == 0 ||
+	            video_gfx_getxdim(rddst_gfx) == 0 || video_gfx_getydim(rddst_gfx) == 0) {
+		ctx->vbt3_ops = _libvideo_emptyblitter3_ops();
 	} else {
+		video_swblitter3_setops(ctx);
 		drv->bsw3_blendmode = rddst_gfx->vg_blend;
 		switch (__builtin_expect(GFX_BLENDMODE_GET_MODE(rddst_gfx->vg_blend),
 		                         GFX_BLENDMODE_ALPHA)) {

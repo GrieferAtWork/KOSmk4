@@ -55,8 +55,8 @@
 #include <libvideo/types.h>
 
 #include "buffer.h"
+#include "buffer/empty.h"
 #include "codec/palette.h"
-#include "gfx-empty.h"
 #include "ramdomain.h"
 #include "ramfddomain.h"
 #include "serial.h"
@@ -307,13 +307,6 @@ ramfdbuffer_subregion_rem__fdinfo(struct video_buffer *__restrict self,
 #endif /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
 
 
-#define return_empty_buffer                                      \
-	do {                                                         \
-		struct video_buffer *_empty_res = &libvideo_emptybuffer; \
-		video_buffer_incref(_empty_res);                         \
-		return _empty_res;                                       \
-	}	__WHILE0
-
 /* RAMFD DOMAIN OPERATORS */
 INTERN WUNUSED NONNULL((1)) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_ramfddomain_newbuffer(struct video_domain const *__restrict self,
@@ -324,7 +317,7 @@ libvideo_ramfddomain_newbuffer(struct video_domain const *__restrict self,
 	assert(format);
 	(void)flags;
 	if unlikely(!xdim || !ydim)
-		return_empty_buffer;
+		return _libvideo_emptybufferref();
 
 	/* Figure out buffer requirements. */
 	(*format->vbf_codec->vc_rambuffer_requirements)(xdim, ydim, &req);

@@ -68,13 +68,13 @@ struct video_ramfdbuffer_subregion_rem
 
 
 /* Return operator tables for different types of ramfd-buffers, as seen above */
-typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_buffer_ops const *(LIBVIDEO_GFX_CC *PVIDEO_RAMFDBUFFER_OPS)(void);
-typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_buffer_ops const *(LIBVIDEO_GFX_CC *PVIDEO_RAMFDBUFFER_SUBREGION_OPS)(void);
-typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_buffer_ops const *(LIBVIDEO_GFX_CC *PVIDEO_RAMFDBUFFER_SUBREGION_REM_OPS)(void);
+typedef __ATTR_CONST_T __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_buffer_ops const *(LIBVIDEO_GFX_CC *PVIDEO_RAMFDBUFFER_OPS)(void);
+typedef __ATTR_CONST_T __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_buffer_ops const *(LIBVIDEO_GFX_CC *PVIDEO_RAMFDBUFFER_SUBREGION_OPS)(void);
+typedef __ATTR_CONST_T __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_buffer_ops const *(LIBVIDEO_GFX_CC *PVIDEO_RAMFDBUFFER_SUBREGION_REM_OPS)(void);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED struct video_buffer_ops const *LIBVIDEO_GFX_CC video_ramfdbuffer_ops(void);
-LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED struct video_buffer_ops const *LIBVIDEO_GFX_CC video_ramfdbuffer_subregion_ops(void);
-LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED struct video_buffer_ops const *LIBVIDEO_GFX_CC video_ramfdbuffer_subregion_rem_ops(void);
+LIBVIDEO_GFX_DECL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct video_buffer_ops const *LIBVIDEO_GFX_CC video_ramfdbuffer_ops(void);
+LIBVIDEO_GFX_DECL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct video_buffer_ops const *LIBVIDEO_GFX_CC video_ramfdbuffer_subregion_ops(void);
+LIBVIDEO_GFX_DECL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct video_buffer_ops const *LIBVIDEO_GFX_CC video_ramfdbuffer_subregion_rem_ops(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 __DECL_END

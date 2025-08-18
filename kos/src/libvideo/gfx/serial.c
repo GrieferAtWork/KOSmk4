@@ -61,6 +61,7 @@
 #include <libvideo/types.h>
 
 #include "buffer.h"
+#include "buffer/empty.h"
 #include "buffer/region.h"
 #include "codec/codec-specs.h"
 #include "codec/codec.h"
@@ -614,6 +615,17 @@ libvideo_generic_deserialize(struct video_domain const *__restrict domain,
 		result_flags |= VIDEO_GFX_F_PALOBJ;
 	result_xdim = UNALIGNED_GETLE32(&fdinfo.nbfi_info.nbi_xdim);
 	result_ydim = UNALIGNED_GETLE32(&fdinfo.nbfi_info.nbi_ydim);
+
+	/* Check for special case: completely empty buffer */
+	if unlikely(!result_xdim || !result_ydim) {
+		/* TODO */
+	}
+
+	/* Check for special case: empty buffer with non-zero dimensions */
+	if ((size_t)fdinfo_size >= sizeof(struct netbuf_fdinfo) &&
+	    UNALIGNED_GETLE32(&fdinfo.nbfi_total) == 0) {
+		/* TODO */
+	}
 
 	/* Check for simple case: got a file descriptor that can be used to mmap the buffer */
 	if ((size_t)fdinfo_size >= sizeof(struct netbuf_fdinfo) && buffer_fd >= 0) {

@@ -48,20 +48,11 @@
 
 #include "../buffer.h"
 #include "../gfx-debug.h"
-#include "../gfx-empty.h"
 #include "../ramdomain.h"
+#include "empty.h"
 #include "region.h"
 
 DECL_BEGIN
-
-#define return_empty_buffer                                      \
-	do {                                                         \
-		struct video_buffer *_empty_res = &libvideo_emptybuffer; \
-		video_buffer_incref(_empty_res);                         \
-		return _empty_res;                                       \
-	}	__WHILE0
-
-
 
 DEFINE_VIDEO_BUFFER_TYPE(region_buffer_ops,
                          &region_buffer__destroy, &region_buffer__initgfx, &region_buffer__updategfx,
@@ -162,9 +153,9 @@ region_buffer__subregion(struct video_surface const *__restrict self,
 	__video_buffer_init_common(result);
 	return result;
 do_return_empty_buffer:
-	/* TODO: This always returns a 0x0 buffer, but we'd  need
-	 *       to return one with a custom size given by `rect' */
-	return_empty_buffer;
+	return libvideo_makeemptybuffer_like(self,
+	                                     video_crect_getxdim(rect),
+	                                     video_crect_getydim(rect));
 err_base:
 	video_buffer_decref(base);
 err:
@@ -460,15 +451,14 @@ _libvideo_surface_region_distinct(struct video_surface const *__restrict self,
 	return result;
 do_return_empty_buffer_r:
 	free(result);
-	/* TODO: This always returns a 0x0 buffer, but we'd  need
-	 *       to return one with a custom size given by `rect' */
-	return_empty_buffer;
+	return libvideo_makeemptybuffer_like(self,
+	                                     video_rect_getxdim(buffer_rect),
+	                                     video_rect_getydim(buffer_rect));
 err_r:
 	free(result);
 err:
 	return NULL;
 }
-
 
 DECL_END
 

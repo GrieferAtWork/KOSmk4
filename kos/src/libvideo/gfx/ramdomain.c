@@ -48,8 +48,8 @@
 #include <libvideo/types.h>
 
 #include "buffer.h"
+#include "buffer/empty.h"
 #include "codec/palette.h"
-#include "gfx-empty.h"
 #include "ramdomain.h"
 #include "serial.h"
 
@@ -206,13 +206,6 @@ rambuffer_subregion__lockregion(struct video_buffer *__restrict self,
 
 
 
-#define return_empty_buffer                                      \
-	do {                                                         \
-		struct video_buffer *_empty_res = &libvideo_emptybuffer; \
-		video_buffer_incref(_empty_res);                         \
-		return _empty_res;                                       \
-	}	__WHILE0
-
 INTERN WUNUSED NONNULL((1)) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
                              struct video_buffer_format const *__restrict format,
@@ -221,7 +214,7 @@ libvideo_ramdomain_newbuffer(struct video_domain const *__restrict self,
 	struct video_rambuffer_requirements req;
 	assert(format);
 	if unlikely(!xdim || !ydim)
-		return_empty_buffer;
+		return _libvideo_emptybufferref();
 
 	/* Figure out buffer requirements. */
 	(*format->vbf_codec->vc_rambuffer_requirements)(xdim, ydim, &req);
@@ -270,7 +263,7 @@ libvideo_ramdomain_formem(struct video_domain const *__restrict self,
 	assert(format);
 	(void)flags;
 	if unlikely(!xdim || !ydim)
-		return_empty_buffer;
+		return _libvideo_emptybufferref();
 
 	/* Ensure that the specified stride is great enough */
 	(*codec->vc_rambuffer_requirements)(xdim, ydim, &req);

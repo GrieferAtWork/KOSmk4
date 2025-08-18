@@ -31,6 +31,7 @@
 #include <kos/anno.h>
 #include <sys/param.h>
 
+#include <assert.h>
 #include <errno.h>
 
 #include <libvideo/crect.h>
@@ -41,8 +42,8 @@
 #include <libvideo/rect.h>
 #include <libvideo/types.h>
 
+#include "buffer/empty.h"
 #include "buffer/region.h"
-#include "gfx-empty.h"
 #include "gfx-utils.h"
 #include "gfx.h"
 
@@ -142,6 +143,11 @@ libvideo_gfx_stretch3__with_blitter3(struct video_gfx const *wrdst, video_offset
 
 
 
+PRIVATE ATTR_COLD NONNULL((1)) void CC
+set_empty_ops(struct video_gfx *__restrict self) {
+	self->vg_clip.vgc_ops = _libvideo_emptygfx_ops();
+}
+
 /* Apply a clipping  rect to "self",  shrinking the  pixel
  * area relative to offsets specified by the given coords.
  *
@@ -165,46 +171,58 @@ libvideo_gfx_clip__generic(struct video_gfx *__restrict self,
                            video_offset_t clip_x, video_offset_t clip_y,
                            video_dim_t size_x, video_dim_t size_y) {
 	video_offset_t cxend, cyend;
-	if unlikely(!size_x || !size_y)
-		goto empty_clip;
 
-	/* Adjust clip rect */
+	/* Adjust clip rect offsets */
 	self->vg_clip.vgc_cxoff += clip_x;
 	self->vg_clip.vgc_cyoff += clip_y;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
 		self->vg_clip.vgc_cxoff -= 2 * clip_x;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YMIRROR)
 		self->vg_clip.vgc_cyoff -= 2 * clip_y;
-	self->vg_clip.vgc_cxdim = size_x;
-	self->vg_clip.vgc_cydim = size_y;
 
 	/* Clamp I/O Rect according to new Clip Rect */
-	if ((video_offset_t)self->vg_clip.vgc_bxmin < self->vg_clip.vgc_cxoff) {
+	if ((video_coord_t)self->vg_clip.vgc_cxoff > self->vg_clip.vgc_bxmin && self->vg_clip.vgc_cxoff >= 0) {
 		self->vg_clip.vgc_bxmin = (video_coord_t)self->vg_clip.vgc_cxoff;
-		if (self->vg_clip.vgc_bxend <= self->vg_clip.vgc_bxmin)
-			goto empty_clip;
+		if unlikely(self->vg_clip.vgc_bxmin >= self->vg_clip.vgc_bxend) {
+			self->vg_clip.vgc_bxmin = self->vg_clip.vgc_bxend;
+			set_empty_ops(self);
+		}
 	}
-	if ((video_offset_t)self->vg_clip.vgc_bymin < self->vg_clip.vgc_cyoff) {
+	if ((video_coord_t)self->vg_clip.vgc_cyoff > self->vg_clip.vgc_bymin && self->vg_clip.vgc_cyoff >= 0) {
 		self->vg_clip.vgc_bymin = (video_coord_t)self->vg_clip.vgc_cyoff;
-		if (self->vg_clip.vgc_byend <= self->vg_clip.vgc_bymin)
-			goto empty_clip;
+		if unlikely(self->vg_clip.vgc_bymin >= self->vg_clip.vgc_byend) {
+			self->vg_clip.vgc_bymin = self->vg_clip.vgc_byend;
+			set_empty_ops(self);
+		}
 	}
 
-	if (!OVERFLOW_SADD(self->vg_clip.vgc_cxoff, size_x, &cxend) &&
-	    self->vg_clip.vgc_bxend > (video_coord_t)cxend && cxend > 0) {
-		self->vg_clip.vgc_bxend = (video_coord_t)cxend;
-		if (self->vg_clip.vgc_bxend <= self->vg_clip.vgc_bxmin)
-			goto empty_clip;
+	if likely(!OVERFLOW_SADD(self->vg_clip.vgc_cxoff, size_x, &cxend)) {
+		if unlikely(cxend <= 0 || (video_coord_t)cxend <= self->vg_clip.vgc_bxmin)
+			cxend = (video_offset_t)self->vg_clip.vgc_bxmin;
+		if (self->vg_clip.vgc_bxend > (video_coord_t)cxend) {
+			self->vg_clip.vgc_bxend = (video_coord_t)cxend;
+			if unlikely(self->vg_clip.vgc_bxend <= self->vg_clip.vgc_bxmin)
+				set_empty_ops(self);
+		}
 	}
-	if (!OVERFLOW_SADD(self->vg_clip.vgc_cyoff, size_y, &cyend) &&
-	    self->vg_clip.vgc_byend > (video_coord_t)cyend && cyend > 0) {
-		self->vg_clip.vgc_byend = (video_coord_t)cyend;
-		if (self->vg_clip.vgc_byend <= self->vg_clip.vgc_bymin)
-			goto empty_clip;
+	if likely(!OVERFLOW_SADD(self->vg_clip.vgc_cyoff, size_y, &cyend)) {
+		if unlikely(cyend <= 0 || (video_coord_t)cyend <= self->vg_clip.vgc_bymin)
+			cyend = (video_offset_t)self->vg_clip.vgc_bymin;
+		if (self->vg_clip.vgc_byend > (video_coord_t)cyend) {
+			self->vg_clip.vgc_byend = (video_coord_t)cyend;
+			if unlikely(self->vg_clip.vgc_byend <= self->vg_clip.vgc_bymin)
+				set_empty_ops(self);
+		}
 	}
-	return self;
-empty_clip:
-	self->vg_clip.vgc_ops = &libvideo_emptygfx_ops;
+
+	self->vg_clip.vgc_cxdim = size_x;
+	self->vg_clip.vgc_cydim = size_y;
+	assertf((!size_x || !size_y)
+	        ? ((self->vg_clip.vgc_bxend <= self->vg_clip.vgc_bxmin ||
+	            self->vg_clip.vgc_byend <= self->vg_clip.vgc_bymin) &&
+	           (self->vg_clip.vgc_ops == &libvideo_emptygfx_ops))
+	        : 1,
+	        "Empty clip rect, but I/O rect didn't become empty?");
 	return self;
 }
 

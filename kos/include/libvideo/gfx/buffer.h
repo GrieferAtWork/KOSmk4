@@ -439,7 +439,7 @@ video_domain_deserialize(struct video_domain const *__restrict __self,
 
 struct video_lock {
 	/* WARNING: DO NOT MODIFY ANYTHING HERE BEFORE `video_buffer_unlock()' */
-	__byte_t *vl_data;   /* [1..vl_size] Memory-mapped video dat (never "NULL") */
+	__byte_t *vl_data;   /* [1..1] Memory-mapped video dat (never "NULL") */
 	__size_t  vl_stride; /* Scanline width (in bytes) */
 #define _VIDEO_LOCK__N_DRIVER 1
 	void *_vl_driver[_VIDEO_LOCK__N_DRIVER]; /* Driver-specific data */

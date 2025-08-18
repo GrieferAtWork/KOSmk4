@@ -17,30 +17,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_GFX_EMPTY_C
-#define GUARD_LIBVIDEO_GFX_GFX_EMPTY_C 1
+#ifndef GUARD_LIBVIDEO_GFX_BUFFER_EMPTY_C
+#define GUARD_LIBVIDEO_GFX_BUFFER_EMPTY_C 1
 #define __VIDEO_BUFFER_const /* nothing */
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
+#include <sys/param.h>
+
 #include <assert.h>
-#include <stddef.h>
+#include <malloc.h>
 #include <string.h>
 
 #include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/buffer/empty.h>
 #include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
-#include "buffer.h"
-#include "codec/codec.h"
-#include "gfx-empty.h"
-#include "ramdomain.h"
+#include "../buffer.h"
+#include "../codec/codec.h"
+#include "../ramdomain.h"
+#include "empty.h"
 
 DECL_BEGIN
 
@@ -53,13 +58,13 @@ DECL_BEGIN
 /* Empty GFX operators */
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
 libvideo_emptygfx_blitfrom(struct video_blitter *__restrict ctx) {
-	ctx->vbt_ops = &libvideo_emptyblitter_ops;
+	ctx->vbt_ops = _libvideo_emptyblitter_ops();
 	return ctx;
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter3 *FCC
 libvideo_emptygfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
-	ctx->vbt3_ops = &libvideo_emptyblitter3_ops;
+	ctx->vbt3_ops = _libvideo_emptyblitter3_ops();
 	return ctx;
 }
 
@@ -67,6 +72,8 @@ INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
 libvideo_emptygfx_clip(struct video_gfx *__restrict self,
                        video_offset_t clip_x, video_offset_t clip_y,
                        video_dim_t size_x, video_dim_t size_y) {
+	gfx_assert(video_gfx_getioxdim(self) == 0);
+	gfx_assert(video_gfx_getioydim(self) == 0);
 	self->vg_clip.vgc_cxoff += clip_x;
 	self->vg_clip.vgc_cyoff += clip_y;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XMIRROR)
@@ -122,6 +129,9 @@ libvideo_emptygfx_line(struct video_gfx const *__restrict UNUSED(self),
 }
 
 DEFINE_INTERN_ALIAS(libvideo_emptygfx_rect, libvideo_emptygfx_fill);
+#if __SIZEOF_VIDEO_DIM_T__ == __SIZEOF_VIDEO_OFFSET_T__
+DEFINE_INTERN_ALIAS(libvideo_emptygfx_fill, libvideo_emptygfx_line);
+#else /* __SIZEOF_VIDEO_DIM_T__ == __SIZEOF_VIDEO_OFFSET_T__ */
 INTERN ATTR_IN(1) void CC
 libvideo_emptygfx_fill(struct video_gfx const *__restrict UNUSED(self),
                         video_offset_t UNUSED(x), video_offset_t UNUSED(y),
@@ -129,6 +139,7 @@ libvideo_emptygfx_fill(struct video_gfx const *__restrict UNUSED(self),
                         video_color_t UNUSED(color)) {
 	COMPILER_IMPURE();
 }
+#endif /* __SIZEOF_VIDEO_DIM_T__ != __SIZEOF_VIDEO_OFFSET_T__ */
 
 INTERN ATTR_IN(1) ATTR_IN(6) void CC
 libvideo_emptygfx_gradient(struct video_gfx const *__restrict UNUSED(self),
@@ -190,8 +201,8 @@ libvideo_emptygfx_stretch3(struct video_gfx const *UNUSED(wrdst),
 }
 
 
-#undef libvideo_emptygfx_ops
-PRIVATE struct video_gfx_ops libvideo_emptygfx_ops = {};
+INTERN struct video_gfx_ops libvideo_emptygfx_ops = {};
+DEFINE_PUBLIC_ALIAS(video_emptygfx_ops, _libvideo_emptygfx_ops);
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_emptygfx_ops(void) {
 	if unlikely(!libvideo_emptygfx_ops.vgfo_getcolor) {
 		libvideo_emptygfx_ops.vgfo_blitfrom     = &libvideo_emptygfx_blitfrom;
@@ -218,28 +229,27 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_emptygfx
 	}
 	return &libvideo_emptygfx_ops;
 }
-#define libvideo_emptygfx_ops (*_libvideo_emptygfx_ops())
 
 /* Empty blit operators */
 INTERN ATTR_IN(1) void CC
 libvideo_emptyblitter_blit(struct video_blitter const *__restrict UNUSED(self),
-                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                            video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
-                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y)) {
+                           video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
+                           video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
+                           video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y)) {
 	COMPILER_IMPURE();
 }
 
 INTERN ATTR_IN(1) void CC
 libvideo_emptyblitter_stretch(struct video_blitter const *__restrict UNUSED(self),
-                               video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                               video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
-                               video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
-                               video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y)) {
+                              video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
+                              video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
+                              video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
+                              video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y)) {
 	COMPILER_IMPURE();
 }
 
-#undef libvideo_emptyblitter_ops
-PRIVATE struct video_blitter_ops libvideo_emptyblitter_ops = {};
+INTERN struct video_blitter_ops libvideo_emptyblitter_ops = {};
+DEFINE_PUBLIC_ALIAS(video_emptyblitter_ops, _libvideo_emptyblitter_ops);
 INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_emptyblitter_ops(void) {
 	if unlikely(!libvideo_emptyblitter_ops.vbto_bitblit) {
 		libvideo_emptyblitter_ops.vbto_stretch = &libvideo_emptyblitter_stretch;
@@ -249,7 +259,6 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_empt
 	}
 	return &libvideo_emptyblitter_ops;
 }
-#define libvideo_emptyblitter_ops (*_libvideo_emptyblitter_ops())
 
 
 
@@ -273,8 +282,8 @@ libvideo_emptyblitter3_stretch(struct video_blitter3 const *__restrict UNUSED(se
 	COMPILER_IMPURE();
 }
 
-#undef libvideo_emptyblitter3_ops
-PRIVATE struct video_blitter3_ops libvideo_emptyblitter3_ops = {};
+INTERN struct video_blitter3_ops libvideo_emptyblitter3_ops = {};
+DEFINE_PUBLIC_ALIAS(video_emptyblitter3_ops, _libvideo_emptyblitter3_ops);
 INTERN ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_emptyblitter3_ops(void) {
 	if unlikely(!libvideo_emptyblitter3_ops.vbt3o_bitblit) {
 		libvideo_emptyblitter3_ops.vbt3o_stretch = &libvideo_emptyblitter3_stretch;
@@ -284,14 +293,13 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_emp
 	}
 	return &libvideo_emptyblitter3_ops;
 }
-#define libvideo_emptyblitter3_ops (*_libvideo_emptyblitter3_ops())
 
 
 
 /* Empty video buffer. */
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_emptybuffer_initgfx(struct video_gfx *__restrict self) {
-	self->vg_clip.vgc_ops = &libvideo_emptygfx_ops;
+	self->vg_clip.vgc_ops = _libvideo_emptygfx_ops();
 	return self;
 }
 
@@ -304,14 +312,10 @@ libvideo_emptybuffer_updategfx(struct video_gfx *__restrict self,
 
 
 INTERN struct video_buffer_ops libvideo_emptybuffer_ops = {};
-INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_emptybuffer_ops(void) {
+DEFINE_PUBLIC_ALIAS(video_emptybuffer_ops, _libvideo_emptybuffer_ops);
+INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _libvideo_emptybuffer_ops(void) {
 	if (!libvideo_emptybuffer_ops.vi_initgfx) {
-		/* NOTE: It is  important  that  an  empty  buffer doesn't  support  video  locks  of  any  kind.
-		 *       Reason is that `old_bigregion_buffer_r::brbr_orig' / `old_subregion_buffer_r::srbr_orig'
-		 *       do  not  get updated  when the  empty buffer  is  assigned during  revoke, and  the impl
-		 *       assumes that  **ONLY**  the  original  buffer  can  create  video  locks,  meaning  that
-		 *       **ONLY** locked created by **IT** can possible by released (for which it always
-		 *       just uses the original buffer). */
+		/* TODO: At this point, there is no reason not to allow empty buffers to be lockable */
 		libvideo_emptybuffer_ops.vi_rlock        = &libvideo_buffer_notsup__rlock;
 		libvideo_emptybuffer_ops.vi_wlock        = &libvideo_buffer_notsup__wlock;
 		libvideo_emptybuffer_ops.vi_unlock       = &libvideo_buffer_noop__unlock;
@@ -320,15 +324,14 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_emptybuffer
 		libvideo_emptybuffer_ops.vi_unlockregion = &libvideo_buffer_noop__unlockregion;
 		libvideo_emptybuffer_ops.vi_updategfx    = &libvideo_emptybuffer_updategfx;
 		COMPILER_WRITE_BARRIER();
-		libvideo_emptybuffer_ops.vi_initgfx    = &libvideo_emptybuffer_initgfx;
+		libvideo_emptybuffer_ops.vi_initgfx = &libvideo_emptybuffer_initgfx;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_emptybuffer_ops;
 }
 
 
-#undef libvideo_emptybuffer
-PRIVATE struct video_buffer libvideo_emptybuffer = {
+INTERN struct video_buffer libvideo_emptybuffer = {
 	.vb_surf = {
 		.vs_pal      = NULL,
 		.vs_buffer   = NULL, /* Initialized lazily */
@@ -342,10 +345,11 @@ PRIVATE struct video_buffer libvideo_emptybuffer = {
 	.vb_refcnt = 0x7fff,
 };
 
+DEFINE_PUBLIC_ALIAS(video_emptybuffer, _libvideo_emptybuffer);
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_emptybuffer(void) {
 	if (!libvideo_emptybuffer.vb_ops) {
 		libvideo_emptybuffer.vb_domain = _libvideo_ramdomain();
-		libvideo_emptybuffer.vb_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
+		libvideo_emptybuffer.vb_codec  = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
 		assertf(libvideo_emptybuffer.vb_codec, "Built-in codec should have been recognized");
 		libvideo_emptybuffer.vb_surf.vs_buffer = &libvideo_emptybuffer;
 		COMPILER_WRITE_BARRIER();
@@ -354,8 +358,83 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_emptybuffer(voi
 	}
 	return &libvideo_emptybuffer;
 }
-#define libvideo_emptybuffer (*_libvideo_emptybuffer())
+
+DEFINE_PUBLIC_ALIAS(video_emptybufferref, _libvideo_emptybufferref);
+INTERN ATTR_RETNONNULL WUNUSED REF struct video_buffer *CC
+_libvideo_emptybufferref(void) {
+	REF struct video_buffer *result = _libvideo_emptybuffer();
+	video_buffer_incref(result);
+	return result;
+}
+
+
+
+/* Construct (or re-using an existing) empty video buffer with the given dimension
+ * The returned buffer always uses `video_ramdomain(3V)' as its associated domain.
+ * @param: buffer_xdim, buffer_ydim: Dimensions of the returned buffer (**NOT** swapped if VIDEO_GFX_F_XYSWAP is set)
+ * @return: * : A reference to a video buffer without any backing
+ *              storage, and  dimensions  matching  those  given.
+ * @return: NULL: [errno=ENOMEM] Out of memory. */
+PRIVATE WUNUSED REF struct video_buffer *CC
+libvideo_makeemptybuffer_impl(video_dim_t xdim, video_dim_t ydim) {
+	REF struct video_buffer *result;
+	result = (REF struct video_buffer *)malloc(sizeof(struct video_buffer));
+	if unlikely(!result)
+		goto err;
+	__video_buffer_init_dim(result, xdim, ydim);
+	__video_buffer_init_ops(result, _libvideo_emptybuffer_ops());
+	__video_buffer_init_domain(result, _libvideo_ramdomain());
+	return result;
+err:
+	return NULL;
+}
+
+DEFINE_PUBLIC_ALIAS(video_makeemptybuffer, libvideo_makeemptybuffer);
+INTERN WUNUSED ATTR_IN(1) REF struct video_buffer *CC
+libvideo_makeemptybuffer(struct video_buffer_format const *__restrict format,
+                         video_dim_t xdim, video_dim_t ydim) {
+	REF struct video_buffer *result;
+	if (xdim == 0 && ydim == 0 &&
+	    format->vbf_codec->vc_codec == VIDEO_CODEC_RGBA8888 &&
+	    format->vbf_flags == VIDEO_GFX_F_NORMAL) {
+		result = _libvideo_emptybuffer();
+		video_buffer_incref(result);
+		goto done;
+	}
+	result = libvideo_makeemptybuffer_impl(xdim, ydim);
+	if unlikely(!result)
+		goto done;
+	__video_buffer_init_format(result, format);
+	__video_buffer_init_common(result);
+done:
+	return result;
+}
+
+DEFINE_PUBLIC_ALIAS(video_makeemptybuffer_like, libvideo_makeemptybuffer_like);
+INTERN WUNUSED ATTR_IN(1) REF struct video_buffer *CC
+libvideo_makeemptybuffer_like(struct video_surface const *__restrict surf,
+                              video_dim_t xdim, video_dim_t ydim) {
+	REF struct video_buffer *result;
+	if (xdim == 0 && ydim == 0 &&
+	    video_surface_getcodec(surf)->vc_codec == VIDEO_CODEC_RGBA8888 &&
+	    video_surface_getflags(surf) == VIDEO_GFX_F_NORMAL) {
+		result = _libvideo_emptybuffer();
+		video_buffer_incref(result);
+		goto done;
+	}
+	result = libvideo_makeemptybuffer_impl(xdim, ydim);
+	if unlikely(!result)
+		goto done;
+	result->vb_surf.vs_pal      = surf->vs_pal;
+	result->vb_surf.vs_flags    = surf->vs_flags;
+	result->vb_surf.vs_colorkey = surf->vs_colorkey;
+	result->vb_codec = video_surface_getcodec(surf);
+	__video_buffer_init_dim(result, xdim, ydim);
+	__video_buffer_init_common(result);
+done:
+	return result;
+}
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_GFX_EMPTY_C */
+#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_EMPTY_C */
