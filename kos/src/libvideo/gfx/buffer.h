@@ -79,14 +79,6 @@ NOTHROW(FCC libvideo_buffer_noop__revoke)(struct video_buffer *__restrict self);
 #define libvideo_buffer_notsup__lockregion (*(int (FCC *)(struct video_buffer *__restrict, struct video_regionlock *__restrict))&libvideo_buffer_notsup__lock)
 #define libvideo_buffer_noop__unlockregion (*(void NOTHROW_T(FCC *)(struct video_buffer *__restrict, struct video_regionlock *__restrict))&libvideo_buffer_noop__unlock)
 
-#define video_buffer_ops_set_LOCKOPS_like_NOTSUP(self)                    \
-	(void)((self)->vi_rlock        = &libvideo_buffer_notsup__rlock,       \
-	       (self)->vi_wlock        = &libvideo_buffer_notsup__wlock,       \
-	       (self)->vi_unlock       = &libvideo_buffer_noop__unlock,        \
-	       (self)->vi_rlockregion  = &libvideo_buffer_notsup__rlockregion, \
-	       (self)->vi_wlockregion  = &libvideo_buffer_notsup__wlockregion, \
-	       (self)->vi_unlockregion = &libvideo_buffer_noop__unlockregion)
-
 #ifdef CONFIG_LIBVIDEO_HAVE_SERIALIZATION
 #define __video_buffer_ops_set_fdinfo(self, cb) (void)((self)->vi_fdinfo = (cb))
 #else /* CONFIG_LIBVIDEO_HAVE_SERIALIZATION */
