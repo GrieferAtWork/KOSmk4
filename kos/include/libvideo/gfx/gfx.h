@@ -1414,7 +1414,7 @@ struct video_gfxclip {
 	video_dim_t                 vgc_cxdim;    /* Absolute width of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
 	video_dim_t                 vgc_cydim;    /* Absolute height of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
 	/* I/O Rect: these values control the (absolute) pixel area where read/writes do something
-	 * NOTE: The I/O Rect is already pre-adjusted for VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR */
+	 * NOTE: The I/O Rect is already pre-adjusted for VIDEO_GFX_F_XYSWAP */
 	video_coord_t               vgc_bxmin;    /* [<= vgc_bxend][>= vgc_cxoff] Absolute buffer start coord in X (start of acc) */
 	video_coord_t               vgc_bymin;    /* [<= vgc_byend][>= vgc_cyoff] Absolute buffer start coord in Y */
 	video_coord_t               vgc_bxend;    /* [<= video_buffer_getxdim(:vg_surf.vs_buffer)] Absolute buffer end coord in X */

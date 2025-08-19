@@ -569,7 +569,7 @@ LOCAL_libvideo_swgfx_fillpoly(struct video_gfx const *__restrict self,
 //	video_coord_t temp;
 	x += self->vg_clip.vgc_cxoff;
 	y += self->vg_clip.vgc_cyoff;
-#if 0 /* TODO */
+#if 0 /* TODO: Clip polygon if necessary */
 	if unlikely(x < (video_offset_t)GFX_BXMIN) {
 		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BXMIN - x);
 		if unlikely(size_x <= off)
@@ -595,7 +595,7 @@ LOCAL_libvideo_swgfx_fillpoly(struct video_gfx const *__restrict self,
 		size_y = GFX_BYEND - (video_coord_t)y;
 	}
 #endif
-	LOCAL_video_swgfx_x_fillpoly(self, x, y, video_polygon_ascpoly(poly), color,
+	LOCAL_video_swgfx_x_fillpoly(self, x, y, video_polygon_asdata(poly), color,
 	                             VIDEO_IMATRIX2D_INIT(1, 0, 0, 1), method);
 }
 

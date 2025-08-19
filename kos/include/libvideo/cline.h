@@ -55,25 +55,27 @@ struct video_cline {
 #define video_cline_getxdim(self) (video_dim_t)((video_cline_getp1x(self) >= video_cline_getp0x(self)) ? (video_cline_getp1x(self) - video_cline_getp0x(self)) : (video_cline_getp0x(self) - video_cline_getp1x(self)))
 #define video_cline_getydim(self) (video_dim_t)(video_cline_getp1y(self) - video_cline_getp0y(self))
 
-#define video_cline_getxres(self) (video_cline_getp1x(self) - video_cline_getp0x(self))
-#define video_cline_getyres(self) (video_cline_getp1y(self) - video_cline_getp0y(self))
+#define video_cline_getxres(self) (video_offset_t)(video_cline_getp1x(self) - video_cline_getp0x(self))
+#define video_cline_getyres(self) (video_offset_t)(video_cline_getp1y(self) - video_cline_getp0y(self))
 
 /* Find the X value where `__self' intersects with a horizontal plane at `__y' */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t
 video_cline_getxat_fast(struct video_cline const *__restrict __self, video_offset_t __y) {
-	video_offset_t __yoff = (video_offset_t)video_cline_getp0y(__self) - __y; // -1
-	video_dim_t __ydim = video_cline_getydim(__self); // 100
-	video_offset_t __result = (video_offset_t)(((__INT_FAST64_TYPE__)__yoff * video_cline_getxres(__self)) / __ydim);
+	video_offset_t __yoff = __y - (video_offset_t)video_cline_getp0y(__self);
+	video_dim_t __ydim = video_cline_getydim(__self);
+	video_offset_t __xres = video_cline_getxres(__self);
+	video_offset_t __result = (video_offset_t)(((__INT_FAST64_TYPE__)__yoff * __xres) / __ydim);
 	return video_cline_getp0x(__self) + __result;
 }
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t
 video_cline_getxat(struct video_cline const *__restrict __self, video_offset_t __y) {
-	video_offset_t __yoff = video_cline_getp0y(__self) - __y;
+	video_offset_t __xres, __result;
+	video_offset_t __yoff = __y - (video_offset_t)video_cline_getp0y(__self);
 	video_dim_t __ydim = video_cline_getydim(__self);
-	video_offset_t __result;
 	if __unlikely(__ydim == 0)
 		return VIDEO_OFFSET_MAX;
-	__result = (video_offset_t)(((__INT_FAST64_TYPE__)__yoff * video_cline_getxres(__self)) / __ydim);
+	__xres   = video_cline_getxres(__self);
+	__result = (video_offset_t)(((__INT_FAST64_TYPE__)__yoff * __xres) / __ydim);
 	return video_cline_getp0x(__self) + __result;
 }
 

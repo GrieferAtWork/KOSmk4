@@ -51,25 +51,24 @@ struct video_polygon_ops {
 };
 
 struct video_polygon_edge {
-	struct video_line           vpe_edge;   /* Line describing this edge. */
-	video_offset_t              vpe_dir;    /* "-1" if points in "vpe_edge" were swapped, else "1" */
-	video_coord_t              _vcp_x;      /* Used internally during rendering */
-	struct video_polygon_edge *_vcp_active; /* Used internally during rendering */
+	struct video_line vpe_edge; /* Line describing this edge ("vl_p1" is non-inclusive) */
+	video_offset_t    vpe_dir;  /* "-1" if points in "vpe_edge" were swapped, else "1" */
 };
 
 struct video_polygon {
-	__UINTPTR_TYPE__                vp_refcnt; /* Reference counter */
-	struct video_polygon_ops const *vp_ops;    /* [1..1][const] Operator table of this polygon */
-	struct video_domain const      *vp_domain; /* [1..1][const] Domain linked to this polygon */
-	video_offset_t                  vp_xmin;   /* [const] Lowest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_x" */
-	video_offset_t                  vp_ymin;   /* [const] Lowest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_y" */
-	video_offset_t                  vp_xend;   /* [const] Greatest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_x + 1" */
-	video_offset_t                  vp_yend;   /* [const] Greatest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_y + 1" */
-	__SIZE_TYPE__                   vp_nedges; /* [>= 3][const] # of edges in this polygon */
+	__UINTPTR_TYPE__                vp_refcnt;  /* Reference counter */
+	struct video_polygon_ops const *vp_ops;     /* [1..1][const] Operator table of this polygon */
+	struct video_domain const      *vp_domain;  /* [1..1][const] Domain linked to this polygon */
+	video_offset_t                  vp_xmin;    /* [const] Lowest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_x" */
+	video_offset_t                  vp_ymin;    /* [const] Lowest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_y" */
+	video_offset_t                  vp_xend;    /* [const] Greatest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_x + 1" */
+	video_offset_t                  vp_yend;    /* [const] Greatest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_y + 1" */
+	__SIZE_TYPE__                   vp_nactive; /* [>= 2 && <= vp_nedges][const] Max # of edges that can be active at the same time */
+	__SIZE_TYPE__                   vp_nedges;  /* [>= 2][const] # of edges in this polygon */
 	__COMPILER_FLEXIBLE_ARRAY(struct video_polygon_edge,
-	                                vp_edges); /* [1..vp_npoints][const] Polygon edges (sorted by [vl_p0.vp_y ASC, vl_p0.vp_x ASC];
-	                                            * because  "video_line" is also sorted, this means  this array sorts edges by their
-	                                            * starting Y coords). Horizontal edges are excluded from here! */
+	                                vp_edges);  /* [1..vp_npoints][const] Polygon edges (sorted by [vl_p0.vp_y ASC, vl_p0.vp_x ASC];
+	                                             * because  "video_line" is also sorted, this means  this array sorts edges by their
+	                                             * starting Y coords). Horizontal edges are excluded from here! */
 };
 
 #define video_polygon_destroy(self) (*(self)->vp_ops->vpo_destroy)(self)
@@ -85,26 +84,21 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_polygon, vp_refcnt, video_polygon_destroy
 
 
 #ifdef LIBVIDEO_GFX_EXPOSE_INTERNALS
-struct video_cpolygon_edge {
-	struct video_cline                                vcpe_edge;   /* Line describing this edge. */
-	video_offset_t                                    vcpe_dir;    /* "-1" if points in "vcpe_edge" were swapped, else "1" */
-	video_offset_t                                   _vcpe_x;      /* Used internally during rendering */
-	struct { struct video_cpolygon_edge *sle_next; } _vcpe_active; /* Used internally during rendering */
-};
-struct video_cpolygon {
-	video_coord_t             vcp_xmin;   /* [const] Lowest "vcp_edges[i].vcpe_edge.vcl_p{0|1}.vcp_x" */
-	video_coord_t             vcp_ymin;   /* [const] Lowest "vcp_edges[i].vcpe_edge.vcl_p{0|1}.vcp_y" */
-	video_coord_t             vcp_xend;   /* [const] Greatest "vcp_edges[i].vcpe_edge.vcl_p{0|1}.vcp_x + 1" */
-	video_coord_t             vcp_yend;   /* [const] Greatest "vcp_edges[i].vcpe_edge.vcl_p{0|1}.vcp_y + 1" */
-	__SIZE_TYPE__             vcp_nedges; /* [>= 3][const] # of edges in this polygon */
-	__COMPILER_FLEXIBLE_ARRAY(struct video_cpolygon_edge,
-	                          vcp_edges); /* [1..vcp_npoints][const] Polygon edges (sorted by [vl_p0.vcp_y ASC, vl_p0.vcp_x ASC];
+struct video_polygon_data {
+	video_offset_t            vpd_xmin;    /* [const] Lowest "vpd_edges[i].vpe_edge.vcl_p{0|1}.vcp_x" */
+	video_offset_t            vpd_ymin;    /* [const] Lowest "vpd_edges[i].vpe_edge.vcl_p{0|1}.vcp_y" */
+	video_offset_t            vpd_xend;    /* [const] Greatest "vpd_edges[i].vpe_edge.vcl_p{0|1}.vcp_x + 1" */
+	video_offset_t            vpd_yend;    /* [const] Greatest "vpd_edges[i].vpe_edge.vcl_p{0|1}.vcp_y + 1" */
+	__SIZE_TYPE__             vpd_nactive; /* [>= 2 && <= vpd_nedges][const] Max # of edges that can be active at the same time */
+	__SIZE_TYPE__             vpd_nedges;  /* [>= 3][const] # of edges in this polygon */
+	__COMPILER_FLEXIBLE_ARRAY(struct video_polygon_edge,
+	                          vpd_edges); /* [1..vcp_npoints][const] Polygon edges (sorted by [vl_p0.vcp_y ASC, vl_p0.vcp_x ASC];
 	                                       * because "video_line" is  also sorted,  this means this  array sorts  edges by  their
 	                                       * starting Y coords). Horizontal edges are excluded from here! */
 };
 
-#define __video_polygon_cpoly_start vp_xmin
-#define video_polygon_ascpoly(self) ((struct video_cpolygon *)&(self)->__video_polygon_cpoly_start)
+#define __video_polygon_data_start vp_xmin
+#define video_polygon_asdata(self) ((struct video_polygon_data *)&(self)->__video_polygon_data_start)
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 
 __DECL_END

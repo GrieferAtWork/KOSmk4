@@ -363,13 +363,26 @@ step:
 
 		case 6: {
 			static const struct video_point points[] = {
-#if 1
+#if 0
+				VIDEO_POINT_INIT(0, 0),
+				VIDEO_POINT_INIT(100, 100),
+				VIDEO_POINT_INIT(100, 0),
+				VIDEO_POINT_INIT(0, 100),
+#elif 0
 				VIDEO_POINT_INIT(250, 0),
 				VIDEO_POINT_INIT(400, 500),
 				VIDEO_POINT_INIT(0, 250),
 				VIDEO_POINT_INIT(500, 250),
 				VIDEO_POINT_INIT(0, 400),
 #else
+#if 1 /* INVERT */
+				VIDEO_POINT_INIT(0, 100),
+				VIDEO_POINT_INIT(0, 0),
+				VIDEO_POINT_INIT(500, 0),
+				VIDEO_POINT_INIT(500, 500),
+				VIDEO_POINT_INIT(0, 500),
+#endif
+				/* It's a duck -- quack! */
 				VIDEO_POINT_INIT(0, 100),
 				VIDEO_POINT_INIT(200, 0),
 				VIDEO_POINT_INIT(250, 300),

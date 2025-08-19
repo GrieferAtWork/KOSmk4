@@ -339,7 +339,7 @@ struct blitter3_swdrv {
 /* SW-GFX                                                               */
 /************************************************************************/
 
-struct video_cpolygon;
+struct video_polygon_data;
 struct gfx_swdrv_shapeops {
 	/* Diagonal line from top-left -> bottom-right
 	 * LLHH -> Low Low High High
@@ -399,8 +399,8 @@ struct gfx_swdrv_shapeops {
 	/* Fill  pixels covered by the given `__poly'. The caller is responsible
 	 * to ensure that coords are always in-bounds. Polygon coords are mapped
 	 * to buffer coords as follows:
-	 * >> video_coord_t poly_x = __poly->vcp_edges[*].vcpe_edge.vcl_p{1|2}.vcp_x;
-	 * >> video_coord_t poly_y = __poly->vcp_edges[*].vcpe_edge.vcl_p{1|2}.vcp_y;
+	 * >> video_coord_t poly_x = __poly->vpd_edges[*].vpe_edge.vcl_p{1|2}.vcp_x;
+	 * >> video_coord_t poly_y = __poly->vpd_edges[*].vpe_edge.vcl_p{1|2}.vcp_y;
 	 * >> video_coord_t buffer_x = __xoff + ((poly_x * video_imatrix2d_get(&__matrix, 0, 0)) +
 	 * >>                                    (poly_y * video_imatrix2d_get(&__matrix, 0, 1)));
 	 * >> video_coord_t buffer_y = __yoff + ((poly_x * video_imatrix2d_get(&__matrix, 1, 0)) +
@@ -410,7 +410,7 @@ struct gfx_swdrv_shapeops {
 	__ATTR_IN_T(1) __ATTR_NONNULL_T((4)) void
 	(LIBVIDEO_GFX_CC *xsws_fillpoly)(struct video_gfx const *__restrict __self,
 	                                 video_offset_t __xoff, video_offset_t __yoff,
-	                                 struct video_cpolygon *__restrict __poly,
+	                                 struct video_polygon_data const *__restrict __poly,
 	                                 video_color_t __color, video_imatrix2d_t __matrix,
 	                                 unsigned int __method);
 

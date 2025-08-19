@@ -55,17 +55,17 @@ typedef video_foffset_t video_float_t;
 #define VIDEO_FLOAT_FROM_FOFFSET(fp) (video_foffset_t)(fp)
 #define VIDEO_FLOAT_FROM_FCOORD(fp)  (video_fcoord_t)(fp)
 #else /* __NO_FPU */
-typedef float video_float_t;
+typedef double video_float_t;
 #define VIDEO_FLOAT_ONE          1.0
-#define VIDEO_FLOAT(whole, frac) ((float)(whole) + (frac))
+#define VIDEO_FLOAT(whole, frac) ((double)(whole) + (frac))
 #define VIDEO_FLOAT_AS_FOFFSET(fp) \
-	((video_foffset_t)(fp) + VIDEO_FOFFSET_FRAC_CAST((float)(fp) * VIDEO_FCOORD(1, 0)))
+	((video_foffset_t)(fp) + VIDEO_FOFFSET_FRAC_CAST((double)(fp) * VIDEO_FCOORD(1, 0)))
 #define VIDEO_FLOAT_AS_FCOORD(fp) \
-	((video_fcoord_t)(fp) + VIDEO_FCOORD_FRAC_CAST((float)(fp) * VIDEO_FCOORD(1, 0)))
+	((video_fcoord_t)(fp) + VIDEO_FCOORD_FRAC_CAST((double)(fp) * VIDEO_FCOORD(1, 0)))
 #define VIDEO_FLOAT_FROM_FOFFSET(fp) \
-	((float)VIDEO_FOFFSET_WHOLE(fp) + ((float)VIDEO_FOFFSET_FRAC(fp) / (float)VIDEO_FOFFSET(1, 0)))
+	((double)VIDEO_FOFFSET_WHOLE(fp) + ((double)VIDEO_FOFFSET_FRAC(fp) / (double)VIDEO_FOFFSET(1, 0)))
 #define VIDEO_FLOAT_FROM_FCOORD(fp) \
-	((float)VIDEO_FCOORD_WHOLE(fp) + ((float)VIDEO_FCOORD_FRAC(fp) / (float)VIDEO_FCOORD(1, 0)))
+	((double)VIDEO_FCOORD_WHOLE(fp) + ((double)VIDEO_FCOORD_FRAC(fp) / (double)VIDEO_FCOORD(1, 0)))
 #endif /* !__NO_FPU */
 
 __DECL_END
