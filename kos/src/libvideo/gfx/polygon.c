@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_POLYGON_C
 #define GUARD_LIBVIDEO_GFX_POLYGON_C 1
+#define __VIDEO_POLYGON_const
 #define _KOS_SOURCE 1
 
 #include "api.h"
@@ -50,9 +51,9 @@ DECL_BEGIN
 /* Assert that "video_polygon_asdata()" works */
 #define OFFSETOF_CPOLY_START offsetof(struct video_polygon, __video_polygon_data_start)
 static_assert(offsetof(struct video_polygon_data, vpd_xmin) == (offsetof(struct video_polygon, vp_xmin) - OFFSETOF_CPOLY_START));
-static_assert(offsetof(struct video_polygon_data, vpd_xend) == (offsetof(struct video_polygon, vp_xend) - OFFSETOF_CPOLY_START));
+static_assert(offsetof(struct video_polygon_data, vpd_xdim) == (offsetof(struct video_polygon, vp_xdim) - OFFSETOF_CPOLY_START));
 static_assert(offsetof(struct video_polygon_data, vpd_ymin) == (offsetof(struct video_polygon, vp_ymin) - OFFSETOF_CPOLY_START));
-static_assert(offsetof(struct video_polygon_data, vpd_yend) == (offsetof(struct video_polygon, vp_yend) - OFFSETOF_CPOLY_START));
+static_assert(offsetof(struct video_polygon_data, vpd_ydim) == (offsetof(struct video_polygon, vp_ydim) - OFFSETOF_CPOLY_START));
 static_assert(offsetof(struct video_polygon_data, vpd_nactive) == (offsetof(struct video_polygon, vp_nactive) - OFFSETOF_CPOLY_START));
 static_assert(offsetof(struct video_polygon_data, vpd_nedges) == (offsetof(struct video_polygon, vp_nedges) - OFFSETOF_CPOLY_START));
 static_assert(offsetof(struct video_polygon_data, vpd_edges) == (offsetof(struct video_polygon, vp_edges) - OFFSETOF_CPOLY_START));
@@ -102,15 +103,16 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
                                 struct video_point const *points, size_t npoints) {
 	REF struct video_polygon *result;
 	size_t i, nedges, sizeof_polygon;
+	video_offset_t poly_xend, poly_yend;
 	sizeof_polygon = offsetof(struct video_polygon, vp_edges) +
 	                 (npoints * sizeof(struct video_polygon_edge));
 	result = (REF struct video_polygon *)malloc(sizeof_polygon);
 	if unlikely(!result)
 		goto err;
 	result->vp_xmin = VIDEO_OFFSET_MAX;
-	result->vp_xend = VIDEO_OFFSET_MIN;
 	result->vp_ymin = VIDEO_OFFSET_MAX;
-	result->vp_yend = VIDEO_OFFSET_MIN;
+	poly_xend = VIDEO_OFFSET_MIN;
+	poly_yend = VIDEO_OFFSET_MIN;
 	for (nedges = i = 0; i < npoints; ++i) {
 		struct video_polygon_edge *edge;
 		struct video_point const *from = &points[i];
@@ -134,18 +136,20 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 		/* Keep track of the min/max bounds of the polygon */
 		if (result->vp_ymin > video_line_getp0y(&edge->vpe_edge))
 			result->vp_ymin = video_line_getp0y(&edge->vpe_edge);
-		if (result->vp_yend < video_line_getp1y(&edge->vpe_edge))
-			result->vp_yend = video_line_getp1y(&edge->vpe_edge);
+		if (poly_yend < video_line_getp1y(&edge->vpe_edge))
+			poly_yend = video_line_getp1y(&edge->vpe_edge);
 		if (result->vp_xmin > video_line_getp0x(&edge->vpe_edge))
 			result->vp_xmin = video_line_getp0x(&edge->vpe_edge);
-		if (result->vp_xend < video_line_getp0x(&edge->vpe_edge))
-			result->vp_xend = video_line_getp0x(&edge->vpe_edge);
+		if (poly_xend < video_line_getp0x(&edge->vpe_edge))
+			poly_xend = video_line_getp0x(&edge->vpe_edge);
 		if (result->vp_xmin > video_line_getp1x(&edge->vpe_edge))
 			result->vp_xmin = video_line_getp1x(&edge->vpe_edge);
-		if (result->vp_xend < video_line_getp1x(&edge->vpe_edge))
-			result->vp_xend = video_line_getp1x(&edge->vpe_edge);
+		if (poly_xend < video_line_getp1x(&edge->vpe_edge))
+			poly_xend = video_line_getp1x(&edge->vpe_edge);
 		++nedges;
 	}
+	result->vp_xdim = (video_dim_t)(poly_xend - result->vp_xmin);
+	result->vp_ydim = (video_dim_t)(poly_yend - result->vp_ymin);
 
 	/* Assert that there are at least 2 edges */
 	if unlikely(nedges < 2) {

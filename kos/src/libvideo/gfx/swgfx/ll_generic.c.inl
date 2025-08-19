@@ -89,7 +89,7 @@ libvideo_swgfx_generic__putcolor_noblend(struct video_gfx const *__restrict self
 	libvideo_swgfx_generic__putcolor_##name(struct video_gfx const *__restrict self, \
 	                                        video_coord_t x, video_coord_t y,        \
 	                                        video_color_t color) {                   \
-		struct video_surface const *surface = video_gfx_assurface(self);            \
+		struct video_surface const *surface = video_gfx_assurface(self);             \
 		video_pixel_t op = LL_getpixel(self, x, y);                                  \
 		video_color_t oc = video_surface_pixel2color(surface, op);                   \
 		video_color_t nc = gfx_blendcolors(oc, color, mode);                         \
@@ -105,7 +105,7 @@ GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_swgfx_generic__putcolor_FOO)
 	libvideo_swgfx_generic__putcolor_##name(struct video_gfx const *__restrict self, \
 	                                        video_coord_t x, video_coord_t y,        \
 	                                        video_color_t color) {                   \
-		struct video_surface const *surface = video_gfx_assurface(self);            \
+		struct video_surface const *surface = video_gfx_assurface(self);             \
 		video_pixel_t op = LL_getpixel(self, x, y);                                  \
 		video_color_t oc = video_surface_pixel2color(surface, op);                   \
 		video_color_t cc = GFX_BLENDMODE_GET_COLOR(self->vg_blend);                  \
@@ -381,19 +381,6 @@ libvideo_swgfx_generic__fill(struct video_gfx const *__restrict self,
 }
 
 
-#ifndef POLYGON_ACTIVE_EDGE_DEFINED
-#define POLYGON_ACTIVE_EDGE_DEFINED
-struct polygon_active_edge {
-	video_offset_t                    pae_x;    /* X coord where `pae_edge' intersects current scanline */
-#if __SIZEOF_POINTER__ <= __SIZEOF_VIDEO_OFFSET_T__
-#define HAVE_POLYGON_ACTIVE_EDGE__PAE_EDGE
-	struct video_polygon_edge const *pae_edge; /* [1..1] Linked polygon */
-#else /* __SIZEOF_POINTER__ <= __SIZEOF_VIDEO_OFFSET_T__ */
-	video_coord_t                     pae_edge_index;
-#endif /* __SIZEOF_POINTER__ > __SIZEOF_VIDEO_OFFSET_T__ */
-};
-#endif /* !POLYGON_ACTIVE_EDGE_DEFINED */
-
 INTERN ATTR_IN(1) NONNULL((4)) void CC
 libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
                                  video_offset_t xoff, video_offset_t yoff,
@@ -401,27 +388,27 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
                                  video_color_t color, video_imatrix2d_t matrix,
                                  unsigned int method) {
 	size_t active_c, active_i;
-	struct polygon_active_edge *active_v;
-#ifdef HAVE_POLYGON_ACTIVE_EDGE__PAE_EDGE
-#define polygon_active_edge__getedge(ae)    ((ae)->pae_edge)
-#define polygon_active_edge__setedge(ae, v) (void)((ae)->pae_edge = (v))
-#else /* HAVE_POLYGON_ACTIVE_EDGE__PAE_EDGE */
-#define polygon_active_edge__getedge(ae)    (&poly->vpd_edges[(ae)->pae_edge_index])
-#define polygon_active_edge__setedge(ae, v) (void)((ae)->pae_edge_index = (video_coord_t)((v) - poly->vpd_edges))
-#endif /* !HAVE_POLYGON_ACTIVE_EDGE__PAE_EDGE */
-	video_offset_t scanline_y;
+	struct video_polygon_edgeref *active_v;
+#ifdef VIDEO_POLYGON_EDGEREF_HAVE_POINTER
+#define video_polygon_edgeref__getedge(ae)    ((ae)->vper_edge)
+#define video_polygon_edgeref__setedge(ae, v) (void)((ae)->vper_edge = (v))
+#else /* VIDEO_POLYGON_EDGEREF_HAVE_POINTER */
+#define video_polygon_edgeref__getedge(ae)    (&poly->vpd_edges[(ae)->vper_edge_index])
+#define video_polygon_edgeref__setedge(ae, v) (void)((ae)->vper_edge_index = (video_coord_t)((v) - poly->vpd_edges))
+#endif /* !VIDEO_POLYGON_EDGEREF_HAVE_POINTER */
+	video_offset_t scanline_y, scanline_yend;
 	size_t next_edge_to_activate;
 	void (LIBVIDEO_GFX_CC *xsws_line)(struct video_gfx const *__restrict self,
 	                                  video_coord_t x, video_coord_t y,
 	                                  video_dim_t length, video_color_t color);
 	TRACE_START("swgfx_generic__fillpoly("
 	            "off: {%" PRIdOFF "x%" PRIdOFF "}, "
-	            "poly: {%" PRIdOFF "x%" PRIdOFF ", %" PRIdOFF "x%" PRIdOFF "}, "
+	            "poly: {%" PRIdOFF "x%" PRIdOFF ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", "
 	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            xoff, yoff,
 	            poly->vpd_xmin, poly->vpd_ymin,
-	            poly->vpd_xend, poly->vpd_yend,
+	            poly->vpd_xdim, poly->vpd_ydim,
 	            color,
 	            (int)video_imatrix2d_get(&matrix, 0, 0), (int)video_imatrix2d_get(&matrix, 0, 1),
 	            (int)video_imatrix2d_get(&matrix, 1, 0), (int)video_imatrix2d_get(&matrix, 1, 1));
@@ -468,14 +455,16 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 
 	/* Select appropriate line drawing method:
 	 * - When X/Y swapping is enabled, must draw vertical lines instead of horizontal ones */
-	xsws_line = video_swgfx_getcdrvshape(self)->xsws_line_h;
+	xsws_line = &libvideo_swgfx_generic__line_h;
 	if (video_imatrix2d_get(&matrix, 1, 0) != 0)
-		xsws_line = video_swgfx_getcdrvshape(self)->xsws_line_v;
+		xsws_line = &libvideo_swgfx_generic__line_v;
 
 	/* Initialize variables and allocate list of "active" edges */
-	active_c = 0;
-	active_v = (struct polygon_active_edge *)alloca(poly->vpd_nactive * sizeof(struct polygon_active_edge));
+	active_c = 0; /* TODO: Don't unconditionally use alloca() --  use malloca, and if  that
+	               * fails, the polygon should have a fallback buffer that we can also use! */
+	active_v = (struct video_polygon_edgeref *)alloca(poly->vpd_nactive * sizeof(struct video_polygon_edgeref));
 	scanline_y = poly->vpd_ymin;
+	scanline_yend = scanline_y + poly->vpd_ydim;
 	next_edge_to_activate = 0;
 
 	/* Main scanline iteration loop */
@@ -487,8 +476,8 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 			if (video_line_getp0y(&next_edge->vpe_edge) /*>*/ != scanline_y)
 				break;
 			gfx_assert(active_c < poly->vpd_nactive);
-			polygon_active_edge__setedge(&active_v[active_c], next_edge);
-			active_v[active_c].pae_x = video_line_getxat_fast(&next_edge->vpe_edge, scanline_y);
+			video_polygon_edgeref__setedge(&active_v[active_c], next_edge);
+			active_v[active_c].vper_x = video_line_getxat_fast(&next_edge->vpe_edge, scanline_y);
 			++active_c;
 			++next_edge_to_activate;
 		}
@@ -501,10 +490,10 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 				changed = false;
 				active_i = 0;
 				do {
-					video_offset_t this_x = active_v[active_i + 0].pae_x;
-					video_offset_t next_x = active_v[active_i + 1].pae_x;
+					video_offset_t this_x = active_v[active_i + 0].vper_x;
+					video_offset_t next_x = active_v[active_i + 1].vper_x;
 					if (next_x < this_x) {
-						struct polygon_active_edge temp;
+						struct video_polygon_edgeref temp;
 						temp = active_v[active_i + 0];
 						active_v[active_i + 0] = active_v[active_i + 1];
 						active_v[active_i + 1] = temp;
@@ -521,13 +510,16 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 		case VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD:
 			active_i = 0;
 			do {
-				video_offset_t start_x = active_v[active_i + 0].pae_x;
-				video_offset_t end_x   = active_v[active_i + 1].pae_x;
+				video_offset_t start_x = active_v[active_i + 0].vper_x;
+				video_offset_t end_x   = active_v[active_i + 1].vper_x;
 				video_dim_t length = (video_dim_t)(end_x - start_x);
 				if likely(length) {
 					video_coord_t render_x = (video_coord_t)(xoff + video_imatrix2d_mapx(&matrix, start_x, scanline_y));
 					video_coord_t render_y = (video_coord_t)(yoff + video_imatrix2d_mapy(&matrix, start_x, scanline_y));
-					/* TODO: For certain matrices, "length" must be subtracted from either "render_x" or "render_y" */
+					if (video_imatrix2d_get(&matrix, 0, 0) < 0 || video_imatrix2d_get(&matrix, 0, 1) < 0)
+						render_x -= (length - 1);
+					if (video_imatrix2d_get(&matrix, 1, 0) < 0 || video_imatrix2d_get(&matrix, 1, 1) < 0)
+						render_y -= (length - 1);
 					(*xsws_line)(self, render_x, render_y, length, color);
 				}
 			} while ((active_i += 2) < active_c);
@@ -541,26 +533,29 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 				video_dim_t length;
 				video_offset_t in_shape;
 				gfx_assert(active_i < active_c);
-				start_x = active_v[active_i].pae_x;
-				edge = polygon_active_edge__getedge(&active_v[active_i]);
+				start_x = active_v[active_i].vper_x;
+				edge = video_polygon_edgeref__getedge(&active_v[active_i]);
 				in_shape = edge->vpe_dir;
 				for (;;) {
 					++active_i;
 					gfx_assert(active_i < active_c);
-					edge = polygon_active_edge__getedge(&active_v[active_i]);
+					edge = video_polygon_edgeref__getedge(&active_v[active_i]);
 					in_shape += edge->vpe_dir;
 					if (in_shape == 0)
 						break;
 					++active_i;
 					gfx_assert(active_i < active_c);
-					edge = polygon_active_edge__getedge(&active_v[active_i]);
+					edge = video_polygon_edgeref__getedge(&active_v[active_i]);
 					in_shape += edge->vpe_dir;
 				}
-				length = (video_dim_t)(active_v[active_i].pae_x - start_x);
+				length = (video_dim_t)(active_v[active_i].vper_x - start_x);
 				if likely(length) {
 					video_coord_t render_x = (video_coord_t)(xoff + video_imatrix2d_mapx(&matrix, start_x, scanline_y));
 					video_coord_t render_y = (video_coord_t)(yoff + video_imatrix2d_mapy(&matrix, start_x, scanline_y));
-					/* TODO: For certain matrices, "length" must be subtracted from either "render_x" or "render_y" */
+					if (video_imatrix2d_get(&matrix, 0, 0) < 0 || video_imatrix2d_get(&matrix, 0, 1) < 0)
+						render_x -= (length - 1);
+					if (video_imatrix2d_get(&matrix, 1, 0) < 0 || video_imatrix2d_get(&matrix, 1, 1) < 0)
+						render_y -= (length - 1);
 					(*xsws_line)(self, render_x, render_y, length, color);
 				}
 			} while ((++active_i) < active_c);
@@ -571,7 +566,7 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 
 		/* Move on to the next scanline */
 		++scanline_y;
-		if (scanline_y >= poly->vpd_yend)
+		if (scanline_y >= scanline_yend)
 			break;
 
 		/* Do 2 things at once:
@@ -581,7 +576,7 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 		gfx_assert(active_c >= 2);
 		do {
 			struct video_polygon_edge const *edge;
-			edge = polygon_active_edge__getedge(&active_v[active_i]);
+			edge = video_polygon_edgeref__getedge(&active_v[active_i]);
 			if (video_line_getp1y(&edge->vpe_edge) == /*<=*/ scanline_y) {
 				--active_c;
 				memmovedownc(&active_v[active_i],
@@ -589,13 +584,13 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 				             active_c - active_i,
 				             sizeof(*active_v));
 			} else {
-				active_v[active_i].pae_x = video_line_getxat_fast(&edge->vpe_edge, scanline_y);
+				active_v[active_i].vper_x = video_line_getxat_fast(&edge->vpe_edge, scanline_y);
 				++active_i;
 			}
 		} while (active_i < active_c);
 	}
-#undef polygon_active_edge__getedge
-#undef polygon_active_edge__setedge
+#undef video_polygon_edgeref__getedge
+#undef video_polygon_edgeref__setedge
 	TRACE_END("swgfx_generic__fillpoly()\n");
 }
 

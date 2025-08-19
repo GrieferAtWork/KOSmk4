@@ -2907,6 +2907,8 @@
 #define GFX_FOREACH_DEDICATED_PREBLENDMODE(cb)cb(alpha,0,alpha_premultiplied,gfx_preblend_alpha)cb(alpha_factor,0,alpha_premultiplied,gfx_preblend_alpha_factor)cb(alpha_override,0,alpha_premultiplied,gfx_preblend_alpha_override)cb(add,0,add_premultiplied,gfx_preblend_add)
 #define DEFINE_VIDEO_BUFFER_TYPE(n,...) struct video_buffer_ops n={};struct video_buffer_ops const*_##n(void){}
 #define __VIDEO_CODEC_const const
+#define __VIDEO_BUFFER_const const
+#define __VIDEO_POLYGON_const const
 #define DEFINE_GFX_SWDRV_SHAPEOPS(n,...) static struct gfx_swdrv_shapeops n = {};struct gfx_swdrv_shapeops const *_##n(void){}
 #define DEFINE_libvideo_swgfx_shapeops__preblend_FOO(n,...)\
 	DEFINE_GFX_SWDRV_SHAPEOPS(libvideo_swgfx_shapeops__preblend_##n)\

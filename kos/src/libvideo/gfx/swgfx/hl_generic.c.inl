@@ -566,9 +566,22 @@ LOCAL_libvideo_swgfx_fillpoly(struct video_gfx const *__restrict self,
                               video_offset_t x, video_offset_t y,
                               struct video_polygon *__restrict poly,
                               video_color_t color, unsigned int method) {
+	video_offset_t poly_xmin, poly_xend;
+	video_offset_t poly_ymin, poly_yend;
+
 //	video_coord_t temp;
 	x += self->vg_clip.vgc_cxoff;
 	y += self->vg_clip.vgc_cyoff;
+
+	poly_xmin = x + poly->vp_xmin;
+	poly_ymin = y + poly->vp_ymin;
+	if unlikely(poly_xmin < (video_offset_t)GFX_BXMIN) {
+		/* TODO */
+	}
+
+	poly_xend = poly_xmin + poly->vp_xdim;
+	poly_yend = poly_ymin + poly->vp_ydim;
+
 #if 0 /* TODO: Clip polygon if necessary */
 	if unlikely(x < (video_offset_t)GFX_BXMIN) {
 		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BXMIN - x);
