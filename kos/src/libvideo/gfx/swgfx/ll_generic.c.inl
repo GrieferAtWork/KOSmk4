@@ -128,8 +128,8 @@ libvideo_swgfx_generic__line_llhh(struct video_gfx const *__restrict self,
                                   video_color_t color) {
 	video_dim_t step;
 	TRACE_START("swgfx_generic__line_llhh("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ")\n",
 	            dst_x, dst_y, size_x, size_y, color);
 	gfx_assert(size_x > 0);
@@ -166,8 +166,8 @@ libvideo_swgfx_generic__line_lhhl(struct video_gfx const *__restrict self,
                                   video_color_t color) {
 	video_dim_t step;
 	TRACE_START("swgfx_generic__line_lhhl("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ")\n",
 	            dst_x, dst_y, size_x, size_y, color);
 	gfx_assert(size_x > 0);
@@ -203,8 +203,8 @@ libvideo_swgfx_generic__line_llhh_l(struct video_gfx const *__restrict self,
                                     video_dim_t size_x, video_dim_t size_y,
                                     video_color_t color) {
 	TRACE_START("swgfx_generic__line_llhh_l("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ")\n",
 	            dst_x, dst_y, size_x, size_y, color);
 	if (size_x > size_y) {
@@ -277,8 +277,8 @@ libvideo_swgfx_generic__line_lhhl_l(struct video_gfx const *__restrict self,
                                     video_dim_t size_x, video_dim_t size_y,
                                     video_color_t color) {
 	TRACE_START("swgfx_generic__line_lhhl_l("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ")\n",
 	            dst_x, dst_y, size_x, size_y, color);
 	if (size_x > size_y) {
@@ -394,17 +394,32 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 	void (LIBVIDEO_GFX_CC *xsws_line)(struct video_gfx const *__restrict self,
 	                                  video_coord_t x, video_coord_t y,
 	                                  video_dim_t length, video_color_t color);
+#ifndef TRACE_IS_NOOP
 	TRACE_START("swgfx_generic__fillpoly("
-	            "off: {%" PRIdOFF "x%" PRIdOFF "}, "
-	            "poly: {%" PRIdOFF "x%" PRIdOFF ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "color: %#" PRIxCOL ", "
-	            "matrix: {{%d,%d},{%d,%d}})\n",
+	            "off: {%" PRIdOFF ":%" PRIdOFF "}, "
+	            "poly: {%" PRIdOFF ":%" PRIdOFF ", %" PRIuDIM ":%" PRIuDIM ", {",
 	            xoff, yoff,
 	            poly->vpd_xmin, poly->vpd_ymin,
-	            poly->vpd_xdim, poly->vpd_ydim,
-	            color,
-	            (int)video_imatrix2d_get(&matrix, 0, 0), (int)video_imatrix2d_get(&matrix, 0, 1),
-	            (int)video_imatrix2d_get(&matrix, 1, 0), (int)video_imatrix2d_get(&matrix, 1, 1));
+	            poly->vpd_xdim, poly->vpd_ydim);
+	{
+		size_t i;
+		for (i = 0; i < poly->vpd_nedges; ++i) {
+			TRACE_CONT("%s{%" PRIdOFF ":%" PRIdOFF ",%" PRIdOFF ":%" PRIdOFF ",%" PRIdOFF "}",
+			           i == 0 ? "" : ", ",
+			           video_polygon_edge_getp0x(&poly->vpd_edges[i]),
+			           video_polygon_edge_getp0y(&poly->vpd_edges[i]),
+			           video_polygon_edge_getp1x(&poly->vpd_edges[i]),
+			           video_polygon_edge_getp1y(&poly->vpd_edges[i]),
+			           poly->vpd_edges[i].vpe_dir);
+		}
+	}
+	TRACE_CONT("}}, "
+	           "color: %#" PRIxCOL ", "
+	           "matrix: {{%d,%d},{%d,%d}})\n",
+	           color,
+	           (int)video_imatrix2d_get(&matrix, 0, 0), (int)video_imatrix2d_get(&matrix, 0, 1),
+	           (int)video_imatrix2d_get(&matrix, 1, 0), (int)video_imatrix2d_get(&matrix, 1, 1));
+#endif /* !TRACE_IS_NOOP */
 
 	/* Our polygon render algorithm here is based on "Efficient Polygon Fill Algorithm"
 	 * >> https://alienryderflex.com/polygon_fill/
@@ -652,7 +667,7 @@ libvideo_swgfx_generic__gradient(struct video_gfx const *__restrict self,
 	}
 
 	TRACE_START("swgfx_generic__gradient("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
 	            "colors: {{%#" PRIxCOL ", %#" PRIxCOL "}, {%#" PRIxCOL ", %#" PRIxCOL "}})\n",
 	            dst_x_, dst_y_, size_x_, size_y_,
 	            colors[0][0], colors[0][1], colors[1][0], colors[1][1]);
@@ -695,7 +710,7 @@ libvideo_swgfx_generic__gradient_h(struct video_gfx const *__restrict self,
 	}
 
 	TRACE_START("swgfx_generic__gradient_h("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
 	            "colors: {%#" PRIxCOL ", %#" PRIxCOL "})\n",
 	            dst_x, dst_y, size_x, size_y,
 	            locolor, hicolor);
@@ -735,7 +750,7 @@ libvideo_swgfx_generic__gradient_v(struct video_gfx const *__restrict self,
 	}
 
 	TRACE_START("swgfx_generic__gradient_v("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
 	            "colors: {%#" PRIxCOL ", %#" PRIxCOL "})\n",
 	            dst_x, dst_y, size_x, size_y,
 	            locolor, hicolor);

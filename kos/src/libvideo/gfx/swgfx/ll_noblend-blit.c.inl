@@ -147,9 +147,9 @@ libvideo_swblitter_noblend_samefmt__blit(struct video_blitter const *__restrict 
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_samefmt__blit("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x, dst_y, size_x, size_y)) {
 		struct video_regionlock src_lock;
@@ -210,9 +210,9 @@ libvideo_swblitter_noblend_samefmt__blit_imatrix(struct video_blitter const *__r
 	}
 
 	TRACE_START("swblitter_noblend_samefmt__blit_imatrix("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "}, "
 	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y,
 	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
@@ -239,8 +239,8 @@ libvideo_swblitter_noblend_samefmt__stretch_n(struct video_blitter const *__rest
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_samefmt__stretch_n("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
@@ -290,8 +290,8 @@ libvideo_swblitter_noblend_samefmt__stretch_imatrix_n(struct video_blitter const
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_samefmt__stretch_imatrix_n("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
@@ -418,9 +418,9 @@ libvideo_swblitter_noblend_samebuf__blit(struct video_blitter const *__restrict 
 	range_union_samesize(&loy, &loy_size, src_y);
 
 	TRACE_START("swblitter_noblend_samebuf__blit("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
 	if likely(LL_wlockregion(dst_buffer, &lock, lox, loy, lox_size, loy_size)) {
 		byte_t *dst_line = video_regionlock_getline(&lock, dst_y - loy);
@@ -534,9 +534,9 @@ libvideo_swblitter_noblend_samefmt_ckey__blit(struct video_blitter const *__rest
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_samefmt_ckey__blit("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x, dst_y, size_x, size_y)) {
 		struct video_regionlock src_lock;
@@ -597,8 +597,8 @@ libvideo_swblitter_noblend_samefmt_ckey__stretch_n(struct video_blitter const *_
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_samefmt_ckey__stretch_n("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
@@ -672,9 +672,9 @@ libvideo_swblitter_noblend_samefmt_ckey__blit_imatrix(struct video_blitter const
 	}
 
 	TRACE_START("swblitter_noblend_samefmt_ckey__blit_imatrix("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "}, "
 	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y,
 	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
@@ -714,8 +714,8 @@ libvideo_swblitter_noblend_samefmt_ckey__stretch_imatrix_n(struct video_blitter 
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_samefmt_ckey__stretch_imatrix_n("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
@@ -774,9 +774,9 @@ libvideo_swblitter_noblend_samebuf_ckey__blit(struct video_blitter const *__rest
 	range_union_samesize(&loy, &loy_size, src_y_);
 
 	TRACE_START("swblitter_noblend_samebuf_ckey__blit("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x_, dst_y_, src_x_, src_y_, size_x_, size_y_);
 	if likely(LL_wlockregion(dst_buffer, &lock, lox, loy, lox_size, loy_size)) {
 		byte_t *dst_line = video_regionlock_getline(&lock, dst_y_ - loy);
@@ -924,9 +924,9 @@ libvideo_swblitter_noblend_difffmt__blit(struct video_blitter const *__restrict 
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_difffmt__blit("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
 
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x, dst_y, size_x, size_y)) {
@@ -1036,9 +1036,9 @@ libvideo_swblitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__r
 	}
 
 	TRACE_START("swblitter_noblend_difffmt__blit_imatrix("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "}, "
 	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            dst_x_, dst_y_, src_x_, src_y_, size_x_, size_y_,
 	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
@@ -1098,8 +1098,8 @@ libvideo_swblitter_noblend_difffmt__stretch_n(struct video_blitter const *__rest
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_difffmt__stretch_n("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
@@ -1149,8 +1149,8 @@ libvideo_swblitter_noblend_difffmt__stretch_imatrix_n(struct video_blitter const
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_difffmt__stretch_imatrix_n("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
@@ -1310,8 +1310,8 @@ libvideo_swblitter_noblend_difffmt_interp8888__stretch_l(struct video_blitter co
                                                          video_coord_t src_x, video_coord_t src_y,
                                                          video_dim_t src_size_x, video_dim_t src_size_y) {
 	TRACE_START("swblitter_noblend_difffmt_interp8888__stretch_l("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            src_x, src_y, src_size_x, src_size_y);
 	/* TODO: Use video locks if possible */
@@ -1422,8 +1422,8 @@ libvideo_swblitter_noblend_difffmt_interp8888__stretch_imatrix_l(struct video_bl
 
 
 	TRACE_START("swblitter_noblend_difffmt_interp8888__stretch_imatrix_l("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
 	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            src_x, src_y, src_size_x, src_size_y,
@@ -1523,9 +1523,9 @@ libvideo_swblitter_noblend_difffmt_ckey__blit(struct video_blitter const *__rest
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_difffmt_ckey__blit("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
 
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x, dst_y, size_x, size_y)) {
@@ -1639,9 +1639,9 @@ libvideo_swblitter_noblend_difffmt_ckey__blit_imatrix(struct video_blitter const
 	}
 
 	TRACE_START("swblitter_noblend_difffmt_ckey__blit_imatrix("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "}, "
 	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            dst_x_, dst_y_, src_x_, src_y_, size_x_, size_y_,
 	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
@@ -1704,8 +1704,8 @@ libvideo_swblitter_noblend_difffmt_ckey__stretch_n(struct video_blitter const *_
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_difffmt_ckey__stretch_n("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
@@ -1758,8 +1758,8 @@ libvideo_swblitter_noblend_difffmt_ckey__stretch_imatrix_n(struct video_blitter 
 	struct video_regionlock dst_lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vg_surf.vs_buffer;
 	TRACE_START("swblitter_noblend_difffmt_ckey__stretch_imatrix_n("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	            src_x_, src_y_, src_size_x_, src_size_y_);
 	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {

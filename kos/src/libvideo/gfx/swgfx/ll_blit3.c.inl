@@ -200,10 +200,10 @@ libvideo_swblitter3__blit__generic(struct video_blitter3 const *__restrict self,
                                    video_coord_t src_x, video_coord_t src_y,
                                    video_dim_t size_x, video_dim_t size_y) {
 	TRACE_START("swblitter3__blit__generic("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "})\n",
 	            out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y);
 	libvideo_swblitter3__blit__generic__bypixel(self, out_x, out_y, dst_x, dst_y,
 	                                            src_x, src_y, size_x, size_y);
@@ -222,10 +222,10 @@ libvideo_swblitter3__blit_imatrix__generic(struct video_blitter3 const *__restri
 	gfx_assert_imatrix2d(&src_matrix);
 
 	TRACE_START("swblitter3__blit_imatrix__generic("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "})\n",
 	            out_x, out_y,
 	            dst_x, dst_y,
 	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),
@@ -253,9 +253,9 @@ libvideo_swblitter3__stretch__generic_n(struct video_blitter3 const *__restrict 
                                         video_coord_t src_x, video_coord_t src_y,
                                         video_dim_t src_size_x, video_dim_t src_size_y) {
 	TRACE_START("swblitter3__stretch__generic_n("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            out_x, out_y,
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            src_x, src_y, src_size_x, src_size_y);
@@ -287,9 +287,9 @@ libvideo_swblitter3__stretch_imatrix__generic_n(struct video_blitter3 const *__r
 	}
 
 	TRACE_START("swblitter3__stretch_imatrix__generic_n("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}})\n",
 	            out_x, out_y,
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),
@@ -316,9 +316,9 @@ libvideo_swblitter3__stretch__generic_l(struct video_blitter3 const *__restrict 
                                         video_coord_t src_x, video_coord_t src_y,
                                         video_dim_t src_size_x, video_dim_t src_size_y) {
 	TRACE_START("swblitter3__stretch__generic_l("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            out_x, out_y,
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            src_x, src_y, src_size_x, src_size_y);
@@ -350,9 +350,9 @@ libvideo_swblitter3__stretch_imatrix__generic_l(struct video_blitter3 const *__r
 	}
 
 	TRACE_START("swblitter3__stretch_imatrix__generic_l("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}})\n",
 	            out_x, out_y,
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),
@@ -390,10 +390,10 @@ libvideo_swblitter3__blit__blend1(struct video_blitter3 const *__restrict self,
 	struct video_gfx const *src = self->vbt3_src;
 
 	TRACE_START("swblitter3__blit__blend1("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "})\n",
 	            out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y);
 
 	/* Try to acquire video locks to perform blit directly on video memory. */
@@ -468,10 +468,10 @@ libvideo_swblitter3__blit_imatrix__blend1(struct video_blitter3 const *__restric
 	}
 
 	TRACE_START("swblitter3__blit_imatrix__blend1("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "dim: {%" PRIuDIM ":%" PRIuDIM "})\n",
 	            out_x, out_y,
 	            dst_x, dst_y,
 	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),
@@ -499,9 +499,9 @@ libvideo_swblitter3__stretch__blend1_n(struct video_blitter3 const *__restrict s
                                        video_coord_t src_x, video_coord_t src_y,
                                        video_dim_t src_size_x, video_dim_t src_size_y) {
 	TRACE_START("swblitter3__stretch__blend1_n("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            out_x, out_y,
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            src_x, src_y, src_size_x, src_size_y);
@@ -535,9 +535,9 @@ libvideo_swblitter3__stretch_imatrix__blend1_n(struct video_blitter3 const *__re
 	}
 
 	TRACE_START("swblitter3__stretch_imatrix__blend1_n("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}})\n",
 	            out_x, out_y,
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),
@@ -566,9 +566,9 @@ libvideo_swblitter3__stretch__blend1_l(struct video_blitter3 const *__restrict s
                                        video_coord_t src_x, video_coord_t src_y,
                                        video_dim_t src_size_x, video_dim_t src_size_y) {
 	TRACE_START("swblitter3__stretch__blend1_l("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "})\n",
 	            out_x, out_y,
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            src_x, src_y, src_size_x, src_size_y);
@@ -602,9 +602,9 @@ libvideo_swblitter3__stretch_imatrix__blend1_l(struct video_blitter3 const *__re
 	}
 
 	TRACE_START("swblitter3__stretch_imatrix__blend1_l("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}})\n",
+	            "out: {%" PRIuCRD ":%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "src: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}})\n",
 	            out_x, out_y,
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),

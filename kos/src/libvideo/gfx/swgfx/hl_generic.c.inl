@@ -30,6 +30,7 @@
 
 #include <hybrid/overflow.h>
 
+#include <alloca.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -37,11 +38,13 @@
 #include <libvideo/color.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/polygon.h>
+#include <libvideo/rect.h>
 #include <libvideo/types.h>
 
 #include "../gfx-debug.h"
 #include "../gfx-utils.h"
 #include "../gfx.h"
+#include "../polygon.h"
 #include "../swgfx.h"
 
 #if (defined(DEFINE_libvideo_swgfx_XXX_xyswap) + \
@@ -75,6 +78,7 @@ DECL_BEGIN
 #define LOCAL_libvideo_swgfx_fill             LOCAL_FUNC(libvideo_swgfx_fill)
 #define LOCAL_libvideo_swgfx_fill_wrap        LOCAL_FUNC(libvideo_swgfx_fill_wrap)
 #define LOCAL_libvideo_swgfx_fill_mirror      LOCAL_FUNC(libvideo_swgfx_fill_mirror)
+#define LOCAL_libvideo_swgfx_fillpoly_c       LOCAL_FUNC(libvideo_swgfx_fillpoly_c)
 #define LOCAL_libvideo_swgfx_fillpoly         LOCAL_FUNC(libvideo_swgfx_fillpoly)
 #define LOCAL_libvideo_swgfx_fillpoly_wrap    LOCAL_FUNC(libvideo_swgfx_fillpoly_wrap)
 #define LOCAL_libvideo_swgfx_fillpoly_mirror  LOCAL_FUNC(libvideo_swgfx_fillpoly_mirror)
@@ -126,6 +130,26 @@ DECL_BEGIN
 #define LOCAL__libvideo_swgfx_ops_wrap   LOCAL_FUNC(_libvideo_swgfx_ops_wrap)
 #define LOCAL__libvideo_swgfx_ops_mirror LOCAL_FUNC(_libvideo_swgfx_ops_mirror)
 
+
+#ifdef DEFINE_libvideo_swgfx_XXX_xyswap
+#define LOCAL_vr_xmin vr_ymin
+#define LOCAL_vr_ymin vr_xmin
+#define LOCAL_vr_xdim vr_ydim
+#define LOCAL_vr_ydim vr_xdim
+#define LOCAL_vp_xmin vp_ymin
+#define LOCAL_vp_ymin vp_xmin
+#define LOCAL_vp_xdim vp_ydim
+#define LOCAL_vp_ydim vp_xdim
+#else /* DEFINE_libvideo_swgfx_XXX_xyswap */
+#define LOCAL_vr_xmin vr_xmin
+#define LOCAL_vr_ymin vr_ymin
+#define LOCAL_vr_xdim vr_xdim
+#define LOCAL_vr_ydim vr_ydim
+#define LOCAL_vp_xmin vp_xmin
+#define LOCAL_vp_ymin vp_ymin
+#define LOCAL_vp_xdim vp_xdim
+#define LOCAL_vp_ydim vp_ydim
+#endif /* !DEFINE_libvideo_swgfx_XXX_xyswap */
 
 /************************************************************************/
 /* GETCOLOR()                                                           */
@@ -561,71 +585,92 @@ LOCAL_libvideo_swgfx_fill_mirror(struct video_gfx const *__restrict self,
 /************************************************************************/
 /* FILLPOLY()                                                           */
 /************************************************************************/
+__pragma_GCC_diagnostic_push_ignored(Wstringop_overread)
+PRIVATE ATTR_NOINLINE ATTR_IN(1) void CC
+LOCAL_libvideo_swgfx_fillpoly_c(struct video_gfx const *__restrict self,
+                                video_offset_t x, video_offset_t y,
+                                struct video_polygon *__restrict poly,
+                                video_color_t color, unsigned int method) {
+	video_offset_t render_xmin;
+	video_offset_t render_ymin;
+	video_coord_t render_xend;
+	video_coord_t render_yend;
+	struct video_polygon_data *cpoly;
+	struct video_rect crect;
+	crect.LOCAL_vr_xmin = poly->LOCAL_vp_xmin;
+	crect.LOCAL_vr_ymin = poly->LOCAL_vp_ymin;
+	crect.LOCAL_vr_xdim = poly->LOCAL_vp_xdim;
+	crect.LOCAL_vr_ydim = poly->LOCAL_vp_ydim;
+
+	render_xmin = x + poly->LOCAL_vp_xmin;
+	render_ymin = y + poly->LOCAL_vp_ymin;
+	if unlikely(render_xmin < (video_offset_t)GFX_BXMIN) {
+		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BXMIN - render_xmin);
+		if unlikely(poly->vp_xdim <= off)
+			return;
+		crect.LOCAL_vr_xmin += off;
+		render_xmin += off;
+	}
+	if unlikely(render_ymin < (video_offset_t)GFX_BYMIN) {
+		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BYMIN - render_ymin);
+		if unlikely(poly->vp_ydim <= off)
+			return;
+		crect.LOCAL_vr_ymin += off;
+		render_ymin += off;
+	}
+	if unlikely(OVERFLOW_UADD((video_coord_t)render_xmin, poly->LOCAL_vp_xdim, &render_xend) ||
+	            render_xend > GFX_BXEND) {
+		if unlikely((video_coord_t)render_xmin >= GFX_BXEND)
+			return;
+		crect.LOCAL_vr_xdim = GFX_BXEND - render_xmin;
+		/*render_xend = GFX_BXEND;*/
+	}
+	if unlikely(OVERFLOW_UADD((video_coord_t)render_ymin, poly->LOCAL_vp_ydim, &render_yend) ||
+	            render_yend > GFX_BYEND) {
+		if unlikely((video_coord_t)render_ymin >= GFX_BYEND)
+			return;
+		crect.LOCAL_vr_ydim = GFX_BYEND - render_ymin;
+		/*render_yend = GFX_BYEND;*/
+	}
+
+	/* TODO: Instead of always doing alloca() here, use `malloca()' and have `struct video_polygon'
+	 *       contain  1 preallocated buffer that can be used (by 1 thread at-a-time) when malloca()
+	 *       fails. */
+	cpoly = (struct video_polygon_data *)alloca(offsetof(struct video_polygon_data, vpd_edges) +
+	                                            (poly->vp_cedges * sizeof(struct video_polygon_edge)));
+	cpoly = libvideo_polygon_data_clip(video_polygon_asdata(poly), cpoly, &crect);
+	LOCAL_video_swgfx_x_fillpoly(self, x, y, cpoly, color,
+	                             VIDEO_IMATRIX2D_INIT(1, 0, 0, 1), method);
+}
+__pragma_GCC_diagnostic_pop_ignored(Wstringop_overread)
+
+
 INTERN ATTR_IN(1) void CC
 LOCAL_libvideo_swgfx_fillpoly(struct video_gfx const *__restrict self,
                               video_offset_t x, video_offset_t y,
                               struct video_polygon *__restrict poly,
                               video_color_t color, unsigned int method) {
-	video_offset_t poly_xmin;
-	video_offset_t poly_ymin;
-	video_coord_t poly_xend;
-	video_coord_t poly_yend;
+	video_offset_t render_xmin;
+	video_offset_t render_ymin;
+	video_coord_t render_xend;
+	video_coord_t render_yend;
 	x += self->vg_clip.vgc_cxoff;
 	y += self->vg_clip.vgc_cyoff;
-
-	poly_xmin = x + poly->vp_xmin;
-	poly_ymin = y + poly->vp_ymin;
-	if unlikely(poly_xmin < (video_offset_t)GFX_BXMIN) {
-		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BXMIN - poly_xmin);
-		if unlikely(poly->vp_xdim <= off)
-			return;
-		/* TODO */
-	}
-	if unlikely(poly_ymin < (video_offset_t)GFX_BYMIN) {
-		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BYMIN - poly_xmin);
-		if unlikely(poly->vp_xdim <= off)
-			return;
-		/* TODO */
-	}
-	if unlikely(OVERFLOW_UADD((video_coord_t)poly_xmin, poly->vp_xdim, &poly_xend) || poly_xend > GFX_BXEND) {
-		if unlikely((video_coord_t)poly_xmin >= GFX_BXEND)
-			return;
-		/* TODO */
-	}
-	if unlikely(OVERFLOW_UADD((video_coord_t)poly_ymin, poly->vp_ydim, &poly_yend) || poly_yend > GFX_BYEND) {
-		if unlikely((video_coord_t)poly_ymin >= GFX_BYEND)
-			return;
-		/* TODO */
-	}
-
-#if 0 /* TODO: Clip polygon if necessary */
-	if unlikely(x < (video_offset_t)GFX_BXMIN) {
-		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BXMIN - x);
-		if unlikely(size_x <= off)
-			return;
-		size_x -= off;
-		x = (video_offset_t)GFX_BXMIN;
-	}
-	if unlikely(y < (video_offset_t)GFX_BYMIN) {
-		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BYMIN - y);
-		if unlikely(size_y <= off)
-			return;
-		size_y -= off;
-		y = (video_offset_t)GFX_BYMIN;
-	}
-	if unlikely(OVERFLOW_UADD((video_coord_t)x, size_x, &temp) || temp > GFX_BXEND) {
-		if unlikely((video_coord_t)x >= GFX_BXEND)
-			return;
-		size_x = GFX_BXEND - (video_coord_t)x;
-	}
-	if unlikely(OVERFLOW_UADD((video_coord_t)y, size_y, &temp) || temp > GFX_BYEND) {
-		if unlikely((video_coord_t)y >= GFX_BYEND)
-			return;
-		size_y = GFX_BYEND - (video_coord_t)y;
-	}
-#endif
+	render_xmin = x + poly->LOCAL_vp_xmin;
+	render_ymin = y + poly->LOCAL_vp_ymin;
+	if unlikely(render_xmin < (video_offset_t)GFX_BXMIN)
+		goto do_clamp;
+	if unlikely(render_ymin < (video_offset_t)GFX_BYMIN)
+		goto do_clamp;
+	if unlikely(OVERFLOW_UADD((video_coord_t)render_xmin, poly->LOCAL_vp_xdim, &render_xend) || render_xend > GFX_BXEND)
+		goto do_clamp;
+	if unlikely(OVERFLOW_UADD((video_coord_t)render_ymin, poly->LOCAL_vp_ydim, &render_yend) || render_yend > GFX_BYEND)
+		goto do_clamp;
 	LOCAL_video_swgfx_x_fillpoly(self, x, y, video_polygon_asdata(poly), color,
 	                             VIDEO_IMATRIX2D_INIT(1, 0, 0, 1), method);
+	return;
+do_clamp:
+	LOCAL_libvideo_swgfx_fillpoly_c(self, x, y, poly, color, method);
 }
 
 INTERN ATTR_IN(1) NONNULL((4)) void CC
@@ -1413,6 +1458,15 @@ LOCAL__libvideo_swgfx_ops_mirror(void) {
 #define libvideo_swgfx_ops_mirror          (*_libvideo_swgfx_ops_mirror())
 #define libvideo_swgfx_ops_mirror_xyswap   (*_libvideo_swgfx_ops_mirror_xyswap())
 
+#undef LOCAL_vr_xmin
+#undef LOCAL_vr_ymin
+#undef LOCAL_vr_xdim
+#undef LOCAL_vr_ydim
+#undef LOCAL_vp_xmin
+#undef LOCAL_vp_ymin
+#undef LOCAL_vp_xdim
+#undef LOCAL_vp_ydim
+
 #undef LOCAL_libvideo_swgfx_getcolor_wrap
 #undef LOCAL_libvideo_swgfx_getcolor_mirror
 #undef LOCAL_libvideo_swgfx_putcolor
@@ -1431,6 +1485,7 @@ LOCAL__libvideo_swgfx_ops_mirror(void) {
 #undef LOCAL_libvideo_swgfx_fill_wrap
 #undef LOCAL_libvideo_swgfx_fill_mirror
 #undef LOCAL_libvideo_swgfx_fillpoly
+#undef LOCAL_libvideo_swgfx_fillpoly_c
 #undef LOCAL_libvideo_swgfx_fillpoly_wrap
 #undef LOCAL_libvideo_swgfx_fillpoly_mirror
 #undef LOCAL_libvideo_swgfx_rect

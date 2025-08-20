@@ -28,6 +28,7 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/bitset.h>
+#include <hybrid/sequence/bsearch.h>
 
 #include <kos/anno.h>
 
@@ -39,6 +40,7 @@
 #include <minmax.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <libvideo/gfx/polygon.h>
 #include <libvideo/point.h>
@@ -88,35 +90,33 @@ PRIVATE WUNUSED int __LIBCCALL
 polygon_edge_compare(void const *_a, void const *_b) {
 	struct video_polygon_edge const *a = (struct video_polygon_edge const *)_a;
 	struct video_polygon_edge const *b = (struct video_polygon_edge const *)_b;
-	if (video_line_getp0y(&a->vpe_edge) < video_line_getp0y(&b->vpe_edge))
+	if (video_polygon_edge_getp0y(a) < video_polygon_edge_getp0y(b))
 		return -1;
-	if (video_line_getp0y(&a->vpe_edge) > video_line_getp0y(&b->vpe_edge))
+	if (video_polygon_edge_getp0y(a) > video_polygon_edge_getp0y(b))
 		return 1;
-	if (video_line_getp0x(&a->vpe_edge) < video_line_getp0x(&b->vpe_edge))
+	if (video_polygon_edge_getp0x(a) < video_polygon_edge_getp0x(b))
 		return -1;
-	if (video_line_getp0x(&a->vpe_edge) > video_line_getp0x(&b->vpe_edge))
+	if (video_polygon_edge_getp0x(a) > video_polygon_edge_getp0x(b))
 		return 1;
 	return 0;
 }
 
-#if 0
 PRIVATE WUNUSED int __LIBCCALL
 polygon_edge_compare_by_x(void const *_a, void const *_b) {
 	struct video_polygon_edge const *a = (struct video_polygon_edge const *)_a;
 	struct video_polygon_edge const *b = (struct video_polygon_edge const *)_b;
-	video_offset_t a_min_x = min(video_line_getp0x(&a->vpe_edge), video_line_getp1x(&a->vpe_edge));
-	video_offset_t b_min_x = min(video_line_getp0x(&b->vpe_edge), video_line_getp1x(&b->vpe_edge));
+	video_offset_t a_min_x = min(video_polygon_edge_getp0x(a), video_polygon_edge_getp1x(a));
+	video_offset_t b_min_x = min(video_polygon_edge_getp0x(b), video_polygon_edge_getp1x(b));
 	if (a_min_x < b_min_x)
 		return -1;
 	if (a_min_x > b_min_x)
 		return 1;
-	if (video_line_getp0y(&a->vpe_edge) < video_line_getp0y(&b->vpe_edge))
+	if (video_polygon_edge_getp0y(a) < video_polygon_edge_getp0y(b))
 		return -1;
-	if (video_line_getp0y(&a->vpe_edge) > video_line_getp0y(&b->vpe_edge))
+	if (video_polygon_edge_getp0y(a) > video_polygon_edge_getp0y(b))
 		return 1;
 	return 0;
 }
-#endif
 
 /* Generic polygon object creator (used by ramdomain) */
 INTERN WUNUSED NONNULL((1)) ATTR_INS(2, 3) REF struct video_polygon *CC
@@ -124,9 +124,7 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
                                 struct video_point const *points, size_t npoints) {
 	REF struct video_polygon *result;
 	size_t i, nedges, sizeof_polygon;
-#if 0
 	size_t poly_xactive;
-#endif
 	video_offset_t poly_xend, poly_yend;
 	bitset_t *active;
 	sizeof_polygon = offsetof(struct video_polygon, vp_edges) +
@@ -159,18 +157,18 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 		}
 
 		/* Keep track of the min/max bounds of the polygon */
-		if (result->vp_ymin > video_line_getp0y(&edge->vpe_edge))
-			result->vp_ymin = video_line_getp0y(&edge->vpe_edge);
-		if (poly_yend < video_line_getp1y(&edge->vpe_edge))
-			poly_yend = video_line_getp1y(&edge->vpe_edge);
-		if (result->vp_xmin > video_line_getp0x(&edge->vpe_edge))
-			result->vp_xmin = video_line_getp0x(&edge->vpe_edge);
-		if (poly_xend < video_line_getp0x(&edge->vpe_edge))
-			poly_xend = video_line_getp0x(&edge->vpe_edge);
-		if (result->vp_xmin > video_line_getp1x(&edge->vpe_edge))
-			result->vp_xmin = video_line_getp1x(&edge->vpe_edge);
-		if (poly_xend < video_line_getp1x(&edge->vpe_edge))
-			poly_xend = video_line_getp1x(&edge->vpe_edge);
+		if (result->vp_ymin > video_polygon_edge_getp0y(edge))
+			result->vp_ymin = video_polygon_edge_getp0y(edge);
+		if (poly_yend < video_polygon_edge_getp1y(edge))
+			poly_yend = video_polygon_edge_getp1y(edge);
+		if (result->vp_xmin > video_polygon_edge_getp0x(edge))
+			result->vp_xmin = video_polygon_edge_getp0x(edge);
+		if (poly_xend < video_polygon_edge_getp0x(edge))
+			poly_xend = video_polygon_edge_getp0x(edge);
+		if (result->vp_xmin > video_polygon_edge_getp1x(edge))
+			result->vp_xmin = video_polygon_edge_getp1x(edge);
+		if (poly_xend < video_polygon_edge_getp1x(edge))
+			poly_xend = video_polygon_edge_getp1x(edge);
 		++nedges;
 	}
 	result->vp_xdim = (video_dim_t)(poly_xend - result->vp_xmin);
@@ -186,12 +184,11 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 	if unlikely(!active)
 		goto err_r;
 
-#if 0
 	/* Sort edges by [MIN(P0.X, P1.X) ASC, P0.Y ASC] */
 	qsort(result->vp_edges, nedges,
 	      sizeof(struct video_polygon_edge),
 	      &polygon_edge_compare_by_x);
-	result->vp_xmin = video_line_getp0x(&result->vp_edges[0].vpe_edge);
+	result->vp_xmin = video_polygon_edge_getp0x(&result->vp_edges[0]);
 
 	/* Figure out the max # of edges ever active when casting vertical scanlines.
 	 * This value is needed to calculate how many total edges are needed in order
@@ -202,33 +199,32 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 	do {
 		size_t active_edge, n_active;
 		video_offset_t scanline_x;
-		scanline_x = min(video_line_getp0x(&result->vp_edges[i].vpe_edge),
-		                 video_line_getp1x(&result->vp_edges[i].vpe_edge));
+		scanline_x = min(video_polygon_edge_getp0x(&result->vp_edges[i]),
+		                 video_polygon_edge_getp1x(&result->vp_edges[i]));
 
 		/* Remove edges that are no longer active at "x" */
 		bitset_foreach (active_edge, active, nedges) {
 			video_offset_t active_end;
-			active_end = max(video_line_getp0x(&result->vp_edges[active_edge].vpe_edge),
-			                 video_line_getp1x(&result->vp_edges[active_edge].vpe_edge));
+			active_end = max(video_polygon_edge_getp0x(&result->vp_edges[active_edge]),
+			                 video_polygon_edge_getp1x(&result->vp_edges[active_edge]));
 			if (scanline_x >= active_end)
 				bitset_clear(active, active_edge);
 		}
 
 		/* Add new active edge */
 		do {
-			if (scanline_x != max(video_line_getp0x(&result->vp_edges[i].vpe_edge),
-			                      video_line_getp1x(&result->vp_edges[i].vpe_edge)))
+			if (scanline_x != max(video_polygon_edge_getp0x(&result->vp_edges[i]),
+			                      video_polygon_edge_getp1x(&result->vp_edges[i])))
 				bitset_set(active, i);
 			++i;
-		} while (i < nedges && scanline_x == min(video_line_getp0x(&result->vp_edges[i].vpe_edge),
-		                                         video_line_getp1x(&result->vp_edges[i].vpe_edge)));
+		} while (i < nedges && scanline_x == min(video_polygon_edge_getp0x(&result->vp_edges[i]),
+		                                         video_polygon_edge_getp1x(&result->vp_edges[i])));
 
 		/* Check if we reached a new upper bound of active edges */
 		n_active = bitset_popcount(active, nedges);
 		if (poly_xactive < n_active)
 			poly_xactive = n_active;
 	} while (i < nedges);
-#endif
 
 	/* Sort edges by [P0.Y ASC, P0.X ASC] */
 	qsort(result->vp_edges, nedges,
@@ -242,12 +238,12 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 	do {
 		size_t active_edge, n_active;
 		video_offset_t scanline_y;
-		scanline_y = video_line_getp0y(&result->vp_edges[i].vpe_edge);
+		scanline_y = video_polygon_edge_getp0y(&result->vp_edges[i]);
 
 		/* Remove edges that are no longer active at "y" */
 		bitset_foreach (active_edge, active, nedges) {
 			video_offset_t active_end;
-			active_end = video_line_getp1y(&result->vp_edges[active_edge].vpe_edge);
+			active_end = video_polygon_edge_getp1y(&result->vp_edges[active_edge]);
 			if (scanline_y >= active_end)
 				bitset_clear(active, active_edge);
 		}
@@ -256,7 +252,7 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 		do {
 			bitset_set(active, i);
 			++i;
-		} while (i < nedges && scanline_y == video_line_getp0y(&result->vp_edges[i].vpe_edge));
+		} while (i < nedges && scanline_y == video_polygon_edge_getp0y(&result->vp_edges[i]));
 
 		/* Check if we reached a new upper bound of active edges */
 		n_active = bitset_popcount(active, nedges);
@@ -272,20 +268,126 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 	result->vp_domain = self;
 	result->vp_nedges = nedges;
 
-#if 0
 	/* To create a new polygon from an arbitrary sub-rect, we need:
 	 * - Possibly all edges from the original polygon (in case none end up out-of-bounds)
 	 * - 2 times "poly_xactive / 2" edges (one for left, one for right) to represent
 	 *   additional vertical edges at the left/right for spikes that may have gotten
-	 *   their tips cut off. */
+	 *   their tips cut off.
+	 *
+	 * Worst case:
+	 * >> \--\
+	 * >>  \  \--\
+	 * >>   \     \--\
+	 * >>    \  +---------------------+
+	 * >>     \ |         \--\        |
+	 * >>      \|             \--\    |
+	 * >>       |                 \--\|
+	 * >>       |\                    |--\
+	 * >>       | \                   |   \--\
+	 * >>       +---------------------+       \--\
+	 * >>           \                             \--\
+	 * >>            \--------------------------------\
+	 *
+	 *
+	 * Clip result:
+	 * >>       +---------
+	 * >>       |         \--\
+	 * >>       |             \--\
+	 * >>       |                 \--\
+	 * >>        \                    |
+	 * >>         \                   |
+	 * >>          -------------------+
+	 *
+	 * After disregarding horizontal edges  (here: 2), the above  polygon
+	 * still  only has 4 edges, which is the  result of the # of edges of
+	 * the original polygon (2), plus the max. # of edges in any vertical
+	 * scanline (which is also 2).
+	 */
 	result->vp_cedges = nedges + poly_xactive;
-#endif
 	freea(active);
 	return result;
 err_r:
 	free(result);
 err:
 	return NULL;
+}
+
+
+/* Add a new edge to "self". Caller must ensure that Y coord of "edge" are sorted */
+PRIVATE NONNULL((1, 2)) void CC
+video_polygon_data_addedge(struct video_polygon_data *__restrict self,
+                           struct video_polygon_edge const *__restrict edge) {
+	assert(video_polygon_edge_getp0y(edge) <= video_polygon_edge_getp1y(edge));
+	if unlikely(video_polygon_edge_getp0y(edge) == video_polygon_edge_getp1y(edge))
+		return; /* Skip horizontal edges */
+	if (video_polygon_edge_getp0x(edge) == video_polygon_edge_getp1x(edge)) {
+		size_t i;
+		/* Check if the previous edge that  this one form a vertical  line
+		 * that touches our's. For this purpose, all continuous-line edges
+		 * are kept near the head of the edge-array. */
+		for (i = 0; i < self->vpd_nedges; ++i) {
+			struct video_polygon_edge *prev = &self->vpd_edges[i];
+			if (video_polygon_edge_getp0x(prev) != video_polygon_edge_getp1x(prev))
+				break;
+			if (video_polygon_edge_getp0x(prev) != video_polygon_edge_getp0x(edge))
+				continue; /* Some other vertical bar (but not at our X coord) */
+
+			/* Both  edges are at the same X  coord. Now check if they can
+			 * actually be continuous: When  their direction is the  same,
+			 * then extension is possible, when they differ, then previous
+			 * edge may be truncated. */
+			if (prev->vpe_dir == edge->vpe_dir) {
+				/* Try to extend previous edge */
+				if (video_polygon_edge_getp0y(prev) == video_polygon_edge_getp1y(edge)) {
+					/* Extend upwards */
+					video_polygon_edge_setp0y(prev, video_polygon_edge_getp0y(edge));
+					assert(video_polygon_edge_getp0y(prev) < video_polygon_edge_getp1y(prev));
+					return;
+				} else if (video_polygon_edge_getp1y(prev) == video_polygon_edge_getp0y(edge)) {
+					/* Extend downwards */
+					video_polygon_edge_setp1y(prev, video_polygon_edge_getp1y(edge));
+					assert(video_polygon_edge_getp0y(prev) < video_polygon_edge_getp1y(prev));
+					return;
+				}
+			} else {
+				assert((prev->vpe_dir + edge->vpe_dir) == 0);
+				/* Try to truncate previous edge */
+				if (video_polygon_edge_getp0y(prev) == video_polygon_edge_getp0y(edge)) {
+					/* Truncate top */
+					video_polygon_edge_setp0y(prev, video_polygon_edge_getp1y(edge));
+remove_empty_prev_and_done:
+					if (video_polygon_edge_getp0y(prev) > video_polygon_edge_getp1y(prev)) {
+						/* Flip edge direction of */
+						struct video_point temp = prev->vpe_edge.vl_p0;
+						prev->vpe_edge.vl_p0 = prev->vpe_edge.vl_p1;
+						prev->vpe_edge.vl_p1 = temp;
+						prev->vpe_dir = -prev->vpe_dir;
+					} else if unlikely(video_polygon_edge_getp0y(prev) == video_polygon_edge_getp1y(prev)) {
+						/* Remove vertical bar if it became empty. */
+						--self->vpd_nedges;
+						memmovedown(prev, prev + 1,
+						            self->vpd_nedges - i,
+						            sizeof(*prev));
+					}
+					return;
+				} else if (video_polygon_edge_getp1y(prev) == video_polygon_edge_getp1y(edge)) {
+					/* Truncate bottom */
+					video_polygon_edge_setp1y(prev, video_polygon_edge_getp0y(edge));
+					goto remove_empty_prev_and_done;
+				}
+			}
+		}
+		memmoveup(&self->vpd_edges[i + 1],
+		          &self->vpd_edges[i],
+		          self->vpd_nedges - i,
+		          sizeof(*self->vpd_edges));
+		self->vpd_edges[i] = *edge;
+		++self->vpd_nedges;
+		return;
+	}
+
+	/* Add additional edge as-is */
+	self->vpd_edges[self->vpd_nedges++] = *edge;
 }
 
 
@@ -298,9 +400,7 @@ INTERN ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT(2) ATTR_IN(3) struct video_polygon_da
 libvideo_polygon_data_clip(struct video_polygon_data const *__restrict self,
                            struct video_polygon_data *__restrict result,
                            struct video_rect const *__restrict rect) {
-#if 0
 	size_t i;
-#endif
 	video_offset_t result_xend, result_yend;
 	result->vpd_xmin = max(self->vpd_xmin, video_rect_getxmin(rect));
 	result->vpd_ymin = max(self->vpd_ymin, video_rect_getymin(rect));
@@ -309,52 +409,151 @@ libvideo_polygon_data_clip(struct video_polygon_data const *__restrict self,
 	result->vpd_xdim = result_xend - result->vpd_xmin;
 	result->vpd_ydim = result_yend - result->vpd_ymin;
 	result->vpd_nactive = self->vpd_nactive;
+	result->vpd_nedges = 0;
 
-	/* Clip edges:
-	 * - For every edge, check how it intersect with any of "rect".
-	 *   - If  it isn't contained by the "rect" at all (its start/end-points
-	 *     both lie outside "rect", and the line formed by them also doesn't
-	 *     intersect with "rect"), skip the edge.
-	 *   - If it doesn't intersect, keep the edge as-is
-	 *   - If it intersects partially, clamp the edge's start/end-points to "rect"
-	 *     - If another yet-to-be-copied edge exists that starts/ends
-	 *       at the same position (before clamping), and clamping  is
-	 *       being  done at the left/right border (xmin/xmax), insert
-	 *       an additional vertical edge to connect the (now-clamped)
-	 *       points.
-	 *
-	 * TODO: The above doesn't work for the following:
-	 *
-	 *  \-\                           /-/
-	 *   \ \-\                     /-/ /
-	 *    \   \-\               /-/   /
-	 *     \+-----------------------+/
-	 *      |       \-\   /-/       |
-	 *      |\         \-/         /|
-	 *      | \                   / |
-	 *      | /                   \ |
-	 *      |/         /-\         \|
-	 *      |       /-/   \-\       |
-	 *     /+-----------------------+\
-	 *    /   /-/               \-\   \
-	 *   / /-/                     \-\ \
-	 *  /-/                           \-\
-	 *
-	 * Here, the original polygon has 8 edges, and
-	 * the clipped polygon needs 12 (2 for left, 2
-	 * for right; horizontal edges don't count)
-	 *
-	 * However:
-	 * - The above code layout doesn't properly handle polygons  clips
-	 *   at the 4 corners (where multiple new edges need to be created
-	 *   between the rect intersection and  then again to wrap  around
-	 *   the corners of the rect)
-	 *
-	 * -- Instead of re-inventing the wheel, implement this:
-	 *    https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm
-	 */
+	for (i = 0; i < self->vpd_nedges; ++i) {
+		struct video_polygon_edge edge = self->vpd_edges[i];
+		if (video_polygon_edge_getp1y(&edge) <= video_rect_getymin(rect))
+			continue; /* Skip edge that lies above clip rect */
+		if (video_polygon_edge_getp0y(&edge) >= video_rect_getyend(rect))
+			continue; /* Skip edge that lies below clip rect */
+		if (video_polygon_edge_getp0y(&edge) < video_rect_getymin(rect)) {
+			/* Clamp P0 against top clip rect border */
+			video_polygon_edge_setp0x(&edge, video_polygon_edge_getxat(&edge, video_rect_getymin(rect)));
+			video_polygon_edge_setp0y(&edge, video_rect_getymin(rect));
+		}
+		if (video_polygon_edge_getp1y(&edge) > video_rect_getyend(rect)) {
+			/* Clamp P1 against bottom clip rect border */
+			video_polygon_edge_setp1x(&edge, video_polygon_edge_getxat(&edge, video_rect_getyend(rect)));
+			video_polygon_edge_setp1y(&edge, video_rect_getyend(rect));
+		}
 
-	/* TODO */
+		/* Clamp left side (and possibly generate an extra vertical edge) */
+		if (video_polygon_edge_getp0x(&edge) < video_rect_getxmin(rect)) {
+			if (video_polygon_edge_getp1x(&edge) < video_rect_getxmin(rect)) {
+				/* >> P0       | CLIP
+				 * >>   \      |
+				 * >>    \     |
+				 * >>     \    |
+				 * >>      P1  | */
+				video_polygon_edge_setp0x(&edge, video_rect_getxmin(rect));
+				video_polygon_edge_setp1x(&edge, video_rect_getxmin(rect));
+			} else {
+				/* >> P0 | CLIP
+				 * >>   \|
+				 * >>    |
+				 * >>    |\
+				 * >>    | P1 */
+				video_dim_t ydim = (video_dim_t)(video_polygon_edge_getp1y(&edge) -
+				                                 video_polygon_edge_getp0y(&edge));
+				video_dim_t xdim = (video_dim_t)(video_polygon_edge_getp1x(&edge) -
+				                                 video_polygon_edge_getp0x(&edge));
+				video_dim_t xoff = (video_dim_t)(video_rect_getxmin(rect) -
+				                                 video_polygon_edge_getp0x(&edge));
+				video_coord_t yrel = (video_coord_t)(((__UINT_FAST64_TYPE__)xoff * ydim) / xdim);
+				video_offset_t yhit = video_polygon_edge_getp0y(&edge) + yrel;
+				struct video_polygon_edge vedge;
+				vedge.vpe_dir = edge.vpe_dir;
+				video_polygon_edge_setp0x(&vedge, video_rect_getxmin(rect));
+				video_polygon_edge_setp0y(&vedge, video_polygon_edge_getp0y(&edge));
+				video_polygon_edge_setp1x(&vedge, video_rect_getxmin(rect));
+				video_polygon_edge_setp1y(&vedge, yhit);
+				video_polygon_data_addedge(result, &vedge);
+				video_polygon_edge_setp0x(&edge, video_rect_getxmin(rect));
+				video_polygon_edge_setp0y(&edge, yhit);
+			}
+		} else if (video_polygon_edge_getp1x(&edge) < video_rect_getxmin(rect)) {
+			/* >>    | P0
+			 * >>    |/
+			 * >>    |
+			 * >>   /|
+			 * >> P1 | CLIP */
+			video_dim_t ydim = (video_dim_t)(video_polygon_edge_getp1y(&edge) -
+			                                 video_polygon_edge_getp0y(&edge));
+			video_dim_t xdim = (video_dim_t)(video_polygon_edge_getp0x(&edge) -
+			                                 video_polygon_edge_getp1x(&edge));
+			video_dim_t xoff = (video_dim_t)(video_rect_getxmin(rect) -
+			                                 video_polygon_edge_getp1x(&edge));
+			video_coord_t yrel = (video_coord_t)(((__UINT_FAST64_TYPE__)xoff * ydim) / xdim);
+			video_offset_t yhit = video_polygon_edge_getp1y(&edge) - yrel;
+			struct video_polygon_edge vedge;
+			vedge.vpe_dir = edge.vpe_dir;
+			video_polygon_edge_setp0x(&vedge, video_rect_getxmin(rect));
+			video_polygon_edge_setp0y(&vedge, yhit);
+			video_polygon_edge_setp1x(&vedge, video_rect_getxmin(rect));
+			video_polygon_edge_setp1y(&vedge, video_polygon_edge_getp1y(&edge));
+			video_polygon_data_addedge(result, &vedge);
+			video_polygon_edge_setp1x(&edge, video_rect_getxmin(rect));
+			video_polygon_edge_setp1y(&edge, yhit);
+		}
+
+		/* Clamp right side (and possibly generate an extra vertical edge) */
+		if (video_polygon_edge_getp0x(&edge) > video_rect_getxend(rect)) {
+			if (video_polygon_edge_getp1x(&edge) > video_rect_getxend(rect)) {
+				/* >>      |   P0
+				 * >>      |     \
+				 * >>      |      \
+				 * >>      |       \
+				 * >> CLIP |        P1 */
+				video_polygon_edge_setp0x(&edge, video_rect_getxend(rect));
+				video_polygon_edge_setp1x(&edge, video_rect_getxend(rect));
+			} else {
+				/* >> CLIP | P0
+				 * >>      |/
+				 * >>      |
+				 * >>     /|
+				 * >>   P1 | */
+				video_dim_t ydim = (video_dim_t)(video_polygon_edge_getp1y(&edge) -
+				                                 video_polygon_edge_getp0y(&edge));
+				video_dim_t xdim = (video_dim_t)(video_polygon_edge_getp0x(&edge) -
+				                                 video_polygon_edge_getp1x(&edge));
+				video_dim_t xoff = (video_dim_t)(video_rect_getxend(rect) -
+				                                 video_polygon_edge_getp1x(&edge));
+				video_coord_t yrel = (video_coord_t)(((__UINT_FAST64_TYPE__)xoff * ydim) / xdim);
+				video_offset_t yhit = video_polygon_edge_getp1y(&edge) - yrel;
+				struct video_polygon_edge vedge;
+				vedge.vpe_dir = edge.vpe_dir;
+				video_polygon_edge_setp0x(&vedge, video_rect_getxend(rect));
+				video_polygon_edge_setp0y(&vedge, video_polygon_edge_getp0y(&edge));
+				video_polygon_edge_setp1x(&vedge, video_rect_getxend(rect));
+				video_polygon_edge_setp1y(&vedge, yhit);
+				video_polygon_data_addedge(result, &vedge);
+				video_polygon_edge_setp0x(&edge, video_rect_getxend(rect));
+				video_polygon_edge_setp0y(&edge, yhit);
+			}
+		} else if (video_polygon_edge_getp1x(&edge) > video_rect_getxend(rect)) {
+			/* >>   P0 |
+			 * >>     \|
+			 * >>      |
+			 * >>      |\
+			 * >> CLIP | P1 */
+			video_dim_t ydim = (video_dim_t)(video_polygon_edge_getp1y(&edge) -
+			                                 video_polygon_edge_getp0y(&edge));
+			video_dim_t xdim = (video_dim_t)(video_polygon_edge_getp1x(&edge) -
+			                                 video_polygon_edge_getp0x(&edge));
+			video_dim_t xoff = (video_dim_t)(video_rect_getxend(rect) -
+			                                 video_polygon_edge_getp0x(&edge));
+			video_coord_t yrel = (video_coord_t)(((__UINT_FAST64_TYPE__)xoff * ydim) / xdim);
+			video_offset_t yhit = video_polygon_edge_getp0y(&edge) + yrel;
+			struct video_polygon_edge vedge;
+			vedge.vpe_dir = edge.vpe_dir;
+			video_polygon_edge_setp0x(&vedge, video_rect_getxend(rect));
+			video_polygon_edge_setp0y(&vedge, yhit);
+			video_polygon_edge_setp1x(&vedge, video_rect_getxend(rect));
+			video_polygon_edge_setp1y(&vedge, video_polygon_edge_getp1y(&edge));
+			video_polygon_data_addedge(result, &vedge);
+			video_polygon_edge_setp1x(&edge, video_rect_getxend(rect));
+			video_polygon_edge_setp1y(&edge, yhit);
+		}
+
+		/* Add edge to result */
+		video_polygon_data_addedge(result, &edge);
+	}
+
+	/* Sort edges by [P0.Y ASC, P0.X ASC] */
+	qsort(result->vpd_edges, result->vpd_nedges,
+	      sizeof(struct video_polygon_edge),
+	      &polygon_edge_compare);
 	return result;
 }
 

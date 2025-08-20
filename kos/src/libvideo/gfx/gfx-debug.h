@@ -52,8 +52,10 @@ DECL_BEGIN
 #ifdef GFX_DEBUG
 #include <sys/syslog.h>
 #define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
+#define TRACE_CONT(...)  syslog(LOG_DEBUG, __VA_ARGS__)
 #define TRACE_END(...)   syslog(LOG_DEBUG, "[gfx] end: " __VA_ARGS__)
 #else
+#define TRACE_IS_NOOP
 #define TRACE_START(...) (void)0
 #define TRACE_END(...)   (void)0
 #endif

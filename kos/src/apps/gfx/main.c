@@ -410,11 +410,11 @@ step:
 			                               points, lengthof(points));
 			if likely(poly) {
 				video_gfx_fillpoly(&gfx,
-				                   rand() % (video_gfx_getxdim(&gfx) - poly->vp_xdim),
-				                   rand() % (video_gfx_getydim(&gfx) - poly->vp_ydim),
+				                   (rand() % (video_gfx_getxdim(&gfx) /*- poly->vp_xdim*/)) - 200,
+				                   (rand() % (video_gfx_getydim(&gfx) /*- poly->vp_ydim*/)) - 200,
 				                   poly, color,
-				                   /*VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD*/
-				                   rand() % VIDEO_GFX_FILLPOLY_METHOD_COUNT);
+				                   VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD
+				                   /*rand() % VIDEO_GFX_FILLPOLY_METHOD_COUNT*/);
 				video_polygon_decref(poly);
 			}
 		}	break;

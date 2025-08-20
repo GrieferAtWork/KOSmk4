@@ -331,7 +331,7 @@ libvideo_swgfx_noblend__fill(struct video_gfx const *__restrict self,
 	gfx_assert(size_x > 0);
 	gfx_assert(size_y > 0);
 	TRACE_START("swgfx_noblend__fill("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, color: %#" PRIxCOL ")\n",
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, color: %#" PRIxCOL ")\n",
 	            dst_x, dst_y, size_x, size_y, color);
 	if likely(LL_wlockregion(buffer, &lock, dst_x, dst_y, size_x, size_y)) {
 		/* Use the low-level linefill operator from the video codec */
@@ -444,7 +444,7 @@ libvideo_swgfx_noblend_interp8888__gradient(struct video_gfx const *__restrict s
 	pixels[1][1] = video_surface_color2pixel(surface, colors[1][1]);
 
 	TRACE_START("swgfx_noblend_interp8888__gradient("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
 	            "colors: {{%#" PRIxCOL ", %#" PRIxCOL "}, {%#" PRIxCOL ", %#" PRIxCOL "}})\n",
 	            dst_x_, dst_y_, size_x_, size_y_,
 	            colors[0][0], colors[0][1], colors[1][0], colors[1][1]);
@@ -571,7 +571,7 @@ libvideo_swgfx_noblend_interp8888__gradient_h(struct video_gfx const *__restrict
 	}
 
 	TRACE_START("swgfx_noblend_interp8888__gradient_h("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
 	            "colors: {%#" PRIxCOL ", %#" PRIxCOL "})\n",
 	            dst_x, dst_y, size_x, size_y,
 	            locolor, hicolor);
@@ -660,7 +660,7 @@ libvideo_swgfx_noblend_interp8888__gradient_v(struct video_gfx const *__restrict
 	}
 
 	TRACE_START("swgfx_noblend_interp8888__gradient_v("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "dst: {%" PRIuCRD ":%" PRIuCRD ", %" PRIuDIM ":%" PRIuDIM "}, "
 	            "colors: {%#" PRIxCOL ", %#" PRIxCOL "})\n",
 	            dst_x, dst_y, size_x, size_y,
 	            locolor, hicolor);

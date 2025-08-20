@@ -87,8 +87,8 @@ video_rect_intersects(struct video_rect const *__a,
 #define video_rect_getymin(self)    (self)->vr_ymin
 #define video_rect_getxdim(self)    (self)->vr_xdim
 #define video_rect_getydim(self)    (self)->vr_ydim
-#define video_rect_getxend(self)    ((self)->vr_xmin + (self)->vr_xdim)
-#define video_rect_getyend(self)    ((self)->vr_ymin + (self)->vr_ydim)
+#define video_rect_getxend(self)    (video_offset_t)((self)->vr_xmin + (self)->vr_xdim)
+#define video_rect_getyend(self)    (video_offset_t)((self)->vr_ymin + (self)->vr_ydim)
 #define video_rect_setxmin(self, v) (void)((self)->vr_xmin = (v))
 #define video_rect_setymin(self, v) (void)((self)->vr_ymin = (v))
 #define video_rect_setxdim(self, v) (void)((self)->vr_xdim = (v))

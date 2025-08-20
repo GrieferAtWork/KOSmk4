@@ -52,6 +52,11 @@ struct video_line {
 #define video_line_getp1x(self) ((self)->vl_p1.vp_x)
 #define video_line_getp1y(self) ((self)->vl_p1.vp_y)
 
+#define video_line_setp0x(self, v) (void)((self)->vl_p0.vp_x = (v))
+#define video_line_setp0y(self, v) (void)((self)->vl_p0.vp_y = (v))
+#define video_line_setp1x(self, v) (void)((self)->vl_p1.vp_x = (v))
+#define video_line_setp1y(self, v) (void)((self)->vl_p1.vp_y = (v))
+
 #define video_line_getxdim(self) (video_dim_t)((video_line_getp1x(self) >= video_line_getp0x(self)) ? (video_line_getp1x(self) - video_line_getp0x(self)) : (video_line_getp0x(self) - video_line_getp1x(self)))
 #define video_line_getydim(self) (video_dim_t)(video_line_getp1y(self) - video_line_getp0y(self))
 

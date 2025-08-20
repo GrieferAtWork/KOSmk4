@@ -59,13 +59,25 @@ struct video_polygon_edge {
 	video_offset_t    __VIDEO_POLYGON_const vpe_dir;  /* "-1" if points in "vpe_edge" were swapped, else "1" */
 };
 
+#define video_polygon_edge_getp0x(self) video_line_getp0x(&(self)->vpe_edge)
+#define video_polygon_edge_getp0y(self) video_line_getp0y(&(self)->vpe_edge)
+#define video_polygon_edge_getp1x(self) video_line_getp1x(&(self)->vpe_edge)
+#define video_polygon_edge_getp1y(self) video_line_getp1y(&(self)->vpe_edge)
+
+#define video_polygon_edge_setp0x(self, v) video_line_setp0x(&(self)->vpe_edge, v)
+#define video_polygon_edge_setp0y(self, v) video_line_setp0y(&(self)->vpe_edge, v)
+#define video_polygon_edge_setp1x(self, v) video_line_setp1x(&(self)->vpe_edge, v)
+#define video_polygon_edge_setp1y(self, v) video_line_setp1y(&(self)->vpe_edge, v)
+
+#define video_polygon_edge_getxat(self, y) video_line_getxat_fast(&(self)->vpe_edge, y)
+
+
+
 struct video_polygon {
 	__UINTPTR_TYPE__                vp_refcnt;  /* Reference counter */
 	struct video_polygon_ops const *__VIDEO_POLYGON_const vp_ops;     /* [1..1][const] Operator table of this polygon */
 	struct video_domain const      *__VIDEO_POLYGON_const vp_domain;  /* [1..1][const] Domain linked to this polygon */
-#if 0
 	__SIZE_TYPE__                   __VIDEO_POLYGON_const vp_cedges;  /* [>= 2][const] Max # of edges needed to apply a clip rect to this polygon */
-#endif
 	video_offset_t                  __VIDEO_POLYGON_const vp_xmin;    /* [const] Lowest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_x" */
 	video_offset_t                  __VIDEO_POLYGON_const vp_ymin;    /* [const] Lowest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_y" */
 	video_dim_t                     __VIDEO_POLYGON_const vp_xdim;    /* [!= 0][const] Max # of pixels rendered in X after "vp_xmin" */
