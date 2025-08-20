@@ -28,7 +28,6 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/bitset.h>
-#include <hybrid/sequence/bsearch.h>
 
 #include <kos/anno.h>
 
@@ -301,6 +300,44 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 	 * still  only has 4 edges, which is the  result of the # of edges of
 	 * the original polygon (2), plus the max. # of edges in any vertical
 	 * scanline (which is also 2).
+	 *
+	 *
+	 *
+	 * NOTE: I don't actually have a proof for this assumption:
+	 * >> The max # of edges of any axis-aligned rect-clipped polygon is
+	 * >>     NUM_EDGES_OF_ORIG_POLYGON +
+	 * >>     MAX(foreach(X) NUM_INTERSECTING_EDGES_OF_VERTICAL_SCANLINE_AT(X)) +
+	 * >>     MAX(foreach(Y) NUM_INTERSECTING_EDGES_OF_HORIZONTAL_SCANLINE_AT(X));
+	 *
+	 * (This assumption being the basis for how we assign "vp_cedges" here,  with
+	 * the  only  deviation from  the  above assumption  being  that we  omit the
+	 * "MAX(foreach(Y) NUM_INTERSECTING_EDGES_OF_HORIZONTAL_SCANLINE_AT(X))" part
+	 * because don't need to track perfectly horizontal edges)
+	 *
+	 * However,  despite not having a proof, I also have yet to find any polygon
+	 * that can be clipped in such a way that more edges are needed to represent
+	 * the result of clip than are needed by the above.
+	 *
+	 *
+	 *
+	 * Even more abstract, the above formula can be simplified as:
+	 * >> The max # of edges to represent a line-L-clipped polygon is
+	 * >>     NUM_EDGES_OF_ORIG_POLYGON +
+	 * >>     (MAX(foreach(D) NUM_INTERSCTING_EDGES_OF_LINE_ROT90(D)) / 2)
+	 * Where "NUM_INTERSCTING_EDGES_OF_LINE_ROT90" is the # of edges
+	 * that intersect with a diagonal going through the point P and
+	 * with an angle that is 90° offset from the original line L:
+	 *        P = L.P0 + ((L.P1 - L.P0) * D)     (Where D is REAL and in [0,1])
+	 *
+	 * Using this formula, and the fact that a rect has 4 lines (2 of each
+	 * of which are each identical, meaning the "/ 2" can be ignored),  we
+	 * end up with the original formula for rects above.
+	 *
+	 *
+	 *
+	 * But again: the above formula is actually just a theory, since I came up
+	 * with  it myself, and don't have any  proof that it is actually correct.
+	 * It only *feels* correct, and I don't have any counter-example.
 	 */
 	result->vp_cedges = nedges + poly_xactive;
 	freea(active);
@@ -442,7 +479,7 @@ libvideo_polygon_data_clip(struct video_polygon_data const *__restrict self,
 				                                 video_polygon_edge_getp0x(&edge));
 				video_dim_t xoff = (video_dim_t)(video_rect_getxmin(rect) -
 				                                 video_polygon_edge_getp0x(&edge));
-				video_coord_t yrel = (video_coord_t)(((__UINT_FAST64_TYPE__)xoff * ydim) / xdim);
+				video_coord_t yrel = (video_coord_t)(((uint_fast64_t)xoff * ydim) / xdim);
 				video_offset_t yhit = video_polygon_edge_getp0y(&edge) + yrel;
 				struct video_polygon_edge vedge;
 				vedge.vpe_dir = edge.vpe_dir;
@@ -466,7 +503,7 @@ libvideo_polygon_data_clip(struct video_polygon_data const *__restrict self,
 			                                 video_polygon_edge_getp1x(&edge));
 			video_dim_t xoff = (video_dim_t)(video_rect_getxmin(rect) -
 			                                 video_polygon_edge_getp1x(&edge));
-			video_coord_t yrel = (video_coord_t)(((__UINT_FAST64_TYPE__)xoff * ydim) / xdim);
+			video_coord_t yrel = (video_coord_t)(((uint_fast64_t)xoff * ydim) / xdim);
 			video_offset_t yhit = video_polygon_edge_getp1y(&edge) - yrel;
 			struct video_polygon_edge vedge;
 			vedge.vpe_dir = edge.vpe_dir;
@@ -501,7 +538,7 @@ libvideo_polygon_data_clip(struct video_polygon_data const *__restrict self,
 				                                 video_polygon_edge_getp1x(&edge));
 				video_dim_t xoff = (video_dim_t)(video_rect_getxend(rect) -
 				                                 video_polygon_edge_getp1x(&edge));
-				video_coord_t yrel = (video_coord_t)(((__UINT_FAST64_TYPE__)xoff * ydim) / xdim);
+				video_coord_t yrel = (video_coord_t)(((uint_fast64_t)xoff * ydim) / xdim);
 				video_offset_t yhit = video_polygon_edge_getp1y(&edge) - yrel;
 				struct video_polygon_edge vedge;
 				vedge.vpe_dir = edge.vpe_dir;
@@ -525,7 +562,7 @@ libvideo_polygon_data_clip(struct video_polygon_data const *__restrict self,
 			                                 video_polygon_edge_getp0x(&edge));
 			video_dim_t xoff = (video_dim_t)(video_rect_getxend(rect) -
 			                                 video_polygon_edge_getp0x(&edge));
-			video_coord_t yrel = (video_coord_t)(((__UINT_FAST64_TYPE__)xoff * ydim) / xdim);
+			video_coord_t yrel = (video_coord_t)(((uint_fast64_t)xoff * ydim) / xdim);
 			video_offset_t yhit = video_polygon_edge_getp0y(&edge) + yrel;
 			struct video_polygon_edge vedge;
 			vedge.vpe_dir = edge.vpe_dir;
