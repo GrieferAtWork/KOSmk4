@@ -644,6 +644,8 @@ LOCAL_libvideo_swgfx_fillpoly_c(struct video_gfx const *__restrict self,
 	cpoly = (struct video_polygon_data *)alloca(offsetof(struct video_polygon_data, vpd_edges) +
 	                                            (poly->vp_cedges * sizeof(struct video_polygon_edge)));
 	cpoly = libvideo_polygon_data_clip(video_polygon_asdata(poly), cpoly, &crect);
+	if unlikely(!cpoly->vpd_nedges)
+		return; /* Ignore empty polygon after clip */
 	LOCAL_video_swgfx_x_fillpoly(self, x, y, cpoly, color,
 	                             LOCAL_VIDEO_IMATRIX2D_IDENTITY, method);
 }

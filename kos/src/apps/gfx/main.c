@@ -369,6 +369,11 @@ step:
 				VIDEO_POINT_INIT(100, 0),
 				VIDEO_POINT_INIT(0, 100),
 #elif 0
+				VIDEO_POINT_INIT(8*50, 8*0),
+				VIDEO_POINT_INIT(8*100, 8*50),
+				VIDEO_POINT_INIT(8*50, 8*100),
+				VIDEO_POINT_INIT(8*0, 8*50),
+#elif 0
 				VIDEO_POINT_INIT(250, 0),
 				VIDEO_POINT_INIT(400, 500),
 				VIDEO_POINT_INIT(0, 250),
@@ -410,8 +415,8 @@ step:
 			                               points, lengthof(points));
 			if likely(poly) {
 				video_gfx_fillpoly(&gfx,
-				                   (rand() % (video_gfx_getxdim(&gfx) /*- poly->vp_xdim*/)) - 200,
-				                   (rand() % (video_gfx_getydim(&gfx) /*- poly->vp_ydim*/)) - 200,
+				                   (rand() % (video_gfx_getxdim(&gfx) /*- poly->vp_xdim*/)) /*- 200*/,
+				                   (rand() % (video_gfx_getydim(&gfx) /*- poly->vp_ydim*/)) /*- 200*/,
 				                   poly, color,
 				                   VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD
 				                   /*rand() % VIDEO_GFX_FILLPOLY_METHOD_COUNT*/);
