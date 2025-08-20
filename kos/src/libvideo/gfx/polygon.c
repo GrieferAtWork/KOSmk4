@@ -356,7 +356,7 @@ video_polygon_data_addedge(struct video_polygon_data *__restrict self,
 					video_polygon_edge_setp0y(prev, video_polygon_edge_getp1y(edge));
 remove_empty_prev_and_done:
 					if (video_polygon_edge_getp0y(prev) > video_polygon_edge_getp1y(prev)) {
-						/* Flip edge direction of */
+						/* Flip direction of edge */
 						struct video_point temp = prev->vpe_edge.vl_p0;
 						prev->vpe_edge.vl_p0 = prev->vpe_edge.vl_p1;
 						prev->vpe_edge.vl_p1 = temp;
