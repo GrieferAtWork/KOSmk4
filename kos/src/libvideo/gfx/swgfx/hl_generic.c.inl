@@ -566,21 +566,37 @@ LOCAL_libvideo_swgfx_fillpoly(struct video_gfx const *__restrict self,
                               video_offset_t x, video_offset_t y,
                               struct video_polygon *__restrict poly,
                               video_color_t color, unsigned int method) {
-	video_offset_t poly_xmin, poly_xend;
-	video_offset_t poly_ymin, poly_yend;
-
-//	video_coord_t temp;
+	video_offset_t poly_xmin;
+	video_offset_t poly_ymin;
+	video_coord_t poly_xend;
+	video_coord_t poly_yend;
 	x += self->vg_clip.vgc_cxoff;
 	y += self->vg_clip.vgc_cyoff;
 
 	poly_xmin = x + poly->vp_xmin;
 	poly_ymin = y + poly->vp_ymin;
 	if unlikely(poly_xmin < (video_offset_t)GFX_BXMIN) {
+		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BXMIN - poly_xmin);
+		if unlikely(poly->vp_xdim <= off)
+			return;
 		/* TODO */
 	}
-
-	poly_xend = poly_xmin + poly->vp_xdim;
-	poly_yend = poly_ymin + poly->vp_ydim;
+	if unlikely(poly_ymin < (video_offset_t)GFX_BYMIN) {
+		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BYMIN - poly_xmin);
+		if unlikely(poly->vp_xdim <= off)
+			return;
+		/* TODO */
+	}
+	if unlikely(OVERFLOW_UADD((video_coord_t)poly_xmin, poly->vp_xdim, &poly_xend) || poly_xend > GFX_BXEND) {
+		if unlikely((video_coord_t)poly_xmin >= GFX_BXEND)
+			return;
+		/* TODO */
+	}
+	if unlikely(OVERFLOW_UADD((video_coord_t)poly_ymin, poly->vp_ydim, &poly_yend) || poly_yend > GFX_BYEND) {
+		if unlikely((video_coord_t)poly_ymin >= GFX_BYEND)
+			return;
+		/* TODO */
+	}
 
 #if 0 /* TODO: Clip polygon if necessary */
 	if unlikely(x < (video_offset_t)GFX_BXMIN) {

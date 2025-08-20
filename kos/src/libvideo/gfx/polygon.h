@@ -41,6 +41,16 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
                                 struct video_point const *points, size_t npoints);
 
 
+/* Calculate a new sub-polygon by clipping edges to the given `rect'.
+ * @param: result: New polygon data with storage for at least `POLY_OF(self)->vp_cedges' edges.
+ * @param: rect:   The clip rect to apply, with coords relative to those used by `self'
+ * @return: * : Always re-returns `result' */
+INTDEF ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT(2) ATTR_IN(3) struct video_polygon_data *CC
+libvideo_polygon_data_clip(struct video_polygon_data const *__restrict self,
+                           struct video_polygon_data *__restrict result,
+                           struct video_rect const *__restrict rect);
+
+
 DECL_END
 
 #endif /* !GUARD_LIBVIDEO_GFX_POLYGON_H */

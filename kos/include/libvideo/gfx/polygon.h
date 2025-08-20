@@ -63,11 +63,14 @@ struct video_polygon {
 	__UINTPTR_TYPE__                vp_refcnt;  /* Reference counter */
 	struct video_polygon_ops const *__VIDEO_POLYGON_const vp_ops;     /* [1..1][const] Operator table of this polygon */
 	struct video_domain const      *__VIDEO_POLYGON_const vp_domain;  /* [1..1][const] Domain linked to this polygon */
+#if 0
+	__SIZE_TYPE__                   __VIDEO_POLYGON_const vp_cedges;  /* [>= 2][const] Max # of edges needed to apply a clip rect to this polygon */
+#endif
 	video_offset_t                  __VIDEO_POLYGON_const vp_xmin;    /* [const] Lowest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_x" */
 	video_offset_t                  __VIDEO_POLYGON_const vp_ymin;    /* [const] Lowest "vp_edges[i].vpe_edge.vl_p{0|1}.vp_y" */
 	video_dim_t                     __VIDEO_POLYGON_const vp_xdim;    /* [!= 0][const] Max # of pixels rendered in X after "vp_xmin" */
 	video_dim_t                     __VIDEO_POLYGON_const vp_ydim;    /* [!= 0][const] Max # of pixels rendered in Y after "vp_ymin" */
-	__SIZE_TYPE__                   __VIDEO_POLYGON_const vp_nactive; /* [>= 2 && <= vp_nedges][const] Max # of edges that can be active at the same time */
+	__SIZE_TYPE__                   __VIDEO_POLYGON_const vp_nactive; /* [>= 2 && <= vp_nedges][const] Max # of edges that can be active at the same time within a horizontal scanline */
 	__SIZE_TYPE__                   __VIDEO_POLYGON_const vp_nedges;  /* [>= 2][const] # of edges in this polygon */
 	__COMPILER_FLEXIBLE_ARRAY(struct video_polygon_edge __VIDEO_POLYGON_const,
 	                                vp_edges);  /* [1..vp_npoints][const] Polygon edges (sorted by [vl_p0.vp_y ASC, vl_p0.vp_x ASC];
@@ -93,8 +96,12 @@ struct video_polygon_edgeref {
 #if __SIZEOF_POINTER__ <= __SIZEOF_VIDEO_OFFSET_T__
 #define VIDEO_POLYGON_EDGEREF_HAVE_POINTER
 	struct video_polygon_edge const *vper_edge; /* [1..1] Linked polygon */
+#define video_polygon_edgeref_getedge(self, polygon_data)    ((self)->vper_edge)
+#define video_polygon_edgeref_setedge(self, polygon_data, v) (void)((self)->vper_edge = (v))
 #else /* __SIZEOF_POINTER__ <= __SIZEOF_VIDEO_OFFSET_T__ */
 	video_coord_t                    vper_edge_index;
+#define video_polygon_edgeref_getedge(self, polygon_data)    (&(polygon_data)->vpd_edges[(self)->vper_edge_index])
+#define video_polygon_edgeref_setedge(self, polygon_data, v) (void)((self)->vper_edge_index = (video_coord_t)((v) - (polygon_data)->vpd_edges))
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_VIDEO_OFFSET_T__ */
 };
 
@@ -103,16 +110,34 @@ struct video_polygon_data {
 	video_offset_t            vpd_ymin;    /* [const] Lowest "vpd_edges[i].vpe_edge.vcl_p{0|1}.vcp_y" */
 	video_dim_t               vpd_xdim;    /* [!= 0][const] Max # of pixels rendered in X after "vpd_xmin" */
 	video_dim_t               vpd_ydim;    /* [!= 0][const] Max # of pixels rendered in Y after "vpd_ymin" */
-	__SIZE_TYPE__             vpd_nactive; /* [>= 2 && <= vpd_nedges][const] Max # of edges that can be active at the same time */
+	__SIZE_TYPE__             vpd_nactive; /* [>= 2 && <= vpd_nedges][const] Max # of edges that can be active at the same time within a horizontal scanline */
 	__SIZE_TYPE__             vpd_nedges;  /* [>= 3][const] # of edges in this polygon */
 	__COMPILER_FLEXIBLE_ARRAY(struct video_polygon_edge,
-	                          vpd_edges); /* [1..vcp_npoints][const] Polygon edges (sorted by [vl_p0.vcp_y ASC, vl_p0.vcp_x ASC];
-	                                       * because "video_line" is  also sorted,  this means this  array sorts  edges by  their
-	                                       * starting Y coords). Horizontal edges are excluded from here! */
+	                          vpd_edges);  /* [1..vcp_npoints][const] Polygon edges (sorted by [vl_p0.vcp_y ASC, vl_p0.vcp_x ASC];
+	                                        * because "video_line" is  also sorted,  this means this  array sorts  edges by  their
+	                                        * starting Y coords). Horizontal edges are excluded from here! */
 };
 
 #define __video_polygon_data_start vp_xmin
 #define video_polygon_asdata(self) ((struct video_polygon_data const *)&(self)->__video_polygon_data_start)
+
+struct video_rect;
+
+/* Calculate a new sub-polygon by clipping edges to the given `__rect'.
+ * @param: __result: New polygon data with storage for at least `POLY_OF(__self)->vp_cedges' edges.
+ * @param: __rect:   The clip rect to apply, with coords relative to those used by `__self'
+ * @return: * : Always re-returns `__result' */
+typedef __ATTR_RETNONNULL_T __ATTR_IN_T(1) __ATTR_OUT_T(2) __ATTR_IN_T(3) struct video_polygon_data *
+(LIBVIDEO_GFX_CC *PVIDEO_POLYGON_DATA_CLIP)(struct video_polygon_data const *__restrict __self,
+                                            struct video_polygon_data *__restrict __result,
+                                            struct video_rect const *__restrict __rect);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_IN(1) __ATTR_OUT(2) __ATTR_IN(3) struct video_polygon_data *LIBVIDEO_GFX_CC
+video_polygon_data_clip(struct video_polygon_data const *__restrict __self,
+                        struct video_polygon_data *__restrict __result,
+                        struct video_rect const *__restrict __rect);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 
 __DECL_END
