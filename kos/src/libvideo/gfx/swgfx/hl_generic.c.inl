@@ -585,6 +585,11 @@ LOCAL_libvideo_swgfx_fill_mirror(struct video_gfx const *__restrict self,
 /************************************************************************/
 /* FILLPOLY()                                                           */
 /************************************************************************/
+#ifdef DEFINE_libvideo_swgfx_XXX_xyswap
+#define LOCAL_VIDEO_IMATRIX2D_IDENTITY VIDEO_IMATRIX2D_INIT(0, 1, 1, 0)
+#else /* DEFINE_libvideo_swgfx_XXX_xyswap */
+#define LOCAL_VIDEO_IMATRIX2D_IDENTITY VIDEO_IMATRIX2D_INIT(1, 0, 0, 1)
+#endif /* !DEFINE_libvideo_swgfx_XXX_xyswap */
 __pragma_GCC_diagnostic_push_ignored(Wstringop_overread)
 PRIVATE ATTR_NOINLINE ATTR_IN(1) void CC
 LOCAL_libvideo_swgfx_fillpoly_c(struct video_gfx const *__restrict self,
@@ -606,14 +611,14 @@ LOCAL_libvideo_swgfx_fillpoly_c(struct video_gfx const *__restrict self,
 	render_ymin = y + poly->LOCAL_vp_ymin;
 	if unlikely(render_xmin < (video_offset_t)GFX_BXMIN) {
 		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BXMIN - render_xmin);
-		if unlikely(poly->vp_xdim <= off)
+		if unlikely(poly->LOCAL_vp_xdim <= off)
 			return;
 		crect.LOCAL_vr_xmin += off;
 		render_xmin += off;
 	}
 	if unlikely(render_ymin < (video_offset_t)GFX_BYMIN) {
 		video_dim_t off = (video_dim_t)((video_offset_t)GFX_BYMIN - render_ymin);
-		if unlikely(poly->vp_ydim <= off)
+		if unlikely(poly->LOCAL_vp_ydim <= off)
 			return;
 		crect.LOCAL_vr_ymin += off;
 		render_ymin += off;
@@ -640,7 +645,7 @@ LOCAL_libvideo_swgfx_fillpoly_c(struct video_gfx const *__restrict self,
 	                                            (poly->vp_cedges * sizeof(struct video_polygon_edge)));
 	cpoly = libvideo_polygon_data_clip(video_polygon_asdata(poly), cpoly, &crect);
 	LOCAL_video_swgfx_x_fillpoly(self, x, y, cpoly, color,
-	                             VIDEO_IMATRIX2D_INIT(1, 0, 0, 1), method);
+	                             LOCAL_VIDEO_IMATRIX2D_IDENTITY, method);
 }
 __pragma_GCC_diagnostic_pop_ignored(Wstringop_overread)
 
@@ -667,7 +672,7 @@ LOCAL_libvideo_swgfx_fillpoly(struct video_gfx const *__restrict self,
 	if unlikely(OVERFLOW_UADD((video_coord_t)render_ymin, poly->LOCAL_vp_ydim, &render_yend) || render_yend > GFX_BYEND)
 		goto do_clamp;
 	LOCAL_video_swgfx_x_fillpoly(self, x, y, video_polygon_asdata(poly), color,
-	                             VIDEO_IMATRIX2D_INIT(1, 0, 0, 1), method);
+	                             LOCAL_VIDEO_IMATRIX2D_IDENTITY, method);
 	return;
 do_clamp:
 	LOCAL_libvideo_swgfx_fillpoly_c(self, x, y, poly, color, method);
@@ -728,6 +733,7 @@ LOCAL_libvideo_swgfx_fillpoly_mirror(struct video_gfx const *__restrict self,
 #endif
 	LOCAL_libvideo_swgfx_fillpoly_wrap(self, x, y, poly, color, method);
 }
+#undef LOCAL_VIDEO_IMATRIX2D_IDENTITY
 
 
 

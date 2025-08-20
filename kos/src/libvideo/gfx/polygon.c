@@ -188,7 +188,6 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 	qsort(result->vp_edges, nedges,
 	      sizeof(struct video_polygon_edge),
 	      &polygon_edge_compare_by_x);
-	result->vp_xmin = video_polygon_edge_getp0x(&result->vp_edges[0]);
 
 	/* Figure out the max # of edges ever active when casting vertical scanlines.
 	 * This value is needed to calculate how many total edges are needed in order
@@ -418,12 +417,12 @@ libvideo_polygon_data_clip(struct video_polygon_data const *__restrict self,
 		if (video_polygon_edge_getp0y(&edge) >= video_rect_getyend(rect))
 			continue; /* Skip edge that lies below clip rect */
 		if (video_polygon_edge_getp0y(&edge) < video_rect_getymin(rect)) {
-			/* Clamp P0 against top clip rect border */
+			/* Clamp P0 against top clip rect border (no need to create extra edges here) */
 			video_polygon_edge_setp0x(&edge, video_polygon_edge_getxat(&edge, video_rect_getymin(rect)));
 			video_polygon_edge_setp0y(&edge, video_rect_getymin(rect));
 		}
 		if (video_polygon_edge_getp1y(&edge) > video_rect_getyend(rect)) {
-			/* Clamp P1 against bottom clip rect border */
+			/* Clamp P1 against bottom clip rect border (no need to create extra edges here) */
 			video_polygon_edge_setp1x(&edge, video_polygon_edge_getxat(&edge, video_rect_getyend(rect)));
 			video_polygon_edge_setp1y(&edge, video_rect_getyend(rect));
 		}

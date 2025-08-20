@@ -387,7 +387,7 @@ step:
 				VIDEO_POINT_INIT(100, 90),
 				VIDEO_POINT_INIT(0, 100),
 #else
-#if 1 /* INVERT */
+#if 0 /* INVERT */
 				VIDEO_POINT_INIT(0, 100),
 				VIDEO_POINT_INIT(0, 0),
 				VIDEO_POINT_INIT(500, 0),
