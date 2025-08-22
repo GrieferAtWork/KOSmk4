@@ -59,6 +59,7 @@ DECL_BEGIN
 DEFINE_PUBLIC_ALIAS(video_codec_lookup_specs, libvideo_codec_lookup_specs);
 INTERN WUNUSED ATTR_PURE ATTR_IN(1) struct video_codec *FCC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
+#define WITH_ENDIAN(c)  ((specs->vcs_flags & VIDEO_CODEC_FLAG_BIG_ENDIAN) ? c##_BE : c##_LE)
 #define IS_RMASK8_LE(v) (specs->vcs_rmask == MASK8_LE(v))
 #define IS_GMASK8_LE(v) (specs->vcs_gmask == MASK8_LE(v))
 #define IS_BMASK8_LE(v) (specs->vcs_bmask == MASK8_LE(v))
@@ -97,7 +98,7 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 				case 2: codec = VIDEO_CODEC_L2_MSB; break;
 				case 4: codec = VIDEO_CODEC_L4_MSB; break;
 				case 8: codec = VIDEO_CODEC_L8; break;
-				case 16: codec = VIDEO_CODEC_L16; break;
+				case 16: codec = WITH_ENDIAN(VIDEO_CODEC_L16); break;
 				default: goto nope;
 				}
 				static_assert((VIDEO_CODEC_L1_MSB + 1) == VIDEO_CODEC_L1_LSB);
@@ -113,7 +114,7 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 					case 2: codec = VIDEO_CODEC_A2_MSB; break;
 					case 4: codec = VIDEO_CODEC_A4_MSB; break;
 					case 8: codec = VIDEO_CODEC_A8; break;
-					case 16: codec = VIDEO_CODEC_A16; break;
+					case 16: codec = WITH_ENDIAN(VIDEO_CODEC_A16); break;
 					default: goto nope;
 					}
 					static_assert((VIDEO_CODEC_A1_MSB + 1) == VIDEO_CODEC_A1_LSB);
@@ -126,7 +127,7 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 				/* With alpha channel */
 				switch (specs->vcs_bpp) {
 
-				case 2: {
+				case 2:
 					if (IS_LMASK1(0x1) && IS_AMASK1(0x2)) {
 						codec = VIDEO_CODEC_LA11_MSB;
 					} else if (IS_LMASK1(0x2) && IS_AMASK1(0x1)) {
@@ -138,9 +139,9 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 					static_assert((VIDEO_CODEC_LA11_MSB + 1) == VIDEO_CODEC_LA11_LSB);
 					if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags))
 						++codec;
-				}	break;
+					break;
 
-				case 4: {
+				case 4:
 					if (IS_LMASK1(0x3) && IS_AMASK1(0xc)) {
 						codec = VIDEO_CODEC_LA22_MSB;
 					} else if (IS_LMASK1(0xc) && IS_AMASK1(0x3)) {
@@ -158,9 +159,9 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 					static_assert((VIDEO_CODEC_AL13_MSB + 1) == VIDEO_CODEC_AL13_LSB);
 					if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags))
 						++codec;
-				}	break;
+					break;
 
-				case 8: {
+				case 8:
 					if (IS_LMASK1(0x0f) && IS_AMASK1(0xf0)) {
 						codec = VIDEO_CODEC_LA44;
 					} else if (IS_LMASK1(0xf0) && IS_AMASK1(0x0f)) {
@@ -172,21 +173,27 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 					} else {
 						goto nope;
 					}
-				}	break;
+					break;
 
-				case 16: {
+				case 16:
 					if (IS_LMASK2_LE(0x00ff) && IS_AMASK2_LE(0xff00)) {
-						codec = VIDEO_CODEC_LA88;
-					} else if (IS_LMASK2_LE(0xff00) && IS_AMASK2_LE(0x00ff)) {
 						codec = VIDEO_CODEC_AL88;
-					} else if (IS_LMASK2_LE(0xffff) && IS_AMASK0()) {
-						codec = VIDEO_CODEC_L16;
-					} else if (IS_LMASK0() && IS_AMASK2_LE(0xffff)) {
-						codec = VIDEO_CODEC_A16;
+					} else if (IS_LMASK2_LE(0xff00) && IS_AMASK2_LE(0x00ff)) {
+						codec = VIDEO_CODEC_LA88;
 					} else {
 						goto nope;
 					}
-				}	break;
+					break;
+
+				case 32:
+					if (IS_LMASK4_LE(0x0000ffff) && IS_AMASK2_LE(0xffff0000)) {
+						codec = WITH_ENDIAN(VIDEO_CODEC_AL1616);
+					} else if (IS_LMASK4_LE(0xffff0000) && IS_AMASK2_LE(0x0000ffff)) {
+						codec = WITH_ENDIAN(VIDEO_CODEC_LA1616);
+					} else {
+						goto nope;
+					}
+					break;
 
 				default: goto nope;
 				}
@@ -203,7 +210,8 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 			static_assert(LUM2PAL(VIDEO_CODEC_L4_MSB) == VIDEO_CODEC_P4_MSB);
 			static_assert(LUM2PAL(VIDEO_CODEC_L4_LSB) == VIDEO_CODEC_P4_LSB);
 			static_assert(LUM2PAL(VIDEO_CODEC_L8) == VIDEO_CODEC_P8);
-			static_assert(LUM2PAL(VIDEO_CODEC_L16) == VIDEO_CODEC_P16);
+			static_assert(LUM2PAL(VIDEO_CODEC_L16_LE) == VIDEO_CODEC_P16_LE);
+			static_assert(LUM2PAL(VIDEO_CODEC_L16_BE) == VIDEO_CODEC_P16_BE);
 			static_assert(LUM2PAL(VIDEO_CODEC_LA11_MSB) == VIDEO_CODEC_PA11_MSB);
 			static_assert(LUM2PAL(VIDEO_CODEC_LA11_LSB) == VIDEO_CODEC_PA11_LSB);
 			static_assert(LUM2PAL(VIDEO_CODEC_AL11_MSB) == VIDEO_CODEC_AP11_MSB);
@@ -222,8 +230,10 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 			static_assert(LUM2PAL(VIDEO_CODEC_AL17) == VIDEO_CODEC_AP17);
 			static_assert(LUM2PAL(VIDEO_CODEC_LA88) == VIDEO_CODEC_PA88);
 			static_assert(LUM2PAL(VIDEO_CODEC_AL88) == VIDEO_CODEC_AP88);
-			static_assert(LUM2PAL(VIDEO_CODEC_LA1616) == VIDEO_CODEC_PA1616);
-			static_assert(LUM2PAL(VIDEO_CODEC_AL1616) == VIDEO_CODEC_AP1616);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA1616_LE) == VIDEO_CODEC_PA1616_LE);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL1616_LE) == VIDEO_CODEC_AP1616_LE);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA1616_BE) == VIDEO_CODEC_PA1616_BE);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL1616_BE) == VIDEO_CODEC_AP1616_BE);
 			codec = LUM2PAL(codec);
 #undef LUM2PAL_OFFSET
 #undef LUM2PAL
@@ -237,30 +247,30 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 			if (IS_RMASK8_LE(0x000000000000ffff)) {
 				if (IS_GMASK8_LE(0x00000000ffff0000) && IS_BMASK8_LE(0x0000ffff00000000)) {
 					if (IS_AMASK8_LE(0xffff000000000000))
-						SET_CODEC(VIDEO_CODEC_RGBA16161616);
+						SET_CODEC(WITH_ENDIAN(VIDEO_CODEC_RGBA16161616));
 					if (IS_AMASK0())
-						SET_CODEC(VIDEO_CODEC_RGBX16161616);
+						SET_CODEC(WITH_ENDIAN(VIDEO_CODEC_RGBX16161616));
 				}
 			} else if (IS_RMASK8_LE(0x00000000ffff0000)) {
 				if (IS_GMASK8_LE(0x0000ffff00000000) && IS_BMASK8_LE(0xffff000000000000)) {
 					if (IS_AMASK8_LE(0x000000000000ffff))
-						SET_CODEC(VIDEO_CODEC_ARGB16161616);
+						SET_CODEC(WITH_ENDIAN(VIDEO_CODEC_ARGB16161616));
 					if (IS_AMASK0())
-						SET_CODEC(VIDEO_CODEC_XRGB16161616);
+						SET_CODEC(WITH_ENDIAN(VIDEO_CODEC_XRGB16161616));
 				}
 			} else if (IS_RMASK8_LE(0x0000ffff00000000)) {
 				if (IS_GMASK8_LE(0x00000000ffff0000) && IS_BMASK8_LE(0x000000000000ffff)) {
 					if (IS_AMASK8_LE(0xffff000000000000))
-						SET_CODEC(VIDEO_CODEC_BGRA16161616);
+						SET_CODEC(WITH_ENDIAN(VIDEO_CODEC_BGRA16161616));
 					if (IS_AMASK0())
-						SET_CODEC(VIDEO_CODEC_BGRX16161616);
+						SET_CODEC(WITH_ENDIAN(VIDEO_CODEC_BGRX16161616));
 				}
 			} else if (IS_RMASK8_LE(0xffff000000000000)) {
 				if (IS_GMASK8_LE(0x0000ffff00000000) && IS_BMASK8_LE(0x00000000ffff0000)) {
 					if (IS_AMASK8_LE(0x000000000000ffff))
-						SET_CODEC(VIDEO_CODEC_ABGR16161616);
+						SET_CODEC(WITH_ENDIAN(VIDEO_CODEC_ABGR16161616));
 					if (IS_AMASK0())
-						SET_CODEC(VIDEO_CODEC_XBGR16161616);
+						SET_CODEC(WITH_ENDIAN(VIDEO_CODEC_XBGR16161616));
 				}
 			}
 			break;
@@ -542,6 +552,7 @@ nope:
 #undef IS_LMASK2_LE
 #undef IS_LMASK1
 #undef IS_LMASK0
+#undef WITH_ENDIAN
 }
 
 

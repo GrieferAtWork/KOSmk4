@@ -37,6 +37,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <hybrid/align.h>
 #include <hybrid/bit.h>
 #include <hybrid/byteorder.h>
+#include <hybrid/byteswap.h>
 #include <hybrid/host.h>
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
@@ -51,8 +52,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <libvideo/color.h>
 #include <libvideo/gfx/api.h>
-#include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/codec/codec-extra.h>
+#include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/surface-defs.h>
 #include <libvideo/gfx/surface.h>
@@ -2622,6 +2623,17 @@ l16_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_co
 	return color_getlumen16(color);
 }
 
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
+l16_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
+	return l16_pixel2color(surface, BSWAP16(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
+l16_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
+	uint16_t result = (uint16_t)l16_color2pixel(surface, color);
+	return BSWAP16(result);
+}
+
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
 l16_pixel2color64(struct video_surface const *__restrict UNUSED(surface), video_pixel64_t pixel) {
@@ -2631,6 +2643,17 @@ l16_pixel2color64(struct video_surface const *__restrict UNUSED(surface), video_
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
 l16_color2pixel64(struct video_surface const *__restrict UNUSED(surface), video_color64_t color) {
 	return color64_getlumen16(color);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+l16_bswap_pixel2color64(struct video_surface const *__restrict surface, video_pixel64_t pixel) {
+	return l16_pixel2color64(surface, BSWAP16(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+l16_bswap_color2pixel64(struct video_surface const *__restrict surface, video_color64_t color) {
+	uint16_t result = (uint16_t)l16_color2pixel64(surface, color);
+	return BSWAP16(result);
 }
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
@@ -2685,6 +2708,17 @@ a16_color2pixel(struct video_surface const *__restrict UNUSED(surface), video_co
 	return color_getalpha16(color);
 }
 
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
+a16_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
+	return a16_pixel2color(surface, BSWAP16(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
+a16_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
+	uint16_t result = (uint16_t)a16_color2pixel(surface, color);
+	return BSWAP16(result);
+}
+
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
 a16_pixel2color64(struct video_surface const *__restrict UNUSED(surface), video_pixel64_t pixel) {
@@ -2694,6 +2728,17 @@ a16_pixel2color64(struct video_surface const *__restrict UNUSED(surface), video_
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
 a16_color2pixel64(struct video_surface const *__restrict UNUSED(surface), video_color64_t color) {
 	return color64_getalpha16(color);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+a16_bswap_pixel2color64(struct video_surface const *__restrict surface, video_pixel64_t pixel) {
+	return a16_pixel2color64(surface, BSWAP16(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+a16_bswap_color2pixel64(struct video_surface const *__restrict surface, video_color64_t color) {
+	uint16_t result = (uint16_t)a16_color2pixel64(surface, color);
+	return BSWAP16(result);
 }
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
@@ -2854,6 +2899,28 @@ la1616_color2pixel(struct video_surface const *__restrict UNUSED(surface), video
 	       ((video_pixel_t)color_getalpha16(color) << 16);
 }
 
+PRIVATE ATTR_CONST WUNUSED uint32_t FCC
+bswap_words32(uint32_t v) {
+	union {
+		uint32_t v;
+		uint16_t w[2];
+	} result;
+	result.v = v;
+	result.w[0] = BSWAP16(result.w[0]);
+	result.w[1] = BSWAP16(result.w[1]);
+	return result.v;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
+la1616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
+	return la1616_pixel2color(surface, bswap_words32(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
+la1616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
+	return bswap_words32(la1616_color2pixel(surface, color));
+}
+
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
 la1616_pixel2color64(struct video_surface const *__restrict UNUSED(surface), video_pixel64_t pixel) {
@@ -2865,6 +2932,16 @@ PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
 la1616_color2pixel64(struct video_surface const *__restrict UNUSED(surface), video_color64_t color) {
 	return ((video_pixel_t)color64_getlumen16(color)) |
 	       ((video_pixel_t)color64_getalpha16(color) << 16);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+la1616_bswap_pixel2color64(struct video_surface const *__restrict surface, video_pixel64_t pixel) {
+	return la1616_pixel2color64(surface, bswap_words32(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+la1616_bswap_color2pixel64(struct video_surface const *__restrict surface, video_color64_t color) {
+	return bswap_words32(la1616_color2pixel64(surface, color));
 }
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
@@ -2880,6 +2957,16 @@ al1616_color2pixel(struct video_surface const *__restrict UNUSED(surface), video
 	       ((video_pixel_t)color_getlumen16(color) << 16);
 }
 
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
+al1616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
+	return al1616_pixel2color(surface, bswap_words32(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
+al1616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
+	return bswap_words32(al1616_color2pixel(surface, color));
+}
+
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
 al1616_pixel2color64(struct video_surface const *__restrict UNUSED(surface), video_pixel64_t pixel) {
@@ -2891,6 +2978,16 @@ PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
 al1616_color2pixel64(struct video_surface const *__restrict UNUSED(surface), video_color64_t color) {
 	return ((video_pixel_t)color64_getalpha16(color)) |
 	       ((video_pixel_t)color64_getlumen16(color) << 16);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+al1616_bswap_pixel2color64(struct video_surface const *__restrict surface, video_pixel64_t pixel) {
+	return al1616_pixel2color64(surface, bswap_words32(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+al1616_bswap_color2pixel64(struct video_surface const *__restrict surface, video_color64_t color) {
+	return bswap_words32(al1616_color2pixel64(surface, color));
 }
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
@@ -3717,6 +3814,16 @@ pa1616_color2pixel(struct video_surface const *__restrict surface, video_color_t
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
+pa1616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
+	return pa1616_pixel2color(surface, bswap_words32(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
+pa1616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
+	return bswap_words32(pa1616_color2pixel(surface, color));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 ap1616_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
 	return alpha16_tocolor((pixel) & 0xffff) |
 	       palet16_tocolor((pixel >> 16) /*& 0xffff*/);
@@ -3726,6 +3833,27 @@ PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 ap1616_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
 	return ((video_pixel_t)color_getalpha16(color)) |
 	       ((video_pixel_t)color_getpalet16(color) << 16);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
+ap1616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
+	return ap1616_pixel2color(surface, bswap_words32(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
+ap1616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
+	return bswap_words32(ap1616_color2pixel(surface, color));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
+p16_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t pixel) {
+	return pal_pixel2color(surface, BSWAP16(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
+p16_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t color) {
+	uint16_t result = pal_color2pixel(surface, color);
+	return BSWAP16(result);
 }
 
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
@@ -3751,6 +3879,37 @@ PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
 ap1616_color2pixel64(struct video_surface const *__restrict surface, video_color64_t color) {
 	return ((video_pixel64_t)color64_getalpha16(color)) |
 	       ((video_pixel64_t)color64_getpalet16(color) << 16);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+pa1616_bswap_pixel2color64(struct video_surface const *__restrict surface, video_pixel64_t pixel) {
+	return pa1616_pixel2color64(surface, bswap_words32(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+pa1616_bswap_color2pixel64(struct video_surface const *__restrict surface, video_color64_t color) {
+	return bswap_words32(pa1616_color2pixel64(surface, color));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+ap1616_bswap_pixel2color64(struct video_surface const *__restrict surface, video_pixel64_t pixel) {
+	return ap1616_pixel2color64(surface, bswap_words32(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+ap1616_bswap_color2pixel64(struct video_surface const *__restrict surface, video_color64_t color) {
+	return bswap_words32(ap1616_color2pixel64(surface, color));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+p16_bswap_pixel2color64(struct video_surface const *__restrict surface, video_pixel64_t pixel) {
+	return pal_pixel2color64(surface, BSWAP16(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+p16_bswap_color2pixel64(struct video_surface const *__restrict surface, video_color64_t color) {
+	uint16_t result = pal_color2pixel64(surface, color);
+	return BSWAP16(result);
 }
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 #undef _paletN_tocolor
@@ -4712,6 +4871,9 @@ unaligned_linecopy64(byte_t *__restrict dst_line, video_coord_t dst_x,
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 
 
+#define rgba16161616_pixel2color64 identity_color2pixel64
+#define rgba16161616_color2pixel64 identity_color2pixel64
+
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
 rgbx16161616_pixel2color64(struct video_surface const *__restrict UNUSED(surface),
                            video_pixel64_t pixel) {
@@ -4828,6 +4990,20 @@ xbgr16161616_color2pixel64(struct video_surface const *__restrict UNUSED(surface
 
 
 
+PRIVATE ATTR_CONST WUNUSED uint64_t FCC
+bswap_words64(uint64_t v) {
+	union {
+		uint64_t v;
+		uint16_t w[4];
+	} result;
+	result.v = v;
+	result.w[0] = BSWAP16(result.w[0]);
+	result.w[1] = BSWAP16(result.w[1]);
+	result.w[2] = BSWAP16(result.w[2]);
+	result.w[3] = BSWAP16(result.w[3]);
+	return result.v;
+}
+
 /* Wrapper implementations for 64-bit color codecs */
 /*[[[deemon
 for (local CODEC: {
@@ -4839,6 +5015,14 @@ for (local CODEC: {
 	"BGRX16161616",
 	"ABGR16161616",
 	"XBGR16161616",
+	"RGBA16161616_BSWAP",
+	"RGBX16161616_BSWAP",
+	"ARGB16161616_BSWAP",
+	"XRGB16161616_BSWAP",
+	"BGRA16161616_BSWAP",
+	"BGRX16161616_BSWAP",
+	"ABGR16161616_BSWAP",
+	"XBGR16161616_BSWAP",
 }) {
 	local codec = CODEC.lower();
 	print("/" "* VIDEO_CODEC_", CODEC, " *" "/");
@@ -4854,6 +5038,20 @@ for (local CODEC: {
 	print(f"#define {codec}_linefill_64 linefill64_64");
 	print(f"#define {codec}_vertfill_64 vertfill64_64");
 	print(f"#define {codec}_rectfill_64 rectfill64_64");
+	if ("BSWAP" in CODEC) {
+		local nbswap = codec.rsstrip("_bswap");
+		print(f"PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC");
+		print(f"{codec}_pixel2color64(struct video_surface const *__restrict surface,");
+		print(f"                                 video_pixel64_t pixel) {{");
+		print(f"	return {nbswap}_pixel2color64(surface, bswap_words64(pixel));");
+		print(f"}}");
+		print(f"");
+		print(f"PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC");
+		print(f"{codec}_color2pixel64(struct video_surface const *__restrict surface,");
+		print(f"                                 video_color64_t color) {{");
+		print(f"	return bswap_words64({nbswap}_color2pixel64(surface, color));");
+		print(f"}}");
+	}
 	print(f"PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC");
 	print(f"{codec}_getpixel(byte_t const *__restrict line, video_coord_t x) \{");
 	print(f"	video_pixel64_t pixel64 = getpixel64_64(line, x);");
@@ -5702,6 +5900,854 @@ unaligned_xbgr16161616_rectfill(byte_t *__restrict line, video_coord_t x, size_t
 	unaligned_rectfill64_64(line, x, stride, pixel64, size_x, size_y);
 }
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
+/* VIDEO_CODEC_RGBA16161616_BSWAP */
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC rgba16161616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t value) ASMNAME("identity_color2pixel");
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC rgba16161616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t value) ASMNAME("identity_color2pixel");
+#define rgba16161616_bswap_getpixel_64 getpixel64_64
+#define rgba16161616_bswap_setpixel_64 setpixel64_64
+#define rgba16161616_bswap_linefill_64 linefill64_64
+#define rgba16161616_bswap_vertfill_64 vertfill64_64
+#define rgba16161616_bswap_rectfill_64 rectfill64_64
+#define rgba16161616_bswap_getpixel_64 getpixel64_64
+#define rgba16161616_bswap_setpixel_64 setpixel64_64
+#define rgba16161616_bswap_linefill_64 linefill64_64
+#define rgba16161616_bswap_vertfill_64 vertfill64_64
+#define rgba16161616_bswap_rectfill_64 rectfill64_64
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+rgba16161616_bswap_pixel2color64(struct video_surface const *__restrict surface,
+                                 video_pixel64_t pixel) {
+	return rgba16161616_pixel2color64(surface, bswap_words64(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+rgba16161616_bswap_color2pixel64(struct video_surface const *__restrict surface,
+                                 video_color64_t color) {
+	return bswap_words64(rgba16161616_color2pixel64(surface, color));
+}
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+rgba16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = getpixel64_64(line, x);
+	video_color64_t color64 = rgba16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+rgba16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgba16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	setpixel64_64(line, x, pixel64);
+}
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_rgba16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	rgba16161616_bswap_setpixel(line, x, pixel);
+}
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+PRIVATE NONNULL((1)) void FCC
+rgba16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgba16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+rgba16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgba16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+rgba16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgba16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_rgba16161616_bswap_getpixel rgba16161616_bswap_getpixel
+#define unaligned_rgba16161616_bswap_setpixel rgba16161616_bswap_setpixel
+#define unaligned_rgba16161616_bswap_linefill rgba16161616_bswap_linefill
+#define unaligned_rgba16161616_bswap_vertfill rgba16161616_bswap_vertfill
+#define unaligned_rgba16161616_bswap_rectfill rgba16161616_bswap_rectfill
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+unaligned_rgba16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = unaligned_getpixel64_64(line, x);
+	video_color64_t color64 = rgba16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgba16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgba16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_setpixel64_64(line, x, pixel64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgba16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgba16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgba16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgba16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgba16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgba16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
+/* VIDEO_CODEC_RGBX16161616_BSWAP */
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC rgbx16161616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t value) ASMNAME("identity_color2pixel");
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC rgbx16161616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t value) ASMNAME("identity_color2pixel");
+#define rgbx16161616_bswap_getpixel_64 getpixel64_64
+#define rgbx16161616_bswap_setpixel_64 setpixel64_64
+#define rgbx16161616_bswap_linefill_64 linefill64_64
+#define rgbx16161616_bswap_vertfill_64 vertfill64_64
+#define rgbx16161616_bswap_rectfill_64 rectfill64_64
+#define rgbx16161616_bswap_getpixel_64 getpixel64_64
+#define rgbx16161616_bswap_setpixel_64 setpixel64_64
+#define rgbx16161616_bswap_linefill_64 linefill64_64
+#define rgbx16161616_bswap_vertfill_64 vertfill64_64
+#define rgbx16161616_bswap_rectfill_64 rectfill64_64
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+rgbx16161616_bswap_pixel2color64(struct video_surface const *__restrict surface,
+                                 video_pixel64_t pixel) {
+	return rgbx16161616_pixel2color64(surface, bswap_words64(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+rgbx16161616_bswap_color2pixel64(struct video_surface const *__restrict surface,
+                                 video_color64_t color) {
+	return bswap_words64(rgbx16161616_color2pixel64(surface, color));
+}
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+rgbx16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = getpixel64_64(line, x);
+	video_color64_t color64 = rgbx16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+rgbx16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgbx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	setpixel64_64(line, x, pixel64);
+}
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_rgbx16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	rgbx16161616_bswap_setpixel(line, x, pixel);
+}
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+PRIVATE NONNULL((1)) void FCC
+rgbx16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgbx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+rgbx16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgbx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+rgbx16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgbx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_rgbx16161616_bswap_getpixel rgbx16161616_bswap_getpixel
+#define unaligned_rgbx16161616_bswap_setpixel rgbx16161616_bswap_setpixel
+#define unaligned_rgbx16161616_bswap_linefill rgbx16161616_bswap_linefill
+#define unaligned_rgbx16161616_bswap_vertfill rgbx16161616_bswap_vertfill
+#define unaligned_rgbx16161616_bswap_rectfill rgbx16161616_bswap_rectfill
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+unaligned_rgbx16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = unaligned_getpixel64_64(line, x);
+	video_color64_t color64 = rgbx16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgbx16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgbx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_setpixel64_64(line, x, pixel64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgbx16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgbx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgbx16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgbx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_rgbx16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = rgbx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
+/* VIDEO_CODEC_ARGB16161616_BSWAP */
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC argb16161616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t value) ASMNAME("identity_color2pixel");
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC argb16161616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t value) ASMNAME("identity_color2pixel");
+#define argb16161616_bswap_getpixel_64 getpixel64_64
+#define argb16161616_bswap_setpixel_64 setpixel64_64
+#define argb16161616_bswap_linefill_64 linefill64_64
+#define argb16161616_bswap_vertfill_64 vertfill64_64
+#define argb16161616_bswap_rectfill_64 rectfill64_64
+#define argb16161616_bswap_getpixel_64 getpixel64_64
+#define argb16161616_bswap_setpixel_64 setpixel64_64
+#define argb16161616_bswap_linefill_64 linefill64_64
+#define argb16161616_bswap_vertfill_64 vertfill64_64
+#define argb16161616_bswap_rectfill_64 rectfill64_64
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+argb16161616_bswap_pixel2color64(struct video_surface const *__restrict surface,
+                                 video_pixel64_t pixel) {
+	return argb16161616_pixel2color64(surface, bswap_words64(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+argb16161616_bswap_color2pixel64(struct video_surface const *__restrict surface,
+                                 video_color64_t color) {
+	return bswap_words64(argb16161616_color2pixel64(surface, color));
+}
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+argb16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = getpixel64_64(line, x);
+	video_color64_t color64 = argb16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+argb16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = argb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	setpixel64_64(line, x, pixel64);
+}
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_argb16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	argb16161616_bswap_setpixel(line, x, pixel);
+}
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+PRIVATE NONNULL((1)) void FCC
+argb16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = argb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+argb16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = argb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+argb16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = argb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_argb16161616_bswap_getpixel argb16161616_bswap_getpixel
+#define unaligned_argb16161616_bswap_setpixel argb16161616_bswap_setpixel
+#define unaligned_argb16161616_bswap_linefill argb16161616_bswap_linefill
+#define unaligned_argb16161616_bswap_vertfill argb16161616_bswap_vertfill
+#define unaligned_argb16161616_bswap_rectfill argb16161616_bswap_rectfill
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+unaligned_argb16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = unaligned_getpixel64_64(line, x);
+	video_color64_t color64 = argb16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_argb16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = argb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_setpixel64_64(line, x, pixel64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_argb16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = argb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_argb16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = argb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_argb16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = argb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
+/* VIDEO_CODEC_XRGB16161616_BSWAP */
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC xrgb16161616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t value) ASMNAME("identity_color2pixel");
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC xrgb16161616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t value) ASMNAME("identity_color2pixel");
+#define xrgb16161616_bswap_getpixel_64 getpixel64_64
+#define xrgb16161616_bswap_setpixel_64 setpixel64_64
+#define xrgb16161616_bswap_linefill_64 linefill64_64
+#define xrgb16161616_bswap_vertfill_64 vertfill64_64
+#define xrgb16161616_bswap_rectfill_64 rectfill64_64
+#define xrgb16161616_bswap_getpixel_64 getpixel64_64
+#define xrgb16161616_bswap_setpixel_64 setpixel64_64
+#define xrgb16161616_bswap_linefill_64 linefill64_64
+#define xrgb16161616_bswap_vertfill_64 vertfill64_64
+#define xrgb16161616_bswap_rectfill_64 rectfill64_64
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+xrgb16161616_bswap_pixel2color64(struct video_surface const *__restrict surface,
+                                 video_pixel64_t pixel) {
+	return xrgb16161616_pixel2color64(surface, bswap_words64(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+xrgb16161616_bswap_color2pixel64(struct video_surface const *__restrict surface,
+                                 video_color64_t color) {
+	return bswap_words64(xrgb16161616_color2pixel64(surface, color));
+}
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+xrgb16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = getpixel64_64(line, x);
+	video_color64_t color64 = xrgb16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+xrgb16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xrgb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	setpixel64_64(line, x, pixel64);
+}
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_xrgb16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	xrgb16161616_bswap_setpixel(line, x, pixel);
+}
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+PRIVATE NONNULL((1)) void FCC
+xrgb16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xrgb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+xrgb16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xrgb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+xrgb16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xrgb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_xrgb16161616_bswap_getpixel xrgb16161616_bswap_getpixel
+#define unaligned_xrgb16161616_bswap_setpixel xrgb16161616_bswap_setpixel
+#define unaligned_xrgb16161616_bswap_linefill xrgb16161616_bswap_linefill
+#define unaligned_xrgb16161616_bswap_vertfill xrgb16161616_bswap_vertfill
+#define unaligned_xrgb16161616_bswap_rectfill xrgb16161616_bswap_rectfill
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+unaligned_xrgb16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = unaligned_getpixel64_64(line, x);
+	video_color64_t color64 = xrgb16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_xrgb16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xrgb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_setpixel64_64(line, x, pixel64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_xrgb16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xrgb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_xrgb16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xrgb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_xrgb16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xrgb16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
+/* VIDEO_CODEC_BGRA16161616_BSWAP */
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC bgra16161616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t value) ASMNAME("identity_color2pixel");
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC bgra16161616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t value) ASMNAME("identity_color2pixel");
+#define bgra16161616_bswap_getpixel_64 getpixel64_64
+#define bgra16161616_bswap_setpixel_64 setpixel64_64
+#define bgra16161616_bswap_linefill_64 linefill64_64
+#define bgra16161616_bswap_vertfill_64 vertfill64_64
+#define bgra16161616_bswap_rectfill_64 rectfill64_64
+#define bgra16161616_bswap_getpixel_64 getpixel64_64
+#define bgra16161616_bswap_setpixel_64 setpixel64_64
+#define bgra16161616_bswap_linefill_64 linefill64_64
+#define bgra16161616_bswap_vertfill_64 vertfill64_64
+#define bgra16161616_bswap_rectfill_64 rectfill64_64
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+bgra16161616_bswap_pixel2color64(struct video_surface const *__restrict surface,
+                                 video_pixel64_t pixel) {
+	return bgra16161616_pixel2color64(surface, bswap_words64(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+bgra16161616_bswap_color2pixel64(struct video_surface const *__restrict surface,
+                                 video_color64_t color) {
+	return bswap_words64(bgra16161616_color2pixel64(surface, color));
+}
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+bgra16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = getpixel64_64(line, x);
+	video_color64_t color64 = bgra16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+bgra16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgra16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	setpixel64_64(line, x, pixel64);
+}
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_bgra16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	bgra16161616_bswap_setpixel(line, x, pixel);
+}
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+PRIVATE NONNULL((1)) void FCC
+bgra16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgra16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+bgra16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgra16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+bgra16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgra16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_bgra16161616_bswap_getpixel bgra16161616_bswap_getpixel
+#define unaligned_bgra16161616_bswap_setpixel bgra16161616_bswap_setpixel
+#define unaligned_bgra16161616_bswap_linefill bgra16161616_bswap_linefill
+#define unaligned_bgra16161616_bswap_vertfill bgra16161616_bswap_vertfill
+#define unaligned_bgra16161616_bswap_rectfill bgra16161616_bswap_rectfill
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+unaligned_bgra16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = unaligned_getpixel64_64(line, x);
+	video_color64_t color64 = bgra16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_bgra16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgra16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_setpixel64_64(line, x, pixel64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_bgra16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgra16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_bgra16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgra16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_bgra16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgra16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
+/* VIDEO_CODEC_BGRX16161616_BSWAP */
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC bgrx16161616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t value) ASMNAME("identity_color2pixel");
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC bgrx16161616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t value) ASMNAME("identity_color2pixel");
+#define bgrx16161616_bswap_getpixel_64 getpixel64_64
+#define bgrx16161616_bswap_setpixel_64 setpixel64_64
+#define bgrx16161616_bswap_linefill_64 linefill64_64
+#define bgrx16161616_bswap_vertfill_64 vertfill64_64
+#define bgrx16161616_bswap_rectfill_64 rectfill64_64
+#define bgrx16161616_bswap_getpixel_64 getpixel64_64
+#define bgrx16161616_bswap_setpixel_64 setpixel64_64
+#define bgrx16161616_bswap_linefill_64 linefill64_64
+#define bgrx16161616_bswap_vertfill_64 vertfill64_64
+#define bgrx16161616_bswap_rectfill_64 rectfill64_64
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+bgrx16161616_bswap_pixel2color64(struct video_surface const *__restrict surface,
+                                 video_pixel64_t pixel) {
+	return bgrx16161616_pixel2color64(surface, bswap_words64(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+bgrx16161616_bswap_color2pixel64(struct video_surface const *__restrict surface,
+                                 video_color64_t color) {
+	return bswap_words64(bgrx16161616_color2pixel64(surface, color));
+}
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+bgrx16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = getpixel64_64(line, x);
+	video_color64_t color64 = bgrx16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+bgrx16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgrx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	setpixel64_64(line, x, pixel64);
+}
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_bgrx16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	bgrx16161616_bswap_setpixel(line, x, pixel);
+}
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+PRIVATE NONNULL((1)) void FCC
+bgrx16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgrx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+bgrx16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgrx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+bgrx16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgrx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_bgrx16161616_bswap_getpixel bgrx16161616_bswap_getpixel
+#define unaligned_bgrx16161616_bswap_setpixel bgrx16161616_bswap_setpixel
+#define unaligned_bgrx16161616_bswap_linefill bgrx16161616_bswap_linefill
+#define unaligned_bgrx16161616_bswap_vertfill bgrx16161616_bswap_vertfill
+#define unaligned_bgrx16161616_bswap_rectfill bgrx16161616_bswap_rectfill
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+unaligned_bgrx16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = unaligned_getpixel64_64(line, x);
+	video_color64_t color64 = bgrx16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_bgrx16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgrx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_setpixel64_64(line, x, pixel64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_bgrx16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgrx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_bgrx16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgrx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_bgrx16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = bgrx16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
+/* VIDEO_CODEC_ABGR16161616_BSWAP */
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC abgr16161616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t value) ASMNAME("identity_color2pixel");
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC abgr16161616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t value) ASMNAME("identity_color2pixel");
+#define abgr16161616_bswap_getpixel_64 getpixel64_64
+#define abgr16161616_bswap_setpixel_64 setpixel64_64
+#define abgr16161616_bswap_linefill_64 linefill64_64
+#define abgr16161616_bswap_vertfill_64 vertfill64_64
+#define abgr16161616_bswap_rectfill_64 rectfill64_64
+#define abgr16161616_bswap_getpixel_64 getpixel64_64
+#define abgr16161616_bswap_setpixel_64 setpixel64_64
+#define abgr16161616_bswap_linefill_64 linefill64_64
+#define abgr16161616_bswap_vertfill_64 vertfill64_64
+#define abgr16161616_bswap_rectfill_64 rectfill64_64
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+abgr16161616_bswap_pixel2color64(struct video_surface const *__restrict surface,
+                                 video_pixel64_t pixel) {
+	return abgr16161616_pixel2color64(surface, bswap_words64(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+abgr16161616_bswap_color2pixel64(struct video_surface const *__restrict surface,
+                                 video_color64_t color) {
+	return bswap_words64(abgr16161616_color2pixel64(surface, color));
+}
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+abgr16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = getpixel64_64(line, x);
+	video_color64_t color64 = abgr16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+abgr16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = abgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	setpixel64_64(line, x, pixel64);
+}
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_abgr16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	abgr16161616_bswap_setpixel(line, x, pixel);
+}
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+PRIVATE NONNULL((1)) void FCC
+abgr16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = abgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+abgr16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = abgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+abgr16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = abgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_abgr16161616_bswap_getpixel abgr16161616_bswap_getpixel
+#define unaligned_abgr16161616_bswap_setpixel abgr16161616_bswap_setpixel
+#define unaligned_abgr16161616_bswap_linefill abgr16161616_bswap_linefill
+#define unaligned_abgr16161616_bswap_vertfill abgr16161616_bswap_vertfill
+#define unaligned_abgr16161616_bswap_rectfill abgr16161616_bswap_rectfill
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+unaligned_abgr16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = unaligned_getpixel64_64(line, x);
+	video_color64_t color64 = abgr16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_abgr16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = abgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_setpixel64_64(line, x, pixel64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_abgr16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = abgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_abgr16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = abgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_abgr16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = abgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
+/* VIDEO_CODEC_XBGR16161616_BSWAP */
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC xbgr16161616_bswap_pixel2color(struct video_surface const *__restrict surface, video_pixel_t value) ASMNAME("identity_color2pixel");
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC xbgr16161616_bswap_color2pixel(struct video_surface const *__restrict surface, video_color_t value) ASMNAME("identity_color2pixel");
+#define xbgr16161616_bswap_getpixel_64 getpixel64_64
+#define xbgr16161616_bswap_setpixel_64 setpixel64_64
+#define xbgr16161616_bswap_linefill_64 linefill64_64
+#define xbgr16161616_bswap_vertfill_64 vertfill64_64
+#define xbgr16161616_bswap_rectfill_64 rectfill64_64
+#define xbgr16161616_bswap_getpixel_64 getpixel64_64
+#define xbgr16161616_bswap_setpixel_64 setpixel64_64
+#define xbgr16161616_bswap_linefill_64 linefill64_64
+#define xbgr16161616_bswap_vertfill_64 vertfill64_64
+#define xbgr16161616_bswap_rectfill_64 rectfill64_64
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC
+xbgr16161616_bswap_pixel2color64(struct video_surface const *__restrict surface,
+                                 video_pixel64_t pixel) {
+	return xbgr16161616_pixel2color64(surface, bswap_words64(pixel));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
+xbgr16161616_bswap_color2pixel64(struct video_surface const *__restrict surface,
+                                 video_color64_t color) {
+	return bswap_words64(xbgr16161616_color2pixel64(surface, color));
+}
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+xbgr16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = getpixel64_64(line, x);
+	video_color64_t color64 = xbgr16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+xbgr16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xbgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	setpixel64_64(line, x, pixel64);
+}
+#ifdef CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_xbgr16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	xbgr16161616_bswap_setpixel(line, x, pixel);
+}
+#endif /* CONFIG_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+PRIVATE NONNULL((1)) void FCC
+xbgr16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xbgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+xbgr16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xbgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+xbgr16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xbgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_xbgr16161616_bswap_getpixel xbgr16161616_bswap_getpixel
+#define unaligned_xbgr16161616_bswap_setpixel xbgr16161616_bswap_setpixel
+#define unaligned_xbgr16161616_bswap_linefill xbgr16161616_bswap_linefill
+#define unaligned_xbgr16161616_bswap_vertfill xbgr16161616_bswap_vertfill
+#define unaligned_xbgr16161616_bswap_rectfill xbgr16161616_bswap_rectfill
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
+unaligned_xbgr16161616_bswap_getpixel(byte_t const *__restrict line, video_coord_t x) {
+	video_pixel64_t pixel64 = unaligned_getpixel64_64(line, x);
+	video_color64_t color64 = xbgr16161616_bswap_pixel2color64((struct video_surface const *)-1, pixel64);
+	return VIDEO_COLOR_FROM_COLOR64(color64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_xbgr16161616_bswap_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xbgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_setpixel64_64(line, x, pixel64);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_xbgr16161616_bswap_linefill(byte_t *__restrict line, video_coord_t x,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xbgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_linefill64_64(line, x, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_xbgr16161616_bswap_vertfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t num_pixels) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xbgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_vertfill64_64(line, x, stride, pixel64, num_pixels);
+}
+PRIVATE NONNULL((1)) void FCC
+unaligned_xbgr16161616_bswap_rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,
+                                video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {
+	video_color64_t color64 = VIDEO_COLOR64_FROM_COLOR(pixel);
+	video_pixel64_t pixel64 = xbgr16161616_bswap_color2pixel64((struct video_surface const *)-1, color64);
+	unaligned_rectfill64_64(line, x, stride, pixel64, size_x, size_y);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 /*[[[end]]]*/
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
@@ -6207,7 +7253,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               a8_pixel2color, a8_color2pixel, initconv_from_a);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_L16,
-	               (VIDEO_CODEC_FLAG_LUM,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
 	                /* vcs_rmask */ 0xffff,
@@ -6224,7 +7270,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               l16_pixel2color, l16_color2pixel, initconv_from_l);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_LA1616,
-	               (VIDEO_CODEC_FLAG_LUM,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0xffff0000),
@@ -6241,7 +7287,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               la1616_pixel2color, la1616_color2pixel, initconv_from_la);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_AL1616,
-	               (VIDEO_CODEC_FLAG_LUM,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0x0000ffff),
@@ -6258,7 +7304,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               al1616_pixel2color, al1616_color2pixel, initconv_from_la);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_A16,
-	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_INTERP8888,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 8,
 	                /* vcs_cbits */ 8,
 	                /* vcs_rmask */ 0,
@@ -6270,6 +7316,71 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               a16_pixel2color, a16_color2pixel, initconv_from_a);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_L16_BSWAP,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ 0xffff,
+	                /* vcs_gmask */ 0xffff,
+	                /* vcs_bmask */ 0xffff,
+	                /* vcs_amask */ 0x0),
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
+	               getpixel16, setpixel16,
+	               rectcopy16, rectmove16, linecopy16,
+	               linefill16, vertfill16, rectfill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
+	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
+	               l16_bswap_pixel2color, l16_bswap_color2pixel, initconv_from_l);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_LA1616_BSWAP,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 32,
+	                /* vcs_rmask */ MASK4_LE(0xffff0000),
+	                /* vcs_gmask */ MASK4_LE(0xffff0000),
+	                /* vcs_bmask */ MASK4_LE(0xffff0000),
+	                /* vcs_amask */ MASK4_LE(0x0000ffff)),
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
+	               getpixel32, setpixel32,
+	               rectcopy32, rectmove32, linecopy32,
+	               linefill32, vertfill32, rectfill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
+	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
+	               la1616_bswap_pixel2color, la1616_bswap_color2pixel, initconv_from_la);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_AL1616_BSWAP,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 32,
+	                /* vcs_rmask */ MASK4_LE(0x0000ffff),
+	                /* vcs_gmask */ MASK4_LE(0x0000ffff),
+	                /* vcs_bmask */ MASK4_LE(0x0000ffff),
+	                /* vcs_amask */ MASK4_LE(0xffff0000)),
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
+	               getpixel32, setpixel32,
+	               rectcopy32, rectmove32, linecopy32,
+	               linefill32, vertfill32, rectfill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
+	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
+	               al1616_bswap_pixel2color, al1616_bswap_color2pixel, initconv_from_la);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_A16_BSWAP,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0,
+	                /* vcs_gmask */ 0,
+	                /* vcs_bmask */ 0,
+	                /* vcs_amask */ 0xffff),
+	               buffer16_requirements, buffer16_coord2bytes,
+	               getpixel16, setpixel16,
+	               rectcopy16, rectmove16, linecopy16,
+	               linefill16, vertfill16, rectfill16,
+	               a16_bswap_pixel2color, a16_bswap_color2pixel, initconv_from_a);
 
 
 
@@ -7192,7 +8303,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	/* 64bpp direct color */
 #ifdef CONFIG_LIBVIDEO_HAVE_PIXEL64
 	CASE_CODEC_ALn(VIDEO_CODEC_RGBA16161616,
-	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 64,
 	                /* vcs_cbits */ 64,
 	                /* vcs_rmask */ MASK8_LE(0x000000000000ffff),
@@ -7206,10 +8317,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_rgba16161616_getpixel, unaligned_rgba16161616_setpixel,
 	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
 	               unaligned_rgba16161616_linefill, unaligned_rgba16161616_vertfill, unaligned_rgba16161616_rectfill,
-	               identity_pixel2color, identity_color2pixel, initconv_from_rgba);
+	               rgba16161616_pixel2color, rgba16161616_color2pixel, initconv_from_rgba);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_RGBX16161616,
-	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 64,
 	                /* vcs_cbits */ 64,
 	                /* vcs_rmask */ MASK8_LE(0x000000000000ffff),
@@ -7226,7 +8337,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               rgbx16161616_pixel2color, rgbx16161616_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_ARGB16161616,
-	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 64,
 	                /* vcs_cbits */ 64,
 	                /* vcs_rmask */ MASK8_LE(0x00000000ffff0000),
@@ -7243,7 +8354,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               argb16161616_pixel2color, argb16161616_color2pixel, initconv_from_rgba);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_XRGB16161616,
-	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 64,
 	                /* vcs_cbits */ 64,
 	                /* vcs_rmask */ MASK8_LE(0x00000000ffff0000),
@@ -7260,7 +8371,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               xrgb16161616_pixel2color, xrgb16161616_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_BGRA16161616,
-	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 64,
 	                /* vcs_cbits */ 64,
 	                /* vcs_rmask */ MASK8_LE(0x0000ffff00000000),
@@ -7274,10 +8385,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_bgra16161616_getpixel, unaligned_bgra16161616_setpixel,
 	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
 	               unaligned_bgra16161616_linefill, unaligned_bgra16161616_vertfill, unaligned_bgra16161616_rectfill,
-	               identity_pixel2color, identity_color2pixel, initconv_from_rgba);
+	               bgra16161616_pixel2color, bgra16161616_color2pixel, initconv_from_rgba);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_BGRX16161616,
-	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 64,
 	                /* vcs_cbits */ 64,
 	                /* vcs_rmask */ MASK8_LE(0x0000ffff00000000),
@@ -7294,7 +8405,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               bgrx16161616_pixel2color, bgrx16161616_color2pixel, initconv_from_rgb);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_ABGR16161616,
-	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 64,
 	                /* vcs_cbits */ 64,
 	                /* vcs_rmask */ MASK8_LE(0xffff000000000000),
@@ -7311,7 +8422,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               abgr16161616_pixel2color, abgr16161616_color2pixel, initconv_from_rgba);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_XBGR16161616,
-	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 64,
 	                /* vcs_cbits */ 64,
 	                /* vcs_rmask */ MASK8_LE(0xffff000000000000),
@@ -7326,6 +8437,142 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
 	               unaligned_xbgr16161616_linefill, unaligned_xbgr16161616_vertfill, unaligned_xbgr16161616_rectfill,
 	               xbgr16161616_pixel2color, xbgr16161616_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_RGBA16161616_BSWAP,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 64,
+	                /* vcs_cbits */ 64,
+	                /* vcs_rmask */ MASK8_LE(0x000000000000ffff),
+	                /* vcs_gmask */ MASK8_LE(0x00000000ffff0000),
+	                /* vcs_bmask */ MASK8_LE(0x0000ffff00000000),
+	                /* vcs_amask */ MASK8_LE(0xffff000000000000)),
+	               __ALIGNOF_INT64__, buffer64_requirements, buffer64_coord2bytes,
+	               rgba16161616_bswap_getpixel, rgba16161616_bswap_setpixel,
+	               rectcopy64, rectmove64, linecopy64,
+	               rgba16161616_bswap_linefill, rgba16161616_bswap_vertfill, rgba16161616_bswap_rectfill,
+	               unaligned_rgba16161616_bswap_getpixel, unaligned_rgba16161616_bswap_setpixel,
+	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
+	               unaligned_rgba16161616_bswap_linefill, unaligned_rgba16161616_bswap_vertfill, unaligned_rgba16161616_bswap_rectfill,
+	               rgba16161616_bswap_pixel2color, rgba16161616_bswap_color2pixel, initconv_from_rgba);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_RGBX16161616_BSWAP,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 64,
+	                /* vcs_cbits */ 64,
+	                /* vcs_rmask */ MASK8_LE(0x000000000000ffff),
+	                /* vcs_gmask */ MASK8_LE(0x00000000ffff0000),
+	                /* vcs_bmask */ MASK8_LE(0x0000ffff00000000),
+	                /* vcs_amask */ 0),
+	               __ALIGNOF_INT64__, buffer64_requirements, buffer64_coord2bytes,
+	               rgbx16161616_bswap_getpixel, rgbx16161616_bswap_setpixel,
+	               rectcopy64, rectmove64, linecopy64,
+	               rgbx16161616_bswap_linefill, rgbx16161616_bswap_vertfill, rgbx16161616_bswap_rectfill,
+	               unaligned_rgbx16161616_bswap_getpixel, unaligned_rgbx16161616_bswap_setpixel,
+	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
+	               unaligned_rgbx16161616_bswap_linefill, unaligned_rgbx16161616_bswap_vertfill, unaligned_rgbx16161616_bswap_rectfill,
+	               rgbx16161616_bswap_pixel2color, rgbx16161616_bswap_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_ARGB16161616_BSWAP,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 64,
+	                /* vcs_cbits */ 64,
+	                /* vcs_rmask */ MASK8_LE(0x00000000ffff0000),
+	                /* vcs_gmask */ MASK8_LE(0x0000ffff00000000),
+	                /* vcs_bmask */ MASK8_LE(0xffff000000000000),
+	                /* vcs_amask */ MASK8_LE(0x000000000000ffff)),
+	               __ALIGNOF_INT64__, buffer64_requirements, buffer64_coord2bytes,
+	               argb16161616_bswap_getpixel, argb16161616_bswap_setpixel,
+	               rectcopy64, rectmove64, linecopy64,
+	               argb16161616_bswap_linefill, argb16161616_bswap_vertfill, argb16161616_bswap_rectfill,
+	               unaligned_argb16161616_bswap_getpixel, unaligned_argb16161616_bswap_setpixel,
+	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
+	               unaligned_argb16161616_bswap_linefill, unaligned_argb16161616_bswap_vertfill, unaligned_argb16161616_bswap_rectfill,
+	               argb16161616_bswap_pixel2color, argb16161616_bswap_color2pixel, initconv_from_rgba);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_XRGB16161616_BSWAP,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 64,
+	                /* vcs_cbits */ 64,
+	                /* vcs_rmask */ MASK8_LE(0x00000000ffff0000),
+	                /* vcs_gmask */ MASK8_LE(0x0000ffff00000000),
+	                /* vcs_bmask */ MASK8_LE(0xffff000000000000),
+	                /* vcs_amask */ 0),
+	               __ALIGNOF_INT64__, buffer64_requirements, buffer64_coord2bytes,
+	               xrgb16161616_bswap_getpixel, xrgb16161616_bswap_setpixel,
+	               rectcopy64, rectmove64, linecopy64,
+	               xrgb16161616_bswap_linefill, xrgb16161616_bswap_vertfill, xrgb16161616_bswap_rectfill,
+	               unaligned_xrgb16161616_bswap_getpixel, unaligned_xrgb16161616_bswap_setpixel,
+	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
+	               unaligned_xrgb16161616_bswap_linefill, unaligned_xrgb16161616_bswap_vertfill, unaligned_xrgb16161616_bswap_rectfill,
+	               xrgb16161616_bswap_pixel2color, xrgb16161616_bswap_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_BGRA16161616_BSWAP,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 64,
+	                /* vcs_cbits */ 64,
+	                /* vcs_rmask */ MASK8_LE(0x0000ffff00000000),
+	                /* vcs_gmask */ MASK8_LE(0x00000000ffff0000),
+	                /* vcs_bmask */ MASK8_LE(0x000000000000ffff),
+	                /* vcs_amask */ MASK8_LE(0xffff000000000000)),
+	               __ALIGNOF_INT64__, buffer64_requirements, buffer64_coord2bytes,
+	               bgra16161616_bswap_getpixel, bgra16161616_bswap_setpixel,
+	               rectcopy64, rectmove64, linecopy64,
+	               bgra16161616_bswap_linefill, bgra16161616_bswap_vertfill, bgra16161616_bswap_rectfill,
+	               unaligned_bgra16161616_bswap_getpixel, unaligned_bgra16161616_bswap_setpixel,
+	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
+	               unaligned_bgra16161616_bswap_linefill, unaligned_bgra16161616_bswap_vertfill, unaligned_bgra16161616_bswap_rectfill,
+	               bgra16161616_bswap_pixel2color, bgra16161616_bswap_color2pixel, initconv_from_rgba);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_BGRX16161616_BSWAP,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 64,
+	                /* vcs_cbits */ 64,
+	                /* vcs_rmask */ MASK8_LE(0x0000ffff00000000),
+	                /* vcs_gmask */ MASK8_LE(0x00000000ffff0000),
+	                /* vcs_bmask */ MASK8_LE(0x000000000000ffff),
+	                /* vcs_amask */ 0),
+	               __ALIGNOF_INT64__, buffer64_requirements, buffer64_coord2bytes,
+	               bgrx16161616_bswap_getpixel, bgrx16161616_bswap_setpixel,
+	               rectcopy64, rectmove64, linecopy64,
+	               bgrx16161616_bswap_linefill, bgrx16161616_bswap_vertfill, bgrx16161616_bswap_rectfill,
+	               unaligned_bgrx16161616_bswap_getpixel, unaligned_bgrx16161616_bswap_setpixel,
+	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
+	               unaligned_bgrx16161616_bswap_linefill, unaligned_bgrx16161616_bswap_vertfill, unaligned_bgrx16161616_bswap_rectfill,
+	               bgrx16161616_bswap_pixel2color, bgrx16161616_bswap_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_ABGR16161616_BSWAP,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 64,
+	                /* vcs_cbits */ 64,
+	                /* vcs_rmask */ MASK8_LE(0xffff000000000000),
+	                /* vcs_gmask */ MASK8_LE(0x0000ffff00000000),
+	                /* vcs_bmask */ MASK8_LE(0x00000000ffff0000),
+	                /* vcs_amask */ MASK8_LE(0x000000000000ffff)),
+	               __ALIGNOF_INT64__, buffer64_requirements, buffer64_coord2bytes,
+	               abgr16161616_bswap_getpixel, abgr16161616_bswap_setpixel,
+	               rectcopy64, rectmove64, linecopy64,
+	               abgr16161616_bswap_linefill, abgr16161616_bswap_vertfill, abgr16161616_bswap_rectfill,
+	               unaligned_abgr16161616_bswap_getpixel, unaligned_abgr16161616_bswap_setpixel,
+	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
+	               unaligned_abgr16161616_bswap_linefill, unaligned_abgr16161616_bswap_vertfill, unaligned_abgr16161616_bswap_rectfill,
+	               abgr16161616_bswap_pixel2color, abgr16161616_bswap_color2pixel, initconv_from_rgba);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_XBGR16161616_BSWAP,
+	               (VIDEO_CODEC_FLAG_COLOR64 | VIDEO_CODEC_FLAG_PIXEL64 | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 64,
+	                /* vcs_cbits */ 64,
+	                /* vcs_rmask */ MASK8_LE(0xffff000000000000),
+	                /* vcs_gmask */ MASK8_LE(0x0000ffff00000000),
+	                /* vcs_bmask */ MASK8_LE(0x00000000ffff0000),
+	                /* vcs_amask */ 0),
+	               __ALIGNOF_INT64__, buffer64_requirements, buffer64_coord2bytes,
+	               xbgr16161616_bswap_getpixel, xbgr16161616_bswap_setpixel,
+	               rectcopy64, rectmove64, linecopy64,
+	               xbgr16161616_bswap_linefill, xbgr16161616_bswap_vertfill, xbgr16161616_bswap_rectfill,
+	               unaligned_xbgr16161616_bswap_getpixel, unaligned_xbgr16161616_bswap_setpixel,
+	               unaligned_rectcopy64, unaligned_rectmove64, unaligned_linecopy64,
+	               unaligned_xbgr16161616_bswap_linefill, unaligned_xbgr16161616_bswap_vertfill, unaligned_xbgr16161616_bswap_rectfill,
+	               xbgr16161616_bswap_pixel2color, xbgr16161616_bswap_color2pixel, initconv_from_rgb);
 #endif /* CONFIG_LIBVIDEO_HAVE_PIXEL64 */
 
 
@@ -7688,7 +8935,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               ap88_pixel2color, ap88_color2pixel, initconv_from_pa);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_P16,
-	               (VIDEO_CODEC_FLAG_PAL,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
 	                /* vcs_rmask */ 0xffff,
@@ -7705,7 +8952,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               pal_pixel2color, pal_color2pixel, initconv_from_l);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_PA1616,
-	               (VIDEO_CODEC_FLAG_PAL,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0xffff0000),
@@ -7722,7 +8969,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               pa1616_pixel2color, pa1616_color2pixel, initconv_from_la);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_AP1616,
-	               (VIDEO_CODEC_FLAG_PAL,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_NATIVE_ENDIAN,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
 	                /* vcs_rmask */ MASK4_LE(0x0000ffff),
@@ -7736,7 +8983,58 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_getpixel32, unaligned_setpixel32,
 	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
 	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
-	               ap1616_pixel2color, ap1616_color2pixel, initconv_from_la);
+	               ap1616_bswap_pixel2color, ap1616_bswap_color2pixel, initconv_from_la);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_P16_BSWAP,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ 0xffff,
+	                /* vcs_gmask */ 0xffff,
+	                /* vcs_bmask */ 0xffff,
+	                /* vcs_amask */ 0x0),
+	               __ALIGNOF_INT16__, buffer16_requirements, buffer16_coord2bytes,
+	               getpixel16, setpixel16,
+	               rectcopy16, rectmove16, linecopy16,
+	               linefill16, vertfill16, rectfill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
+	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
+	               p16_bswap_pixel2color, p16_bswap_color2pixel, initconv_from_l);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_PA1616_BSWAP,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 32,
+	                /* vcs_rmask */ MASK4_LE(0xffff0000),
+	                /* vcs_gmask */ MASK4_LE(0xffff0000),
+	                /* vcs_bmask */ MASK4_LE(0xffff0000),
+	                /* vcs_amask */ MASK4_LE(0x0000ffff)),
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
+	               getpixel32, setpixel32,
+	               rectcopy32, rectmove32, linecopy32,
+	               linefill32, vertfill32, rectfill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
+	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
+	               pa1616_bswap_pixel2color, pa1616_bswap_color2pixel, initconv_from_la);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_AP1616_BSWAP,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_BSWAP_ENDIAN,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 32,
+	                /* vcs_rmask */ MASK4_LE(0x0000ffff),
+	                /* vcs_gmask */ MASK4_LE(0x0000ffff),
+	                /* vcs_bmask */ MASK4_LE(0x0000ffff),
+	                /* vcs_amask */ MASK4_LE(0xffff0000)),
+	               __ALIGNOF_INT32__, buffer32_requirements, buffer32_coord2bytes,
+	               getpixel32, setpixel32,
+	               rectcopy32, rectmove32, linecopy32,
+	               linefill32, vertfill32, rectfill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
+	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
+	               ap1616_bswap_pixel2color, ap1616_bswap_color2pixel, initconv_from_la);
 
 
 
