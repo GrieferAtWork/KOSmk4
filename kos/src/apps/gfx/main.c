@@ -114,6 +114,7 @@ int main(int argc, char *argv[]) {
 		err(EXIT_FAILURE, "Failed to get screen buffer");
 
 	video_buffer_getgfx(screen, &gfx, GFX_BLENDMODE_ALPHA);
+	video_gfx_enableflags(&gfx, VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
 	if (argc >= 2) {
 		if (strcmp(argv[1], "h") == 0) {
 			video_gfx_hmirror(&gfx);
@@ -492,8 +493,8 @@ step:
 			                               points, lengthof(points));
 			if likely(poly) {
 				video_gfx_fillpoly(&gfx,
-				                   (rand() % (video_gfx_getxdim(&gfx) /*- poly->vp_xdim*/ + 400)) - 200,
-				                   (rand() % (video_gfx_getydim(&gfx) /*- poly->vp_ydim*/ + 400)) - 200,
+				                   video_gfx_getxdim(&gfx) - 10, // (rand() % (video_gfx_getxdim(&gfx) /*- poly->vp_xdim*/ + 400)) - 200,
+				                   0, // (rand() % (video_gfx_getydim(&gfx) /*- poly->vp_ydim*/ + 400)) - 200,
 				                   poly, color,
 				                   VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD
 				                   /*rand() % VIDEO_GFX_FILLPOLY_METHOD_COUNT*/);

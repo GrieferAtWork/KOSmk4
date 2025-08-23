@@ -699,40 +699,32 @@ LOCAL_libvideo_swgfx_fillpoly_wrap(struct video_gfx const *__restrict self,
                                    video_offset_t x, video_offset_t y,
                                    struct video_polygon *__restrict poly,
                                    video_color_t color, unsigned int method) {
-#if 0 /* TODO */
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
+		x += poly->vp_xmin;
 		x = wrap(x, self->vg_clip.vgc_cxdim);
-		if (OVERFLOW_UADD((video_coord_t)x, size_x, &cxend) || size_x >= self->vg_clip.vgc_cxdim) {
-			x = 0;
-			size_x = self->vg_clip.vgc_cxdim;
-		} else {
-			/* # of pixels that go beyond the right clip-edge */
-			if (OVERFLOW_USUB(cxend, self->vg_clip.vgc_cxdim, &xwrap))
-				xwrap = 0;
-		}
+		cxend = (video_coord_t)x + poly->vp_xdim;
+		if (OVERFLOW_USUB(cxend, self->vg_clip.vgc_cxdim, &xwrap))
+			xwrap = 0;
+		x -= poly->vp_xmin;
 	}
 	if (video_gfx_getflags(self) & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
+		y += poly->vp_ymin;
 		y = wrap(y, self->vg_clip.vgc_cydim);
-		if (OVERFLOW_UADD((video_coord_t)y, size_y, &cyend) || size_y >= self->vg_clip.vgc_cydim) {
-			y = 0;
-			size_y = self->vg_clip.vgc_cydim;
-		} else {
-			/* # of pixels that go beyond the bottom clip-edge */
-			if (OVERFLOW_USUB(cyend, self->vg_clip.vgc_cydim, &ywrap))
-				ywrap = 0;
-		}
+		cyend = (video_coord_t)y + poly->vp_ydim;
+		if (OVERFLOW_USUB(cyend, self->vg_clip.vgc_cydim, &ywrap))
+			ywrap = 0;
+		y -= poly->vp_ymin;
 	}
 	if (xwrap && ywrap) /* Must do a partial fill at the top-left */
-		LOCAL_libvideo_swgfx_fillpoly(self, 0, 0, xwrap, ywrap, color);
+		LOCAL_libvideo_swgfx_fillpoly(self, x - self->vg_clip.vgc_cxdim, y - self->vg_clip.vgc_cydim, poly, color, method);
 	if (xwrap) /* Must do a partial fill at the left */
-		LOCAL_libvideo_swgfx_fillpoly(self, 0, y, xwrap, size_y, color);
+		LOCAL_libvideo_swgfx_fillpoly(self, x - self->vg_clip.vgc_cxdim, y, poly, color, method);
 	if (ywrap) /* Must do a partial fill at the top */
-		LOCAL_libvideo_swgfx_fillpoly(self, x, 0, size_x, ywrap, color);
-#endif
+		LOCAL_libvideo_swgfx_fillpoly(self, x, y - self->vg_clip.vgc_cydim, poly, color, method);
 	LOCAL_libvideo_swgfx_fillpoly(self, x, y, poly, color, method);
 }
 

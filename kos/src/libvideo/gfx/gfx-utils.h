@@ -163,7 +163,7 @@ DECL_BEGIN
 LOCAL ATTR_CONST WUNUSED video_coord_t CC
 wrap(video_offset_t offset, video_dim_t dim) {
 #if 1
-	offset %= dim;
+	offset %= (video_offset_t)dim; /* Force signed remainder! */
 	if (offset < 0)
 		offset += dim;
 	return (video_coord_t)offset;

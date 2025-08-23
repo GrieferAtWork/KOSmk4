@@ -1003,10 +1003,8 @@ LOCAL_libvideo_swblitter_blit_rdwrap1(LOCAL_struct_video_blitter const *__restri
 		}
 
 		/* Bottom-right corner (render via fallthru) */
-#ifdef LOCAL_USE_SWBLITTER3
 		out_x += (iter_src_x - src_x);
 		out_y += (iter_src_y - src_y);
-#endif /* LOCAL_USE_SWBLITTER3 */
 		src_x  = iter_src_x;
 		src_y  = iter_src_y;
 		dst_x  = 0;
