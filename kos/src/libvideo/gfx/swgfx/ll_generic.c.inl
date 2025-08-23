@@ -28,6 +28,7 @@
 
 #include <alloca.h>
 #include <inttypes.h>
+#include <minmax.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -467,7 +468,7 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 	/* Select appropriate line drawing method:
 	 * - When X/Y swapping is enabled, must draw vertical lines instead of horizontal ones */
 	xsws_line = &libvideo_swgfx_generic__line_h;
-	if (video_imatrix2d_get(&matrix, 1, 0) != 0)
+	if (video_imatrix2d_get(&matrix, 0, 1) != 0)
 		xsws_line = &libvideo_swgfx_generic__line_v;
 
 	/* Initialize variables and allocate list of "active" edges */
@@ -525,13 +526,14 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 				video_offset_t end_x   = active_v[active_i + 1].vper_x;
 				video_dim_t length = (video_dim_t)(end_x - start_x);
 				if likely(length) {
-					video_coord_t render_x = (video_coord_t)(xoff + video_imatrix2d_mapx(&matrix, start_x, scanline_y));
-					video_coord_t render_y = (video_coord_t)(yoff + video_imatrix2d_mapy(&matrix, start_x, scanline_y));
-					if (video_imatrix2d_get(&matrix, 0, 0) < 0 || video_imatrix2d_get(&matrix, 0, 1) < 0)
-						render_x -= (length - 1);
-					if (video_imatrix2d_get(&matrix, 1, 0) < 0 || video_imatrix2d_get(&matrix, 1, 1) < 0)
-						render_y -= (length - 1);
-					(*xsws_line)(self, render_x, render_y, length, color);
+					video_offset_t render_xmin = video_imatrix2d_mapx(&matrix, start_x, scanline_y);
+					video_offset_t render_ymin = video_imatrix2d_mapy(&matrix, start_x, scanline_y);
+					video_offset_t render_xmax = video_imatrix2d_mapx(&matrix, end_x - 1, scanline_y);
+					video_offset_t render_ymax = video_imatrix2d_mapy(&matrix, end_x - 1, scanline_y);
+					(*xsws_line)(self,
+					             (video_coord_t)(xoff + min(render_xmin, render_xmax)),
+					             (video_coord_t)(yoff + min(render_ymin, render_ymax)),
+					             length, color);
 				}
 			} while ((active_i += 2) < active_c);
 			break;
@@ -540,7 +542,7 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 			active_i = 0;
 			do {
 				struct video_polygon_edge const *edge;
-				video_offset_t start_x;
+				video_offset_t start_x, end_x;
 				video_dim_t length;
 				video_offset_t in_shape;
 				gfx_assert(active_i < active_c);
@@ -559,15 +561,17 @@ libvideo_swgfx_generic__fillpoly(struct video_gfx const *__restrict self,
 					edge = video_polygon_edgeref_getedge(&active_v[active_i], poly);
 					in_shape += edge->vpe_dir;
 				}
-				length = (video_dim_t)(active_v[active_i].vper_x - start_x);
+				end_x = active_v[active_i].vper_x;
+				length = (video_dim_t)(end_x - start_x);
 				if likely(length) {
-					video_coord_t render_x = (video_coord_t)(xoff + video_imatrix2d_mapx(&matrix, start_x, scanline_y));
-					video_coord_t render_y = (video_coord_t)(yoff + video_imatrix2d_mapy(&matrix, start_x, scanline_y));
-					if (video_imatrix2d_get(&matrix, 0, 0) < 0 || video_imatrix2d_get(&matrix, 0, 1) < 0)
-						render_x -= (length - 1);
-					if (video_imatrix2d_get(&matrix, 1, 0) < 0 || video_imatrix2d_get(&matrix, 1, 1) < 0)
-						render_y -= (length - 1);
-					(*xsws_line)(self, render_x, render_y, length, color);
+					video_offset_t render_xmin = video_imatrix2d_mapx(&matrix, start_x, scanline_y);
+					video_offset_t render_ymin = video_imatrix2d_mapy(&matrix, start_x, scanline_y);
+					video_offset_t render_xmax = video_imatrix2d_mapx(&matrix, end_x - 1, scanline_y);
+					video_offset_t render_ymax = video_imatrix2d_mapy(&matrix, end_x - 1, scanline_y);
+					(*xsws_line)(self,
+					             (video_coord_t)(xoff + min(render_xmin, render_xmax)),
+					             (video_coord_t)(yoff + min(render_ymin, render_ymax)),
+					             length, color);
 				}
 			} while ((++active_i) < active_c);
 			break;

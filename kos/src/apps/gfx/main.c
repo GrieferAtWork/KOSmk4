@@ -37,6 +37,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <termios.h>
 #include <time.h>
 #include <unicode.h>
@@ -113,6 +114,24 @@ int main(int argc, char *argv[]) {
 		err(EXIT_FAILURE, "Failed to get screen buffer");
 
 	video_buffer_getgfx(screen, &gfx, GFX_BLENDMODE_ALPHA);
+	if (argc >= 2) {
+		if (strcmp(argv[1], "h") == 0) {
+			video_gfx_hmirror(&gfx);
+		} else if (strcmp(argv[1], "v") == 0) {
+			video_gfx_vmirror(&gfx);
+		} else if (strcmp(argv[1], "90") == 0 ||
+		           strcmp(argv[1], "-270") == 0) {
+			video_gfx_rrot90(&gfx);
+		} else if (strcmp(argv[1], "-90") == 0 ||
+		           strcmp(argv[1], "270") == 0) {
+			video_gfx_lrot90(&gfx);
+		} else if (strcmp(argv[1], "180") == 0 ||
+		           strcmp(argv[1], "-180") == 0) {
+			video_gfx_rot180(&gfx);
+		} else if (strcmp(argv[1], "xy") == 0) {
+			video_gfx_xyswap(&gfx);
+		}
+	}
 
 	/* Load the video-mode font. */
 	font = video_font_lookup(video_gfx_getdomain(&gfx),
@@ -172,11 +191,55 @@ again_font:
 
 	              "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏\n"
 	              "▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟\n");
+	format_printf(&video_fontprinter,
+	              &fontprinter_data,
+	              "res: %ux%u\n",
+	              video_gfx_getxdim(&gfx),
+	              video_gfx_getydim(&gfx));
 	/* Clear screen beyond text area */
 	fontgfx.fill(fontprinter_data.vfp_curx, fontprinter_data.vfp_cury,
 	             video_gfx_getxdim(&fontgfx) - fontprinter_data.vfp_curx,
 	             video_gfx_getydim(&fontgfx) - fontprinter_data.vfp_cury,
 	             fontprinter_data.vfp_bg_fg_colors[0]);
+
+
+	{
+		static const struct video_point points[] = {
+			/* Rect where each corner has a different shape to easily spot rotation/mirroring */
+			VIDEO_POINT_INIT(10, 20),
+			VIDEO_POINT_INIT(0, 20),
+			VIDEO_POINT_INIT(0, 0),
+			VIDEO_POINT_INIT(20, 0),
+			VIDEO_POINT_INIT(20, 10),
+
+			VIDEO_POINT_INIT(80, 10),
+			VIDEO_POINT_INIT(80, 0),
+			VIDEO_POINT_INIT(100, 20),
+			VIDEO_POINT_INIT(90, 20),
+
+			VIDEO_POINT_INIT(90, 80),
+			VIDEO_POINT_INIT(100, 80),
+			VIDEO_POINT_INIT(100, 90),
+			VIDEO_POINT_INIT(90, 90),
+			VIDEO_POINT_INIT(90, 100),
+			VIDEO_POINT_INIT(80, 100),
+			VIDEO_POINT_INIT(80, 90),
+
+			VIDEO_POINT_INIT(10, 90),
+
+		};
+		REF struct video_polygon *poly;
+		poly = video_domain_newpolygon(video_gfx_getdomain(&gfx),
+		                               points, lengthof(points));
+		if likely (poly) {
+			video_gfx_fillpoly(&gfx,
+			                   100,
+			                   100,
+			                   poly, VIDEO_COLOR_BLUE,
+			                   VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD);
+			video_polygon_decref(poly);
+		}
+	}
 
 	for (;;) {
 		char buf[1];
@@ -194,7 +257,7 @@ again_font:
 		} else if (buf[0] == 'd') {
 			video_gfx_toggleflags(&gfx, VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
 		} else if (buf[0] == 'p') {
-			video_buffer_save(screen, "/var/screen.png", NULL);
+			video_gfx_save(&gfx, "/var/screen.png", NULL);
 		} else if (buf[0] == 'q') {
 			break;
 		}
@@ -284,9 +347,9 @@ again_font:
 				goto step;
 
 			case 'p':
-				video_buffer_save(screen, "/var/screen.jpg", NULL);
-				video_buffer_save(screen, "/var/screen.png", NULL);
-				video_buffer_save(screen, "/var/screen.bmp", NULL);
+				video_gfx_save(&gfx, "/var/screen.jpg", NULL);
+				video_gfx_save(&gfx, "/var/screen.png", NULL);
+				video_gfx_save(&gfx, "/var/screen.bmp", NULL);
 				break;
 
 			default: break;
@@ -379,7 +442,21 @@ step:
 				VIDEO_POINT_INIT(0, 250),
 				VIDEO_POINT_INIT(500, 250),
 				VIDEO_POINT_INIT(0, 400),
-#elif 0
+#elif 1 /* The letter "K" */
+				VIDEO_POINT_INIT(0, 0),
+				VIDEO_POINT_INIT(10, 0),
+				VIDEO_POINT_INIT(10, 40),
+				VIDEO_POINT_INIT(30, 0),
+				VIDEO_POINT_INIT(40, 0),
+				VIDEO_POINT_INIT(40, 10),
+				VIDEO_POINT_INIT(10, 50),
+				VIDEO_POINT_INIT(40, 90),
+				VIDEO_POINT_INIT(40, 100),
+				VIDEO_POINT_INIT(30, 100),
+				VIDEO_POINT_INIT(10, 60),
+				VIDEO_POINT_INIT(10, 100),
+				VIDEO_POINT_INIT(0, 100),
+#elif 1
 				VIDEO_POINT_INIT(0, 0),
 				VIDEO_POINT_INIT(100, 10),
 				VIDEO_POINT_INIT(0, 20),
@@ -415,8 +492,8 @@ step:
 			                               points, lengthof(points));
 			if likely(poly) {
 				video_gfx_fillpoly(&gfx,
-				                   (rand() % (video_gfx_getxdim(&gfx) /*- poly->vp_xdim*/)) /*- 200*/,
-				                   (rand() % (video_gfx_getydim(&gfx) /*- poly->vp_ydim*/)) /*- 200*/,
+				                   (rand() % (video_gfx_getxdim(&gfx) /*- poly->vp_xdim*/ + 400)) - 200,
+				                   (rand() % (video_gfx_getydim(&gfx) /*- poly->vp_ydim*/ + 400)) - 200,
 				                   poly, color,
 				                   VIDEO_GFX_FILLPOLY_METHOD_EVEN_ODD
 				                   /*rand() % VIDEO_GFX_FILLPOLY_METHOD_COUNT*/);
