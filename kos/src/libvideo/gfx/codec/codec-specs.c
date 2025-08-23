@@ -38,6 +38,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <libvideo/color.h>
+#include <libvideo/gfx/api.h>
 #include <libvideo/gfx/codec/codec.h>
 
 #include "codec-specs.h"

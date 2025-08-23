@@ -40,6 +40,7 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/codec/palette.h>
+#include <libvideo/gfx/gfx.h>
 
 #include "anim.h"
 #include "buffer.h"

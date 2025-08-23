@@ -25,9 +25,9 @@
 
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/gfx/swgfx.h>
 
 #include "../gfx-debug.h"
-#include "../swgfx.h"
 
 /* When  low-level  GFX  functions want  to  call other
  * low-level GFX functions, these macros should be used */

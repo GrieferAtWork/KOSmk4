@@ -32,6 +32,7 @@
 #include <stdint.h>
 
 #include <libvideo/color.h>
+#include <libvideo/float.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/gfx.h>
@@ -40,6 +41,7 @@
 
 #include "../gfx-debug.h"
 #include "../gfx-utils.h"
+#include "../swgfx.h"
 #include "ll.h"
 
 DECL_BEGIN

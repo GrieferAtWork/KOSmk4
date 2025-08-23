@@ -72,6 +72,8 @@
  *   greater bits than pixels that follow thereafter.
  * - "_LSB" means the opposite, meaning the bit=0 belongs to the
  *   first pixel (as opposed to the last)
+ * - "_BE", "_LE", "_BSWAP" endian-override for multi-byte, and bit-
+ *   aligned full-color, channel-based  codecs (e.g.  RGBA16161616).
  */
 
 /* Full-color */

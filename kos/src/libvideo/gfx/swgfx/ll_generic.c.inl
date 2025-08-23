@@ -28,11 +28,13 @@
 
 #include <alloca.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
 #include <libvideo/color.h>
 #include <libvideo/float.h>
+#include <libvideo/gfx/api.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/blendcolors.h>
 #include <libvideo/gfx/codec/codec.h>
@@ -40,6 +42,7 @@
 #include <libvideo/gfx/gfx/swgfx.h>
 #include <libvideo/gfx/polygon.h>
 #include <libvideo/gfx/surface.h>
+#include <libvideo/line.h>
 #include <libvideo/types.h>
 
 #include "../gfx-debug.h"

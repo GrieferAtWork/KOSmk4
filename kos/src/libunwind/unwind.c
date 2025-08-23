@@ -383,7 +383,7 @@ NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwar
 	dlunlocksection(eh_frame_sect);
 no_dl_info:
 
-	/* If that failed, search through auxillary information given by `__register_frame_info_bases()' */
+	/* If that failed, search through auxiliary information given by `__register_frame_info_bases()' */
 	result = NULL;
 	register_frame_aux_read();
 	SLIST_FOREACH (obj, &register_frame_aux_list, ro_link) {

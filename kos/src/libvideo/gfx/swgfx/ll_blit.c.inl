@@ -37,8 +37,10 @@
 #include <libvideo/color.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/buffer/rambuffer.h>
 #include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/gfx/swgfx.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 

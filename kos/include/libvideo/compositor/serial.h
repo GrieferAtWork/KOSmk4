@@ -28,6 +28,7 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 
+#include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/serial.h>
 
 /************************************************************************/

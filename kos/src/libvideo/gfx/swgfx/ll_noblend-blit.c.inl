@@ -31,6 +31,7 @@
 #include <kos/types.h>
 
 #include <inttypes.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include <libvideo/color.h>
@@ -38,6 +39,7 @@
 #include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/codec/converter.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/gfx/swgfx.h>
 #include <libvideo/gfx/surface.h>
 #include <libvideo/types.h>
 

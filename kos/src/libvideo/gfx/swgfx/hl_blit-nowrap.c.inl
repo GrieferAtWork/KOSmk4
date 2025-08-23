@@ -40,9 +40,10 @@
 #include <stdint.h>
 
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/gfx/swgfx.h>
 #include <libvideo/types.h>
-/**/
 
+#include "../gfx-debug.h"
 #include "../gfx-utils.h"
 #include "../swgfx.h"
 

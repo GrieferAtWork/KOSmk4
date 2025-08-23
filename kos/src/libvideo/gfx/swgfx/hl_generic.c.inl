@@ -37,6 +37,7 @@
 
 #include <libvideo/color.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/gfx/swgfx.h>
 #include <libvideo/gfx/polygon.h>
 #include <libvideo/rect.h>
 #include <libvideo/types.h>

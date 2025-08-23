@@ -32,7 +32,6 @@
 
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/display.h>
-#include <libvideo/gfx/gfx.h>
 
 #include "display.h"
 
