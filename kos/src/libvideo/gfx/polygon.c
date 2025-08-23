@@ -272,33 +272,35 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 	 *   additional vertical edges at the left/right for spikes that may have gotten
 	 *   their tips cut off.
 	 *
-	 * Worst case:
-	 * >> \--\
-	 * >>  \  \--\
-	 * >>   \     \--\
-	 * >>    \  +---------------------+
-	 * >>     \ |         \--\        |
-	 * >>      \|             \--\    |
-	 * >>       |                 \--\|
-	 * >>       |\                    |--\
-	 * >>       | \                   |   \--\
-	 * >>       +---------------------+       \--\
-	 * >>           \                             \--\
-	 * >>            \--------------------------------\
+	 * Worst case (2 non-horizontal edges):              Worst case (3 non-horizontal edges):
+	 * >> \--\                                           \--\
+	 * >>  \  \--\                                        \  \--\
+	 * >>   \     \--\                                     \     \--\
+	 * >>    \  +---------------------+                     \  +-----------------+
+	 * >>     \ |         \--\        |                      \ |         \--\    |
+	 * >>      \|             \--\    |                       \|             \--\|
+	 * >>       |                 \--\|                        |                 |--\
+	 * >>       |\                    |--\                     |\                | /--/
+	 * >>       | \                   |   \--\                 | \             /-|/
+	 * >>       +---------------------+       \--\             |  \         /-/  |
+	 * >>           \                             \--\         ------------------+
+	 * >>            \--------------------------------\             \ /-/
+	 * >>                                                            -
 	 *
 	 *
-	 * Clip result:
-	 * >>       +---------
-	 * >>       |         \--\
-	 * >>       |             \--\
-	 * >>       |                 \--\
-	 * >>        \                    |
-	 * >>         \                   |
-	 * >>          -------------------+
+	 * Clip result (4 non-horizontal edges):             Clip result (5 non-horizontal edges):
+	 * >>       +---------                                     +---------
+	 * >>       |         \--\                                 |         \--\
+	 * >>       |             \--\                             |             \--\
+	 * >>       |                 \--\                         |                 |
+	 * >>        \                    |                         \                |
+	 * >>         \                   |                          \             /-/
+	 * >>          -------------------+                           \         /-/
+	 * >>                                                          ---------
 	 *
-	 * After disregarding horizontal edges  (here: 2), the above  polygon
-	 * still  only has 4 edges, which is the  result of the # of edges of
-	 * the original polygon (2), plus the max. # of edges in any vertical
+	 * After disregarding horizontal edges (here: 2|3), the above  polygons
+	 * still  only has 4|5 edges, which is the  result of the # of edges of
+	 * the original polygon (2|3), plus the max. # of edges in any vertical
 	 * scanline (which is also 2).
 	 *
 	 *
@@ -323,11 +325,7 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 	 * Even more abstract, the above formula can be simplified as:
 	 * >> The max # of edges to represent a line-L-clipped polygon is
 	 * >>     NUM_EDGES_OF_ORIG_POLYGON +
-	 * >>     (MAX(foreach(D) NUM_INTERSCTING_EDGES_OF_LINE_ROT90(D)) / 2)
-	 * Where "NUM_INTERSCTING_EDGES_OF_LINE_ROT90" is the # of edges
-	 * that intersect with a diagonal going through the point P and
-	 * with an angle that is 90° offset from the original line L:
-	 *        P = L.P0 + ((L.P1 - L.P0) * D)     (Where D is REAL and in [0,1])
+	 * >>     (MAX(foreach(D) NUM_INTERSCTING_EDGES_OF_LINE_WITH_ANGLE(D, ANGLE_OF(L))) / 2)
 	 *
 	 * Using this formula, and the fact that a rect has 4 lines (2 of each
 	 * of which are each identical, meaning the "/ 2" can be ignored),  we
