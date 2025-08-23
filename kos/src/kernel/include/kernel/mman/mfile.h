@@ -988,7 +988,7 @@ struct mfile {
 #endif /* __WANT_MFILE__mf_mpplop */
 
 #ifdef __WANT_MFILE__mf_ramdirlop
-		Toblockop(ramfs_dirnode) _mf_ramdirlop;  /* ramfs-disnode post-lock operation */
+		Toblockop(ramfs_dirnode) _mf_ramdirlop;  /* ramfs-dirnode post-lock operation */
 #endif /* __WANT_MFILE__mf_ramdirlop */
 
 #if defined(__WANT_MFILE__mf_fsuperplop) && defined(__WANT_MFILE__mf_delfnodes)

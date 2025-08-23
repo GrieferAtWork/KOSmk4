@@ -513,7 +513,9 @@
 #define __CXX_DELETE_DTOR(T) ~T()
 #define __CXX_DELETE_COPY(T) T(T const&)
 #define __CXX_DELETE_COPY_ASSIGN(T) T&operator=(T const&)
+#define __CXX_DELETE_COPY_ASSIGN_X(T) T&operator=(T const&)
 #define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) T&operator=(T const&)volatile
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN_X(T) T&operator=(T const&)volatile
 #define __CXXDECL_BEGIN extern "C++"{
 #define __CXXDECL_END }
 #define __CXX_THROWS(...)

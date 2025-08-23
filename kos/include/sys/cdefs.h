@@ -294,9 +294,9 @@
 #if !defined(_Thread_local) && !defined(__ATTR_THREAD_IS__Thread_local)
 #define _Thread_local __ATTR_THREAD
 #endif /* !_Thread_local && !__ATTR_THREAD_IS__Thread_local */
-#if !defined(__restrict__) && !defined(__RESTRICT_IS___RESTRICT__)
+#if !defined(__restrict__) && !defined(__restrict_IS___restrict__)
 #define __restrict__ __restrict
-#endif /* !__restrict__ && !__RESTRICT_IS___RESTRICT__ */
+#endif /* !__restrict__ && !__restrict_IS___restrict__ */
 #if !defined(restrict) && !defined(__restrict_IS_restrict)
 #define restrict __restrict
 #endif /* !restrict && !__restrict_IS_restrict */
