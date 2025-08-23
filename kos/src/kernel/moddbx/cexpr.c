@@ -3048,7 +3048,7 @@ do_pointer_pointer_op:
 			if unlikely(!rhs_value)
 				return DBX_EDIVZERO;
 			if (is_signed) {
-				lhs_value = (uintmax_t)((intmax_t)lhs_value / rhs_value);
+				lhs_value = (uintmax_t)((intmax_t)lhs_value / (intmax_t)rhs_value);
 			} else {
 				lhs_value /= rhs_value;
 			}
@@ -3060,7 +3060,7 @@ do_pointer_pointer_op:
 			if unlikely(!rhs_value)
 				return DBX_EDIVZERO;
 			if (is_signed) {
-				lhs_value = (uintmax_t)((intmax_t)lhs_value % rhs_value);
+				lhs_value = (uintmax_t)((intmax_t)lhs_value % (intmax_t)rhs_value);
 			} else {
 				lhs_value %= rhs_value;
 			}
