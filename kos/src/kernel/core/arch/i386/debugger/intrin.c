@@ -35,6 +35,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
+#include <debugger/util.h>
 #include <kernel/addr2line.h>
 #include <kernel/except.h>
 
@@ -297,8 +298,9 @@ DBG_COMMAND(r,
 		struct sgregs sg;
 		u64 kgsbase;
 		regdump_gpregs(&re_printer, &fst.fcs_gpregs);
-		regdump_ip(&re_printer, (uintptr_t)fcpustate_getpc(&fst),
-		           fcpustate_getisa(&fst));
+		regdump_ip(&re_printer,
+		           (uintptr_t)dbg_getfaultpcreg(DBG_RT_REGLEVEL_VIEW),
+		           (uintptr_t)fcpustate_getpc(&fst));
 		sg.sg_gs = fst.fcs_sgregs.sg_gs16;
 		sg.sg_fs = fst.fcs_sgregs.sg_fs16;
 		sg.sg_es = fst.fcs_sgregs.sg_es16;
@@ -362,6 +364,7 @@ DBG_COMMAND(r,
 		regdump_idt(&re_printer, &fst.fcs_idt);
 	}
 #else /* __x86_64__ */
+	fcpustate_setpc(&fst, dbg_getfaultpcreg(DBG_RT_REGLEVEL_VIEW));
 	regdump_fcpustate(&re_printer, &fst);
 #endif /* !__x86_64__ */
 	return 0;

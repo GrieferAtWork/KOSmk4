@@ -149,9 +149,9 @@ E:\c\kls\kos\kos\src\libdl\module-init.c(186,30) : 00000000BF107A8F+5[/lib64/lib
     %rbp 000000007FFFFEF8 %rsp 000000000E471E80
     %rbx 000000000E4833F4 %rdx 000000000E47D4C0
     %rcx 0000000000000000 %rax 000000000E47DE00
-    %rip 000000000E2F327C [orig=000000000E2F3278]
+    %rip 000000000E2F327C
         [streambuf] [line=475,29]
-        [addq	$0x10, %rax]
+        [movaps	%xmm3, 32(%rsp)]
     %es 0063 [gdt+0x60,rpl=3,dpl=3,00000000+0xffffffff,--cwa] (USER_DATA+3)
     %ds 0063 [gdt+0x60,rpl=3,dpl=3,00000000+0xffffffff,--cwa] (USER_DATA+3)
     %fs 0063 [gdt+0x60,rpl=3,dpl=3,00000000+0xffffffff,--cwa] (USER_DATA+3)
@@ -160,11 +160,11 @@ E:\c\kls\kos\kos\src\libdl\module-init.c(186,30) : 00000000BF107A8F+5[/lib64/lib
     %ss 0053 [gdt+0x50,rpl=3,dpl=3,00000000+0xffffffff,--cw-] (USER_DATA32+3)
     %tr 0008 [gdt+0x08,rpl=0,dpl=0,EEEF2000+0x00003000,sxcra] (CPU_TSS)
     %ldt 0018 [gdt+0x18,rpl=0,dpl=3,EEEEE1C0+0x0000000f,s-cw-] (CPU_LDT)
-    %fs.base 00000000100018B0 %gs.base FFFFF62780C27A00 [user]
-                  %IA32_KERNEL_GS_BASE FFFFFFFFE2054CE8 [kern]
+    %fs.base 00000000100018B0 %gs.base FFFFFE04579CE630 [user]
+                  %IA32_KERNEL_GS_BASE FFFFFFFFE20578E0 [kern]
     %rflags 50206 [-p---] [if,rf,ac] [iopl=0]
     %cr0 00000000E0010033 [pe,mp,et,ne,wp,nw,cd,pg]    %cr2 FFFFFFFFF0A6C1CD
-    %cr4 00000000001102B0 [pse,pae,pge,osfxsr,fsgsbase,smep]    %cr3 000000000752B000
+    %cr4 00000000001102B0 [pse,pae,pge,osfxsr,fsgsbase,smep]    %cr3 000000000752E000
     %dr7 0000000000000400    %dr6 00000000FFFF0FF0 [rtm]
     %gdt FFFFFFFFEEEEE140+119
     %idt FFFFFFFF809F0840+4095

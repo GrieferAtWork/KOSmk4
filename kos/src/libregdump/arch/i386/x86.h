@@ -61,7 +61,7 @@ INTDEF NONNULL((1)) ssize_t CC libregdump_sreg(struct regdump_printer *__restric
 /* Print the eflags/rflags register */
 INTDEF NONNULL((1)) ssize_t CC libregdump_flags(struct regdump_printer *__restrict self, uintptr_t flags);
 /* Print the InstructionPointer register. */
-INTDEF NONNULL((1)) ssize_t CC libregdump_ip(struct regdump_printer *__restrict self, uintptr_t ip, isa_t isa);
+INTDEF NONNULL((1)) ssize_t CC libregdump_ip(struct regdump_printer *__restrict self, uintptr_t ip_start, uintptr_t ip_end);
 INTDEF NONNULL((1, 2)) ssize_t CC libregdump_gdt(struct regdump_printer *__restrict self, struct desctab const *__restrict gdt);
 INTDEF NONNULL((1, 2)) ssize_t CC libregdump_idt(struct regdump_printer *__restrict self, struct desctab const *__restrict idt);
 

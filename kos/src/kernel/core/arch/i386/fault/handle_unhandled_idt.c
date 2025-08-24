@@ -139,8 +139,7 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	rd_printer.rdp_printer_arg = SYSLOG_LEVEL_EMERG;
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &ustate->ucs_gpregs);
-	regdump_ip(&rd_printer, (uintptr_t)ucpustate_getpc(ustate),
-	           ucpustate_getisa(ustate));
+	regdump_ip(&rd_printer, (uintptr_t)ucpustate_getpc(ustate), 0);
 	regdump_flags(&rd_printer, ustate->ucs_Pflags);
 	printk(KERN_EMERG "\n");
 	regdump_sgregs_with_cs_ss_tr_ldt(&rd_printer, &ustate->ucs_sgregs,

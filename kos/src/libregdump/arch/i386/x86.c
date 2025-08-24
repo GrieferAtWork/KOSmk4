@@ -45,7 +45,6 @@
 
 #include <libdebuginfo/addr2line.h>
 #include <libdisasm/disassembler.h>
-#include <libinstrlen/instrlen.h>
 #include <libregdump/x86.h>
 
 #include "x86.h"
@@ -1088,7 +1087,6 @@ void fini_libraries(void) {
 			result = NULL;                                               \
 		return result;                                                   \
 	}
-DEFINE_LIBRARY_OPEN(open_libinstrlen, pdyn_libinstrlen, LIBINSTRLEN_LIBRARY_NAME)
 DEFINE_LIBRARY_OPEN(open_libdebuginfo, pdyn_libdebuginfo, LIBDEBUGINFO_LIBRARY_NAME)
 DEFINE_LIBRARY_OPEN(open_libdisasm, pdyn_libdisasm, LIBDISASM_LIBRARY_NAME)
 #undef DEFINE_LIBRARY_OPEN
@@ -1096,27 +1094,11 @@ DEFINE_LIBRARY_OPEN(open_libdisasm, pdyn_libdisasm, LIBDISASM_LIBRARY_NAME)
 PRIVATE PDEBUG_ADDR2LINE_SECTIONS_LOCK /*  */ pdyn_debug_addr2line_sections_lock   = NULL;
 PRIVATE PDEBUG_ADDR2LINE_SECTIONS_UNLOCK /**/ pdyn_debug_addr2line_sections_unlock = NULL;
 PRIVATE PDEBUG_ADDR2LINE /*                */ pdyn_debug_addr2line                 = NULL;
-PRIVATE PINSTRUCTION_PRED_NX /*            */ pdyn_instruction_pred_nx             = NULL;
 PRIVATE PDISASM_SINGLE /*                  */ pdyn_disasm_single                   = NULL;
 #define debug_addr2line_sections_lock   (*pdyn_debug_addr2line_sections_lock)
 #define debug_addr2line_sections_unlock (*pdyn_debug_addr2line_sections_unlock)
 #define debug_addr2line                 (*pdyn_debug_addr2line)
-#define instruction_pred_nx             (*pdyn_instruction_pred_nx)
 #define disasm_single                   (*pdyn_disasm_single)
-
-#define ENSURE_LIBINSTRLEN() ensure_libinstrlen()
-PRIVATE bool CC ensure_libinstrlen(void) {
-	void *libinstrlen;
-	if (pdyn_instruction_pred_nx)
-		return true;
-	libinstrlen = open_libinstrlen();
-	if unlikely(!libinstrlen)
-		return false;
-	COMPILER_WRITE_BARRIER();
-	*(void **)&pdyn_instruction_pred_nx = dlsym(libinstrlen, "instruction_pred_nx");
-	COMPILER_WRITE_BARRIER();
-	return pdyn_instruction_pred_nx != NULL;
-}
 
 #define ENSURE_LIBDEBUGINFO() ensure_libdebuginfo()
 PRIVATE bool CC ensure_libdebuginfo(void) {
@@ -1215,7 +1197,8 @@ libregdump_do_ip_addr2line_info(struct regdump_printer *__restrict self,
 /* Print the InstructionPointer register. */
 INTERN NONNULL((1)) ssize_t CC
 libregdump_ip(struct regdump_printer *__restrict self,
-              uintptr_t ip, isa_t isa) {
+              uintptr_t ip_start, uintptr_t ip_end) {
+	bool did_lf_after_eip = false;
 	BEGIN;
 	format(REGDUMP_FORMAT_INDENT);
 	format(REGDUMP_FORMAT_REGISTER_PREFIX);
@@ -1223,68 +1206,59 @@ libregdump_ip(struct regdump_printer *__restrict self,
 	format(REGDUMP_FORMAT_REGISTER_SUFFIX);
 	PRINT(" ");
 	format(REGDUMP_FORMAT_VALUE_PREFIX);
-	printf("%p", ip);
+	printf("%p", ip_start);
 	format(REGDUMP_FORMAT_VALUE_SUFFIX);
-	{
-		uintptr_t prev_ip = 0;
-		bool did_lf_after_eip = false;
-		if (ENSURE_LIBINSTRLEN())
-			prev_ip = (uintptr_t)instruction_pred_nx((void const *)ip, isa);
-		if (!prev_ip)
-			prev_ip = ip;
-		if (prev_ip == ip) {
-			--prev_ip;
-		} else {
-			PRINT(" [orig=");
-			format(REGDUMP_FORMAT_VALUE_PREFIX);
-			printf("%p", prev_ip);
-			format(REGDUMP_FORMAT_VALUE_SUFFIX);
-			PRINT("]");
-		}
-		if (ENSURE_LIBDEBUGINFO()) {
-			REF module_t *ip_module;
-			ip_module = module_fromaddr_nx((void const *)ip);
-			if (ip_module) {
-				di_addr2line_sections_t sections;
-				di_addr2line_dl_sections_t dl_sections;
-				temp = 0;
-				if (debug_addr2line_sections_lock(ip_module, &sections, &dl_sections) ==
-				    DEBUG_INFO_ERROR_SUCCESS) {
-					di_debug_addr2line_t info;
-					uintptr_t relpc = prev_ip - module_getloadaddr(ip_module);
-					if (debug_addr2line(&sections, &info, relpc, 0, 0) == DEBUG_INFO_ERROR_SUCCESS)
-						temp = libregdump_do_ip_addr2line_info(self, &info, relpc, &did_lf_after_eip);
-					debug_addr2line_sections_unlock(&dl_sections);
-				}
-				module_decref_unlikely(ip_module);
-				if unlikely(temp < 0)
-					goto err;
-				result += temp;
-			}
-		}
-		if (ENSURE_LIBDISASM()) {
-			if (!did_lf_after_eip)
-				PRINT("\n");
-			format(REGDUMP_FORMAT_INDENT);
-			format(REGDUMP_FORMAT_INDENT);
-			PRINT("[");
-			NESTED_TRY {
-				DO(disasm_single(self->rdp_printer, self->rdp_printer_arg, (void *)prev_ip,
-				                 DISASSEMBLER_TARGET_CURRENT, DISASSEMBLER_FNORMAL));
-			} EXCEPT {
-				except_class_t cls = except_class();
-				if (EXCEPTCLASS_ISRTLPRIORITY(cls))
-					RETHROW();
-				format(REGDUMP_FORMAT_ERROR_PREFIX);
-				printf("error:%s", except_name(except_code()));
-				format(REGDUMP_FORMAT_ERROR_SUFFIX);
-			}
-			PRINT("]\n");
-			did_lf_after_eip = true;
-		}
-		if unlikely(!did_lf_after_eip)
-			PRINT("\n");
+	if (ip_end > ip_start) {
+		format(REGDUMP_FORMAT_OFFSET_PREFIX);
+		PRINT("+");
+		format(REGDUMP_FORMAT_OFFSET_SUFFIX);
+		format(REGDUMP_FORMAT_VALUE_PREFIX);
+		printf("%" PRIuPTR, ip_end - ip_start);
+		format(REGDUMP_FORMAT_VALUE_SUFFIX);
 	}
+	if (ENSURE_LIBDEBUGINFO()) {
+		REF module_t *ip_module;
+		ip_module = module_fromaddr_nx((void const *)ip_start);
+		if (ip_module) {
+			di_addr2line_sections_t sections;
+			di_addr2line_dl_sections_t dl_sections;
+			temp = 0;
+			if (debug_addr2line_sections_lock(ip_module, &sections, &dl_sections) ==
+			    DEBUG_INFO_ERROR_SUCCESS) {
+				di_debug_addr2line_t info;
+				uintptr_t relpc = ip_start - module_getloadaddr(ip_module);
+				if (debug_addr2line(&sections, &info, relpc, 0, 0) == DEBUG_INFO_ERROR_SUCCESS)
+					temp = libregdump_do_ip_addr2line_info(self, &info, relpc, &did_lf_after_eip);
+				debug_addr2line_sections_unlock(&dl_sections);
+			}
+			module_decref_unlikely(ip_module);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+	}
+	if (ENSURE_LIBDISASM()) {
+		if (!did_lf_after_eip)
+			PRINT("\n");
+		format(REGDUMP_FORMAT_INDENT);
+		format(REGDUMP_FORMAT_INDENT);
+		PRINT("[");
+		NESTED_TRY {
+			DO(disasm_single(self->rdp_printer, self->rdp_printer_arg, (void *)ip_start,
+			                 DISASSEMBLER_TARGET_CURRENT, DISASSEMBLER_FNORMAL));
+		} EXCEPT {
+			except_class_t cls = except_class();
+			if (EXCEPTCLASS_ISRTLPRIORITY(cls))
+				RETHROW();
+			format(REGDUMP_FORMAT_ERROR_PREFIX);
+			printf("error:%s", except_name(except_code()));
+			format(REGDUMP_FORMAT_ERROR_SUFFIX);
+		}
+		PRINT("]\n");
+		did_lf_after_eip = true;
+	}
+	if unlikely(!did_lf_after_eip)
+		PRINT("\n");
 	END;
 }
 

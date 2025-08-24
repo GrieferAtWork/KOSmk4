@@ -23,7 +23,6 @@
 #include <libregdump/api.h>
 /**/
 
-#include <asm/isa.h>
 #include <bits/types.h>
 
 #include <libregdump/printer.h>
@@ -102,7 +101,7 @@ typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SREG)(struct re
 /* Print the eflags/rflags register */
 typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_FLAGS)(struct regdump_printer *__restrict __self, __uintptr_t __flags);
 /* Print the InstructionPointer register. */
-typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_IP)(struct regdump_printer *__restrict __self, __uintptr_t __ip);
+typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_IP)(struct regdump_printer *__restrict __self, __uintptr_t __ip_start, __uintptr_t __ip_end);
 typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GDT)(struct regdump_printer *__restrict __self, struct desctab const *__restrict __gdt);
 typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_IDT)(struct regdump_printer *__restrict __self, struct desctab const *__restrict __idt);
 #ifdef LIBREGDUMP_WANT_PROTOTYPES
@@ -132,7 +131,7 @@ LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_sreg(struct 
 /* Print the eflags/rflags register */
 LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_flags(struct regdump_printer *__restrict __self, __uintptr_t __flags);
 /* Print the InstructionPointer register. */
-LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_ip(struct regdump_printer *__restrict __self, __uintptr_t __ip, isa_t __isa);
+LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_ip(struct regdump_printer *__restrict __self, __uintptr_t __ip_start, __uintptr_t __ip_end);
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_gdt(struct regdump_printer *__restrict __self, struct desctab const *__restrict __gdt);
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_idt(struct regdump_printer *__restrict __self, struct desctab const *__restrict __idt);
 

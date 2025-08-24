@@ -97,8 +97,9 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 	rd_printer.rdp_printer_arg = arg;
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &info.ei_state.kcs_gpregs);
-	regdump_ip(&rd_printer, kcpustate_getpip(&info.ei_state),
-	           kcpustate_getisa(&info.ei_state));
+	regdump_ip(&rd_printer,
+	           (uintptr_t)info.ei_data.e_faultaddr,
+	           kcpustate_getpip(&info.ei_state));
 	regdump_flags(&rd_printer, kcpustate_getpflags(&info.ei_state));
 	(*printer)(arg, "\n", 1);
 	is_first_pointer = true;
