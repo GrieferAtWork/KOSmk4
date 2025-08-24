@@ -525,10 +525,10 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
  * @return: false: Successfully served all pending free operations,
  *                 but  the heap lock was lost and could not be re-
  *                 acquired. */
-PRIVATE WUNUSED NONNULL((1, 2)) bool
-NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
-                                  struct heap_pending_free *__restrict pend,
-                                  gfp_t flags) {
+PRIVATE WUNUSED NONNULL((1, 2)) bool KCALL
+heap_serve_pending(struct heap *__restrict self,
+                   struct heap_pending_free *__restrict pend,
+                   gfp_t flags) {
 	struct heap_pending_free *next;
 	for (;;) {
 		bool still_locked;
