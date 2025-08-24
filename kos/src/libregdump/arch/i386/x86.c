@@ -88,22 +88,22 @@ err:               \
 #define GPREGS_MAXLEN  2
 #define GPREGS_FIRSTCH 'r'
 PRIVATE char const gpregs_names[GPREGS_COUNT][2] = {
-	{ '1', '5' },
-	{ '1', '4' },
-	{ '1', '3' },
-	{ '1', '2' },
-	{ '1', '1' },
-	{ '1', '0' },
-	{ '9', ' ' },
-	{ '8', ' ' },
-	{ 'd', 'i' },
-	{ 's', 'i' },
-	{ 'b', 'p' },
-	{ 's', 'p' },
-	{ 'b', 'x' },
-	{ 'd', 'x' },
-	{ 'c', 'x' },
-	{ 'a', 'x' },
+	/*[0] =*/ { '1', '5' },
+	/*[1] =*/ { '1', '4' },
+	/*[2] =*/ { '1', '3' },
+	/*[3] =*/ { '1', '2' },
+	/*[4] =*/ { '1', '1' },
+	/*[5] =*/ { '1', '0' },
+	/*[6] =*/ { '9', ' ' },
+	/*[7] =*/ { '8', ' ' },
+	/*[8] =*/ { 'd', 'i' },
+	/*[9] =*/ { 's', 'i' },
+	/*[10]=*/ { 'b', 'p' },
+	/*[11]=*/ { 's', 'p' },
+	/*[12]=*/ { 'b', 'x' },
+	/*[13]=*/ { 'd', 'x' },
+	/*[14]=*/ { 'c', 'x' },
+	/*[15]=*/ { 'a', 'x' },
 };
 #else /* __x86_64__ */
 #define GPREGS_COUNT 8
@@ -152,9 +152,9 @@ libregdump_gpregs_with_sp(struct regdump_printer *__restrict self,
 #ifdef __x86_64__
 		{
 			uintptr_t used_value;
-			if (i == 10) {
+			if (i == 11) {
 				used_value = sp;
-			} else if (i > 10) {
+			} else if (i > 11) {
 				used_value = ((uintptr_t *)data)[i - 1];
 			} else {
 				used_value = ((uintptr_t *)data)[i];
