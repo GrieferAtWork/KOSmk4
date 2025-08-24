@@ -73,6 +73,15 @@
 #define LOCAL_STRINGARRAY_TYPE NCX UNCHECKED LOCAL_PTR(char const) NCX const *
 #endif /* !LOCAL_EXEC_ARGV_SIZE */
 
+
+#if !defined(NDEBUG) && 0
+#include <kernel/printk.h>
+#include <kernel/syslog.h>
+#include <kernel/fs/path.h>
+#include <kernel/fs/dirent.h>
+#define ELF_EXEC_DBG_DUMP_BUILDER
+#endif
+
 DECL_BEGIN
 
 LOCAL WUNUSED NONNULL((1)) unsigned int FCALL
@@ -299,6 +308,58 @@ done_PT_LOAD_bss:
 		                                          (LOCAL_STRINGARRAY_TYPE)args->ea_argv,
 		                                          (LOCAL_STRINGARRAY_TYPE)args->ea_envp);
 #endif /* !LOCAL_EXEC_ARGV_SIZE */
+
+#ifdef ELF_EXEC_DBG_DUMP_BUILDER
+		{
+			struct mbnode_tree_minmax mima;
+			mbuilder_mappings_minmaxlocate(&builder, (void *)0, (void *)-1, &mima);
+			if (mima.mm_min) {
+				struct mbnode *iter = mima.mm_min;
+				for (;;) {
+					printk(KERN_DEBUG "builder: %p-%p %c%c%c%c: ",
+					       iter->mbn_minaddr, iter->mbn_maxaddr,
+					       (iter->mbn_flags & MNODE_F_PREAD) ? 'r' : '-',
+					       (iter->mbn_flags & MNODE_F_PWRITE) ? 'w' : '-',
+					       (iter->mbn_flags & MNODE_F_PEXEC) ? 'x' : '-',
+					       (iter->mbn_flags & MNODE_F_SHARED) ? 's' : 'p');
+					if (iter->mbn_fspath && iter->mbn_fsname) {
+						path_printent(iter->mbn_fspath,
+						              iter->mbn_fsname->fd_name,
+						              iter->mbn_fsname->fd_namelen,
+						              &syslog_printer, SYSLOG_LEVEL_DEBUG);
+					} else if (iter->mbn_fsname) {
+						syslog_printer(SYSLOG_LEVEL_DEBUG,
+						               iter->mbn_fsname->fd_name,
+						               iter->mbn_fsname->fd_namelen);
+					}
+					printk(KERN_DEBUG " part:%p", iter->mbn_part);
+					if (iter->mbn_part) {
+						printk(KERN_DEBUG " {%#I64x-%#I64x, ",
+						       mpart_getminaddr(iter->mbn_part),
+						       mpart_getmaxaddr(iter->mbn_part));
+						mfile_uprintlink(iter->mbn_part->mp_file, &syslog_printer, SYSLOG_LEVEL_DEBUG);
+						printk(KERN_DEBUG "}");
+					} else {
+					}
+					bool contains = false;
+					SLIST_CONTAINS(&builder.mb_files, iter, mbn_nxtfile, { contains = true; });
+					if (contains) {
+						printk(KERN_DEBUG " file:");
+						if (iter->mbn_file) {
+							mfile_uprintlink(iter->mbn_file, &syslog_printer, SYSLOG_LEVEL_DEBUG);
+						} else {
+							printk(KERN_DEBUG "NULL");
+						}
+						printk(KERN_DEBUG "@%#I64x", mnode_mbn_filpos_get(iter));
+					}
+					printk(KERN_DEBUG "\n");
+					if (iter == mima.mm_max)
+						break;
+					iter = mbnode_tree_nextnode(iter);
+				}
+			}
+		}
+#endif /* ELF_EXEC_DBG_DUMP_BUILDER */
 
 		/* Apply  the newly  loaded binary  to the  given VM and
 		 * terminate all threads using it except for the caller. */

@@ -462,6 +462,7 @@ NOTHROW(FCALL mfile_map_unlock_and_remove_non_overlapping_parts)(struct mfile_ma
 			SLIST_P_REMOVE(p_node, _mn_alloc);
 			DBG_memset(node, 0xcc, sizeof(*node));
 			SLIST_INSERT(&self->mfm_flist, node, _mn_alloc);
+			assert(mpart_lock_acquired(part));
 			mpart_lock_release(part);
 			decref(part);
 		} else {

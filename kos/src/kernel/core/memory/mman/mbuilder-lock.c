@@ -156,6 +156,30 @@ struct mfile_map_for_reflow: mfile_map {
 };
 
 
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct mbnode *
+NOTHROW(FCALL mbuilder_find_other_mbnode_mapping_mpart)(struct mbnode *__restrict root,
+                                                        struct mbnode const *__restrict not_this,
+                                                        struct mpart const *__restrict part) {
+again:
+	if (root != not_this && root->mbn_part == part)
+		return root;
+	if (root->mbn_mement.rb_lhs) {
+		if (root->mbn_mement.rb_rhs) {
+			struct mbnode *result;
+			result = mbuilder_find_other_mbnode_mapping_mpart(root->mbn_mement.rb_rhs,
+			                                                  not_this, part);
+			if (result)
+				return result;
+		}
+		root = root->mbn_mement.rb_lhs;
+		goto again;
+	}
+	if (root->mbn_mement.rb_rhs) {
+		root = root->mbn_mement.rb_rhs;
+		goto again;
+	}
+	return NULL;
+}
 
 /* Convert a file-map-base node `*p_fmnode' into the associated `mfile_map',
  * as well as remove all nodes associated with the mapping from `self',  and
@@ -193,6 +217,72 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder_norpc *__rest
 		iter->mbn_minaddr -= fm->mfmfr_mapaddr;
 		iter->mbn_maxaddr -= fm->mfmfr_mapaddr;
 		assert(iter->mbn_part);
+		assert(mpart_lock_acquired(iter->mbn_part));
+
+		/* NOTE: the logic here needs to handle a rather complicated case:
+		 *
+		 * Given a program with these PHDRs (is: /bin/busybox on x86_64)
+		 *   LOAD           0x000000 0000000000400000 0000000000400000 0x0b03a0 0x0b03a0 R E 0x1000  (.text)
+		 *   LOAD           0x0b03a0 00000000004b13a0 00000000004b13a0 0x000e6c 0x0027b8 RW  0x1000  (.data + .bss)
+		 *
+		 * Since the .data isn't page-aligned, but does have synced file/vaddr offsets,
+		 * the  ELF  loader   will  extend   its  mapping  by   0x3a0  leading   bytes:
+		 *   LOAD           0x0b0000 00000000004b1000 00000000004b1000 0x00120c 0x0027b8 RW  0x1000  (.data + .bss)
+		 *
+		 * This gets mapped as:
+		 * - 0000000000400000-00000000004B0FFF r-xp: /bin/busybox+0000000000000000
+		 * - 00000000004B1000-00000000004B1FFF rw-p: /bin/busybox+00000000000B0000 [leading "3A0" are redundant; maps 0x1000 of 0x120c .data from /bin/busybox+0xb0000]
+		 * - 00000000004B2000-00000000004B2FFF rw-p: /bin/busybox+00000000000B1000 [Mapped using "mbnode_create_partialbss"; leading 0x20c are read /bin/busybox+0xb1000]
+		 *
+		 * In this configuration, "/bin/busybox+0xb0000-0xb0fff" is mapped twice:
+		 * - 00000000004B0000-00000000004B0FFF r-xp
+		 * - 00000000004B1000-00000000004B1FFF rw-p
+		 *
+		 * That is actually OK however, both mappings are "p" (PRIVATE)
+		 *
+		 * Now,  when  the 3rd  mapping  (00000000004B2000-00000000004B2FFF) is
+		 * initialized,  this is done  by "mbnode_create_partialbss" which does
+		 * a partial read from the actual file (iow: doesn't use lazy mapping),
+		 * though  the same effect  could also be  achieved when another thread
+		 * calls "cc(1)" or similar.
+		 *
+		 * The end result is that there is  a chance that the kernel will  try
+		 * to merge the node for "/bin/busybox+00000000000B0000" with the node
+		 * for its successor "/bin/busybox+00000000000B1000".
+		 *
+		 * That is also OK, but when it happens, then the kernel may also choose
+		 * to anonymize the mpart (that will later become our  `iter->mbn_part')
+		 * because it doesn't appear to be in-use.
+		 *
+		 * This, too, is OK, since that is where we come in: when the file
+		 * mapping is re-locked, the non-continuous mnode that was deleted
+		 * during the merge is detected by "mbnode_is_continuous", and  we
+		 * get here, with it being our job to re-construct an (incomplete)
+		 * "struct mfile_map_for_reflow" that can then be completed by our
+		 * caller  by replacing the deleted (from the merge) part with its
+		 * proper equivalent.
+		 *
+		 * However, recall what happened earlier: the mbuilder still contains
+		 * 2 different mnodes referencing  the same (now-deleted) mpart  (the
+		 * one that is currently in `iter->mbn_part'), but only one of them
+		 * (specifically: "00000000004B0000-00000000004B0FFF") is considered
+		 * to be the lock-owner.
+		 *
+		 * Yet, this representing a problem how:
+		 * - mbuilder_reflow_filemap_or_unlock
+		 * - mfile_map_reflow_or_unlock
+		 * - mfile_map_unlock_and_remove_non_overlapping_parts
+		 *
+		 * This call chain will unlock the twice-mapped part both during the first pass,
+		 * and  then try to do so again during  the second pass, leading to an assertion
+		 * fault in "mfile_map_unlock_and_remove_non_overlapping_parts" when it tries to
+		 * release a lock that was already released during the second pass.
+		 *
+		 * The  solution  here is  "mbuilder_find_other_mbnode_mapping_mpart", which
+		 * checks  if the associated mpart might have another mapping, and transfers
+		 * the responsibility of (re-)acquiring a lock to some other mbnode, in case
+		 * mfile_map reflowing caused locks to be reloaded.
+		 */
 
 		/* Not needed! Nothing in `mfile_map_reflow_or_unlock()' every read this! */
 		/*iter->_mbn_partoff = ...;*/
@@ -201,123 +291,15 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder_norpc *__rest
 		 * nodes that map unique parts, since we have to gift `fm'  our
 		 * lock to that part. */
 		if likely(LIST_ISBOUND(iter, mbn_nxtuprt)) {
-			/* Simple case: Our node is the only (or currently registered)
-			 *              mapping of the associated part. */
+			/* If the builder contains another mbnode that references "iter->mbn_part",
+			 * then that mbnode must be inserted into  the set at this point, so-as  to
+			 * ensure that a lock to that part will be re-acquired in later passes! */
+			struct mbnode *other_mapping_for_part;
+			other_mapping_for_part = mbuilder_find_other_mbnode_mapping_mpart(self->mb_mappings,
+			                                                                  iter, iter->mbn_part);
+			if (other_mapping_for_part)
+				LIST_INSERT_BEFORE(iter, other_mapping_for_part, mbn_nxtuprt);
 			LIST_REMOVE(iter, mbn_nxtuprt);
-		} else {
-			struct mbnode *owner_node;
-			/* Slightly difficult case: Must find+remove the actual node
-			 * that is registered as owner  of the lock associated  with
-			 * the relevant mem-part. */
-			owner_node = mbuilder_find_node_for_mpart(self, iter->mbn_part);
-
-			/* FIXME: This assertion started failing after the GCC15 update:
-			 *   1: Start KOS on x86_64  (i386 builds don't fault here)
-			 *   2: run "system-test" or "system-test32"
-			 *   3: When the wordexp test calls the following, this assertion fails:
-			 *   >> sys32_execve(path: "/bin/sh", argv: ["sh", "-c", "echo \"$VAR\""], envp: ["SHLVL=1", "HOME=/", "TERM=xterm", "PATH=/bin:/usr/bin:/usr/sbin:/sbin", "PWD=/", "IFS=, \t\r\n", "VAR=foo, bar ,,   baz"])
-			 *
-			 * NOTE: It seems likely that this branch shouldn't even get hit.
-			 *       On i386, running system-test with a breakpoint set here
-			 *       sees that breakpoint never get hit.
-			 *
-			 *       Additionally, as far as I can recall, this code is only
-			 *       used when the same part of a file is mapped multiple
-			 *       times within the same mbuilder (but as you can see down
-			 *       below, this is faults for an anon mapping, which should
-			 *       never get mapped multiple times).
-			 *
-[2025-08-24T14:36:41.578262876:emerg ][14] Assertion Check [pc=FFFFFFFF801F0122]
-E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(213) : mbuilder_extract_filemap : owner_node != NULL
-Internal error: No-one is holding known unique part 0000000000000000
-E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(213,4) : mbuilder_extract_filemap+752 : FFFFFFFF801F011D+5 : Caused here [sp=FFFFFFFFEAFCB610]
-E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(390,26) : mbuilder_reflow_filemap_or_unlock+119 : FFFFFFFF801F07C5+5 : Called here [sp=FFFFFFFFEAFCB680]
-E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(434,41) : mbuilder_partlocks_acquire_or_unlock+76 : FFFFFFFF801F0933+5 : Called here [sp=FFFFFFFFEAFCB778]
-E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(114,46) : mbuilder_partlocks_acquire+25 : FFFFFFFF801EFD05+5 : Called here [sp=FFFFFFFFEAFCB7A0]
-E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-apply.c(397,28) : mbuilder_apply+61 : FFFFFFFF801EF55F+5 : Called here [sp=FFFFFFFFEAFCB7B8]
-E:\c\kls\kos\kos\src\kernel\modelf\elf-exec.c.inl(314,18) : elf_exec_impl+2577 : FFFFFFFF8017A6C3+5 : Called here [sp=FFFFFFFFEAFCB898]
-E:\c\kls\kos\kos\src\kernel\modelf\elf.c(181,23) : elfabi_exec+46 : FFFFFFFF8017B9D1+5 : Called here [sp=FFFFFFFFEAFCBAC0]
-E:\c\kls\kos\kos\src\kernel\core\memory\mman\exec.c(102,28) : mman_exec+641 : FFFFFFFF801DF87A+2 : Called here [sp=FFFFFFFFEAFCBAE0]
-E:\c\kls\kos\kos\src\kernel\core\filesys\syscalls.c(2195,13) : kernel_do_execveat_impl+364 : FFFFFFFF8034AF5E+5 : Called here [sp=FFFFFFFFEAFCBBC8]
-E:\c\kls\kos\kos\src\kernel\core\filesys\syscalls.c(2333,26) : kernel_do_execveat+518 : FFFFFFFF8034B5D0+5 : Called here [sp=FFFFFFFFEAFCBCC0]
-E:\c\kls\kos\kos\src\kernel\core\filesys\syscalls.c(2477,21) : kernel_execveat+1330 : FFFFFFFF8034BED2+5 : Called here [sp=FFFFFFFFEAFCBD38]
-E:\c\kls\kos\kos\src\kernel\core\arch\i386\syscall\fastpass-impl.S(521) : __x86_asm64_syscall_execve+46 : FFFFFFFF8044C80A+5 : Called here [sp=FFFFFFFFEAFCBF58]
-E:\c\kls\kos\kos\include\i386-kos\kos\asm\syscall.h(159,221) : 000000000E00C8AF+2[/lib64/libc.so][__x86_syscall3+16]
-E:\c\kls\kos\kos\include\i386-kos\kos\syscalls64.h(530,1) : 000000000E00C853+26[/lib64/libc.so][sys_execve+76]
-E:\c\kls\kos\kos\src\libc\user\unistd.c(107,21) : 000000000E00C853+58[/lib64/libc.so][libc_execve+44]
-E:\c\kls\kos\kos\src\libc\auto\unistd.c(67,20) : 000000000E00C9E8+5[/lib64/libc.so][libc_execv+59]
-E:\c\kls\kos\kos\src\libc\auto\unistd.c(105,2) : 000000000E00CCCC+5[/lib64/libc.so][libc_execl+667]
-E:\c\kls\kos\kos\src\libc\auto\stdlib.c(3413,12) : 000000000E0B12B5+5[/lib64/libc.so][libc_shexec+157]
-E:\c\kls\kos\kos\src\libc\user\wordexp.c(265,15) : 000000000E009CFB+5[/lib64/libc.so][shexec_fixedlength+130]
-E:\c\kls\kos\kos\src\libc\user\wordexp.c(314,21) : 000000000E0B69A6+5[/lib64/libc.so][wxparser_insert_command+361]
-E:\c\kls\kos\kos\src\libc\user\wordexp.c(2416,36) : 000000000E0BBBFF+5[/lib64/libc.so][wxparser_parse_backtick+265]
-E:\c\kls\kos\kos\src\libc\user\wordexp.c(2934,35) : 000000000E0BCBAC+5[/lib64/libc.so][libc_wordexp+1037]
-E:\c\kls\kos\kos\src\libc\libc\wordexp.ctest(43,2) : 000000000048F0ED+5[/bin/system-test][assert_wordexp+140]
-E:\c\kls\kos\kos\src\libc\libc\wordexp.ctest(236,16) : 0000000000490516+5[/bin/system-test][test_wordexp+4321]
-E:\c\kls\kos\kos\src\apps\system-test\main.c(109,19) : 000000000040799A+2[/bin/system-test][run_all_tests+113]
-E:\c\kls\kos\kos\src\apps\system-test\main.c(148,16) : 0000000000407A8F+5[/bin/system-test][main+43]
-E:\c\kls\kos\kos\src\crt0\i386\crt064.S(39) : 000000000049C016+5[/bin/system-test][_start+12]
-expr: owner_node != NULL
-file: kos/src/kernel/core/memory/mman/mbuilder-lock.c (line 213)
-func: mbuilder_extract_filemap
-mesg: Internal error: No-one is holding known unique part 0000000000000000
-addr: FFFFFFFF801F0122
-
-> eval *iter
-struct mbnode:
-{
-  mbn_mement: {
-    rb_par: 0xcccccccccccccccc, rb_lhs: 0xcccccccccccccccc,
-    rb_rhs: 0xcccccccccccccccc
-  }, mbn_minaddr: 0xb0000, mbn_maxaddr: 0xb0fff, mbn_flags: 5,
-  mbn_part: 0xffffffffe203ec60 (mpart),
-  mbn_fspath: 0xffffffffe1000b60 (path /bin),
-  mbn_fsname: 0xffffffffe1008200 (fdirent reg:busybox), _mbn_mman: NULL,
-  _mbn_alloc: {sle_next: NULL}, mbn_filnxt: NULL,
-  mbn_filpos: 0xcccccccccccccccc, __mbn_pad: {[0 ... 7] = 170},
-  mbn_nxtfile: {sle_next: 0xcccccccccccccccc},
-  mbn_nxtuprt: {le_next: 0xcccccccccccccccc, le_prev: NULL},
-  mbn_file: 0xcccccccccccccccc, _mbn_partoff: 0xcccccccccccccccc,
-  _mbn_link: {le_next: 0xaaaaaaaaaaaaaaaa, le_prev: 0xcccccccccccccccc},
-  _mbn_writable: {le_next: 0xcccccccccccccccc, le_prev: NULL},
-  _mbn_module: 0xcccccccccccccccc
-} (mbnode)
-> eval iter
-struct mbnode *:
-0xffffffffe2073018 (mbnode)
-> eval iter.mbn_part
-struct mpart *:
-0xffffffffe203ec60 (mpart)
-> eval *iter.mbn_part
-struct mpart:
-{
-  mp_refcnt: 1, mp_flags: 0xc000, mp_xflags: 0, mp_state: 0,
-  _mp_joblink: {sle_next: 0xaaaaaaaaaaaaaaaa},
-  mp_file: 0xffffffff809f3918 (mfile [/dev/zero:anon:9]), mp_copy: {NULL},
-  mp_share: {lh_first: NULL}, mp_lockops: {slh_first: NULL},
-  mp_allparts: {
-    tqe_next: 0xffffffffe203e988 (mpart /bin/busybox:4000-7fff),
-    tqe_prev: 0xffffffffe203ed90
-  }, mp_changed: {sle_next: 0xcccccccccccccccc}, mp_minaddr: 0x1000,
-  mp_maxaddr: 0xfff,
-  mp_filent: {
-    rb_par: 0xffffffffffffffff (mpart), rb_lhs: 0xcccccccccccccccc,
-    rb_rhs: NULL
-  }, mp_blkst_ptr: NULL, mp_blkst_inl: 0,
-  mp_mem: {mc_start: 0xcccccccccccccccc, mc_size: 0xcccccccccccccccc},
-  mp_mem_sc: {ms_v: 0xcccccccccccccccc, ms_c: 0xcccccccccccccccc},
-  mp_swp: {mc_start: 0xcccccccccccccccc, mc_size: 0xcccccccccccccccc},
-  mp_swp_sc: {ms_v: 0xcccccccccccccccc, ms_c: 0xcccccccccccccccc},
-  mp_meta: NULL
-} (mpart)
-
-*/
-			assertf(owner_node != NULL,
-			        "Internal error: No-one is holding known unique part %p",
-			        iter->mbn_part);
-			/* NOTE: Mark as unbound, since `owner_node' isn't part of our
-			 *       current file mapping! */
-			LIST_UNBIND(owner_node, mbn_nxtuprt);
 		}
 		DBG_memset(&iter->mbn_nxtuprt, 0xcc, sizeof(iter->mbn_nxtuprt));
 
@@ -340,8 +322,7 @@ struct mpart:
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder_norpc *__restrict self,
                                        /*in|out:insert*/ struct mbnode **__restrict p_fmnode,
-                                       /*in*/ struct mfile_map_for_reflow *__restrict fm,
-                                       bool success) {
+                                       /*in*/ struct mfile_map_for_reflow *__restrict fm) {
 	struct mbnode *fmnode, *iter;
 	fmnode = (struct mbnode *)SLIST_FIRST(&fm->mfm_nodes);
 
@@ -367,29 +348,13 @@ NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder_norpc *__restr
 		 * the list of unique mem-parts used by our mem-builder. */
 		LIST_ENTRY_UNBOUND_INIT(&iter->mbn_nxtuprt);
 
-		/* Insert  the node as the holder of the associated unique part.
-		 * Note that upon  success (i.e.  `mfile_map_reflow_or_unlock()'
-		 * didn't  return `false'),  we may  assume that  the reflow was
-		 * successful, which also  means that we've  inherited locks  to
-		 * to all of the parts, which also means that all of those locks
-		 * are  unique,  since `mfile_map_reflow_or_unlock()'  will have
-		 * ensured that all locks are exclusive.
+		/* Insert the node as the holder of the associated unique part.
 		 *
-		 * Upon  failure, it is  possible that one of  the parts we've been
-		 * given by `mfile_map_reflow_or_unlock()' already exists somewhere
-		 * else within our  node-tree, meaning if  that has happened,  then
-		 * we must manually check if the part is actually unique! */
-#ifdef NDEBUG
-		if likely(success || !mbuilder_uparts_contains(self, iter->mbn_part))
-#else /* NDEBUG */
-		if (success) {
-			assert(!mbuilder_uparts_contains(self, iter->mbn_part));
+		 * Because some singular mpart may be mapped multiple times, it
+		 * is  always possible that the part is always contained in the
+		 * set of parts referenced by the mbuilder. */
+		if (!mbuilder_uparts_contains(self, iter->mbn_part))
 			mbuilder_uparts_insert(self, iter);
-		} else if (!mbuilder_uparts_contains(self, iter->mbn_part))
-#endif /* !NDEBUG */
-		{
-			mbuilder_uparts_insert(self, iter);
-		}
 		iter->mbn_flags = fm->mfmfr_nodeflags;
 		iter->mbn_minaddr += (uintptr_t)fm->mfmfr_mapaddr;
 		iter->mbn_maxaddr += (uintptr_t)fm->mfmfr_mapaddr;
@@ -503,10 +468,10 @@ mbuilder_reflow_filemap_or_unlock(struct mbuilder_norpc *__restrict self,
 		/* Do the actual re-flow. */
 		ok = mfile_map_reflow_or_unlock(&fm, &inner_unlock);
 	} EXCEPT {
-		mbuilder_insert_filemap(self, p_fmnode, &fm, false);
+		mbuilder_insert_filemap(self, p_fmnode, &fm);
 		RETHROW();
 	}
-	mbuilder_insert_filemap(self, p_fmnode, &fm, ok);
+	mbuilder_insert_filemap(self, p_fmnode, &fm);
 	return ok;
 }
 
