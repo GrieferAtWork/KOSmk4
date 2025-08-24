@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa306ad94 */
+/* HASH CRC-32:0xc41ced9f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -459,7 +459,7 @@ __CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,cthread_set_name,(cthread_t __self
 #endif /* ... */
 __CDECLARE_OPT(__ATTR_IN(1),char const *,__NOTHROW_NCX,cthread_name,(cthread_t __self),(__self))
 /* >> cthread_count(3)
- * Return the number of running threads (s.a. `DLAUXCTRL_GET_MAIN_TLSSEG') */
+ * Return the number of running threads (s.a. `DLAUXCTRL_GET_TLSSEG_COUNT') */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,cthread_count,(void),())
 #ifdef __CRT_HAVE_cthread_set_limit
 /* >> cthread_set_limit(3)

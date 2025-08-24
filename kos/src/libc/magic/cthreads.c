@@ -375,7 +375,7 @@ void cthread_set_name([[inout]] cthread_t self, char const *_name) = pthread_set
 char const *cthread_name([[in]] cthread_t self);
 
 @@>> cthread_count(3)
-@@Return the number of running threads (s.a. `DLAUXCTRL_GET_MAIN_TLSSEG')
+@@Return the number of running threads (s.a. `DLAUXCTRL_GET_TLSSEG_COUNT')
 int cthread_count(void);
 
 @@>> cthread_set_limit(3)

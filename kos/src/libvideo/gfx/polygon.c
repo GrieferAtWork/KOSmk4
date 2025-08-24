@@ -188,6 +188,8 @@ libvideo_generic_polygon_create(struct video_domain const *__restrict self,
 	      sizeof(struct video_polygon_edge),
 	      &polygon_edge_compare_by_x);
 
+	/* XXX: This would be the perfect place to optimize doubled-up/adjacent, vertical edges */
+
 	/* Figure out the max # of edges ever active when casting vertical scanlines.
 	 * This value is needed to calculate how many total edges are needed in order
 	 * to create a sub-clip-polygon from this one. */

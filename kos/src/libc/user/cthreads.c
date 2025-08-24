@@ -446,9 +446,9 @@ err:
 }
 /*[[[end:libc_cthread_name]]]*/
 
-/*[[[head:libc_cthread_count,hash:CRC-32=0xbf5f5753]]]*/
+/*[[[head:libc_cthread_count,hash:CRC-32=0x7c1f52fa]]]*/
 /* >> cthread_count(3)
- * Return the number of running threads (s.a. `DLAUXCTRL_GET_MAIN_TLSSEG') */
+ * Return the number of running threads (s.a. `DLAUXCTRL_GET_TLSSEG_COUNT') */
 INTERN ATTR_SECTION(".text.crt.compat.hurd.cthreads") int
 NOTHROW_NCX(LIBCCALL libc_cthread_count)(void)
 /*[[[body:libc_cthread_count]]]*/

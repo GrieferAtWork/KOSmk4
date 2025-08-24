@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a860389 */
+/* HASH CRC-32:0xa8d9f868 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ INTDEF vm_offset_t NOTHROW_NCX(LIBCCALL libc_cthread_sp)(void);
 INTDEF ur_cthread_t NOTHROW_NCX(LIBCCALL libc_ur_cthread_self)(void);
 INTDEF ATTR_IN(1) char const *NOTHROW_NCX(LIBCCALL libc_cthread_name)(cthread_t self);
 /* >> cthread_count(3)
- * Return the number of running threads (s.a. `DLAUXCTRL_GET_MAIN_TLSSEG') */
+ * Return the number of running threads (s.a. `DLAUXCTRL_GET_TLSSEG_COUNT') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_cthread_count)(void);
 /* >> cthread_set_data(3)
  * Set the value of a TLS variable for `self' */
