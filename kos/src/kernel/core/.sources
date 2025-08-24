@@ -157,6 +157,11 @@ BEGIN
 		"--eh-frame-hdr",
 		"--gc-sections",
 
+		/* Disable warnings about RWX mappings (we build our own paging tables,
+		 * so  whatever the ELF says doesn't matter  and should be as simple to
+		 * map by the bootloader as possible) */
+		"--no-warn-rwx-segments",
+
 		/* This right here is _needed_, else ld will remove ~unused~
 		 * symbols  that  are   exported  from   the  kernel   core. */
 		"--gc-keep-exported",
