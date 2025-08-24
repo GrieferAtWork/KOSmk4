@@ -53,6 +53,8 @@
 #include <libdl/extension.h>
 #include <libdl/module.h>
 
+#include "ucall.h"
+
 #undef LAZY_TRACE
 #if 1
 #define LAZY_TRACE 1
@@ -196,7 +198,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 				if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
 				    ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_KOS_IDATA) {
 					TRY {
-						addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
+						addr = (ElfW(Addr))libdl_ucall0(addr);
 					} EXCEPT {
 						if (pweak_symbol->ds_mod)
 							decref(pweak_symbol->ds_mod);
@@ -229,6 +231,7 @@ DlModule_ElfFindSymbol(DlModule *__restrict self, uintptr_t symid,
 	char const *name;
 	weak_symbol.ds_mod = NULL;
 	symbol = self->dm_elf.de_dynsym_tab + symid;
+	name = self->dm_elf.de_dynstr + symbol->st_name;
 	if ((symbol->st_shndx != SHN_UNDEF) && (self->dm_flags & RTLD_DEEPBIND)) {
 		/* Symbol has been defined locally. */
 		if (ELFW(ST_BIND)(symbol->st_info) == STB_WEAK) {
@@ -243,7 +246,7 @@ got_local_symbol:
 			addr += self->dm_loadaddr;
 		if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC ||
 		    ELFW(ST_TYPE)(symbol->st_info) == STT_KOS_IDATA)
-			addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
+			addr = (ElfW(Addr))libdl_ucall0(addr);
 		TRACE_RESOLVE_FOR_RELOC(name, addr, symbol->st_size,
 		                        self->dm_filename);
 		if (ELFW(ST_BIND)(symbol->st_info) != STB_WEAK &&
@@ -262,7 +265,6 @@ got_local_symbol:
 		REF DlModule *iter, *next;
 		uintptr_t hash_elf, hash_gnu;
 search_external_symbol:
-		name = self->dm_elf.de_dynstr + symbol->st_name;
 
 		/* Search the symbol tables of already loaded modules. */
 		hash_elf = hash_gnu = DLMODULE_GETLOCALSYMBOL_HASH_UNSET;
@@ -359,7 +361,7 @@ again_search_globals_module:
 						if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC ||
 						    ELFW(ST_TYPE)(symbol->st_info) == STT_KOS_IDATA) {
 							TRY {
-								addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
+								addr = (ElfW(Addr))libdl_ucall0(addr);
 							} EXCEPT {
 								decref(iter);
 								RETHROW();
@@ -425,7 +427,7 @@ again_search_globals_module:
 				if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
 				    ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_KOS_IDATA) {
 					TRY {
-						addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
+						addr = (ElfW(Addr))libdl_ucall0(addr);
 					} EXCEPT {
 						decref(weak_symbol.ds_mod);
 						RETHROW();

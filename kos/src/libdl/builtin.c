@@ -77,6 +77,7 @@
 #include <libzlib/inflate.h>
 
 #include "builtin.h"
+#include "ucall.h"
 
 DECL_BEGIN
 
@@ -590,7 +591,7 @@ dl_symbol_resolve_indirect(struct dl_symbol const *__restrict symbol,
 	 * There needs to be a lookup table of indirect symbols and their known
 	 * resolve addresses. */
 	(void)symbol;
-	*p_result = (*resolver)();
+	*p_result = (ElfW(Addr))libdl_ucall0(resolver);
 	return 0;
 }
 

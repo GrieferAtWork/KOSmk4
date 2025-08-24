@@ -41,7 +41,12 @@ BEGIN
 
 	if (TARGET_ARCH == "x86_64") {
 		CC_FLAGS({
-			"-mno-red-zone",  /* Don't require the hosted application to comply with the red zone. */
+			"-mno-red-zone",                /* Don't require the hosted application to comply with the red zone. */
+			"-mpreferred-stack-boundary=3", /* 8-byte stack alignment */
+		})
+	} else if (TARGET_ARCH == "i386") {
+		CC_FLAGS({
+			"-mpreferred-stack-boundary=2", /* 4-byte stack alignment */
 		})
 	}
 

@@ -26,6 +26,8 @@
 
 #include <hybrid/compiler.h>
 
+#include <asm/instr/compat.h>
+
 #include <cfi.h>
 
 #include "../../builtin.h"
@@ -155,5 +157,23 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	                     * Cleanup: RESOLVED_ADDRESS + MODULE + JMPREL_index */
 	.cfi_endproc
 END(dl_load_lazy_relocation)
+
+
+
+.section .text
+INTERN_FUNCTION(libdl_ucall0_amd64)
+	.cfi_startproc
+	movP   %R_sysvabi0P, %R_sysvabi3P
+INTERN_FUNCTION(libdl_ucall3_amd64)
+	pushP_cfi_r %Pbp
+	movP   %Psp, %Pbp
+	andP   $-16, %Psp /* Force alignment */
+	callP  *%R_sysvabi3P
+	leave
+	ret
+END(libdl_ucall3_amd64)
+	.cfi_endproc
+END(libdl_ucall0_amd64)
+
 
 #endif /* !GUARD_LIBDL_ARCH_I386_RT64_S */
