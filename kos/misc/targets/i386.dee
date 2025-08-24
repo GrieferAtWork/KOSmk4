@@ -28,7 +28,7 @@ import * from deemon;
 global final XARCH = "i386";
 
 @@Cross-Arch CPU name:
-@@  - @"/kos/include/{XARCH}-kos/c++/12.1.0/{CPUNAME}-kos
+@@  - @"/kos/include/{XARCH}-kos/c++/15.2.0/{CPUNAME}-kos
 @@  - ...
 global final CPUNAME = "i686";
 
@@ -80,7 +80,7 @@ global final VS_PROJECT_TARGET = "Win32";
 function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 	toolchain.provideStdlibCache(
 		("c++", ("-fstack-protector-strong", )), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/15.2.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -89,7 +89,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("c++", ()), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/15.2.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -98,7 +98,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("c", ("-fstack-protector-strong",)), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/15.2.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -107,7 +107,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("c", ()), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/15.2.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -116,7 +116,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("assembler-with-cpp", ()), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/15.2.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -125,7 +125,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("assembler-with-cpp", ("-fstack-protector-strong",)), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/15.2.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },

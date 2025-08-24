@@ -106,11 +106,11 @@ function scanDirectoryForEditorConfigTags(path: string, relBase: string) {
 		} else if (ent.d_type == posix.DT_REG) {
 			local includeFilename = relBase + ent.d_name;
 			for (local prefix: {
-					"i386-kos/c++/12.1.0/i686-kos/",
-					"i386-kos/c++/12.1.0/",
+					"i386-kos/c++/15.2.0/i686-kos/",
+					"i386-kos/c++/15.2.0/",
 					"i386-kos/",
-					"arm-kos/c++/12.1.0/i686-kos/",
-					"arm-kos/c++/12.1.0/",
+					"arm-kos/c++/15.2.0/i686-kos/",
+					"arm-kos/c++/15.2.0/",
 					"arm-kos/",
 			}) {
 				if (includeFilename.startswith(prefix)) {

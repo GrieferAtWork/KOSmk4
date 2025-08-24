@@ -80,10 +80,10 @@ __NOTHROW_NCX(siginfox32_to_siginfox64)(struct __siginfox32_struct const *__rest
 	case __SIGFPE:
 	case __SIGSEGV:
 	case __SIGBUS:
-		__result->si_addr     = __self->si_addr;
+		__result->si_addr     = (__HYBRID_PTR64(void))__self->si_addr;
 		__result->si_addr_lsb = __self->si_addr_lsb;
-		__result->si_lower    = __self->si_lower;
-		__result->si_upper    = __self->si_upper;
+		__result->si_lower    = (__HYBRID_PTR64(void))__self->si_lower;
+		__result->si_upper    = (__HYBRID_PTR64(void))__self->si_upper;
 		break;
 
 	case __SIGPOLL:
@@ -92,7 +92,7 @@ __NOTHROW_NCX(siginfox32_to_siginfox64)(struct __siginfox32_struct const *__rest
 		break;
 
 	case __SIGSYS:
-		__result->si_call_addr = __self->si_call_addr;
+		__result->si_call_addr = (__HYBRID_PTR64(void))__self->si_call_addr;
 		__result->si_syscall   = __self->si_syscall;
 		__result->si_arch      = __self->si_arch;
 		break;
@@ -126,10 +126,10 @@ __NOTHROW_NCX(siginfox64_to_siginfox32)(struct __siginfox64_struct const *__rest
 	case __SIGFPE:
 	case __SIGSEGV:
 	case __SIGBUS:
-		__result->si_addr     = __self->si_addr;
+		__result->si_addr     = (__HYBRID_PTR32(void))__self->si_addr;
 		__result->si_addr_lsb = __self->si_addr_lsb;
-		__result->si_lower    = __self->si_lower;
-		__result->si_upper    = __self->si_upper;
+		__result->si_lower    = (__HYBRID_PTR32(void))__self->si_lower;
+		__result->si_upper    = (__HYBRID_PTR32(void))__self->si_upper;
 		break;
 
 	case __SIGPOLL:
@@ -138,7 +138,7 @@ __NOTHROW_NCX(siginfox64_to_siginfox32)(struct __siginfox64_struct const *__rest
 		break;
 
 	case __SIGSYS:
-		__result->si_call_addr = __self->si_call_addr;
+		__result->si_call_addr = (__HYBRID_PTR32(void))__self->si_call_addr;
 		__result->si_syscall   = __self->si_syscall;
 		__result->si_arch      = __self->si_arch;
 		break;

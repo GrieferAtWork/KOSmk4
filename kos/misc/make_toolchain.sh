@@ -39,13 +39,21 @@ MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
 ###############################################################
 ####### Version numbers for dependencies
-#config: gcc-12.1.0                    (>= 20220515)
-BINUTILS_VERSION_NUMBER="2.38"
-GCC_VERSION_NUMBER="12.1.0"
+#config: gcc-15.2.0                    (>= 20250824)
+BINUTILS_VERSION_NUMBER="2.45"
+GCC_VERSION_NUMBER="15.2.0"
 LIBGCC_VERSION="1"
 LIBGCC_VERSION_FULL="1"
 LIBSTDCXX_VERSION="6"
-LIBSTDCXX_VERSION_FULL="6.0.30"
+LIBSTDCXX_VERSION_FULL="6.0.34"
+
+#config: gcc-12.1.0                    (>= 20220515)
+#	BINUTILS_VERSION_NUMBER="2.38"
+#	GCC_VERSION_NUMBER="12.1.0"
+#	LIBGCC_VERSION="1"
+#	LIBGCC_VERSION_FULL="1"
+#	LIBSTDCXX_VERSION="6"
+#	LIBSTDCXX_VERSION_FULL="6.0.30"
 
 ##config: gcc-9.1.0                    (< 20220515)
 #	BINUTILS_VERSION_NUMBER="2.32"
@@ -78,11 +86,12 @@ CXX_KOS_SPECIFIC_HEADER_FILES=(
 	"stdatomic.h"
 )
 
-
 BINUTILS_VERSION="binutils-${BINUTILS_VERSION_NUMBER}"
-BINUTILS_VERSION_URL="https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION_NUMBER}.tar.gz"
+BINUTILS_VERSION_URL="https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION_NUMBER}.tar.xz"
+#BINUTILS_VERSION_URL="https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION_NUMBER}.tar.gz"
 GCC_VERSION="gcc-${GCC_VERSION_NUMBER}"
-GCC_VERSION_URL="https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION_NUMBER}/gcc-${GCC_VERSION_NUMBER}.tar.gz"
+GCC_VERSION_URL="https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION_NUMBER}/gcc-${GCC_VERSION_NUMBER}.tar.xz"
+#GCC_VERSION_URL="https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION_NUMBER}/gcc-${GCC_VERSION_NUMBER}.tar.gz"
 MTOOLS_VERSION="mtools-${MTOOLS_VERSION_NUMBER}"
 MTOOLS_VERSION_URL="ftp://ftp.gnu.org/gnu/mtools/mtools-${MTOOLS_VERSION_NUMBER}.tar.gz"
 
@@ -109,12 +118,17 @@ download_binutils() {
 	if ! [ -f "src/$BINUTILS_VERSION/configure" ]; then
 		cmd cd "src"
 		if ! [ -f "$BINUTILS_VERSION.tar" ]; then
-			if ! [ -f "$BINUTILS_VERSION.tar.gz" ]; then
+			if ! [ -f "$BINUTILS_VERSION.tar.xz" ] && ! [ -f "$BINUTILS_VERSION.tar.gz" ]; then
 				echo "	Downloading: $BINUTILS_VERSION_URL"
 				cmd wget "$BINUTILS_VERSION_URL"
 			fi
-			echo "	Decompressing: $BINUTILS_VERSION.tar.gz"
-			cmd gunzip "$BINUTILS_VERSION.tar.gz"
+			if [ -f "$BINUTILS_VERSION.tar.xz" ]; then
+				echo "	Decompressing: $BINUTILS_VERSION.tar.xz"
+				cmd unxz "$BINUTILS_VERSION.tar.xz"
+			else
+				echo "	Decompressing: $BINUTILS_VERSION.tar.gz"
+				cmd gunzip "$BINUTILS_VERSION.tar.gz"
+			fi
 		fi
 		echo "	Unpacking: $BINUTILS_VERSION.tar"
 		cmd tar -xf "$BINUTILS_VERSION.tar"
@@ -151,12 +165,17 @@ download_gcc() {
 	if ! [ -f "src/$GCC_VERSION/configure" ]; then
 		cmd cd "src"
 		if ! [ -f "$GCC_VERSION.tar" ]; then
-			if ! [ -f "$GCC_VERSION.tar.gz" ]; then
+			if ! [ -f "$GCC_VERSION.tar.gz" ] && ! [ -f "$GCC_VERSION.tar.xz" ]; then
 				echo "	Downloading: $GCC_VERSION_URL"
 				cmd wget "$GCC_VERSION_URL"
 			fi
-			echo "	Decompressing: $GCC_VERSION.tar.gz"
-			cmd gunzip "$GCC_VERSION.tar.gz"
+			if [ -f "$GCC_VERSION.tar.xz" ]; then
+				echo "	Decompressing: $GCC_VERSION.tar.xz"
+				cmd unxz "$GCC_VERSION.tar.xz"
+			else
+				echo "	Decompressing: $GCC_VERSION.tar.gz"
+				cmd gunzip "$GCC_VERSION.tar.gz"
+			fi
 		fi
 		echo "	Unpacking: $GCC_VERSION.tar"
 		cmd tar -xf "$GCC_VERSION.tar"
@@ -510,7 +529,6 @@ else
 fi
 
 
-
 echo "Checking if $GCC_VERSION has been configured"
 if ! [ -f "$PREFIX/gcc/Makefile" ]; then
 	echo "	Now configuring $GCC_VERSION"
@@ -576,6 +594,7 @@ remove_bad_fixinclude() {
 	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stddef.h"
 	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdbool.h"
 	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdarg.h"
+#	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdckdint.h" # TODO
 	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdatomic.h"
 	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdnoreturn.h"
 	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdalign.h"
@@ -655,7 +674,6 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] && \
 else
 	echo "	$GCC_VERSION:libgcc has already been built"
 fi
-
 
 echo "Check if $GCC_VERSION:libstdc++ needs to be built"
 if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \

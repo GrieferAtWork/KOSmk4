@@ -28,7 +28,7 @@ import * from deemon;
 global final XARCH = "arm";
 
 @@Cross-Arch CPU name:
-@@  - @"/kos/include/{XARCH}-kos/c++/12.1.0/{CPUNAME}-kos
+@@  - @"/kos/include/{XARCH}-kos/c++/15.2.0/{CPUNAME}-kos
 @@  - ...
 global final CPUNAME = "arm";
 
@@ -77,7 +77,7 @@ global final VS_PROJECT_TARGET = "ARM";
 function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 	toolchain.provideStdlibCache(
 		("c++", ("-fstack-protector-strong", )), (
-			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+			{	"binutils/arm-kos/lib/gcc/arm-kos/15.2.0",
 				"binutils/arm-kos/arm-kos/lib",
 				"binutils/arm-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -86,7 +86,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("c++", ()), (
-			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+			{	"binutils/arm-kos/lib/gcc/arm-kos/15.2.0",
 				"binutils/arm-kos/arm-kos/lib",
 				"binutils/arm-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -95,7 +95,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("c", ("-fstack-protector-strong",)), (
-			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+			{	"binutils/arm-kos/lib/gcc/arm-kos/15.2.0",
 				"binutils/arm-kos/arm-kos/lib",
 				"binutils/arm-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -104,7 +104,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("c", ()), (
-			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+			{	"binutils/arm-kos/lib/gcc/arm-kos/15.2.0",
 				"binutils/arm-kos/arm-kos/lib",
 				"binutils/arm-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -113,7 +113,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("assembler-with-cpp", ()), (
-			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+			{	"binutils/arm-kos/lib/gcc/arm-kos/15.2.0",
 				"binutils/arm-kos/arm-kos/lib",
 				"binutils/arm-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -122,7 +122,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("assembler-with-cpp", ("-fstack-protector-strong",)), (
-			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+			{	"binutils/arm-kos/lib/gcc/arm-kos/15.2.0",
 				"binutils/arm-kos/arm-kos/lib",
 				"binutils/arm-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },

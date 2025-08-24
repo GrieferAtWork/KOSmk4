@@ -34,6 +34,11 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+struct lockop;
+struct oblockop;
+struct postlockop;
+struct obpostlockop;
+
 /* Callback prototype for an operation to-be performed once locks have been released. */
 typedef __NOBLOCK __ATTR_NONNULL_T((1)) void
 __NOTHROW_T(__LOCKOP_CC *__postlockop_callback_t)(struct postlockop *__restrict __self);
@@ -47,7 +52,8 @@ __NOTHROW_T(__LOCKOP_CC *__obpostlockop_callback_t)(struct obpostlockop *__restr
 typedef __NOBLOCK __ATTR_NONNULL_T((1)) struct postlockop *
 __NOTHROW_T(__LOCKOP_CC *__lockop_callback_t)(struct lockop *__restrict __self);
 typedef __NOBLOCK __ATTR_NONNULL_T((1, 2)) struct obpostlockop *
-__NOTHROW_T(__LOCKOP_CC *__oblockop_callback_t)(struct oblockop *__restrict __self, void *__restrict __obj);
+__NOTHROW_T(__LOCKOP_CC *__oblockop_callback_t)(struct oblockop *__restrict __self,
+                                                void *__restrict __obj);
 
 struct postlockop {
 /*	SLIST_ENTRY(postlockop)                 plo_link; */

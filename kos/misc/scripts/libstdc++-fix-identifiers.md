@@ -1,28 +1,28 @@
 
 ### Creatign libstdc++ system header patches (for KOS) from scratch
 
-- Replace `12.1.0` with your version number below
-- Install vanilla libstdc++ headers (via `make_toolchain.sh`) to `/kos/include/i386-kos/c++/12.1.0`:
+- Replace `15.2.0` with your version number below
+- Install vanilla libstdc++ headers (via `make_toolchain.sh`) to `/kos/include/i386-kos/c++/15.2.0`:
 	- `bash kos/misc/make_toolchain.sh i386-kos`
 	- `bash kos/misc/make_toolchain.sh x86_64-kos`
 - ```sh
   cd     "kos/include/i386-kos/c++"
-  mv     "./12.1.0/i686-kos" "./backup-12.1.0-i686-kos"
-  mv     "./12.1.0/x86_64-kos" "./backup-12.1.0-x86_64-kos"
-  cp     -R "./12.1.0" "./12.1.0-orig"
-  deemon "../../../misc/scripts/libstdc++-fix-identifiers.dee" "12.1.0"
-  diff   -Naur "12.1.0-orig" "12.1.0" > "../../../misc/patches/libstdc++-12.1.0.patch"
-  rm     -rf "./12.1.0-orig"
-  mv     "./backup-12.1.0-i686-kos" "./12.1.0/i686-kos"
-  mv     "./backup-12.1.0-x86_64-kos" "./12.1.0/x86_64-kos"
-  cd     "./12.1.0"
+  mv     "./15.2.0/i686-kos" "./backup-15.2.0-i686-kos"
+  mv     "./15.2.0/x86_64-kos" "./backup-15.2.0-x86_64-kos"
+  cp     -R "./15.2.0" "./15.2.0-orig"
+  deemon "../../../misc/scripts/libstdc++-fix-identifiers.dee" "15.2.0"
+  diff   -Naur "15.2.0-orig" "15.2.0" > "../../../misc/patches/libstdc++-15.2.0.patch"
+  rm     -rf "./15.2.0-orig"
+  mv     "./backup-15.2.0-i686-kos" "./15.2.0/i686-kos"
+  mv     "./backup-15.2.0-x86_64-kos" "./15.2.0/x86_64-kos"
+  cd     "./15.2.0"
   cp     -R "./i686-kos" "./i686-kos-orig"
   deemon "../../../../misc/scripts/libstdc++-fix-identifiers.dee" "i686-kos"
-  diff   -Naur "i686-kos-orig" "i686-kos" > "../../../../misc/patches/libstdc++-12.1.0-i386-kos.patch"
+  diff   -Naur "i686-kos-orig" "i686-kos" > "../../../../misc/patches/libstdc++-15.2.0-i386-kos.patch"
   rm     -rf "./i686-kos-orig"
   cp     -R "./x86_64-kos" "./x86_64-kos-orig"
   deemon "../../../../misc/scripts/libstdc++-fix-identifiers.dee" "x86_64-kos"
-  diff   -Naur "x86_64-kos-orig" "x86_64-kos" > "../../../../misc/patches/libstdc++-12.1.0-x86_64-kos.patch"
+  diff   -Naur "x86_64-kos-orig" "x86_64-kos" > "../../../../misc/patches/libstdc++-15.2.0-x86_64-kos.patch"
   rm     -rf "./x86_64-kos-orig"
   >      "./.libstdc++.kos_patched"
   >      "./i686-kos/.libstdc++.kos_patched"

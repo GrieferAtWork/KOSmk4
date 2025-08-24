@@ -78,7 +78,7 @@ hackgcc_wrapper cpp
 hackgcc_symlink elfedit
 hackgcc_wrapper g++
 hackgcc_wrapper gcc
-hackgcc_wrapper gcc-12.1.0
+hackgcc_wrapper gcc-15.2.0
 hackgcc_symlink gcc-ar
 hackgcc_symlink gcc-nm
 hackgcc_symlink gcc-ranlib

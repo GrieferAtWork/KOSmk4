@@ -28,7 +28,7 @@ import OPT_GCC_OPTIONS from ..libmagic.toolchain.gcc;
 import fs;
 
 @@Version of the linked libstdc++
-global final LIBSTDCXX_VERSION = "12.1.0";
+global final LIBSTDCXX_VERSION = "15.2.0";
 
 
 @@Return the names of all supported targets (CPU architectures)

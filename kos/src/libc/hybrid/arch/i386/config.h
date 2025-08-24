@@ -278,7 +278,6 @@ NOTHROW(libc_sys_sigreturn)(struct ucpustate const *restore_cpu,
 #define libc_handle libc_handle
 LOCAL ATTR_CONST ATTR_RETNONNULL WUNUSED void *
 NOTHROW(libc_handle)(void) {
-	void *result;
 	/* The  `current@tlsgd' symbol points to a `tls_index' structure,
 	 * which consists of 16 bytes total, where the first 8 are filled
 	 * with a module handle pointer by libdl.
@@ -288,7 +287,15 @@ NOTHROW(libc_handle)(void) {
 	 * simply re-uses  the regular  module handle  for this  purpose,
 	 * meaning that we can simply (ab-)use that fact to quickly get a
 	 * handle for libc itself. */
+#if 1 /* https://sourceware.org/pipermail/binutils-cvs/2024-September/065790.html
+       * TODO: Figure out a way to work around this! */
+	__register_var(void *, result, "%rdi");
+	__asm__("leaq current@tlsgd(%%rip), %0" : "=r" (result));
+	result = *(void **)result;
+#else
+	void *result;
 	__asm__("movq current@tlsgd(%%rip), %0" : "=r" (result));
+#endif
 	return result;
 }
 #endif /* __x86_64__ */

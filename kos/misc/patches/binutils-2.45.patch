@@ -1,0 +1,819 @@
+diff -Naur binutils-2.45-orig/bfd/config.bfd binutils-2.45/bfd/config.bfd
+--- binutils-2.45-orig/bfd/config.bfd	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/bfd/config.bfd	2025-08-24 11:47:55.431870800 +0200
+@@ -420,7 +420,7 @@
+     targ_defvec=arm_elf32_le_vec
+     targ_selvecs=arm_elf32_be_vec
+     ;;
+-  arm-*-elf | arm*-*-freebsd* | arm*-*-linux-* | arm*-*-conix* | \
++  arm-*-elf | arm*-*-freebsd* | arm*-*-linux-* | arm*-*-kos* | arm*-*-conix* | \
+   arm*-*-uclinux* | arm-*-kfreebsd*-gnu | \
+   arm*-*-eabi* | arm-*-rtems* | arm*-*-uclinuxfdpiceabi)
+     targ_defvec=arm_elf32_le_vec
+@@ -587,7 +587,7 @@
+     targ_selvecs=hppa_elf32_vec
+     ;;
+ 
+-  i[3-7]86-*-elf* | i[3-7]86-*-rtems* | i[3-7]86-*-genode*)
++  i[3-7]86-*-elf* | i[3-7]86-*-rtems* | i[3-7]86-*-genode* | i[3-7]86-*-kos*)
+     targ_defvec=i386_elf32_vec
+     targ_selvecs="iamcu_elf32_vec i386_coff_vec"
+     ;;
+@@ -681,7 +681,7 @@
+     targ_selvecs="i386_elf32_vec iamcu_elf32_vec"
+     want64=true
+     ;;
+-  x86_64-*-elf* | x86_64-*-rtems* | x86_64-*-fuchsia | x86_64-*-genode*)
++  x86_64-*-elf* | x86_64-*-rtems* | x86_64-*-fuchsia | x86_64-*-genode* | x86_64-*-kos*)
+     targ_defvec=x86_64_elf64_vec
+     targ_selvecs="i386_elf32_vec iamcu_elf32_vec x86_64_elf32_vec"
+     case "${targ}" in
+diff -Naur binutils-2.45-orig/bfd/elf-eh-frame.c binutils-2.45/bfd/elf-eh-frame.c
+--- binutils-2.45-orig/bfd/elf-eh-frame.c	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/bfd/elf-eh-frame.c	2025-08-24 11:48:22.667203400 +0200
+@@ -358,6 +358,8 @@
+     case DW_CFA_restore:
+     case DW_CFA_remember_state:
+     case DW_CFA_restore_state:
++    case DW_CFA_KOS_startcapsule:
++    case DW_CFA_KOS_endcapsule:
+     case DW_CFA_GNU_window_save:
+     case DW_CFA_AARCH64_negate_ra_state_with_pc:
+       /* No arguments.  */
+diff -Naur binutils-2.45-orig/bfd/elf.c binutils-2.45/bfd/elf.c
+--- binutils-2.45-orig/bfd/elf.c	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/bfd/elf.c	2025-08-24 11:48:55.248561800 +0200
+@@ -8894,7 +8894,7 @@
+       if ((flags & BSF_THREAD_LOCAL) != 0)
+ 	type = STT_TLS;
+       else if ((flags & BSF_GNU_INDIRECT_FUNCTION) != 0)
+-	type = STT_GNU_IFUNC;
++	type = (flags & BSF_OBJECT) ? 11 : STT_GNU_IFUNC;
+       else if ((flags & BSF_FUNCTION) != 0)
+ 	type = STT_FUNC;
+       else if ((flags & BSF_OBJECT) != 0)
+diff -Naur binutils-2.45-orig/bfd/elf64-x86-64.c binutils-2.45/bfd/elf64-x86-64.c
+--- binutils-2.45-orig/bfd/elf64-x86-64.c	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/bfd/elf64-x86-64.c	2025-08-24 11:49:27.400528000 +0200
+@@ -3888,6 +3888,13 @@
+ 	  if ((input_section->flags & SEC_ALLOC) != 0
+ 	      && (input_section->flags & SEC_READONLY) != 0
+ 	      && h != NULL
++	      /* PATCH for KOS: Allow non-64-bit PC-relative relocation in shared objects
++	       *                when `-Wl,-z,noreloc-overflow' is passed.
++	       *                Why this isn't standard behavior, I don't know, but if
++	       *                you understand what's happening here, you should conclude
++	       *                that this makes sense. (after all: disallowing it is done
++	       *                to prevent a potential overflow at runtime) */
++	      && !htab->params->no_reloc_overflow_check
+ 	      && ((bfd_link_executable (info)
+ 		   && ((h->root.type == bfd_link_hash_undefweak
+ 			&& (eh == NULL
+diff -Naur binutils-2.45-orig/bfd/elfcode.h binutils-2.45/bfd/elfcode.h
+--- binutils-2.45-orig/bfd/elfcode.h	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/bfd/elfcode.h	2025-08-24 11:49:43.408816600 +0200
+@@ -1473,6 +1473,9 @@
+ 	    case STT_GNU_IFUNC:
+ 	      sym->symbol.flags |= BSF_GNU_INDIRECT_FUNCTION;
+ 	      break;
++	    case 11:
++	      sym->symbol.flags |= BSF_OBJECT | BSF_GNU_INDIRECT_FUNCTION;
++	      break;
+ 	    }
+ 
+ 	  if (dynamic)
+diff -Naur binutils-2.45-orig/bfd/elflink.c binutils-2.45/bfd/elflink.c
+--- binutils-2.45-orig/bfd/elflink.c	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/bfd/elflink.c	2025-08-24 11:55:16.129456200 +0200
+@@ -641,7 +641,7 @@
+       /* We don't put any version information in the dynamic string
+ 	 table.  */
+       name = h->root.root.string;
+-      p = strchr (name, ELF_VER_CHR);
++      p = name[0] == '?' ? NULL : strchr (name, ELF_VER_CHR);
+       if (p != NULL)
+ 	{
+ 	  unversioned_name = bfd_malloc (p - name + 1);
+@@ -722,7 +722,7 @@
+     {
+       /* Set versioned if symbol version is unknown.  */
+       char *version = strrchr (name, ELF_VER_CHR);
+-      if (version)
++      if (version && name[0] != '?')
+ 	{
+ 	  if (version > name && version[-1] != ELF_VER_CHR)
+ 	    h->versioned = versioned_hidden;
+@@ -1181,6 +1181,8 @@
+     {
+       /* Symbol version is unknown or versioned.  */
+       new_version = strrchr (name, ELF_VER_CHR);
++	  if (new_version && name[0] == '?')
++		  new_version = NULL;
+       if (new_version)
+ 	{
+ 	  if (h->versioned == unknown)
+@@ -1966,6 +1968,8 @@
+      decorated name.  This will cause external references which do not
+      specify a version to be bound to this version of the symbol.  */
+   p = strchr (name, ELF_VER_CHR);
++  if (p && name[0] == '?')
++	  p = NULL;
+   if (h->versioned == unknown)
+     {
+       if (p == NULL)
+@@ -2525,7 +2529,7 @@
+ 	    return false;
+ 	  memcpy (alc, h->root.root.string, len - 1);
+ 	  alc[len - 1] = '\0';
+-	  if (alc[len - 2] == ELF_VER_CHR)
++	  if (alc[len - 2] == ELF_VER_CHR && alc[0] != '?')
+ 	    alc[len - 2] = '\0';
+ 
+ 	  h->verinfo.vertree = t;
+@@ -2572,6 +2576,8 @@
+     return true;
+ 
+   p = strchr (h->root.root.string, ELF_VER_CHR);
++  if (p && h->root.root.string[0] == '?')
++	  p = NULL;
+   if (p != NULL && h->verinfo.vertree == NULL)
+     {
+       struct bfd_elf_version_tree *t;
+@@ -2651,6 +2657,8 @@
+ 
+   hide = false;
+   p = strchr (h->root.root.string, ELF_VER_CHR);
++  if (p && h->root.root.string[0] == '?')
++	  p = NULL;
+   if (p != NULL && h->verinfo.vertree == NULL)
+     {
+       struct bfd_elf_version_tree *t;
+@@ -5578,6 +5586,9 @@
+ 	      if (type == STT_GNU_IFUNC
+ 		  && (abfd->flags & DYNAMIC) != 0)
+ 		type = STT_FUNC;
++	      if (type == 11
++		  && (abfd->flags & DYNAMIC) != 0)
++		type = STT_OBJECT;
+ 
+ 	      if (h->type != type)
+ 		{
+@@ -5622,7 +5633,7 @@
+ 	      && (abfd->flags & BFD_PLUGIN) == 0)
+ 	    {
+ 	      char *p = strchr (name, ELF_VER_CHR);
+-	      if (p != NULL && p[1] != ELF_VER_CHR)
++	      if (p != NULL && p[1] != ELF_VER_CHR && name[0] != '?')
+ 		{
+ 		  /* Queue non-default versions so that .symver x, x@FOO
+ 		     aliases can be checked.  */
+@@ -5879,6 +5890,8 @@
+ 	      || (h->root.type != bfd_link_hash_defined
+ 		  && h->root.type != bfd_link_hash_defweak))
+ 	    continue;
++	  if (h->root.root.string[0] == '?')
++	    continue;
+ 
+ 	  amt = p - h->root.root.string;
+ 	  shortname = (char *) bfd_malloc (amt + 1);
+@@ -6164,7 +6177,7 @@
+      version will be matched by the default symbol in the archive.  */
+ 
+   p = strchr (name, ELF_VER_CHR);
+-  if (p == NULL || p[1] != ELF_VER_CHR)
++  if (p == NULL || p[1] != ELF_VER_CHR || name[0] == '?')
+     {
+       /* Add this symbol to first hash if this archive has the first
+ 	 definition.  */
+@@ -6447,7 +6460,7 @@
+   if (h->versioned >= versioned)
+     {
+       char *p = strchr (name, ELF_VER_CHR);
+-      if (p != NULL)
++      if (p != NULL && name[0] != '?')
+ 	{
+ 	  alc = (char *) bfd_malloc (p - name + 1);
+ 	  if (alc == NULL)
+@@ -6520,7 +6533,7 @@
+   if (h->versioned >= versioned)
+     {
+       char *p = strchr (name, ELF_VER_CHR);
+-      if (p != NULL)
++      if (p != NULL && name[0] != '?')
+ 	{
+ 	  alc = (char *) bfd_malloc (p - name + 1);
+ 	  if (alc == NULL)
+@@ -11100,7 +11113,7 @@
+ 	{
+ 	  char *p = strrchr (h->root.root.string, ELF_VER_CHR);
+ 
+-	  if (p && p [1] != '\0')
++	  if (p && p [1] != '\0' && h->root.root.string[0] != '?')
+ 	    {
+ 	      _bfd_error_handler
+ 		/* xgettext:c-format */
+diff -Naur binutils-2.45-orig/binutils/dwarf.c binutils-2.45/binutils/dwarf.c
+--- binutils-2.45-orig/binutils/dwarf.c	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/binutils/dwarf.c	2025-08-24 11:55:54.988342100 +0200
+@@ -10259,6 +10259,7 @@
+ 	      break;
+ 
+ 	    case DW_CFA_remember_state:
++	    case DW_CFA_KOS_startcapsule:
+ 	      if (! do_debug_frames_interp)
+ 		printf ("  DW_CFA_remember_state\n");
+ 	      rs = (Frame_Chunk *) xmalloc (sizeof (Frame_Chunk));
+@@ -10278,6 +10279,7 @@
+ 	      break;
+ 
+ 	    case DW_CFA_restore_state:
++	    case DW_CFA_KOS_endcapsule:
+ 	      if (! do_debug_frames_interp)
+ 		printf ("  DW_CFA_restore_state\n");
+ 	      rs = remembered_state;
+diff -Naur binutils-2.45-orig/config.sub binutils-2.45/config.sub
+--- binutils-2.45-orig/config.sub	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/config.sub	2025-08-24 11:56:39.835448100 +0200
+@@ -2025,6 +2025,7 @@
+ 	| ironclad* \
+ 	| isc* \
+ 	| its* \
++	| kos* \
+ 	| l4re* \
+ 	| libertybsd* \
+ 	| lites* \
+diff -Naur binutils-2.45-orig/gas/cond.c binutils-2.45/gas/cond.c
+--- binutils-2.45-orig/gas/cond.c	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/gas/cond.c	2025-08-24 12:16:03.918182100 +0200
+@@ -241,6 +241,22 @@
+ 	}
+       SKIP_WHITESPACE ();
+     }
++  else if (*input_line_pointer == '\"')
++    {
++      ++s;
++      ++input_line_pointer;
++      while (! is_end_of_stmt (*input_line_pointer))
++	{
++	  *s++ = *input_line_pointer++;
++	  if (s[-1] == '\"')
++	    {
++	      if (*input_line_pointer != '\"')
++		break;
++	      ++input_line_pointer;
++	    }
++	}
++      SKIP_WHITESPACE ();
++    }
+   else
+     {
+       while (*input_line_pointer != terminator
+@@ -257,6 +273,74 @@
+ 
+ /* The MRI IFC and IFNC pseudo-ops.  */
+ 
++
++
++#include <ctype.h>
++static int my_memcasecmp(void const *lhs, void const *rhs, size_t num_bytes) {
++	unsigned char const *p1 = (unsigned char const *)lhs;
++	unsigned char const *p2 = (unsigned char const *)rhs;
++	unsigned char v1, v2;
++	v1 = v2 = 0;
++	while (num_bytes--) {
++		v1 = *p1++;
++		v2 = *p2++;
++		if (v1 != v2) {
++			v1 = (unsigned char)tolower(v1);
++			v2 = (unsigned char)tolower(v2);
++			if (v1 != v2)
++				break;
++		}
++	}
++	return (int)v1 - (int)v2;
++}
++
++static void *my_memcasemem(void const *haystack, size_t haystacklen,
++                           void const *needle, size_t needlelen) {
++	unsigned char *candidate, marker;
++	unsigned char *hayend;
++	if (!needlelen)
++		return (unsigned char *)haystack + haystacklen;
++	if (needlelen > haystacklen)
++		return NULL;
++	haystacklen -= (needlelen - 1);
++	marker       = (unsigned char)tolower(*(unsigned char *)needle);
++	hayend       = (unsigned char *)haystack + haystacklen;
++	for (;;) {
++		for (candidate = (unsigned char *)haystack; candidate < hayend; ++candidate) {
++			unsigned char b = *candidate;
++			if (b == marker || (unsigned char)tolower(b) == marker)
++				goto got_candidate;
++		}
++		break;
++got_candidate:
++		if (my_memcasecmp(candidate, needle, needlelen) == 0)
++			return (void *)candidate;
++		++candidate;
++		haystacklen = ((unsigned char *)haystack + haystacklen) - candidate;
++		haystack    = (void const *)candidate;
++	}
++	return NULL;
++}
++static void *my_memmem(void const *haystack, size_t haystacklen,
++                       void const *needle, size_t needlelen) {
++	unsigned char *candidate, marker;
++	if (!needlelen)
++		return (void *)haystack;
++	if (needlelen > haystacklen)
++		return NULL;
++	haystacklen -= (needlelen - 1);
++	marker       = *(unsigned char *)needle;
++	while ((candidate = (unsigned char *)memchr(haystack, marker, haystacklen)) != NULL) {
++		if (memcmp(candidate, needle, needlelen) == 0)
++			return (void *)candidate;
++		++candidate;
++		haystacklen = ((unsigned char *)haystack + haystacklen) - candidate;
++		haystack    = (void const *)candidate;
++	}
++	return NULL;
++}
++
++
+ void
+ s_ifc (int arg)
+ {
+@@ -264,7 +348,7 @@
+   char stopc = 0;
+   char *s1, *s2;
+   int len1, len2;
+-  int res;
++  int res, nocase;
+   struct conditional_frame cframe;
+ 
+   if (flag_mri)
+@@ -279,10 +363,94 @@
+ 
+   s2 = get_mri_string (';', &len2);
+ 
+-  res = len1 == len2 && strncmp (s1, s2, len1) == 0;
++	/* Strip surrounding quotation marks. */
++	if (len1 >= 2 && s1[0] == '\"' && s1[len1 - 1] == '\"')
++		++s1, len1 -= 2;
++	if (len2 >= 2 && s2[0] == '\"' && s2[len2 - 1] == '\"')
++		++s2, len2 -= 2;
++
++//	fprintf(stderr, ".ifc:{arg=%#x,s1='%.*s',s2='%.*s'}\n",
++//		(unsigned int)arg,
++//		(int)len1, s1,
++//		(int)len2, s2);
++
++	nocase = (arg & 0x8000) != 0;
++	switch ((arg >> 1) & 0xff) {
++
++	case 1: /* ifc_startswith */
++		res = len1 >= len2 &&
++		      ((nocase ? my_memcasecmp(s1, s2, len2)
++		               : memcmp(s1, s2, len2)) == 0);
++		break;
++
++	case 2: /* ifc_endswith */
++		res = len1 >= len2 &&
++		      ((nocase ? my_memcasecmp(s1 + len1 - len2, s2, len2)
++		               : memcmp(s1 + len1 - len2, s2, len2)) == 0);
++		break;
++
++	case 3: /* ifc_contains */
++		res = ((nocase ? my_memmem(s1, len1, s2, len2)
++		               : my_memcasemem(s1, len1, s2, len2)) != NULL);
++		break;
++
++	case 4: /* ifc_ignorespace */
++		for (;;) {
++			char c1, c2;
++			while (len1 && isspace((unsigned char)*s1))
++				--len1, ++s1;
++			while (len2 && isspace((unsigned char)*s2))
++				--len2, ++s2;
++			if (!len1 || !len2)
++				break;
++			c1 = *s1++, --len1;
++			c2 = *s2++, --len2;
++			if (c1 != c2) {
++				if (nocase) {
++					c1 = (char)tolower((unsigned char)c1);
++					c2 = (char)tolower((unsigned char)c2);
++				}
++				if (c1 != c2)
++					break;
++			}
++		}
++		res = len1 == 0 && len2 == 0;
++		break;
++
++	case 5: { /* ifc_bcontains */
++		char *pos;
++		res = 0;
++		/* bcontains: regex-style contains for "\b{needle}\b" */
++again_find_bcontains_needle:
++		pos = nocase ? my_memmem(s1, len1, s2, len2)
++		             : my_memcasemem(s1, len1, s2, len2);
++		if (pos && len2) {
++			res = 1;
++			if (pos > s1 && isalnum((unsigned char)pos[-1]))
++				res = 0;
++			pos += len2;
++			if (pos < (s1 + len1) && isalnum((unsigned char)pos[0]))
++				res = 0;
++			if (!res) {
++				/* Repeat the search */
++				len1 = (s1 + len1) - pos;
++				s1   = pos;
++				goto again_find_bcontains_needle;
++			}
++		}
++	}	break;
++
++	default:
++		res = len1 == len2 &&
++		      ((nocase ? my_memcasecmp(s1, s2, len1)
++		               : memcmp(s1, s2, len1)) == 0);
++		break;
++	}
++	if (arg & 1)
++		res = !res;
+ 
+   initialize_cframe (&cframe);
+-  cframe.ignoring = cframe.dead_tree || ! (res ^ arg);
++  cframe.ignoring = cframe.dead_tree || !res;
+   current_cframe = obstack_alloc (&cond_obstack, sizeof cframe);
+   memcpy (current_cframe, &cframe, sizeof cframe);
+   
+diff -Naur binutils-2.45-orig/gas/config/obj-elf.c binutils-2.45/gas/config/obj-elf.c
+--- binutils-2.45-orig/gas/config/obj-elf.c	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/gas/config/obj-elf.c	2025-08-24 11:58:53.922531400 +0200
+@@ -2529,6 +2529,12 @@
+       elf_tdata (stdoutput)->has_gnu_osabi |= elf_gnu_osabi_ifunc;
+       type = BSF_FUNCTION | BSF_GNU_INDIRECT_FUNCTION;
+     }
++  else if (strcmp (type_name, "kos_indirect_data") == 0
++	   || strcmp (type_name, "11") == 0
++	   || strcmp (type_name, "STT_KOS_IDATA") == 0)
++    {
++      type = BSF_OBJECT | BSF_GNU_INDIRECT_FUNCTION;
++    }
+   else if (strcmp (type_name, "gnu_unique_object") == 0)
+     {
+       const struct elf_backend_data *bed;
+diff -Naur binutils-2.45-orig/gas/configure.tgt binutils-2.45/gas/configure.tgt
+--- binutils-2.45-orig/gas/configure.tgt	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/gas/configure.tgt	2025-08-24 11:59:26.675698700 +0200
+@@ -126,6 +126,8 @@
+ generic_target=${cpu_type}-$vendor-$os
+ # Note: This table is alpha-sorted, please try to keep it that way.
+ case ${generic_target} in
++  i386-*-kos*)			fmt=elf em=linux ;;
++  arm-*-kos*)			fmt=elf em=linux ;;
+   aarch64*-*-elf*)			fmt=elf;;
+   aarch64*-*-fuchsia*)			fmt=elf;;
+   aarch64*-*-haiku*)			fmt=elf em=haiku ;;
+diff -Naur binutils-2.45-orig/gas/read.c binutils-2.45/gas/read.c
+--- binutils-2.45-orig/gas/read.c	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/gas/read.c	2025-08-24 11:59:59.453969000 +0200
+@@ -418,7 +418,18 @@
+   {"hword", cons, 2},
+   {"if", s_if, (int) O_ne},
+   {"ifb", s_ifb, 1},
+-  {"ifc", s_ifc, 0},
++  {"ifc",              s_ifc, (0 << 1)},
++  {"ifc_startswith",   s_ifc, (1 << 1)},
++  {"ifc_endswith",     s_ifc, (2 << 1)},
++  {"ifc_contains",     s_ifc, (3 << 1)},
++  {"ifc_skipspace",    s_ifc, (4 << 1)},
++  {"ifc_bcontains",    s_ifc, (5 << 1)},
++  {"ifc_i",            s_ifc, (0 << 1) | 0x8000},
++  {"ifc_istartswith",  s_ifc, (1 << 1) | 0x8000},
++  {"ifc_iendswith",    s_ifc, (2 << 1) | 0x8000},
++  {"ifc_icontains",    s_ifc, (3 << 1) | 0x8000},
++  {"ifc_iskipspace",   s_ifc, (4 << 1) | 0x8000},
++  {"ifc_ibcontains",   s_ifc, (5 << 1) | 0x8000},
+   {"ifdef", s_ifdef, 0},
+   {"ifeq", s_if, (int) O_eq},
+   {"ifeqs", s_ifeqs, 0},
+@@ -427,7 +438,18 @@
+   {"ifle", s_if, (int) O_le},
+   {"iflt", s_if, (int) O_lt},
+   {"ifnb", s_ifb, 0},
+-  {"ifnc", s_ifc, 1},
++  {"ifnc",              s_ifc, (0 << 1) | 1},
++  {"ifnc_startswith",   s_ifc, (1 << 1) | 1},
++  {"ifnc_endswith",     s_ifc, (2 << 1) | 1},
++  {"ifnc_contains",     s_ifc, (3 << 1) | 1},
++  {"ifnc_skipspace",    s_ifc, (4 << 1) | 1},
++  {"ifnc_bcontains",    s_ifc, (5 << 1) | 1},
++  {"ifnc_i",            s_ifc, (0 << 1) | 1 | 0x8000},
++  {"ifnc_istartswith",  s_ifc, (1 << 1) | 1 | 0x8000},
++  {"ifnc_iendswith",    s_ifc, (2 << 1) | 1 | 0x8000},
++  {"ifnc_icontains",    s_ifc, (3 << 1) | 1 | 0x8000},
++  {"ifnc_iskipspace",   s_ifc, (4 << 1) | 1 | 0x8000},
++  {"ifnc_ibcontains",   s_ifc, (5 << 1) | 1 | 0x8000},
+   {"ifndef", s_ifdef, 1},
+   {"ifne", s_if, (int) O_ne},
+   {"ifnes", s_ifeqs, 1},
+diff -Naur binutils-2.45-orig/include/dwarf2.def binutils-2.45/include/dwarf2.def
+--- binutils-2.45-orig/include/dwarf2.def	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/include/dwarf2.def	2025-08-24 12:00:22.375120300 +0200
+@@ -794,6 +794,10 @@
+ DW_CFA (DW_CFA_GNU_args_size, 0x2e)
+ DW_CFA (DW_CFA_GNU_negative_offset_extended, 0x2f)
+ 
++/* KOS extensions. */
++DW_CFA (DW_CFA_KOS_startcapsule, 0x38)
++DW_CFA (DW_CFA_KOS_endcapsule, 0x39)
++
+ DW_END_CFA
+ 
+ /* Index attributes in the Abbreviations Table.  */
+diff -Naur binutils-2.45-orig/ld/Makefile.am binutils-2.45/ld/Makefile.am
+--- binutils-2.45-orig/ld/Makefile.am	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/ld/Makefile.am	2025-08-24 12:01:20.118015000 +0200
+@@ -168,6 +168,7 @@
+ 	earmelf_fbsd.c \
+ 	earmelf_fuchsia.c \
+ 	earmelf_haiku.c \
++	earmelf_kos.c \
+ 	earmelf_linux.c \
+ 	earmelf_linux_eabi.c \
+ 	earmelf_linux_fdpiceabi.c \
+@@ -178,6 +179,7 @@
+ 	earmelfb.c \
+ 	earmelfb_fbsd.c \
+ 	earmelfb_fuchsia.c \
++	earmelfb_kos.c \
+ 	earmelfb_linux.c \
+ 	earmelfb_linux_eabi.c \
+ 	earmelfb_linux_fdpiceabi.c \
+@@ -277,6 +279,7 @@
+ 	eelf32xtensa.c \
+ 	eelf32z80.c \
+ 	eelf_i386.c \
++	eelf_i386_kos.c \
+ 	eelf_i386_be.c \
+ 	eelf_i386_fbsd.c \
+ 	eelf_i386_haiku.c \
+@@ -459,6 +462,7 @@
+ 	eelf64tilegx_be.c \
+ 	eelf_mipsel_haiku.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_kos.c \
+ 	eelf_x86_64_cloudabi.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_haiku.c \
+diff -Naur binutils-2.45-orig/ld/Makefile.in binutils-2.45/ld/Makefile.in
+--- binutils-2.45-orig/ld/Makefile.in	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/ld/Makefile.in	2025-08-24 12:20:01.017467500 +0200
+@@ -543,6 +543,7 @@
+ prefix = @prefix@
+ program_transform_name = @program_transform_name@
+ psdir = @psdir@
++runstatedir = @runstatedir@
+ sbindir = @sbindir@
+ sharedstatedir = @sharedstatedir@
+ srcdir = @srcdir@
+@@ -679,6 +680,7 @@
+ 	earmelf_fbsd.c \
+ 	earmelf_fuchsia.c \
+ 	earmelf_haiku.c \
++	earmelf_kos.c \
+ 	earmelf_linux.c \
+ 	earmelf_linux_eabi.c \
+ 	earmelf_linux_fdpiceabi.c \
+@@ -689,6 +691,7 @@
+ 	earmelfb.c \
+ 	earmelfb_fbsd.c \
+ 	earmelfb_fuchsia.c \
++	earmelfb_kos.c \
+ 	earmelfb_linux.c \
+ 	earmelfb_linux_eabi.c \
+ 	earmelfb_linux_fdpiceabi.c \
+@@ -788,6 +791,7 @@
+ 	eelf32xtensa.c \
+ 	eelf32z80.c \
+ 	eelf_i386.c \
++	eelf_i386_kos.c \
+ 	eelf_i386_be.c \
+ 	eelf_i386_fbsd.c \
+ 	eelf_i386_haiku.c \
+@@ -969,6 +973,7 @@
+ 	eelf64tilegx_be.c \
+ 	eelf_mipsel_haiku.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_kos.c \
+ 	eelf_x86_64_cloudabi.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_haiku.c \
+@@ -1301,6 +1306,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fuchsia.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_haiku.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux_eabi.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux_fdpiceabi.Po@am__quote@
+@@ -1311,6 +1317,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_fbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_fuchsia.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux_eabi.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux_fdpiceabi.Po@am__quote@
+@@ -1479,6 +1486,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_haiku.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_ldso.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_sol2.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_vxworks.Po@am__quote@
+@@ -1489,6 +1497,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_cloudabi.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_fbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_haiku.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_sol2.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eh8300elf.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eh8300elf_linux.Po@am__quote@
+diff -Naur binutils-2.45-orig/ld/configure binutils-2.45/ld/configure
+--- binutils-2.45-orig/ld/configure	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/ld/configure	2025-08-24 12:20:04.334894200 +0200
+@@ -804,6 +804,7 @@
+ docdir
+ oldincludedir
+ includedir
++runstatedir
+ localstatedir
+ sharedstatedir
+ sysconfdir
+@@ -934,6 +935,7 @@
+ sysconfdir='${prefix}/etc'
+ sharedstatedir='${prefix}/com'
+ localstatedir='${prefix}/var'
++runstatedir='${localstatedir}/run'
+ includedir='${prefix}/include'
+ oldincludedir='/usr/include'
+ docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+@@ -1186,6 +1188,15 @@
+   | -silent | --silent | --silen | --sile | --sil)
+     silent=yes ;;
+ 
++  -runstatedir | --runstatedir | --runstatedi | --runstated \
++  | --runstate | --runstat | --runsta | --runst | --runs \
++  | --run | --ru | --r)
++    ac_prev=runstatedir ;;
++  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
++  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
++  | --run=* | --ru=* | --r=*)
++    runstatedir=$ac_optarg ;;
++
+   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+     ac_prev=sbindir ;;
+   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
+@@ -1323,7 +1334,7 @@
+ for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
+ 		datadir sysconfdir sharedstatedir localstatedir includedir \
+ 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
+-		libdir localedir mandir
++		libdir localedir mandir runstatedir
+ do
+   eval ac_val=\$$ac_var
+   # Remove trailing slashes.
+@@ -1476,6 +1487,7 @@
+   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
++  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+   --libdir=DIR            object code libraries [EPREFIX/lib]
+   --includedir=DIR        C header files [PREFIX/include]
+   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+@@ -11514,7 +11526,7 @@
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 11517 "configure"
++#line 11529 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -11620,7 +11632,7 @@
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 11623 "configure"
++#line 11635 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+diff -Naur binutils-2.45-orig/ld/configure.tgt binutils-2.45/ld/configure.tgt
+--- binutils-2.45-orig/ld/configure.tgt	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/ld/configure.tgt	2025-08-24 12:04:45.141795000 +0200
+@@ -82,6 +82,25 @@
+ # Please try to keep this table more or less in alphabetic order - it
+ # makes it much easier to lookup a specific archictecture.
+ case "${targ}" in
++arm*b-*-kos*)
++			targ_emul=armelfb_kos
++			targ_extra_emuls="armelfb armelf armelf_kos"
++			targ_extra_libpath="armelf_kos"
++			;;
++arm*-*-kos*)
++			targ_emul=armelf_kos
++			targ_extra_emuls="armelf armelfb armelfb_kos"
++			targ_extra_libpath="armelfb_kos"
++			;;
++i[3-7]86-*-kos*)
++			targ_emul=elf_i386_kos
++			targ_extra_emuls=elf_i386
++			targ64_extra_emuls="elf_x86_64_kos elf_x86_64"
++			;;
++x86_64-*-kos*)
++			targ_emul=elf_x86_64_kos
++			targ_extra_emuls="elf_i386_kos elf_x86_64 elf_i386"
++			;;
+ aarch64_be-*-elf)	targ_emul=aarch64elfb
+ 			targ_extra_emuls="aarch64elf aarch64elf32 aarch64elf32b armelfb armelf"
+ 			;;
+diff -Naur binutils-2.45-orig/ld/emulparams/armelf_kos.sh binutils-2.45/ld/emulparams/armelf_kos.sh
+--- binutils-2.45-orig/ld/emulparams/armelf_kos.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.45/ld/emulparams/armelf_kos.sh	2025-08-24 12:05:16.247935200 +0200
+@@ -0,0 +1,24 @@
++ARCH=arm
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-littlearm"
++BIG_OUTPUT_FORMAT="elf32-bigarm"
++LITTLE_OUTPUT_FORMAT="elf32-littlearm"
++MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
++COMMONPAGESIZE="CONSTANT (COMMONPAGESIZE)"
++TEMPLATE_NAME=elf
++EXTRA_EM_FILE=armelf
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++
++DATA_START_SYMBOLS='PROVIDE (__data_start = .);';
++OTHER_TEXT_SECTIONS='*(.glue_7t) *(.glue_7) *(.vfp11_veneer) *(.v4_bx)'
++OTHER_BSS_SYMBOLS="${CREATE_SHLIB+PROVIDE (}__bss_start__ = .${CREATE_SHLIB+)};"
++OTHER_BSS_END_SYMBOLS="${CREATE_SHLIB+PROVIDE (}_bss_end__ = .${CREATE_SHLIB+)}; ${CREATE_SHLIB+PROVIDE (}__bss_end__ = .${CREATE_SHLIB+)};"
++OTHER_END_SYMBOLS="${CREATE_SHLIB+PROVIDE (}__end__ = .${CREATE_SHLIB+)};"
++OTHER_SECTIONS='.note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }'
++
++TEXT_START_ADDR=0x00010000
++TARGET2_TYPE=got-rel
++
++# ARM does not support .s* sections.
++NO_SMALL_DATA=yes
+\ No newline at end of file
+diff -Naur binutils-2.45-orig/ld/emulparams/armelfb_kos.sh binutils-2.45/ld/emulparams/armelfb_kos.sh
+--- binutils-2.45-orig/ld/emulparams/armelfb_kos.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.45/ld/emulparams/armelfb_kos.sh	2025-08-24 12:05:31.592795300 +0200
+@@ -0,0 +1,2 @@
++source_sh ${srcdir}/emulparams/armelf_kos.sh
++OUTPUT_FORMAT="elf32-bigarm"
+diff -Naur binutils-2.45-orig/ld/emulparams/elf_i386_kos.sh binutils-2.45/ld/emulparams/elf_i386_kos.sh
+--- binutils-2.45-orig/ld/emulparams/elf_i386_kos.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.45/ld/emulparams/elf_i386_kos.sh	2025-08-24 12:05:43.720430600 +0200
+@@ -0,0 +1,4 @@
++. ${srcdir}/emulparams/elf_i386.sh
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++XDATA_NAME=.xdata
+diff -Naur binutils-2.45-orig/ld/emulparams/elf_x86_64_kos.sh binutils-2.45/ld/emulparams/elf_x86_64_kos.sh
+--- binutils-2.45-orig/ld/emulparams/elf_x86_64_kos.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.45/ld/emulparams/elf_x86_64_kos.sh	2025-08-24 12:05:53.916505600 +0200
+@@ -0,0 +1,4 @@
++. ${srcdir}/emulparams/elf_x86_64.sh
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++XDATA_NAME=.xdata
+diff -Naur binutils-2.45-orig/ld/scripttempl/elf.sc binutils-2.45/ld/scripttempl/elf.sc
+--- binutils-2.45-orig/ld/scripttempl/elf.sc	2025-07-27 01:00:00.000000000 +0200
++++ binutils-2.45/ld/scripttempl/elf.sc	2025-08-24 12:06:52.442529800 +0200
+@@ -683,6 +683,19 @@
+   /* Start of the Read Only Data region.  */
+ EOF
+ 
++if test -n "$XDATA_NAME"; then
++cat <<EOF
++  ${XDATA_NAME} :
++  {
++    ${RELOCATING+*(.xdata.unlikely .xdata.*_unlikely .xdata.unlikely.*)}
++    ${RELOCATING+*(.xdata.exit .xdata.exit.*)}
++    ${RELOCATING+*(.xdata.startup .xdata.startup.*)}
++    ${RELOCATING+*(.xdata.hot .xdata.hot.*)}
++    *(.xdata ${RELOCATING+ .xdata.*})
++  } ${FILL}
++EOF
++fi
++
+ if test -n "${SEPARATE_CODE}${SEPARATE_TEXT}"; then
+ 
+   if test -n "${RODATA_ADDR}"; then

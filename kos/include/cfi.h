@@ -104,7 +104,7 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_escape_uleb128 value:req)
 __ASM_L(	.if (__ASM_ARG(\value)) <= 0x7f)
-__ASM_L(		.cfi_escape __ASM_ARG(\value))
+__ASM_L(		.cfi_escape __ASM_ARG(\value) + 0) /* "+0" required to work around gas bug */
 __ASM_L(	.else)
 __ASM_L(		.cfi_escape ((__ASM_ARG(\value)) & 0x7f) | 0x80)
 __ASM_L(		.cfi_escape_uleb128 (__ASM_ARG(\value)) >> 7)
@@ -119,9 +119,9 @@ __ASM_L(	.else)
 __ASM_L(		.Lvalue = ~(~(__ASM_ARG(\value)) / 128))
 __ASM_L(	.endif)
 __ASM_L(	.if ((.Lvalue == 0) && ((.Lbyte & 0x40) == 0)) || ((.Lvalue == -1) && ((.Lbyte & 0x40) != 0)))
-__ASM_L(		.cfi_escape .Lbyte)
+__ASM_L(		.cfi_escape .Lbyte + 0) /* "+0" required to work around gas bug */
 __ASM_L(	.else)
-__ASM_L(		.cfi_escape .Lbyte | 0x80)
+__ASM_L(		.cfi_escape (.Lbyte | 0x80)) /* Extra parens required to work around gas bug */
 __ASM_L(		.cfi_escape_sleb128 .Lvalue)
 __ASM_L(	.endif)
 __ASM_L(.endm)

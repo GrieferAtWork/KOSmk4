@@ -24,6 +24,8 @@ require_utility libmpfr "$PKG_CONFIG_PATH/mpfr.pc"
 require_utility libmpc "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libmpc.so.3"
 require_utility libgmp "$PKG_CONFIG_PATH/gmp.pc"
 
+# TODO: Also update to 15.2.0 ?
+
 PACKAGE_URL="https://ftp.gnu.org/gnu/gcc/gcc-12.1.0/gcc-12.1.0.tar.gz"
 
 # Binutils and gcc are special, in that we actually don't fake being linux for them!

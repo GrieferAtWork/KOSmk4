@@ -84,8 +84,8 @@ global final PROJ_TARGETS: {string: (string, {string...}, {string...})} = Dict.F
 					f"{name}={value}"
 			),
 			{
-				f"kos/include/{TARGET.XARCH}-kos/c++/12.1.0/{TARGET.CPUNAME}-kos",
-				f"kos/include/{TARGET.XARCH}-kos/c++/12.1.0",
+				f"kos/include/{TARGET.XARCH}-kos/c++/15.2.0/{TARGET.CPUNAME}-kos",
+				f"kos/include/{TARGET.XARCH}-kos/c++/15.2.0",
 				f"kos/include/{TARGET.XARCH}-kos",
 				f"kos/include"
 			},

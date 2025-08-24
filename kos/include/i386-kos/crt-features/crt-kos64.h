@@ -481,6 +481,7 @@
 #define __CRT_HAVE___chmod
 #define __CRT_HAVE___chown
 #define __CRT_HAVE___chroot
+#define __CRT_HAVE___clang_call_terminate
 #define __CRT_HAVE___clearenv
 #define __CRT_HAVE___clock_getcpuclockid
 #define __CRT_HAVE___clock_getres
@@ -531,6 +532,8 @@
 #define __CRT_HAVE___curbrk
 #define __CRT_HAVE___cxa_atexit
 #define __CRT_HAVE___cxa_begin_catch
+#define __CRT_HAVE___cxa_call_terminate
+#define __CRT_HAVE___cxa_call_unexpected
 #define __CRT_HAVE___cxa_end_catch
 #define __CRT_HAVE___cxa_rethrow
 #define __CRT_HAVE___cxa_thread_atexit

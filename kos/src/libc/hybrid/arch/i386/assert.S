@@ -164,7 +164,10 @@ DEFINE_PUBLIC_ALIAS(abortf, libc_abortf)
 /* Provide debugging facilities for __builtin_unreachable() (s.a. <__crt.h>) */
 DEFINE_PUBLIC_ALIAS(__ubsan_handle_builtin_unreachable, libc_abort)
 DEFINE_INTERN_ALIAS(libc___ubsan_handle_builtin_unreachable, libc_abort)
-DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, libc_abort) /* std::terminate(void) */
+DEFINE_PUBLIC_ALIAS(__cxa_call_unexpected, libc_abort)  /* void __cxa_call_unexpected(void *exception) */
+DEFINE_PUBLIC_ALIAS(__cxa_call_terminate, libc_abort)   /* void __cxa_call_terminate(void *exception) */
+DEFINE_PUBLIC_ALIAS(__clang_call_terminate, libc_abort) /* void __clang_call_terminate(void *exception) (same as "__cxa_call_terminate()") */
+DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, libc_abort)        /* std::terminate(void) */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(terminate, libc_abort)           /* std::terminate(void) */
 DEFINE_PUBLIC_ALIAS("?terminate@@YAXXZ", libc_abort) /* std::terminate(void) */
