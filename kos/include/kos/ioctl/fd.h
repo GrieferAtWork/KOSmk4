@@ -56,7 +56,7 @@
 #define FD_IOC_GETTYPE     _IOR_KOS('f', 0x80, __uint32_t)     /* Get handle type (one of `HANDLE_TYPE_*' from <kos/kernel/handle.h>) */
 #define FD_IOC_GETKIND     _IOR_KOS('f', 0x81, __uint32_t)     /* Get handle kind (one of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>) */
 #define FD_IOC_GETMODE     _IOR_KOS('f', 0x82, __uint32_t)     /* Get handle mode (set of `IO_*' from <kos/io.h>) */
-#define FD_IOC_GETADDR     _IOR_KOS('f', 0x83, __uint64_t)     /* Get handle address (skewed, but guarantied unqiue) */
+#define FD_IOC_GETADDR     _IOR_KOS('f', 0x83, __uint64_t)     /* Get handle address (skewed, but guarantied unique) */
 #define FD_IOC_GETRADDR    _IOR_KOS('f', 0x84, __uint64_t)     /* Get handle address (non-skewed; requires `CAP_SYS_MODULE') */
 #define FD_IOC_GETREFCNT   _IOR_KOS('f', 0x85, __uint64_t)     /* Get reference counter of handle (close(2) decrements; dup(2) increments; never returns `0') */
 #define _FD_IOC_INCREF      _IO_KOS('f', 0xc0)                 /* increment reference counter and set `_KERNEL_POISON_NO_WARRANTY'; requires `CAP_SYS_MODULE'; not available in NDEBUG kernels. */

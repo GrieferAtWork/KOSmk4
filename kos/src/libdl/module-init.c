@@ -91,6 +91,84 @@ typedef void (*elf_init_t)(int argc, char *argv[], char *envp[]) THROWS(...);
 	((*(elf_init_t)(funptr))(dl_globals.dg_peb->pp_argc, \
 	                         dl_globals.dg_peb->pp_argv, \
 	                         dl_globals.dg_peb->pp_envp))
+/* FIXME: When hardware-acceleration is enabled, a "movaps"
+ *        instruction in libstdc++ called from here faults:
+ *        >> movaps %xmm3, 32(%rsp)
+ * However, %rsp is properly aligned at this point (see below: 000000000E471E80)
+ *
+ * - Started happening after GCC15 update
+ * - To reproduce:
+ *     1: Start KOS for x86_64 with hw acceleration enabled (w/o hw-acceleration, fault doesn't happen)
+ *     2: run "gfx"
+ *     3: Fault happens during init of libstdc++
+ *
+[2025-08-24T15:05:17.312537610:warn  ][6][gpf] Assuming Segmentation fault at ? [pc=000000000E2F327C,opcode=0xf29,opflags=0x0]
+[2025-08-24T15:05:17.312719562:error ][6][coredump] Creating coredump...
+[2025-08-24T15:05:17.313018096:error ][6] exception 0xff0e:0x1 [E_SEGFAULT_UNMAPPED,EFAULT] [cr2:0000800000000000,--uc--]
+[2025-08-24T15:05:17.313229120:error ][6] 	pointer[0] = 0000800000000000 (140737488355328)
+[2025-08-24T15:05:17.313361589:error ][6] 	pointer[1] = 000000000000000C (12)
+[2025-08-24T15:05:17.313472588:error ][6] signal 11 (SIGSEGV: Segmentation violation)
+[2025-08-24T15:05:17.313602265:error ][6] 	code:  1 (SEGV_MAPERR: Address not mapped to object)
+[2025-08-24T15:05:17.313740991:error ][6] 	errno: 14 (EFAULT: Bad address)
+E2F327C [ios_init.cc:78,3:_ZNSt8ios_base4InitC2Ev] faultaddr
+E2F327C [ios_init.cc:78,3:_ZNSt8ios_base4InitC2Ev] orig_ustate
+Coredump /bin/gfx tid:6
+exception 0xff0e:0x1 [E_SEGFAULT_UNMAPPED,EFAULT] [cr2:0000800000000000,--uc--]
+	pointer[0] = 0x0000800000000000 (140737488355328)
+	pointer[1] = 0x000000000000000C (12)
+signal 11 (SIGSEGV: Segmentation violation)
+	code:  1 (SEGV_MAPERR: Address not mapped to object)
+	errno: 14 (EFAULT: Bad address)
+[RT] Cached method `string.casestartswith' in `string' (tp_cache)
+E:\c\kls\kos\binutils\x86_64-kos\gcc\x86_64-kos\libstdc++-v3\include\streambuf(475,29) : 000000000E2F327C+5[/lib64/libstdc++.so.6][_ZSt21ios_base_library_initv+69] [faultaddr]
+E:\c\kls\kos\binutils\x86_64-kos\gcc\x86_64-kos\libstdc++-v3\include\ext\stdio_sync_filebuf.h(83,54) : 000000000E2F3200+133[/lib64/libstdc++.so.6][_ZSt21ios_base_library_initv+55] [faultaddr]
+E:\c\kls\kos\binutils\src\gcc-15.2.0\libstdc++-v3\src\c++98\ios_init.cc(85,54) : 000000000E2F3200+133[/lib64/libstdc++.so.6][_ZSt21ios_base_library_initv+55] [faultaddr]
+E:\c\kls\kos\binutils\src\gcc-15.2.0\libstdc++-v3\src\c++98\ios_init.cc(78,3) : 000000000E2F3200+1470[/lib64/libstdc++.so.6][_ZNSt8ios_base4InitC2Ev+55] [faultaddr]
+E:\c\kls\kos\binutils\x86_64-kos\gcc\x86_64-kos\libstdc++-v3\include\streambuf(475,29) : 000000000E2F327C+5[/lib64/libstdc++.so.6][_ZSt21ios_base_library_initv+69] [orig_ustate]
+E:\c\kls\kos\binutils\x86_64-kos\gcc\x86_64-kos\libstdc++-v3\include\ext\stdio_sync_filebuf.h(83,54) : 000000000E2F3200+133[/lib64/libstdc++.so.6][_ZSt21ios_base_library_initv+55] [orig_ustate]
+E:\c\kls\kos\binutils\src\gcc-15.2.0\libstdc++-v3\src\c++98\ios_init.cc(85,54) : 000000000E2F3200+133[/lib64/libstdc++.so.6][_ZSt21ios_base_library_initv+55] [orig_ustate]
+E:\c\kls\kos\binutils\src\gcc-15.2.0\libstdc++-v3\src\c++98\ios_init.cc(78,3) : 000000000E2F3200+1470[/lib64/libstdc++.so.6][_ZNSt8ios_base4InitC2Ev+55] [orig_ustate]
+> trace
+E:\c\kls\kos\binutils\x86_64-kos\gcc\x86_64-kos\libstdc++-v3\include\streambuf(475,29) : 000000000E2F327C+5[/lib64/libstdc++.so.6][_ZSt21ios_base_library_initv+69]
+E:\c\kls\kos\binutils\x86_64-kos\gcc\x86_64-kos\libstdc++-v3\include\ext\stdio_sync_filebuf.h(83,54) : 000000000E2F3200+133[/lib64/libstdc++.so.6][_ZSt21ios_base_library_initv+55]
+E:\c\kls\kos\binutils\src\gcc-15.2.0\libstdc++-v3\src\c++98\ios_init.cc(85,54) : 000000000E2F3200+133[/lib64/libstdc++.so.6][_ZSt21ios_base_library_initv+55]
+E:\c\kls\kos\binutils\src\gcc-15.2.0\libstdc++-v3\src\c++98\ios_init.cc(78,3) : 000000000E2F3200+1470[/lib64/libstdc++.so.6][_ZNSt8ios_base4InitC2Ev+55]
+E:\c\kls\kos\binutils\src\gcc-15.2.0\libstdc++-v3\src\c++98\globals_io.cc(80,65) : 000000000E2DE3CB+5[/lib64/libstdc++.so.6][__static_initialization_and_destruction_0+7]
+E:\c\kls\kos\binutils\src\gcc-15.2.0\libstdc++-v3\src\c++98\globals_io.cc(118,1) : 000000000E2DE3C0+19[/lib64/libstdc++.so.6][_GLOBAL__sub_I.00090_globals_io.cc+4]
+[2025-08-24T15:05:19.530848362:debug ][6][heap] Acquire kernel heap: FFFFFFFFDFFDA000...FFFFFFFFDFFDAFFF
+[2025-08-24T15:05:19.531134000:debug ][6][mm] Merge nodes at FFFFFFFFDFFD5000-FFFFFFFFDFFD9FFF and FFFFFFFFDFFDA000-FFFFFFFFDFFDAFFF
+[2025-08-24T15:05:19.531349153:debug ][6][heap] Acquire kernel heap: FFFFFFFFDFFD5000...FFFFFFFFDFFD9FFF
+E:\c\kls\kos\kos\src\libdl\module-init.c(150,3) : 00000000BF10773C+2[/lib64/libdl.so][DlModule_ElfRunInitializers+231]
+E:\c\kls\kos\kos\src\libdl\module-init.c(186,30) : 00000000BF107A8F+5[/lib64/libdl.so][DlModule_RunAllStaticInitializers+528]
+> r
+    %r15 0000000000000000 %r14 0000000010000A80
+    %r13 0000000000000000 %r12 000000000000000B
+    %r11 0000000000040202 %r10 0000000000227990
+    %r9  0000000010000030 %r8  0000000000000000
+    %rdi 000000000E482918 %rsi 00000000BFFFF020
+    %rbp 000000007FFFFEF8 %rsp 000000000E471E80
+    %rbx 000000000E4833F4 %rdx 000000000E47D4C0
+    %rcx 0000000000000000 %rax 000000000E47DE00
+    %rip 000000000E2F327C [orig=000000000E2F3278]
+        [streambuf] [line=475,29]
+        [addq	$0x10, %rax]
+    %es 0063 [gdt+0x60,rpl=3,dpl=3,00000000+0xffffffff,--cwa] (USER_DATA+3)
+    %ds 0063 [gdt+0x60,rpl=3,dpl=3,00000000+0xffffffff,--cwa] (USER_DATA+3)
+    %fs 0063 [gdt+0x60,rpl=3,dpl=3,00000000+0xffffffff,--cwa] (USER_DATA+3)
+    %gs 0063 [gdt+0x60,rpl=3,dpl=3,00000000+0xffffffff,--cwa] (USER_DATA+3)
+    %cs 005B [gdt+0x58,rpl=3,dpl=3,00000000+0xffffffff,-xcr-] (USER_CODE+3)
+    %ss 0053 [gdt+0x50,rpl=3,dpl=3,00000000+0xffffffff,--cw-] (USER_DATA32+3)
+    %tr 0008 [gdt+0x08,rpl=0,dpl=0,EEEF2000+0x00003000,sxcra] (CPU_TSS)
+    %ldt 0018 [gdt+0x18,rpl=0,dpl=3,EEEEE1C0+0x0000000f,s-cw-] (CPU_LDT)
+    %fs.base 00000000100018B0 %gs.base FFFFF62780C27A00 [user]
+                  %IA32_KERNEL_GS_BASE FFFFFFFFE2054CE8 [kern]
+    %rflags 50206 [-p---] [if,rf,ac] [iopl=0]
+    %cr0 00000000E0010033 [pe,mp,et,ne,wp,nw,cd,pg]    %cr2 FFFFFFFFF0A6C1CD
+    %cr4 00000000001102B0 [pse,pae,pge,osfxsr,fsgsbase,smep]    %cr3 000000000752B000
+    %dr7 0000000000000400    %dr6 00000000FFFF0FF0 [rtm]
+    %gdt FFFFFFFFEEEEE140+119
+    %idt FFFFFFFF809F0840+4095
+ */
 
 
 /* Run library initializers for `self' */

@@ -198,7 +198,7 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder_norpc *__rest
 		/*iter->_mbn_partoff = ...;*/
 
 		/* Remove whatever node is mapping this one's part from list of
-		 * node that map unqiue parts, since  we have to gift `fm'  our
+		 * nodes that map unique parts, since we have to gift `fm'  our
 		 * lock to that part. */
 		if likely(LIST_ISBOUND(iter, mbn_nxtuprt)) {
 			/* Simple case: Our node is the only (or currently registered)
@@ -210,6 +210,84 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder_norpc *__rest
 			 * that is registered as owner  of the lock associated  with
 			 * the relevant mem-part. */
 			owner_node = mbuilder_find_node_for_mpart(self, iter->mbn_part);
+			/* FIXME: This assertion started failing after the GCC15 update:
+			 *   1: Start KOS on x86_64  (i386 builds don't fault here)
+			 *   2: run "system-test" or "system-test32"
+			 *   3: When the wordexp test calls the following, this assertion fails:
+			 *   >> sys32_execve(path: "/bin/sh", argv: ["sh", "-c", "echo \"$VAR\""], envp: ["SHLVL=1", "HOME=/", "TERM=xterm", "PATH=/bin:/usr/bin:/usr/sbin:/sbin", "PWD=/", "IFS=, \t\r\n", "VAR=foo, bar ,,   baz"])
+[2025-08-24T14:36:41.578262876:emerg ][14] Assertion Check [pc=FFFFFFFF801F0122]
+E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(213) : mbuilder_extract_filemap : owner_node != NULL
+Internal error: No-one is holding known unique part 0000000000000000
+E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(213,4) : mbuilder_extract_filemap+752 : FFFFFFFF801F011D+5 : Caused here [sp=FFFFFFFFEAFCB610]
+E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(390,26) : mbuilder_reflow_filemap_or_unlock+119 : FFFFFFFF801F07C5+5 : Called here [sp=FFFFFFFFEAFCB680]
+E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(434,41) : mbuilder_partlocks_acquire_or_unlock+76 : FFFFFFFF801F0933+5 : Called here [sp=FFFFFFFFEAFCB778]
+E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(114,46) : mbuilder_partlocks_acquire+25 : FFFFFFFF801EFD05+5 : Called here [sp=FFFFFFFFEAFCB7A0]
+E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-apply.c(397,28) : mbuilder_apply+61 : FFFFFFFF801EF55F+5 : Called here [sp=FFFFFFFFEAFCB7B8]
+E:\c\kls\kos\kos\src\kernel\modelf\elf-exec.c.inl(314,18) : elf_exec_impl+2577 : FFFFFFFF8017A6C3+5 : Called here [sp=FFFFFFFFEAFCB898]
+E:\c\kls\kos\kos\src\kernel\modelf\elf.c(181,23) : elfabi_exec+46 : FFFFFFFF8017B9D1+5 : Called here [sp=FFFFFFFFEAFCBAC0]
+E:\c\kls\kos\kos\src\kernel\core\memory\mman\exec.c(102,28) : mman_exec+641 : FFFFFFFF801DF87A+2 : Called here [sp=FFFFFFFFEAFCBAE0]
+E:\c\kls\kos\kos\src\kernel\core\filesys\syscalls.c(2195,13) : kernel_do_execveat_impl+364 : FFFFFFFF8034AF5E+5 : Called here [sp=FFFFFFFFEAFCBBC8]
+E:\c\kls\kos\kos\src\kernel\core\filesys\syscalls.c(2333,26) : kernel_do_execveat+518 : FFFFFFFF8034B5D0+5 : Called here [sp=FFFFFFFFEAFCBCC0]
+E:\c\kls\kos\kos\src\kernel\core\filesys\syscalls.c(2477,21) : kernel_execveat+1330 : FFFFFFFF8034BED2+5 : Called here [sp=FFFFFFFFEAFCBD38]
+E:\c\kls\kos\kos\src\kernel\core\arch\i386\syscall\fastpass-impl.S(521) : __x86_asm64_syscall_execve+46 : FFFFFFFF8044C80A+5 : Called here [sp=FFFFFFFFEAFCBF58]
+E:\c\kls\kos\kos\include\i386-kos\kos\asm\syscall.h(159,0) : libc_execve : 000000000E00C8AF : Called here [sp=000000007FFFF7C0]%
+E:\c\kls\kos\kos\include\i386-kos\kos\syscalls64.h(530,0) : sys_execve : 000000000E00C8AF : Called here [sp=000000007FFFF7C0]
+E:\c\kls\kos\kos\src\libc\user\unistd.c(107,0) : libc_execve : 000000000E00C8AF : Called here [sp=000000007FFFF7C0]
+expr: owner_node != NULL
+file: kos/src/kernel/core/memory/mman/mbuilder-lock.c (line 213)
+func: mbuilder_extract_filemap
+mesg: Internal error: No-one is holding known unique part 0000000000000000
+addr: FFFFFFFF801F0122
+
+> eval *iter
+struct mbnode:
+{
+  mbn_mement: {
+    rb_par: 0xcccccccccccccccc, rb_lhs: 0xcccccccccccccccc,
+    rb_rhs: 0xcccccccccccccccc
+  }, mbn_minaddr: 0xb0000, mbn_maxaddr: 0xb0fff, mbn_flags: 5,
+  mbn_part: 0xffffffffe203ec60 (mpart),
+  mbn_fspath: 0xffffffffe1000b60 (path /bin),
+  mbn_fsname: 0xffffffffe1008200 (fdirent reg:busybox), _mbn_mman: NULL,
+  _mbn_alloc: {sle_next: NULL}, mbn_filnxt: NULL,
+  mbn_filpos: 0xcccccccccccccccc, __mbn_pad: {[0 ... 7] = 170},
+  mbn_nxtfile: {sle_next: 0xcccccccccccccccc},
+  mbn_nxtuprt: {le_next: 0xcccccccccccccccc, le_prev: NULL},
+  mbn_file: 0xcccccccccccccccc, _mbn_partoff: 0xcccccccccccccccc,
+  _mbn_link: {le_next: 0xaaaaaaaaaaaaaaaa, le_prev: 0xcccccccccccccccc},
+  _mbn_writable: {le_next: 0xcccccccccccccccc, le_prev: NULL},
+  _mbn_module: 0xcccccccccccccccc
+} (mbnode)
+> eval iter
+struct mbnode *:
+0xffffffffe2073018 (mbnode)
+> eval iter.mbn_part
+struct mpart *:
+0xffffffffe203ec60 (mpart)
+> eval *iter.mbn_part
+struct mpart:
+{
+  mp_refcnt: 1, mp_flags: 0xc000, mp_xflags: 0, mp_state: 0,
+  _mp_joblink: {sle_next: 0xaaaaaaaaaaaaaaaa},
+  mp_file: 0xffffffff809f3918 (mfile [/dev/zero:anon:9]), mp_copy: {NULL},
+  mp_share: {lh_first: NULL}, mp_lockops: {slh_first: NULL},
+  mp_allparts: {
+    tqe_next: 0xffffffffe203e988 (mpart /bin/busybox:4000-7fff),
+    tqe_prev: 0xffffffffe203ed90
+  }, mp_changed: {sle_next: 0xcccccccccccccccc}, mp_minaddr: 0x1000,
+  mp_maxaddr: 0xfff,
+  mp_filent: {
+    rb_par: 0xffffffffffffffff (mpart), rb_lhs: 0xcccccccccccccccc,
+    rb_rhs: NULL
+  }, mp_blkst_ptr: NULL, mp_blkst_inl: 0,
+  mp_mem: {mc_start: 0xcccccccccccccccc, mc_size: 0xcccccccccccccccc},
+  mp_mem_sc: {ms_v: 0xcccccccccccccccc, ms_c: 0xcccccccccccccccc},
+  mp_swp: {mc_start: 0xcccccccccccccccc, mc_size: 0xcccccccccccccccc},
+  mp_swp_sc: {ms_v: 0xcccccccccccccccc, ms_c: 0xcccccccccccccccc},
+  mp_meta: NULL
+} (mpart)
+
+*/
 			assertf(owner_node != NULL,
 			        "Internal error: No-one is holding known unique part %p",
 			        iter->mbn_part);

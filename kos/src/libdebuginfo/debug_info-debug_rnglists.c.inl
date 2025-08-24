@@ -241,7 +241,7 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 #ifndef DEFINE_libdi_debuginfo_rnglists_iterator_next
 	if unlikely(self->r_ranges_offset >= (size_t)(LOCAL_ranges_end -
 	                                              sections->drs_debug_ranges_start))
-		ERROR(err);
+		ERROR(err); /* FIXME: This check started failing randomly after the GCC15 update */
 	LOCAL_iter = sections->drs_debug_ranges_start + self->r_ranges_offset;
 #endif /* !DEFINE_libdi_debuginfo_rnglists_iterator_next */
 
