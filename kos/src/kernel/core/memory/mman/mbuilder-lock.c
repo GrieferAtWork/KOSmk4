@@ -210,11 +210,23 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder_norpc *__rest
 			 * that is registered as owner  of the lock associated  with
 			 * the relevant mem-part. */
 			owner_node = mbuilder_find_node_for_mpart(self, iter->mbn_part);
+
 			/* FIXME: This assertion started failing after the GCC15 update:
 			 *   1: Start KOS on x86_64  (i386 builds don't fault here)
 			 *   2: run "system-test" or "system-test32"
 			 *   3: When the wordexp test calls the following, this assertion fails:
 			 *   >> sys32_execve(path: "/bin/sh", argv: ["sh", "-c", "echo \"$VAR\""], envp: ["SHLVL=1", "HOME=/", "TERM=xterm", "PATH=/bin:/usr/bin:/usr/sbin:/sbin", "PWD=/", "IFS=, \t\r\n", "VAR=foo, bar ,,   baz"])
+			 *
+			 * NOTE: It seems likely that this branch shouldn't even get hit.
+			 *       On i386, running system-test with a breakpoint set here
+			 *       sees that breakpoint never get hit.
+			 *
+			 *       Additionally, as far as I can recall, this code is only
+			 *       used when the same part of a file is mapped multiple
+			 *       times within the same mbuilder (but as you can see down
+			 *       below, this is faults for an anon mapping, which should
+			 *       never get mapped multiple times).
+			 *
 [2025-08-24T14:36:41.578262876:emerg ][14] Assertion Check [pc=FFFFFFFF801F0122]
 E:\c\kls\kos\kos\src\kernel\core\memory\mman\mbuilder-lock.c(213) : mbuilder_extract_filemap : owner_node != NULL
 Internal error: No-one is holding known unique part 0000000000000000
@@ -230,9 +242,21 @@ E:\c\kls\kos\kos\src\kernel\core\filesys\syscalls.c(2195,13) : kernel_do_execvea
 E:\c\kls\kos\kos\src\kernel\core\filesys\syscalls.c(2333,26) : kernel_do_execveat+518 : FFFFFFFF8034B5D0+5 : Called here [sp=FFFFFFFFEAFCBCC0]
 E:\c\kls\kos\kos\src\kernel\core\filesys\syscalls.c(2477,21) : kernel_execveat+1330 : FFFFFFFF8034BED2+5 : Called here [sp=FFFFFFFFEAFCBD38]
 E:\c\kls\kos\kos\src\kernel\core\arch\i386\syscall\fastpass-impl.S(521) : __x86_asm64_syscall_execve+46 : FFFFFFFF8044C80A+5 : Called here [sp=FFFFFFFFEAFCBF58]
-E:\c\kls\kos\kos\include\i386-kos\kos\asm\syscall.h(159,0) : libc_execve : 000000000E00C8AF : Called here [sp=000000007FFFF7C0]%
-E:\c\kls\kos\kos\include\i386-kos\kos\syscalls64.h(530,0) : sys_execve : 000000000E00C8AF : Called here [sp=000000007FFFF7C0]
-E:\c\kls\kos\kos\src\libc\user\unistd.c(107,0) : libc_execve : 000000000E00C8AF : Called here [sp=000000007FFFF7C0]
+E:\c\kls\kos\kos\include\i386-kos\kos\asm\syscall.h(159,221) : 000000000E00C8AF+2[/lib64/libc.so][__x86_syscall3+16]
+E:\c\kls\kos\kos\include\i386-kos\kos\syscalls64.h(530,1) : 000000000E00C853+26[/lib64/libc.so][sys_execve+76]
+E:\c\kls\kos\kos\src\libc\user\unistd.c(107,21) : 000000000E00C853+58[/lib64/libc.so][libc_execve+44]
+E:\c\kls\kos\kos\src\libc\auto\unistd.c(67,20) : 000000000E00C9E8+5[/lib64/libc.so][libc_execv+59]
+E:\c\kls\kos\kos\src\libc\auto\unistd.c(105,2) : 000000000E00CCCC+5[/lib64/libc.so][libc_execl+667]
+E:\c\kls\kos\kos\src\libc\auto\stdlib.c(3413,12) : 000000000E0B12B5+5[/lib64/libc.so][libc_shexec+157]
+E:\c\kls\kos\kos\src\libc\user\wordexp.c(265,15) : 000000000E009CFB+5[/lib64/libc.so][shexec_fixedlength+130]
+E:\c\kls\kos\kos\src\libc\user\wordexp.c(314,21) : 000000000E0B69A6+5[/lib64/libc.so][wxparser_insert_command+361]
+E:\c\kls\kos\kos\src\libc\user\wordexp.c(2416,36) : 000000000E0BBBFF+5[/lib64/libc.so][wxparser_parse_backtick+265]
+E:\c\kls\kos\kos\src\libc\user\wordexp.c(2934,35) : 000000000E0BCBAC+5[/lib64/libc.so][libc_wordexp+1037]
+E:\c\kls\kos\kos\src\libc\libc\wordexp.ctest(43,2) : 000000000048F0ED+5[/bin/system-test][assert_wordexp+140]
+E:\c\kls\kos\kos\src\libc\libc\wordexp.ctest(236,16) : 0000000000490516+5[/bin/system-test][test_wordexp+4321]
+E:\c\kls\kos\kos\src\apps\system-test\main.c(109,19) : 000000000040799A+2[/bin/system-test][run_all_tests+113]
+E:\c\kls\kos\kos\src\apps\system-test\main.c(148,16) : 0000000000407A8F+5[/bin/system-test][main+43]
+E:\c\kls\kos\kos\src\crt0\i386\crt064.S(39) : 000000000049C016+5[/bin/system-test][_start+12]
 expr: owner_node != NULL
 file: kos/src/kernel/core/memory/mman/mbuilder-lock.c (line 213)
 func: mbuilder_extract_filemap
