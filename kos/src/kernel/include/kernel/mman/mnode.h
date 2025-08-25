@@ -104,7 +104,7 @@
 #define MNODE_F__RBRED     0x00004000 /* [lock(mn_mman->mm_lock)] Internal flag: This node is red in the mman-mappings R/B tree. */
 #define MBNODE_F_POPULATE  0x00008000 /* Used internally by `struct mbnode' */
 #define MBNODE_F_NONBLOCK  0x00010000 /* Used internally by `struct mbnode' */
-/*efine MNODE_F_           0x00020000  * ... */
+#define MBNODE_F_DUPLICATE 0x00020000 /* Used internally by `struct mbnode' (linked "mpart" may also be getting mapped by some other mbnode) */
 #define MNODE_F_NOSPLIT    0x00040000 /* [const] Don't allow this mem-node to be split. */
 #define MNODE_F_NOMERGE    0x00080000 /* [const] Don't allow this mem-node to be merged. When set, this flag
                                        *         guaranties that munmap() will _always_ succeed without ever

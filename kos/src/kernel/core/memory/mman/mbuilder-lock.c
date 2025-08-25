@@ -118,35 +118,6 @@ mbuilder_partlocks_acquire(struct mbuilder_norpc *__restrict self)
 
 
 
-/* Check if `part' is already referenced by `self' */
-#define mbuilder_uparts_contains(self, part) \
-	(mbuilder_find_node_for_mpart(self, part) != NULL)
-
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder_norpc *__restrict self,
-                                      struct mbnode *__restrict node) {
-	struct mbnode_list *list;
-	list = mbnode_partset_listof(&self->mb_uparts, node->mbn_part);
-	LIST_INSERT_HEAD(list, node, mbn_nxtuprt);
-}
-
-/* Find the mb-node currently registered as part of the `mb_uparts'
- * set, as  the owner  of the  lock that  is being  held on  `part' */
-PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) struct mbnode *
-NOTHROW(FCALL mbuilder_find_node_for_mpart)(struct mbuilder_norpc const *__restrict self,
-                                            struct mpart const *__restrict part) {
-	struct mbnode *iter;
-	struct mbnode_list const *list;
-	list = mbnode_partset_listof(&self->mb_uparts, part);
-	LIST_FOREACH (iter, list, mbn_nxtuprt) {
-		if (iter->mbn_part == part)
-			break; /* Found it! */
-	}
-	return iter;
-}
-
-
-
 struct mfile_map_for_reflow: mfile_map {
 	/* @override(.mfm_file, [REF]) */
 	uintptr_t           mfmfr_nodeflags; /* Finalized values for `mnode::mn_flags'. */
@@ -295,10 +266,25 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder_norpc *__rest
 			 * then that mbnode must be inserted into  the set at this point, so-as  to
 			 * ensure that a lock to that part will be re-acquired in later passes! */
 			struct mbnode *other_mapping_for_part;
-			other_mapping_for_part = mbuilder_find_other_mbnode_mapping_mpart(self->mb_mappings,
-			                                                                  iter, iter->mbn_part);
-			if (other_mapping_for_part)
-				LIST_INSERT_BEFORE(iter, other_mapping_for_part, mbn_nxtuprt);
+
+			/* NOTE: This is an O(n) operation in a hot branch. Instead of always doing this,
+			 *       have some sort of flag to indicate  that the linked mpart of the  mbnode
+			 *       *may* be referenced by another mbnode within the mbuilder.
+			 *
+			 * Since  that flag wouldn't be hot, it could be used to speed up calls to
+			 * mbuilder_find_other_mbnode_mapping_mpart by mirroring the behavior when
+			 * said function returns NULL. */
+			if (iter->mbn_flags & MBNODE_F_DUPLICATE) {
+				other_mapping_for_part = mbuilder_find_other_mbnode_mapping_mpart(self->mb_mappings,
+				                                                                  iter, iter->mbn_part);
+				if (other_mapping_for_part)
+					LIST_INSERT_BEFORE(iter, other_mapping_for_part, mbn_nxtuprt);
+			} else {
+				assertf((other_mapping_for_part = mbuilder_find_other_mbnode_mapping_mpart(self->mb_mappings,
+				                                                                           iter, iter->mbn_part)) == NULL,
+				        "There shouldn't be another mapping for this "
+				        "part because `MBNODE_F_DUPLICATE' isn't set!");
+			}
 			LIST_REMOVE(iter, mbn_nxtuprt);
 		}
 		DBG_memset(&iter->mbn_nxtuprt, 0xcc, sizeof(iter->mbn_nxtuprt));
@@ -353,8 +339,6 @@ NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder_norpc *__restr
 		 * Because some singular mpart may be mapped multiple times, it
 		 * is  always possible that the part is always contained in the
 		 * set of parts referenced by the mbuilder. */
-		if (!mbuilder_uparts_contains(self, iter->mbn_part))
-			mbuilder_uparts_insert(self, iter);
 		iter->mbn_flags = fm->mfmfr_nodeflags;
 		iter->mbn_minaddr += (uintptr_t)fm->mfmfr_mapaddr;
 		iter->mbn_maxaddr += (uintptr_t)fm->mfmfr_mapaddr;
@@ -363,6 +347,7 @@ NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder_norpc *__restr
 
 		/* Insert the node into our builder's mapping-tree */
 		mbnode_tree_insert(&self->mb_mappings, iter);
+		mbuilder_uparts_insert(self, iter);
 
 		next = iter->mbn_filnxt;
 		if (!next)

@@ -88,6 +88,40 @@ static_assert(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, mbn
 #define DBG_memset(p, c, n) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+
+/* Check  if  `self->mb_uparts'  already  contains  `node->mbn_part'.
+ * If so, set `MBNODE_F_DUPLICATE' for that existing mapping, as well
+ * as the given `node'.  Else, insert `node' into  `self->mb_uparts'.
+ * @return: true:  Given `node' was inserted into `self->mb_uparts'
+ * @return: false: `node->mbn_part' was already contained (but `MBNODE_F_DUPLICATE' was set) */
+PUBLIC NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder_norpc *__restrict self,
+                                      struct mbnode *__restrict node) {
+	struct mbnode *iter;
+	struct mbnode_list *list;
+	struct mpart *part = node->mbn_part;
+	assert(part);
+	list = mbnode_partset_listof(&self->mb_uparts, part);
+	LIST_FOREACH (iter, list, mbn_nxtuprt) {
+		if (iter->mbn_part == part) {
+			/* Set the DUPLICATE flag for both nodes. This allows  other
+			 * code to more easily detect parts that are mapped multiple
+			 * times. */
+			iter->mbn_flags |= MBNODE_F_DUPLICATE;
+			node->mbn_flags |= MBNODE_F_DUPLICATE;
+			return false;
+		}
+	}
+
+	/* Insert `node' into the set. */
+	LIST_INSERT_HEAD(list, node, mbn_nxtuprt);
+	return false;
+}
+
+
+
+
+
 #define file_mbnode_destroy(self) \
 	(decref((self)->mbn_file), mbnode_destroy(self))
 
@@ -289,36 +323,14 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
 /* Functions for populating MBUILDER                                    */
 /************************************************************************/
 
-/* Check if `part' is already referenced by `self' */
-PRIVATE NOBLOCK ATTR_PURE NONNULL((1, 2)) bool
-NOTHROW(FCALL mbuilder_uparts_contains)(struct mbuilder_norpc const *__restrict self,
-                                        struct mpart const *__restrict part) {
-	struct mbnode const *node;
-	struct mbnode_list list;
-	list = *mbnode_partset_listof(&self->mb_uparts, part);
-	LIST_FOREACH (node, &list, mbn_nxtuprt) {
-		if (node->mbn_part == part)
-			return true;
-	}
-	return false;
-}
-
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder_norpc *__restrict self,
-                                      struct mbnode *__restrict node) {
-	struct mbnode_list *list;
-	list = mbnode_partset_listof(&self->mb_uparts, node->mbn_part);
-	LIST_INSERT_HEAD(list, node, mbn_nxtuprt);
-}
-
-
-
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mbuilder_insert_anon_file_node)(struct mbuilder_norpc *__restrict self,
                                               /*inherit(always)*/ struct mbnode *__restrict node) {
-	mbuilder_uparts_insert(self, node);
+	struct mbnode_list *list;
+	list = mbnode_partset_listof(&self->mb_uparts, node->mbn_part);
+	LIST_INSERT_HEAD(list, node, mbn_nxtuprt);
 	SLIST_INSERT(&self->mb_files, node, mbn_nxtfile);
-	mbnode_tree_insert(&self->mb_mappings, node); /* Inherit */
+	mbuilder_mappings_insert(self, node); /* Inherit */
 }
 
 
@@ -451,8 +463,6 @@ er_bad_addr_alignment:
 		/* If this part isn't already being used, insert it into
 		 * the list of unique mem-parts used by our mem-builder. */
 		LIST_ENTRY_UNBOUND_INIT(&iter->mbn_nxtuprt);
-		if (!mbuilder_uparts_contains(self, iter->mbn_part))
-			mbuilder_uparts_insert(self, iter);
 		iter->mbn_flags = mbnodeflags_from_mapflags(flags) |
 		                  mnodeflags_from_prot(prot);
 		iter->mbn_minaddr += (uintptr_t)baseaddr;
@@ -461,7 +471,8 @@ er_bad_addr_alignment:
 		iter->mbn_fsname = xincref(file_fsname);
 
 		/* Insert the node into our builder's mapping-tree */
-		mbnode_tree_insert(&self->mb_mappings, iter);
+		mbuilder_mappings_insert(self, iter);
+		mbuilder_uparts_insert(self, iter);
 
 		next = iter->mbn_filnxt;
 		if (!next)
@@ -621,11 +632,10 @@ er_bad_addr_alignment:
 				/* If this part isn't already being used, insert it into
 				 * the list of unique mem-parts used by our mem-builder. */
 				LIST_ENTRY_UNBOUND_INIT(&iter->mbn_nxtuprt);
-				if (!mbuilder_uparts_contains(self, iter->mbn_part))
-					mbuilder_uparts_insert(self, iter);
+				mbuilder_uparts_insert(self, iter);
 
 				/* Insert the node into our builder's mapping-tree */
-				mbnode_tree_insert(&self->mb_mappings, iter);
+				mbuilder_mappings_insert(self, iter);
 
 				next = iter->mbn_filnxt;
 				if (!next)
@@ -700,7 +710,7 @@ mbuilder_map_res(struct mbuilder_norpc *__restrict self,
 	 * Note that we don't add the part to the files- or uparts lists,
 	 * but  only to the mappings tree, since the node doesn't contain
 	 * a mem-file or mem-part. */
-	mbnode_tree_insert(&self->mb_mappings, fmnode); /* Inherit */
+	mbuilder_mappings_insert(self, fmnode); /* Inherit */
 	return result;
 }
 
@@ -725,7 +735,7 @@ mbuilder_getunmapped(struct mbuilder_norpc *__restrict self, void *addr,
 		byte_t *maxaddr;
 		result  = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
 		maxaddr = (byte_t *)addr + num_bytes - 1;
-		node    = mbnode_tree_rlocate(self->mb_mappings, addr, maxaddr);
+		node    = mbuilder_mappings_rlocate(self, addr, maxaddr);
 		if unlikely(node != NULL) {
 			/* Always behave as through `MAP_FIXED_NOREPLACE' had been given. */
 			void *node_minaddr, *node_maxaddr;
@@ -760,7 +770,7 @@ mbuilder_getunmapped(struct mbuilder_norpc *__restrict self, void *addr,
  *  - LIST_INSERT_HEAD(mbnode_partset_listof(&self->mb_uparts,
  *                                           fmnode->mbn_part),
  *                     fmnode, mbn_nxtuprt);
- *  - mbnode_tree_insert(&self->mb_mappings, fmnode);
+ *  - mbuilder_mappings_insert(self, fmnode);
  * As such, the caller must initialize:
  *  - fmnode->mbn_minaddr  (Mapping min address)
  *  - fmnode->mbn_maxaddr  (Mapping max address)
@@ -780,7 +790,7 @@ NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder_norpc *__restrict self,
 	SLIST_INSERT(&self->mb_files, fmnode, mbn_nxtfile);
 	list = mbnode_partset_listof(&self->mb_uparts, fmnode->mbn_part);
 	LIST_INSERT_HEAD(list, fmnode, mbn_nxtuprt);
-	mbnode_tree_insert(&self->mb_mappings, fmnode);
+	mbuilder_mappings_insert(self, fmnode);
 }
 
 /* Remove `fmnode' from `self'. - Asserts that no secondary nodes have
@@ -793,7 +803,7 @@ NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder_norpc *__restrict self,
 	assert(fmnode->mbn_part != NULL);
 	assert(fmnode->mbn_file != NULL);
 	assert(fmnode->mbn_filnxt == NULL);
-	mbnode_tree_removenode(&self->mb_mappings, fmnode);
+	mbuilder_mappings_removenode(self, fmnode);
 	LIST_REMOVE(fmnode, mbn_nxtuprt);
 	SLIST_REMOVE(&self->mb_files, fmnode, mbn_nxtfile); /* WARNING: O(n) operation! */
 	DBG_memset(&fmnode->mbn_mement, 0xcc, sizeof(fmnode->mbn_mement));

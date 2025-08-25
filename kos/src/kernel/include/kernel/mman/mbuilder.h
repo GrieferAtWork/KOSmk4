@@ -229,6 +229,15 @@ struct mbuilder_norpc {
 	};
 };
 
+/* Check  if  `self->mb_uparts'  already  contains  `node->mbn_part'.
+ * If so, set `MBNODE_F_DUPLICATE' for that existing mapping, as well
+ * as the given `node'.  Else, insert `node' into  `self->mb_uparts'.
+ * @return: true:  Given `node' was inserted into `self->mb_uparts'
+ * @return: false: `node->mbn_part' was already contained (but `MBNODE_F_DUPLICATE' was set) */
+FUNDEF NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder_norpc *__restrict self,
+                                      struct mbnode *__restrict node);
+
 struct pending_rpc;
 #ifndef __pending_rpc_slist_defined
 #define __pending_rpc_slist_defined
@@ -308,7 +317,7 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self);
  *  - LIST_INSERT_HEAD(mbnode_partset_listof(&self->mb_uparts,
  *                                           fmnode->mbn_part),
  *                     fmnode, mbn_nxtuprt);
- *  - mbnode_tree_insert(&self->mb_mappings, fmnode);
+ *  - mbuilder_mappings_insert(self, fmnode);
  * As such, the caller must initialize:
  *  - fmnode->mbn_minaddr  (Mapping min address)
  *  - fmnode->mbn_maxaddr  (Mapping max address)
