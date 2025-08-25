@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_RT32_S
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_RT32_S 1
+#define __ASSEMBLER__ 1
 
 #include <debugger/rt.h>
 
@@ -39,9 +40,13 @@
 	EXTERN(x86_dbg_exitstate_b3);
 
 	/* Encode CFA as `x86_dbg_exitstate' */
-	.cfi_escape DW_CFA_def_cfa_expression, 5
-	.cfi_escape DW_OP_addr, x86_dbg_exitstate_b0, x86_dbg_exitstate_b1, \
-	                        x86_dbg_exitstate_b2, x86_dbg_exitstate_b3
+	.cfi_escape DW_CFA_def_cfa_expression
+	.cfi_escape 5
+	.cfi_escape DW_OP_addr
+	.cfi_escape (x86_dbg_exitstate_b0 + 0)
+	.cfi_escape (x86_dbg_exitstate_b1 + 0)
+	.cfi_escape (x86_dbg_exitstate_b2 + 0)
+	.cfi_escape (x86_dbg_exitstate_b3 + 0)
 	ASM_CFI_OFFSET_RESTORE_FCPUSTATE(0)
 	nop /* For tracebacks. */
 PUBLIC_FUNCTION(dbg_exit)

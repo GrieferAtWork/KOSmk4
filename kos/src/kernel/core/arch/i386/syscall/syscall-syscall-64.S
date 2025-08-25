@@ -66,7 +66,7 @@ PUBLIC_FUNCTION(x86_syscall64_syscall)
 	ret
 1:	push   %rsp
 ]]]*/
-	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS_RSP,155,6
+	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,(this_x86_sysret_iret + OFFSET_IRREGS_RSP),155,6
 	.cfi_escape 47,2,0,119,0
 /*[[[end]]]*/
 
@@ -136,7 +136,7 @@ PUBLIC_FUNCTION(x86_syscall64_syscall_traced)
 	ret
 1:	push   %rsp
 ]]]*/
-	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS_RSP,155,6
+	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,(this_x86_sysret_iret + OFFSET_IRREGS_RSP),155,6
 	.cfi_escape 47,2,0,119,0
 /*[[[end]]]*/
 

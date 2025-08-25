@@ -1520,7 +1520,9 @@ function outputBytesForAssembly(bytes: {int | string...},
 			for (local b: line) b !is int ? b : b.hex(2)), lineSuffix);
 #else
 	for (local line: bytes.segments(bytesPerLine))
-		print outputFile: (linePrefix, "\t.cfi_escape ", ",".join(line), lineSuffix);
+		print outputFile: (linePrefix, "\t.cfi_escape ", ",".join(
+			/* NOTE: The extra parenthesis for custom bytes is needed to work around a GAS bug */
+			for (local b: line) b is int ? b : f"({b})"), lineSuffix);
 #endif
 }
 
