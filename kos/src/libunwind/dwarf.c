@@ -120,9 +120,6 @@ NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(NCX byte_t const **__restrict p_reade
 		if (dw_bases) {
 			result = (byte_t *)dw_bases->ub_tbase;
 			if (!result) {
-				result = (byte_t *)dw_bases->ub_fbase;
-				if (!result)
-					result = (byte_t *)reader;
 				result = calculate_tbase(reader);
 				dw_bases->ub_tbase = result;
 			}
@@ -135,9 +132,6 @@ NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(NCX byte_t const **__restrict p_reade
 		if (dw_bases) {
 			result = (byte_t *)dw_bases->ub_dbase;
 			if (!result) {
-				result = (byte_t *)dw_bases->ub_fbase;
-				if (!result)
-					result = (byte_t *)reader;
 				result = calculate_dbase(reader);
 				dw_bases->ub_dbase = result;
 			}
