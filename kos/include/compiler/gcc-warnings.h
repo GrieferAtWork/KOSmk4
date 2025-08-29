@@ -17,7 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/*!included_by <__stdinc.h>*/
+/* !!! GENERATED FILE -- DO NOT EDIT
+ * Generator: kos/misc/scripts/gcc_builtins/gcc_warnings.dee
+ */
 
 #ifndef __has_GCC_warning
 #define __has_GCC_warning(x) __GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##x)
@@ -46,9 +48,9 @@
 #define __PRIVATE_pragma_GCC_diagnostic_ignored_1(decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl
 #define __PRIVATE_pragma_GCC_diagnostic_push_ignored_1(decl) __pragma_GCC_diagnostic_push __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl
 #define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_1(decl)  __pragma_GCC_diagnostic_pop
-#define __PRIVATE_pragma_GCC_diagnostic_ignored_0(decl)           /* Nothing */
-#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_0(decl)      /* Nothing */
-#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_0(decl)       /* Nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_ignored_0(decl)           /* nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_0(decl)      /* nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_0(decl)       /* nothing */
 #define __PRIVATE_pragma_GCC_diagnostic_ignored_(cond, decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_##cond(decl)
 #define __PRIVATE_pragma_GCC_diagnostic_push_ignored_(cond, decl) __PRIVATE_pragma_GCC_diagnostic_push_ignored_##cond(decl)
 #define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_(cond, decl)  __PRIVATE_pragma_GCC_diagnostic_pop_ignored_##cond(decl)
@@ -487,8 +489,6 @@
 #endif /* __GCC_VERSION_NUM >= 130000 */
 
 #if __GCC_VERSION_NUM >= 130001
-#define __GCC_HAS_WARNING_Wchanges_meaning _xS("-Wchanges-meaning")
-#define __GCC_HAS_WARNING_Wcomplain_wrong_lang _xS("-Wcomplain-wrong-lang")
 #define __GCC_HAS_WARNING_Wdangling_reference _xS("-Wdangling-reference")
 #define __GCC_HAS_WARNING_Wenum_int_mismatch _xS("-Wenum-int-mismatch")
 #define __GCC_HAS_WARNING_Winvalid_constexpr _xS("-Winvalid-constexpr")
@@ -498,4 +498,60 @@
 #define __GCC_HAS_WARNING_Wunicode _xS("-Wunicode")
 #define __GCC_HAS_WARNING_Wxor_used_as_pow _xS("-Wxor-used-as-pow")
 #endif /* __GCC_VERSION_NUM >= 130001 */
+
+#if __GCC_VERSION_NUM >= 140000
+#define __GCC_HAS_WARNING_Wchanges_meaning _xS("-Wchanges-meaning")
+#define __GCC_HAS_WARNING_Wcomplain_wrong_lang _xS("-Wcomplain-wrong-lang")
+#endif /* __GCC_VERSION_NUM >= 140000 */
+
+#if __GCC_VERSION_NUM >= 140001
+#undef __GCC_HAS_WARNING_Wc11_c2x_compat
+#define __GCC_HAS_WARNING_Walloc_size _xS("-Walloc-size")
+#define __GCC_HAS_WARNING_Wc11_c23_compat _xS("-Wc11-c23-compat")
+#define __GCC_HAS_WARNING_Wcalloc_transposed_args _xS("-Wcalloc-transposed-args")
+#define __GCC_HAS_WARNING_Wcompare_distinct_pointer_types _xS("-Wcompare-distinct-pointer-types")
+#define __GCC_HAS_WARNING_Wcxx26_extensions _xS("-Wc++26-extensions")
+#define __GCC_HAS_WARNING_Wdeclaration_missing_parameter_type _xS("-Wdeclaration-missing-parameter-type")
+#define __GCC_HAS_WARNING_Welaborated_enum_base _xS("-Welaborated-enum-base")
+#define __GCC_HAS_WARNING_Wflex_array_member_not_at_end _xS("-Wflex-array-member-not-at-end")
+#define __GCC_HAS_WARNING_Whardened _xS("-Whardened")
+#define __GCC_HAS_WARNING_Wmissing_variable_declarations _xS("-Wmissing-variable-declarations")
+#define __GCC_HAS_WARNING_Wopenmp _xS("-Wopenmp")
+#define __GCC_HAS_WARNING_Wreturn_mismatch _xS("-Wreturn-mismatch")
+#define __GCC_HAS_WARNING_Wsuggest_attribute_returns_nonnull _xS("-Wsuggest-attribute=returns_nonnull")
+#endif /* __GCC_VERSION_NUM >= 140001 */
+
+#if __GCC_VERSION_NUM >= 150000
+#define __GCC_HAS_WARNING_Wcast_user_defined _xS("-Wcast-user-defined")
+#define __GCC_HAS_WARNING_Wcoverage_too_many_conditions _xS("-Wcoverage-too-many-conditions")
+#define __GCC_HAS_WARNING_Wglobal_module _xS("-Wglobal-module")
+#define __GCC_HAS_WARNING_Wtemplate_id_cdtor _xS("-Wtemplate-id-cdtor")
+#endif /* __GCC_VERSION_NUM >= 150000 */
+
+#if __GCC_VERSION_NUM >= 160000
+#define __GCC_HAS_WARNING_Wabbreviated_auto_in_template_arg _xS("-Wabbreviated-auto-in-template-arg")
+#define __GCC_HAS_WARNING_Wauto_profile _xS("-Wauto-profile")
+#define __GCC_HAS_WARNING_Wc23_c2y_compat _xS("-Wc23-c2y-compat")
+#define __GCC_HAS_WARNING_Wcoverage_too_many_paths _xS("-Wcoverage-too-many-paths")
+#define __GCC_HAS_WARNING_Wcxx26_compat _xS("-Wc++26-compat")
+#define __GCC_HAS_WARNING_Wdefaulted_function_deleted _xS("-Wdefaulted-function-deleted")
+#define __GCC_HAS_WARNING_Wdeprecated_literal_operator _xS("-Wdeprecated-literal-operator")
+#define __GCC_HAS_WARNING_Wdeprecated_non_prototype _xS("-Wdeprecated-non-prototype")
+#define __GCC_HAS_WARNING_Wdeprecated_variadic_comma_omission _xS("-Wdeprecated-variadic-comma-omission")
+#define __GCC_HAS_WARNING_Wfree_labels _xS("-Wfree-labels")
+#define __GCC_HAS_WARNING_Wheader_guard _xS("-Wheader-guard")
+#define __GCC_HAS_WARNING_Wkeyword_macro _xS("-Wkeyword-macro")
+#define __GCC_HAS_WARNING_Wleading_whitespace _xX("-Wleading-whitespace=")
+#define __GCC_HAS_WARNING_Wmaybe_musttail_local_addr _xS("-Wmaybe-musttail-local-addr")
+#define __GCC_HAS_WARNING_Wmissing_parameter_name _xS("-Wmissing-parameter-name")
+#define __GCC_HAS_WARNING_Wmusttail_local_addr _xS("-Wmusttail-local-addr")
+#define __GCC_HAS_WARNING_Wnon_c_typedef_for_linkage _xS("-Wnon-c-typedef-for-linkage")
+#define __GCC_HAS_WARNING_Wnrvo _xS("-Wnrvo")
+#define __GCC_HAS_WARNING_Wpragma_once_outside_header _xS("-Wpragma-once-outside-header")
+#define __GCC_HAS_WARNING_Wsfinae_incomplete _xS("-Wsfinae-incomplete")
+#define __GCC_HAS_WARNING_Wtemplate_body _xS("-Wtemplate-body")
+#define __GCC_HAS_WARNING_Wtemplate_names_tu_local _xS("-Wtemplate-names-tu-local")
+#define __GCC_HAS_WARNING_Wtrailing_whitespace _xS("-Wtrailing-whitespace")
+#define __GCC_HAS_WARNING_Wunterminated_string_initialization _xS("-Wunterminated-string-initialization")
+#endif /* __GCC_VERSION_NUM >= 160000 */
 #endif /* !__has_GCC_warning */

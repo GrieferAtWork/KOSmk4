@@ -182,6 +182,10 @@ function loadVersionFeatures(commit: (string, (int,int,int))) {
 
 /* NOTE: Generate this list using `git log --follow -- gcc/BASE-VER' */
 local gccReleaseCommits: {(string, (int,int,int))...} = {
+	("7eac294e087165e2f2bceee4d8ea11c70667cb7b", (16, 0, 0)),
+	("48a320a175780a0714741c71b4299a634807ad4b", (15, 0, 0)),
+	("2b811d9feff6d6a77f0f5668873410c44e4579e7", (14, 0, 1)),
+	("48f0f297774bbc38ae8cb8bf12212e124fe479ad", (14, 0, 0)),
 	("2f81164255bf0d7605cd0651ede0063d10ec72c1", (13, 0, 1)),
 	("091e10203846812c4e98b465ddfb36d12f146be8", (13, 0, 0)),
 	("4152e4ad3f3a67ce30f5e0e01d5eba03fcff10b8", (12, 0, 1)),
@@ -278,7 +282,11 @@ function printFeatureSetDiff(out: File, hasWarningKey: Callable, old: GCCFeature
 
 function generateAllVersionsFeatureHistory(out: File): {GCCWarning...} {
 	local result = Dict();
-	out << COPYRIGHT << "\n\n";
+	out << COPYRIGHT << "\n"
+		"/*!included_by <__stdinc.h>*/"
+		"/* !!! GENERATED FILE -- DO NOT EDIT\n"
+		" * Generator: kos/misc/scripts/gcc_builtins/gcc_warnings.dee\n"
+		" */\n\n";
 	out << "#ifndef __has_GCC_warning\n";
 	out << "#define __has_GCC_warning(x) __GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##x)\n";
 	out << "#define __GCC_PRIVATE_W_ARG_PLACEHOLDER__xS(x) ,\n";
@@ -306,9 +314,9 @@ function generateAllVersionsFeatureHistory(out: File): {GCCWarning...} {
 	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_1(decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl\n";
 	out << "#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_1(decl) __pragma_GCC_diagnostic_push __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl\n";
 	out << "#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_1(decl)  __pragma_GCC_diagnostic_pop\n";
-	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_0(decl)           /* nothing */\n";
-	out << "#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_0(decl)      /* nothing */\n";
-	out << "#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_0(decl)       /* nothing */\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_0(decl)           /* Nothing */\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_0(decl)      /* Nothing */\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_0(decl)       /* Nothing */\n";
 	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_(cond, decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_##cond(decl)\n";
 	out << "#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_(cond, decl) __PRIVATE_pragma_GCC_diagnostic_push_ignored_##cond(decl)\n";
 	out << "#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_(cond, decl)  __PRIVATE_pragma_GCC_diagnostic_pop_ignored_##cond(decl)\n";

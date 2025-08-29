@@ -24,7 +24,7 @@ import * from deemon;
 import * from errors;
 
 global final ROOT = fs.headof(__FILE__);
-global final GCC = "E:\\home\\src\\git-gcc\\gcc";
+global final GCC = "E:\\home\\src\\gcc-git\\gcc";
 
 
 class GCCBuiltin {
@@ -74,7 +74,7 @@ function getGCCVersion(): string | none {
 }
 
 function unescapeName(name: string): string {
-	return name.replace("\" \"","").decode("c-escape");
+	return name.replace("\" \"", "").decode("c-escape");
 }
 
 function replaceAll(s: string, f: string, r: string): string {
@@ -140,7 +140,7 @@ function getGCCBuiltins(version: (int,int,int)): {string...} {
 	proc.stdout = w;
 	proc.start();
 	w.close();
-	local data = r.read();
+	local data = r.readall();
 	r.close();
 	local error = proc.join();
 	//if (error != 0)
@@ -162,7 +162,7 @@ function getGCCBuiltins(version: (int,int,int)): {string...} {
 			break;
 		local content = data[i:content_end];
 		local parts = List(content.split(","));
-		if (#parts == 11) {
+		if (#parts in [11, 12]) {
 			/* ENUM, NAME, CLASS, TYPE, LIBTYPE, BOTH_P, FALLBACK_P, NONANSI_P, ATTRS, IMPLICIT, COND */
 			local name = parts[1].strip();
 			if (!name.startswith("\""))
@@ -170,6 +170,8 @@ function getGCCBuiltins(version: (int,int,int)): {string...} {
 			local usesLibc = removeSurroundingParens(parts[6].strip());
 			local usesLibc = usesLibc !in ["false", "0"];
 			name = unescapeName(name);
+			if (!name.issymbol())
+				continue;
 			local c = parts[10].strip().replace("\t"," ");
 			c = replaceAll(c,"  ", " ");
 			c = removeSurroundingParens(c);
@@ -184,6 +186,8 @@ function getGCCBuiltins(version: (int,int,int)): {string...} {
 			local usesLibc = removeSurroundingParens(parts[6].strip());
 			local usesLibc = usesLibc !in ["false", "0"];
 			name = unescapeName(name);
+			if (!name.issymbol())
+				continue;
 			yield GCCBuiltin(name: name, cond: "?true", usesLibc: usesLibc);
 		} else if (#parts == 1) {
 			/* DEF_BUILTIN(BUILT_IN_ALLOCA) */
@@ -321,33 +325,45 @@ function loadVersionFeatures(commit: (string, (int,int,int))) {
 
 /* NOTE: Generate this list using `git log --follow -- gcc/BASE-VER' */
 local gccReleaseCommits: {(string, (int,int,int))...} = {
-	("70f448fa5347ba24e0916201dd8549bc16783ff0", (10, 0, 0)),
-	("feb90a0dd6fc4e12786dce8338f716253d50b545", (9, 0, 1)),
-	("949bc65ce4d0d7dd036ccfb279bffe63d02feee6", (9, 0, 0)),
-	("bd3a898090e445d324faf7390adc7fc0af10c17d", (8, 0, 1)),
-	("498621e8159c1f494a9b8a5f2c3e5225c74ed242", (8, 0, 0)),
-	("9f7481c9b5313a6e15a1b7e8a9c1410328e60076", (7, 0, 1)),
-	("72709ee77118abb12560a4aa7aecffd1b1262fe4", (7, 0, 0)),
-	("2d444913351f6386df286eef76e5b67e56fecf74", (6, 0, 0)),
-	("21f0203c9247d32365d3b87142629712f109262a", (5, 0, 0)),
-	("0be1362fd7481bfed545c517e4d889c3a32566f9", (4, 10, 0)),
-	("67f9d82180a9c46600a51dea0bfbefcc4602d692", (4, 9, 0)),
-	("f5c0f43306fffaa52aaed2805f819faf57baedcb", (4, 8, 0)),
-	("caec3e6702a2de35f632d0f1bd39af02182df0f2", (4, 7, 0)),
-	("2fb69c7ac1a474c30db3d9e3a3806cb623179203", (4, 6, 0)),
-	("08da3d21a203aaf9698c982fc8fc25f9788d9049", (4, 5, 0)),
-	("8d705311c5c80046444afea85585cb94d307aecd", (4, 4, 0)),
-	("782f6c8b1609769f2f94a74e5409bc91993c1cda", (4, 3, 0)),
-	("bb23e61120082b6643da44eb85ee331060bf8e42", (4, 2, 0)),
-	("1af67e62c0a70161eebc3d792f1e65896c4a797f", (4, 1, 0)),
-	("30ff3273d55e9196702f4ee56f1a4f0fcdf1774a", (4, 0, 0)),
-	("2c8653eda811864b1a79d5ddf74c0c5c7f078427", (3, 5, 0)),
-//	("7969252bc0fb9cb928a1703d6d186995a73c96eb", (3, 4, 0)), /* Changed 3.4 -> 3.4.0 */
-	("805e22b2051e9c6a75377ea6599654d7415da483", (3, 4, 0)),
-	("74dd0d01c435c6d2c926aee0857b71b4c98a9693", (3, 3, 0)),
-	("f2a612f63be5c9acb3bbd0ff95a916fc3e530cf6", (3, 2, 0)),
-	("314c3585f2350529ae969c3f4edd9ef006c713a0", (3, 1, 0)),
-	("cf873f20399b64bfa0ea8c15d8d3104f7a72827f", (2, 97, 0)),
+	("7eac294e087165e2f2bceee4d8ea11c70667cb7b", (16, 0, 0)),
+	("48a320a175780a0714741c71b4299a634807ad4b", (15, 0, 0)),
+	("2b811d9feff6d6a77f0f5668873410c44e4579e7", (14, 0, 1)),
+	("48f0f297774bbc38ae8cb8bf12212e124fe479ad", (14, 0, 0)),
+	("2f81164255bf0d7605cd0651ede0063d10ec72c1", (13, 0, 1)),
+	("091e10203846812c4e98b465ddfb36d12f146be8", (13, 0, 0)),
+	("4152e4ad3f3a67ce30f5e0e01d5eba03fcff10b8", (12, 0, 1)),
+	("0cc79337ad265aabccab63882a810f9dc509a9d0", (12, 0, 0)),
+	("a21b99e8cebc990f7b62ed1ebadb582082e922b6", (11, 0, 1)),
+	("46eed414a332f7684a9d8f07c0f7e94b8cc2659e", (11, 0, 0)),
+	("a52d93219c63d38fa9a97d0eb727e7fcc935e9b3", (10, 0, 1)),
+	("68ec60c4a377b532ec2d265ea542107c36b1d15c", (10, 0, 0)),
+	("561fd08128381a5b37569b465f55cb4cac1f3b14", (9, 0, 1)),
+	("3bedd3463137d0712b72d582836a0b14c74ef620", (9, 0, 0)),
+	("a55e8b53d059fbe33c5f016d8d9aca9731322ab7", (8, 0, 1)),
+	("aa90195aedfa348284c6e4e8ce59dc1b734f1d71", (8, 0, 0)),
+	("d40036b846df9d07f679d593c55f0090f513bb24", (7, 0, 1)),
+	("70f4fdeb67fe065041a52304bb20f6ce701b1cf7", (7, 0, 0)),
+	("1a46d358050cf6964df0d8ceaffafd0cc88539b2", (6, 0, 0)),
+	("2813008eeb7057da284ed901d4c6817880da0eff", (5, 0, 0)),
+	("89eb97de15f1618bd63b6138e8a5536b935861e8", (4, 10, 0)),
+	("8a298c045dedfe40f8bc4348a772047a53c84772", (4, 9, 0)),
+	("45c29d4d5720ce566398ec4949553b9a66f7c11b", (4, 8, 0)),
+	("6bd73dd88994055cdddca4225a5305f7a9282df9", (4, 7, 0)),
+	("d3bccded30236d16e477a7bbd79aff51724234b0", (4, 6, 0)),
+	("e54d52a8fb13d13b5ec27ef02617f053267d13b9", (4, 5, 0)),
+	("8d855c3de1619284343036a4ee9fe2600c1fafe2", (4, 4, 0)),
+	("20a0da35970e790ebbcedc244f24fb0361df11c6", (4, 3, 0)),
+	("040a473fc7b07f01a30d9dff9a5735fde8d41c5e", (4, 2, 0)),
+	("a1286ef574be4a388b14de74a406dc60391a8b91", (4, 1, 0)),
+	("89029cd4d9fdd2482c20a98ea9544a633c185e99", (4, 0, 0)),
+	("79a76d653a725b128f216aaf5972c02609d58b95", (3, 5, 0)),
+//	("56d3513643efd59267a4bd6825d0a3fe466b680d", (3, 4, 0)), /* Changed 3.4 -> 3.4.0 */
+	("4977bab6ed59f01c73f9c8b9e92298706df9b6d5", (3, 4, 0)), /* Actually "3.4" (not "3.4.0") */
+	("5922c46ce94c43b5ccedf256e27040cfa565054f", (3, 3, 0)),
+	("3664fcf9b79961ebee4b328562e71cd97c44cbc0", (3, 2, 0)),
+	("7539316943c17368ce5ef876a9baba6b8c2e64f6", (3, 1, 0)),
+	("0c6129af811f88b0ebabc443a29fb88ea44b52aa", (2, 97, 0)),
+
 	/* builtins.def didn't exist in earlier versions...
 	 * Also: The absurdly small # of builtins at this point leads me
 	 *       to believe that  this point truly  is the inception  of
@@ -601,7 +617,11 @@ set_new_condition:
 
 function generateAllVersionsFeatureHistory(out: File): {GCCBuiltin...} {
 	local result = Dict();
-	out << COPYRIGHT << "\n\n";
+	out << COPYRIGHT << "\n"
+		"/*!included_by <__stdinc.h>*/"
+		"/* !!! GENERATED FILE -- DO NOT EDIT\n"
+		" * Generator: kos/misc/scripts/gcc_builtins/gcc_builtins.dee\n"
+		" */\n\n";
 	out << "#ifndef __has_builtin\n";
 	out << "#define __has_builtin(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_BUILTIN_##x)\n";
 	out << "#ifndef __GCC_PRIVATE_IS_DEFINED\n";
