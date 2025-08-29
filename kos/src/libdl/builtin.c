@@ -3005,11 +3005,12 @@ libdl_dlauxctrl(NCX DlModule *self, unsigned int cmd, ...)
 		/* Search for the lowest program header with the correct flags. */
 		for (result = (void *)-1, i = 0; i < self->dm_elf.de_phnum; ++i) {
 			uintptr_t hdraddr;
-			if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
+			ElfW(Phdr) const *phdr = &self->dm_elf.de_phdr[i];
+			if (phdr->p_type != PT_LOAD)
 				continue;
-			if ((self->dm_elf.de_phdr[i].p_flags & (PF_R | PF_W | PF_X)) != rwx)
+			if ((phdr->p_flags & (PF_R | PF_W | PF_X)) != rwx)
 				continue;
-			hdraddr = self->dm_loadaddr + self->dm_elf.de_phdr[i].p_vaddr;
+			hdraddr = self->dm_loadaddr + phdr->p_vaddr;
 			if ((uintptr_t)result > hdraddr)
 				result = (void *)hdraddr;
 		}
