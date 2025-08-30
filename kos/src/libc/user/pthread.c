@@ -3781,6 +3781,91 @@ again:
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_mutex_reltimedlock64_np]]]*/
 
+/*[[[head:libc_pthread_mutex_clocklock,hash:CRC-32=0xb8d0349]]]*/
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_mutex_clocklock)(pthread_mutex_t *__restrict self,
+                                                   clockid_t clock_id,
+                                                   struct timespec const *__restrict abstime)
+/*[[[body:libc_pthread_mutex_clocklock]]]*/
+{
+	uint32_t lock;
+	errno_t result;
+	syscall_ulong_t futex_op;
+	if (clock_id == CLOCK_REALTIME) {
+		futex_op = FUTEX_WAIT_BITSET | FUTEX_CLOCK_REALTIME;
+	} else if (clock_id == CLOCK_MONOTONIC) {
+		futex_op = FUTEX_WAIT_BITSET;
+	} else {
+		return EINVAL;
+	}
+again:
+	result = mutex_trylock_waiters(self, &lock);
+	if (result != EBUSY)
+		return result;
+	/* Wait until the mutex is unlocked.
+	 * NOTE: Need to use `FUTEX_WAIT_BITSET', since only that one  takes
+	 *       an absolute timeout, rather than the relative timeout taken
+	 *       by the regular `FUTEX_WAIT' */
+	result = (errno_t)sys_futex((uint32_t *)&self->m_lock,
+	                            futex_op, lock, abstime,
+	                            NULL, FUTEX_BITSET_MATCH_ANY);
+	/* Check for timeout. */
+	if (result == -ETIMEDOUT || result == -EINVAL)
+		return -result;
+	goto again;
+}
+/*[[[end:libc_pthread_mutex_clocklock]]]*/
+
+/*[[[head:libc_pthread_mutex_clocklock64,hash:CRC-32=0xa3966ac]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_mutex_clocklock64, libc_pthread_mutex_clocklock);
+#else /* MAGIC:alias */
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_mutex_clocklock64)(pthread_mutex_t *__restrict self,
+                                                     clockid_t clock_id,
+                                                     struct timespec64 const *__restrict abstime)
+/*[[[body:libc_pthread_mutex_clocklock64]]]*/
+{
+	uint32_t lock;
+	errno_t result;
+	syscall_ulong_t lfutex_op_flags;
+	if (clock_id == CLOCK_REALTIME) {
+		lfutex_op_flags = LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
+	} else if (clock_id == CLOCK_MONOTONIC) {
+		lfutex_op_flags = 0;
+	} else {
+		return EINVAL;
+	}
+again:
+	result = mutex_trylock_waiters(self, &lock);
+	if (result != EBUSY)
+		return result;
+	/* Wait until the mutex is unlocked. */
+	result = (errno_t)sys_lfutex32_waitwhile64((uint32_t *)&self->m_lock,
+	                                           lock, abstime,
+	                                           lfutex_op_flags);
+	/* Check for timeout. */
+	if (result == -ETIMEDOUT || result == -EINVAL)
+		return -result;
+	goto again;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_pthread_mutex_clocklock64]]]*/
+
 /*[[[head:libc_pthread_mutex_unlock,hash:CRC-32=0x5caeb000]]]*/
 /* >> pthread_mutex_unlock(3)
  * Unlock the given mutex `self'
@@ -5714,7 +5799,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xaacccc38]]]*/
+/*[[[start:exports,hash:CRC-32=0xcd32a750]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -5813,6 +5898,11 @@ DEFINE_PUBLIC_ALIAS_P(pthread_mutex_timedlock64,libc_pthread_mutex_timedlock64,W
 DEFINE_PUBLIC_ALIAS_P(pthread_mutex_reltimedlock_np,libc_pthread_mutex_reltimedlock_np,WUNUSED ATTR_IN(2) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_mutex_t *__restrict self, struct timespec const *__restrict reltime),(self,reltime));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS_P(pthread_mutex_reltimedlock64_np,libc_pthread_mutex_reltimedlock64_np,WUNUSED ATTR_IN(2) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_mutex_t *__restrict self, struct timespec64 const *__restrict reltime),(self,reltime));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS_P(pthread_mutex_clocklock,libc_pthread_mutex_clocklock,WUNUSED ATTR_IN(3) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_mutex_t *__restrict self, clockid_t clock_id, struct timespec const *__restrict abstime),(self,clock_id,abstime));
+DEFINE_PUBLIC_ALIAS_P(__pthread_mutex_clocklock64,libc_pthread_mutex_clocklock64,WUNUSED ATTR_IN(3) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_mutex_t *__restrict self, clockid_t clock_id, struct timespec64 const *__restrict abstime),(self,clock_id,abstime));
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(pthread_mutex_clocklock64,libc_pthread_mutex_clocklock64,WUNUSED ATTR_IN(3) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_mutex_t *__restrict self, clockid_t clock_id, struct timespec64 const *__restrict abstime),(self,clock_id,abstime));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS_P(__pthread_mutex_unlock,libc_pthread_mutex_unlock,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_mutex_t *self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_mutex_unlock,libc_pthread_mutex_unlock,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_mutex_t *self),(self));

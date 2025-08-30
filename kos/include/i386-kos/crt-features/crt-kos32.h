@@ -1323,6 +1323,7 @@
 #define __CRT_HAVE___pthread_cond_timedwait64
 #define __CRT_HAVE___pthread_getspecific
 #define __CRT_HAVE___pthread_key_create
+#define __CRT_HAVE___pthread_mutex_clocklock64
 #define __CRT_HAVE___pthread_mutex_destroy
 #define __CRT_HAVE___pthread_mutex_init
 #define __CRT_HAVE___pthread_mutex_lock
@@ -4717,6 +4718,8 @@
 #define __CRT_HAVE_pthread_main_np
 #define __CRT_HAVE_pthread_mainthread_np
 #define __CRT_HAVE_pthread_multi_np
+#define __CRT_HAVE_pthread_mutex_clocklock
+#define __CRT_HAVE_pthread_mutex_clocklock64
 #define __CRT_HAVE_pthread_mutex_consistent
 #define __CRT_HAVE_pthread_mutex_consistent_np
 #define __CRT_HAVE_pthread_mutex_destroy

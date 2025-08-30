@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d401e72 */
+/* HASH CRC-32:0xc2ab84cf */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1877,6 +1877,8 @@ DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_timedlock, libc_pthread_m
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_timedlock64, libc_pthread_mutex_timedlock64, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_reltimedlock_np, libc_pthread_mutex_reltimedlock_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_reltimedlock64_np, libc_pthread_mutex_reltimedlock64_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_clocklock, libc_pthread_mutex_clocklock, TIn(__SIZEOF_ERRNO_T__), 3, TP, TIn(__SIZEOF_CLOCKID_T__), TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_clocklock64, libc_pthread_mutex_clocklock64, TIn(__SIZEOF_ERRNO_T__), 3, TP, TIn(__SIZEOF_CLOCKID_T__), TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_unlock, libc_pthread_mutex_unlock, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_getprioceiling, libc_pthread_mutex_getprioceiling, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_setprioceiling, libc_pthread_mutex_setprioceiling, TIn(__SIZEOF_ERRNO_T__), 3, TP, TD, TP)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbdb2c8c */
+/* HASH CRC-32:0x882ecbfa */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1806,6 +1806,11 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_timedlock64, libd_pthread_mutex_timedlock6
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_reltimedlock_np, libd_pthread_mutex_reltimedlock_np);
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_reltimedlock64_np, libd_pthread_mutex_reltimedlock64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_clocklock, libd_pthread_mutex_clocklock);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutex_clocklock64, libd_pthread_mutex_clocklock64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_clocklock64, libd_pthread_mutex_clocklock64);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutex_unlock, libd_pthread_mutex_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_unlock, libd_pthread_mutex_unlock);

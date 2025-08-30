@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6b5af94 */
+/* HASH CRC-32:0x8c77b5e6 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -388,6 +388,22 @@ INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_pthrea
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
 INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_mutex_reltimedlock64_np)(pthread_mutex_t *__restrict self, struct timespec64 const *__restrict reltime);
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_mutex_clocklock)(pthread_mutex_t *__restrict self, clockid_t clock_id, struct timespec const *__restrict abstime);
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_mutex_clocklock64)(pthread_mutex_t *__restrict self, clockid_t clock_id, struct timespec64 const *__restrict abstime);
 /* >> pthread_mutex_unlock(3)
  * Unlock the given mutex `self'
  * @return: EOK: Success */

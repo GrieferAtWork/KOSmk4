@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe83b08bb */
+/* HASH CRC-32:0xe4d54e37 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1803,6 +1803,86 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock64_np, __FORCELOCAL __
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
+#ifdef __USE_GNU
+#if defined(__CRT_HAVE_pthread_mutex_clocklock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_clocklock,(pthread_mutex_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime),(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_mutex_clocklock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_clocklock,(pthread_mutex_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime),pthread_mutex_clocklock64,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE___pthread_mutex_clocklock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_clocklock,(pthread_mutex_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime),__pthread_mutex_clocklock64,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_mutex_clocklock64) || defined(__CRT_HAVE___pthread_mutex_clocklock64) || defined(__CRT_HAVE_pthread_mutex_clocklock)
+#include <libc/local/pthread/pthread_mutex_clocklock.h>
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_clocklock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_clocklock)(pthread_mutex_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_clocklock))(__self, __clock_id, __abstime); })
+#endif /* ... */
+#ifdef __USE_TIME64
+#if defined(__CRT_HAVE_pthread_mutex_clocklock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_clocklock64,(pthread_mutex_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime),pthread_mutex_clocklock,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_mutex_clocklock64)
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_clocklock64,(pthread_mutex_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime),(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE___pthread_mutex_clocklock64)
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_clocklock64,(pthread_mutex_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime),__pthread_mutex_clocklock64,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_mutex_clocklock)
+#include <libc/local/pthread/pthread_mutex_clocklock64.h>
+/* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
+ * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_clocklock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_clocklock64)(pthread_mutex_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_clocklock64))(__self, __clock_id, __abstime); })
+#endif /* ... */
+#endif /* __USE_TIME64 */
+#endif /* __USE_GNU */
 #ifdef __CRT_HAVE_pthread_mutex_unlock
 /* >> pthread_mutex_unlock(3)
  * Unlock the given mutex `self'
