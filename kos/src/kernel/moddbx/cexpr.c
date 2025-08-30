@@ -2410,7 +2410,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_deref)(void) {
 	top = &cexpr_stacktop;
 
 	/* Make sure that `top' has pointer typing.
-	 * Note  that we need  to check for arrays  here, since those will
+	 * Note that we don't need to check for arrays here, as they  will
 	 * have already been promoted to base-pointers by `cexpr_rvalue()' */
 	typ = top->cv_type.ct_typ;
 	if unlikely(!CTYPE_KIND_ISPOINTER(typ->ct_kind))

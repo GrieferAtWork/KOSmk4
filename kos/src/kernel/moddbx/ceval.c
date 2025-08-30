@@ -621,9 +621,9 @@ NOTHROW_CB_NCX(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict se
 }
 
 struct autocomplete_register_name_data {
-	struct cparser     *self;
-	NCX char const *startswith_str;
-	size_t              startswith_len;
+	struct cparser *arn_self;
+	NCX char const *arn_startswith_str;
+	size_t          arn_startswith_len;
 };
 
 PRIVATE NONNULL((1)) ssize_t
@@ -634,11 +634,11 @@ NOTHROW_CB_NCX(LIBCPUSTATE_CC autocomplete_register_name_cb)(void *cookie,
 	data = (struct autocomplete_register_name_data *)cookie;
 
 	/* Check if the given startswith prefix applies to this register name */
-	if (namelen >= data->startswith_len &&
-	    memcasecmp(name, data->startswith_str, data->startswith_len) == 0) {
-		cparser_autocomplete(data->self,
-		                     name + data->startswith_len,
-		                     namelen - data->startswith_len);
+	if (namelen >= data->arn_startswith_len &&
+	    memcasecmp(name, data->arn_startswith_str, data->arn_startswith_len) == 0) {
+		cparser_autocomplete(data->arn_self,
+		                     name + data->arn_startswith_len,
+		                     namelen - data->arn_startswith_len);
 	}
 	return 0;
 }
@@ -649,9 +649,9 @@ NOTHROW_CB_NCX(FCALL autocomplete_register_name)(struct cparser *__restrict self
                                                  size_t namelen) {
 	/* auto-complete register names that start with the given `name...+=namelen' */
 	struct autocomplete_register_name_data data;
-	data.self           = self;
-	data.startswith_str = name;
-	data.startswith_len = namelen;
+	data.arn_self           = self;
+	data.arn_startswith_str = name;
+	data.arn_startswith_len = namelen;
 	register_listnames(&autocomplete_register_name_cb, &data);
 }
 
@@ -1171,9 +1171,9 @@ err_nomem:
 
 
 struct autocomplete_struct_data {
-	struct cparser     *self;
-	NCX char const *name;
-	size_t              namelen;
+	struct cparser *ac_self;
+	NCX char const *ac_name;
+	size_t          ac_namelen;
 };
 
 PRIVATE NONNULL((2, 3, 4, 5)) ssize_t
@@ -1186,14 +1186,14 @@ NOTHROW_CB_NCX(KCALL autocomplete_struct_fields_callback)(void *arg,
 	size_t member_namelen;
 	cookie         = (struct autocomplete_struct_data *)arg;
 	member_namelen = strlen(member->m_name);
-	if (member_namelen <= cookie->namelen)
+	if (member_namelen <= cookie->ac_namelen)
 		return 0;
-	if (bcmp(member->m_name, cookie->name,
-	         cookie->namelen, sizeof(char)) != 0)
+	if (bcmp(member->m_name, cookie->ac_name,
+	         cookie->ac_namelen, sizeof(char)) != 0)
 		return 0;
-	cparser_autocomplete(cookie->self,
-	                     member->m_name + cookie->namelen,
-	                     member_namelen - cookie->namelen);
+	cparser_autocomplete(cookie->ac_self,
+	                     member->m_name + cookie->ac_namelen,
+	                     member_namelen - cookie->ac_namelen);
 	return 0;
 }
 
@@ -1208,9 +1208,9 @@ NOTHROW_CB_NCX(KCALL autocomplete_struct_fields)(struct cparser *__restrict self
 	ct = cexpr_stacktop.cv_type.ct_typ;
 	if unlikely(!CTYPE_KIND_ISSTRUCT(ct->ct_kind))
 		return DBX_ESYNTAX;
-	data.self    = self;
-	data.name    = name;
-	data.namelen = namelen;
+	data.ac_self    = self;
+	data.ac_name    = name;
+	data.ac_namelen = namelen;
 	ctype_struct_enumfields(ct, &autocomplete_struct_fields_callback, &data);
 	return DBX_ENOENT;
 }

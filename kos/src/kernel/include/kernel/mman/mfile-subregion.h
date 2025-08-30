@@ -51,7 +51,7 @@ DATDEF struct mfile_ops const mfile_subregion_ops;
  *         Given file `self' does not support "raw" I/O, and also isn't another sub-region mfile.
  *         >> !mfile_has_rawio(self) && self->mf_ops != &mfile_subregion_ops
  * @throw: E_ILLEGAL_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE:
- *         Given file `maxaddr' is greater than the or equal to current size of `self' */
+ *         Given  `maxaddr' is greater than the or  equal to current size of `self' */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfile *KCALL
 mfile_subregion(struct mfile *__restrict self,
                 PAGEDIR_PAGEALIGNED pos_t minaddr, pos_t maxaddr)
