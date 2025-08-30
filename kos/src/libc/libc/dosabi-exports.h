@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x882ecbfa */
+/* HASH CRC-32:0xc93a9024 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1724,9 +1724,12 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_getresult_np, libd_pthread_getresult_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_peekjoin_np, libd_pthread_tryjoin_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_tryjoin_np, libd_pthread_tryjoin_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_timedjoin_np, libd_pthread_timedjoin_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_clockjoin_np, libd_pthread_clockjoin_np);
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$__pthread_timedjoin_np64, libd_pthread_timedjoin64_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_timedjoin64_np, libd_pthread_timedjoin64_np);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_clockjoin_np64, libd_pthread_clockjoin64_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_clockjoin64_np, libd_pthread_clockjoin64_np);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$cthread_detach, libd_pthread_detach);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_detach, libd_pthread_detach);

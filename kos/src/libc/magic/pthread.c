@@ -713,6 +713,11 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
+struct timespec;
+#ifdef __USE_TIME64
+struct timespec64;
+#endif /* __USE_TIME64 */
+
 }
 
 @@>> pthread_create(3)
@@ -764,7 +769,6 @@ $errno_t pthread_getresult_np(pthread_t self, [[out_opt]] void **thread_return);
 [[export_alias("pthread_peekjoin_np")]] /* BSD-specific name */
 $errno_t pthread_tryjoin_np(pthread_t self, [[out_opt]] void **thread_return);
 
-%struct timespec;
 @@>> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
 @@Make calling thread  wait for termination  of the thread  `self',
 @@but only until `timeout'. The exit status of the thread is stored
@@ -797,6 +801,38 @@ $errno_t pthread_timedjoin_np(pthread_t self,
 @@pp_endif@@
 }
 
+@@>> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+@@Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+@@whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+@@@return: EOK:       Success
+@@@return: EINVAL:    The given `abstime' is invalid
+@@@return: EINVAL:    Invalid/unsupported `clock_id'
+@@@return: ETIMEDOUT: The given `abstime' has expired
+[[guard, cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_clockjoin_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_clockjoin64_np", "__pthread_clockjoin_np64")]]
+[[userimpl, requires($has_function(crt_pthread_clockjoin32_np) ||
+                     $has_function(pthread_clockjoin64_np))]]
+$errno_t pthread_clockjoin_np(pthread_t self,
+                              [[out_opt]] void **thread_return, $clockid_t clock_id,
+                              [[in_opt]] struct timespec const *abstime) {
+@@pp_if $has_function(crt_pthread_clockjoin32_np)@@
+	struct timespec32 abstime32;
+	if (!abstime)
+		return crt_pthread_clockjoin32_np(self, thread_return, clock_id, NULL);
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	return crt_pthread_clockjoin32_np(self, thread_return, clock_id, &abstime32);
+@@pp_else@@
+	struct timespec64 abstime64;
+	if (!abstime)
+		return pthread_clockjoin64_np(self, thread_return, clock_id, NULL);
+	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
+	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	return pthread_clockjoin64_np(self, thread_return, clock_id, &abstime32);
+@@pp_endif@@
+}
+
 %#ifdef __USE_TIME64
 [[cp, ignore, doc_alias("pthread_timedjoin_np"), nocrt, alias("pthread_timedjoin_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
@@ -817,6 +853,26 @@ $errno_t pthread_timedjoin64_np(pthread_t self, [[out_opt]] void **thread_return
 	return crt_pthread_timedjoin32_np(self, thread_return, &abstime32);
 }
 
+[[cp, ignore, doc_alias("pthread_clockjoin_np"), nocrt, alias("pthread_clockjoin_np")]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
+$errno_t crt_pthread_clockjoin32_np(pthread_t self,
+                                    [[out_opt]] void **thread_return, $clockid_t clock_id,
+                                    [[in_opt]] struct timespec32 const *abstime);
+
+[[cp, preferred_time64_variant_of(pthread_clockjoin_np), doc_alias("pthread_clockjoin_np")]]
+[[guard, time64_export_alias("__pthread_clockjoin_np64")]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
+[[userimpl, requires_function(crt_pthread_clockjoin32_np)]]
+$errno_t pthread_clockjoin64_np(pthread_t self,
+                                [[out_opt]] void **thread_return, $clockid_t clock_id,
+                                [[in_opt]] struct timespec64 const *abstime) {
+	struct timespec32 abstime32;
+	if (!abstime)
+		return crt_pthread_clockjoin32_np(self, thread_return, clock_id, NULL);
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	return crt_pthread_clockjoin32_np(self, thread_return, clock_id, &abstime32);
+}
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_GNU */
 

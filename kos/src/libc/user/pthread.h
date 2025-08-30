@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cd26b1a */
+/* HASH CRC-32:0xc584ffd8 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,6 +82,14 @@ INTDEF ATTR_OUT_OPT(2) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pth
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 INTDEF ATTR_IN_OPT(3) ATTR_OUT_OPT(2) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t self, void **thread_return, struct timespec const *abstime);
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTDEF ATTR_IN_OPT(4) ATTR_OUT_OPT(2) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_clockjoin_np)(pthread_t self, void **thread_return, clockid_t clock_id, struct timespec const *abstime);
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
  * Make calling thread  wait for termination  of the thread  `self',
  * but only until `timeout'. The exit status of the thread is stored
@@ -90,6 +98,14 @@ INTDEF ATTR_IN_OPT(3) ATTR_OUT_OPT(2) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 INTDEF ATTR_IN_OPT(3) ATTR_OUT_OPT(2) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t self, void **thread_return, struct timespec64 const *abstime);
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTDEF ATTR_IN_OPT(4) ATTR_OUT_OPT(2) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_clockjoin64_np)(pthread_t self, void **thread_return, clockid_t clock_id, struct timespec64 const *abstime);
 /* >> pthread_detach(3)
  * Indicate that the thread `self' is  never to be joined with  `pthread_join(3)'.
  * The resources of `self' will therefore be freed immediately when it terminates,

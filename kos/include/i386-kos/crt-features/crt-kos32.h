@@ -1317,6 +1317,7 @@
 #define __CRT_HAVE___pthread_barrier_init
 #define __CRT_HAVE___pthread_barrier_wait
 #define __CRT_HAVE___pthread_cleanup_routine
+#define __CRT_HAVE___pthread_clockjoin_np64
 #define __CRT_HAVE___pthread_cond_clockwait64
 #define __CRT_HAVE___pthread_cond_destroy
 #define __CRT_HAVE___pthread_cond_init
@@ -4667,6 +4668,8 @@
 #define __CRT_HAVE_pthread_barrierattr_init
 #define __CRT_HAVE_pthread_barrierattr_setpshared
 #define __CRT_HAVE_pthread_cancel
+#define __CRT_HAVE_pthread_clockjoin64_np
+#define __CRT_HAVE_pthread_clockjoin_np
 #define __CRT_HAVE_pthread_cond_broadcast
 #define __CRT_HAVE_pthread_cond_clockwait
 #define __CRT_HAVE_pthread_cond_clockwait64

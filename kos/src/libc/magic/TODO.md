@@ -130,7 +130,6 @@
 		- #ifdef __USE_BSD: `char *fdevname($fd_t fd);` (partner to "devname")
 		- #ifdef __USE_BSD: `char *fdevname_r($fd_t fd, char *buf, __STDC_INT_AS_SIZE_T bufsize);` (partner to "devname_r")
 	- <pthread.h>
-		- #ifdef __USE_GNU: pthread_clockjoin_np
 		- #ifdef __USE_GNU: pthread_rwlock_clockwrlock
 		- #ifdef __USE_GNU: pthread_rwlock_clockrdlock
 

@@ -781,6 +781,33 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t self,
                                                 struct timespec const *abstime)
 /*[[[body:libc_pthread_timedjoin_np]]]*/
 {
+	return libc_pthread_clockjoin_np(self, thread_return, CLOCK_REALTIME, abstime);
+}
+/*[[[end:libc_pthread_timedjoin_np]]]*/
+
+/*[[[head:libc_pthread_clockjoin_np,hash:CRC-32=0xbdcc80d8]]]*/
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(4) ATTR_OUT_OPT(2) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_clockjoin_np)(pthread_t self,
+                                                void **thread_return,
+                                                clockid_t clock_id,
+                                                struct timespec const *abstime)
+/*[[[body:libc_pthread_clockjoin_np]]]*/
+{
+	syscall_ulong_t futex_op;
+	if (clock_id == CLOCK_REALTIME) {
+		futex_op = FUTEX_WAIT | FUTEX_CLOCK_REALTIME;
+	} else if (clock_id == CLOCK_MONOTONIC) {
+		futex_op = FUTEX_WAIT;
+	} else {
+		return EINVAL;
+	}
 	for (;;) {
 		pid_t tid;
 		syscall_slong_t result;
@@ -792,7 +819,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t self,
 			return EDEADLK;
 		/* >> wait_while(self->pt_tid == tid) */
 		result = sys_futex((uint32_t *)&self->pt_tid,
-		                   FUTEX_WAIT, tid,
+		                   futex_op, tid,
 		                   abstime, NULL, 0);
 		if (result == -ETIMEDOUT)
 			return (errno_t)-result;
@@ -802,7 +829,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t self,
 	decref(self);
 	return EOK;
 }
-/*[[[end:libc_pthread_timedjoin_np]]]*/
+/*[[[end:libc_pthread_clockjoin_np]]]*/
 
 /*[[[head:libc_pthread_timedjoin64_np,hash:CRC-32=0x5093588f]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -821,7 +848,38 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t self,
                                                   struct timespec64 const *abstime)
 /*[[[body:libc_pthread_timedjoin64_np]]]*/
 {
+	return libc_pthread_clockjoin64_np(self, thread_return, CLOCK_REALTIME, abstime);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_pthread_timedjoin64_np]]]*/
+
+/*[[[head:libc_pthread_clockjoin64_np,hash:CRC-32=0xde547845]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_clockjoin64_np, libc_pthread_clockjoin_np);
+#else /* MAGIC:alias */
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(4) ATTR_OUT_OPT(2) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_clockjoin64_np)(pthread_t self,
+                                                  void **thread_return,
+                                                  clockid_t clock_id,
+                                                  struct timespec64 const *abstime)
+/*[[[body:libc_pthread_clockjoin64_np]]]*/
+{
 #if __SIZEOF_POINTER__ == 4
+	syscall_ulong_t lfutex_op;
+	if (clock_id == CLOCK_REALTIME) {
+		lfutex_op = LFUTEX_WAIT_WHILE | LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
+	} else if (clock_id == CLOCK_MONOTONIC) {
+		lfutex_op = LFUTEX_WAIT_WHILE;
+	} else {
+		return EINVAL;
+	}
 	for (;;) {
 		pid_t tid;
 		syscall_slong_t result;
@@ -833,8 +891,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t self,
 			return EDEADLK;
 		/* >> wait_while(self->pt_tid == tid) */
 		result = sys_lfutex((uint32_t *)&self->pt_tid,
-		                    LFUTEX_WAIT_WHILE, tid,
-		                    abstime, 0);
+		                    lfutex_op, tid, abstime, 0);
 		if (result == -ETIMEDOUT)
 			return (errno_t)-result;
 	}
@@ -847,12 +904,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t self,
 	struct timespec32 abstime32;
 	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
 	abstime32.tv_nsec = abstime->tv_nsec;
-	result = libc_pthread_timedjoin_np(self, thread_return, &abstime32);
+	result = libc_pthread_clockjoin_np(self, thread_return, clock_id, &abstime32);
 	return result;
 #endif /* __SIZEOF_POINTER__ != 4 */
 }
 #endif /* MAGIC:alias */
-/*[[[end:libc_pthread_timedjoin64_np]]]*/
+/*[[[end:libc_pthread_clockjoin64_np]]]*/
 
 /*[[[head:libc_pthread_detach,hash:CRC-32=0xbab1a98c]]]*/
 /* >> pthread_detach(3)
@@ -5799,7 +5856,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xcd32a750]]]*/
+/*[[[start:exports,hash:CRC-32=0x6c56c7f4]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -5812,10 +5869,13 @@ DEFINE_PUBLIC_ALIAS_P(pthread_getresult_np,libc_pthread_getresult_np,ATTR_OUT_OP
 DEFINE_PUBLIC_ALIAS_P(pthread_peekjoin_np,libc_pthread_tryjoin_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, void **thread_return),(self,thread_return));
 DEFINE_PUBLIC_ALIAS_P(pthread_tryjoin_np,libc_pthread_tryjoin_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, void **thread_return),(self,thread_return));
 DEFINE_PUBLIC_ALIAS_P(pthread_timedjoin_np,libc_pthread_timedjoin_np,ATTR_IN_OPT(3) ATTR_OUT_OPT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_t self, void **thread_return, struct timespec const *abstime),(self,thread_return,abstime));
+DEFINE_PUBLIC_ALIAS_P(pthread_clockjoin_np,libc_pthread_clockjoin_np,ATTR_IN_OPT(4) ATTR_OUT_OPT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_t self, void **thread_return, clockid_t clock_id, struct timespec const *abstime),(self,thread_return,clock_id,abstime));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS_P(__pthread_timedjoin_np64,libc_pthread_timedjoin64_np,ATTR_IN_OPT(3) ATTR_OUT_OPT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_t self, void **thread_return, struct timespec64 const *abstime),(self,thread_return,abstime));
 DEFINE_PUBLIC_ALIAS_P(pthread_timedjoin64_np,libc_pthread_timedjoin64_np,ATTR_IN_OPT(3) ATTR_OUT_OPT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_t self, void **thread_return, struct timespec64 const *abstime),(self,thread_return,abstime));
+DEFINE_PUBLIC_ALIAS_P(__pthread_clockjoin_np64,libc_pthread_clockjoin64_np,ATTR_IN_OPT(4) ATTR_OUT_OPT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_t self, void **thread_return, clockid_t clock_id, struct timespec64 const *abstime),(self,thread_return,clock_id,abstime));
+DEFINE_PUBLIC_ALIAS_P(pthread_clockjoin64_np,libc_pthread_clockjoin64_np,ATTR_IN_OPT(4) ATTR_OUT_OPT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_t self, void **thread_return, clockid_t clock_id, struct timespec64 const *abstime),(self,thread_return,clock_id,abstime));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS_P(cthread_detach,libc_pthread_detach,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_detach,libc_pthread_detach,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));

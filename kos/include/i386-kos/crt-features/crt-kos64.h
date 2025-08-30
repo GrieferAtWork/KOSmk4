@@ -4351,6 +4351,7 @@
 #define __CRT_HAVE_pthread_barrierattr_init
 #define __CRT_HAVE_pthread_barrierattr_setpshared
 #define __CRT_HAVE_pthread_cancel
+#define __CRT_HAVE_pthread_clockjoin_np
 #define __CRT_HAVE_pthread_cond_broadcast
 #define __CRT_HAVE_pthread_cond_clockwait
 #define __CRT_HAVE_pthread_cond_destroy
@@ -10253,6 +10254,7 @@
 #define __CRT_HAVE_KOS$pthread_barrierattr_init
 #define __CRT_HAVE_KOS$pthread_barrierattr_setpshared
 #define __CRT_HAVE_KOS$pthread_cancel
+#define __CRT_HAVE_KOS$pthread_clockjoin_np
 #define __CRT_HAVE_KOS$pthread_cond_broadcast
 #define __CRT_HAVE_KOS$pthread_cond_clockwait
 #define __CRT_HAVE_KOS$pthread_cond_destroy
@@ -15133,6 +15135,7 @@
 #define __CRT_HAVE_DOS$pthread_barrierattr_init
 #define __CRT_HAVE_DOS$pthread_barrierattr_setpshared
 #define __CRT_HAVE_DOS$pthread_cancel
+#define __CRT_HAVE_DOS$pthread_clockjoin_np
 #define __CRT_HAVE_DOS$pthread_cond_broadcast
 #define __CRT_HAVE_DOS$pthread_cond_clockwait
 #define __CRT_HAVE_DOS$pthread_cond_destroy

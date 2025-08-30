@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4d54e37 */
+/* HASH CRC-32:0x2172b8ec */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -661,6 +661,11 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
+struct timespec;
+#ifdef __USE_TIME64
+struct timespec64;
+#endif /* __USE_TIME64 */
+
 /* >> pthread_create(3)
  * Create a  new thread,  starting with  execution of  `start_routine'
  * getting passed `arg'. Creation attributed come from `attr'. The new
@@ -718,7 +723,6 @@ __CDECLARE(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_NCX,pthread_tryjoin_np,(pthread
  * @return: EBUSY: The thread has yet to terminate */
 __CREDIRECT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_NCX,pthread_tryjoin_np,(pthread_t __self, void **__thread_return),pthread_peekjoin_np,(__self,__thread_return))
 #endif /* ... */
-struct timespec;
 #ifndef __pthread_timedjoin_np_defined
 #define __pthread_timedjoin_np_defined
 #if defined(__CRT_HAVE_pthread_timedjoin_np) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -762,6 +766,49 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL __ATTR_ARTIFI
 #undef __pthread_timedjoin_np_defined
 #endif /* !... */
 #endif /* !__pthread_timedjoin_np_defined */
+#ifndef __pthread_clockjoin_np_defined
+#define __pthread_clockjoin_np_defined
+#if defined(__CRT_HAVE_pthread_clockjoin_np) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CDECLARE(__ATTR_IN_OPT(4) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_clockjoin_np,(pthread_t __self, void **__thread_return, __clockid_t __clock_id, struct timespec const *__abstime),(__self,__thread_return,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_clockjoin64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_clockjoin_np,(pthread_t __self, void **__thread_return, __clockid_t __clock_id, struct timespec const *__abstime),pthread_clockjoin64_np,(__self,__thread_return,__clock_id,__abstime))
+#elif defined(__CRT_HAVE___pthread_clockjoin_np64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_clockjoin_np,(pthread_t __self, void **__thread_return, __clockid_t __clock_id, struct timespec const *__abstime),__pthread_clockjoin_np64,(__self,__thread_return,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_clockjoin64_np) || defined(__CRT_HAVE___pthread_clockjoin_np64) || defined(__CRT_HAVE_pthread_clockjoin_np)
+#include <libc/local/pthread/pthread_clockjoin_np.h>
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_clockjoin_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(4) __ATTR_OUT_OPT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_clockjoin_np)(pthread_t __self, void **__thread_return, __clockid_t __clock_id, struct timespec const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_clockjoin_np))(__self, __thread_return, __clock_id, __abstime); })
+#else /* ... */
+#undef __pthread_clockjoin_np_defined
+#endif /* !... */
+#endif /* !__pthread_clockjoin_np_defined */
 #ifdef __USE_TIME64
 #ifndef __pthread_timedjoin64_np_defined
 #define __pthread_timedjoin64_np_defined
@@ -806,6 +853,49 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL __ATTR_ARTI
 #undef __pthread_timedjoin64_np_defined
 #endif /* !... */
 #endif /* !__pthread_timedjoin64_np_defined */
+#ifndef __pthread_clockjoin64_np_defined
+#define __pthread_clockjoin64_np_defined
+#if defined(__CRT_HAVE_pthread_clockjoin_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_clockjoin64_np,(pthread_t __self, void **__thread_return, __clockid_t __clock_id, struct timespec64 const *__abstime),pthread_clockjoin_np,(__self,__thread_return,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_clockjoin64_np)
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CDECLARE(__ATTR_IN_OPT(4) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_clockjoin64_np,(pthread_t __self, void **__thread_return, __clockid_t __clock_id, struct timespec64 const *__abstime),(__self,__thread_return,__clock_id,__abstime))
+#elif defined(__CRT_HAVE___pthread_clockjoin_np64)
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_clockjoin64_np,(pthread_t __self, void **__thread_return, __clockid_t __clock_id, struct timespec64 const *__abstime),__pthread_clockjoin_np64,(__self,__thread_return,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_clockjoin_np)
+#include <libc/local/pthread/pthread_clockjoin64_np.h>
+/* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
+ * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_clockjoin64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(4) __ATTR_OUT_OPT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_clockjoin64_np)(pthread_t __self, void **__thread_return, __clockid_t __clock_id, struct timespec64 const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_clockjoin64_np))(__self, __thread_return, __clock_id, __abstime); })
+#else /* ... */
+#undef __pthread_clockjoin64_np_defined
+#endif /* !... */
+#endif /* !__pthread_clockjoin64_np_defined */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
 #ifdef __CRT_HAVE_pthread_detach
