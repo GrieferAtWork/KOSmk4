@@ -5043,13 +5043,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict self,
                                              pthread_condattr_t const *__restrict cond_attr)
 /*[[[body:libc_pthread_cond_init]]]*/
 {
-	clockid_t clock_id;
 	bzero(self, sizeof(*self));
-	clock_id = (cond_attr->ca_value & PTHREAD_CONDATTR_CLOCKID_MASK) >> PTHREAD_CONDATTR_CLOCKID_SHIFT;
-	if (clock_id == CLOCK_REALTIME)
-		self->c_flags |= LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
-	if (!(cond_attr->ca_value & PTHREAD_CONDATTR_FLAG_PSHARED))
-		self->c_flags |= LFUTEX_WAIT_FLAG_TIMEOUT_PRIVATE;
+	if (cond_attr) {
+		clockid_t clock_id = (cond_attr->ca_value & PTHREAD_CONDATTR_CLOCKID_MASK) >>
+		                     PTHREAD_CONDATTR_CLOCKID_SHIFT;
+		if (clock_id == CLOCK_REALTIME)
+			self->c_flags |= LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
+		if (!(cond_attr->ca_value & PTHREAD_CONDATTR_FLAG_PSHARED))
+			self->c_flags |= LFUTEX_WAIT_FLAG_TIMEOUT_PRIVATE;
+	}
 	return EOK;
 }
 /*[[[end:libc_pthread_cond_init]]]*/
