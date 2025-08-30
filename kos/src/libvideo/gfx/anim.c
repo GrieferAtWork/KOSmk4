@@ -372,8 +372,8 @@ unlock_and_return_frame:
 	assertf(atomic_read(&frame->vaf_frame->vb_refcnt) >= 2,
 	        "1 by the cache, and one by the caller");
 	atomic_dec(&frame->vaf_frame->vb_refcnt);
-	video_buffer_incref(cframe->cf_frame);
 	cframe = &me->ca_framev[next_id];
+	video_buffer_incref(cframe->cf_frame);
 	frame->vaf_frame   = cframe->cf_frame;
 	frame->vaf_showfor = cframe->cf_showfor;
 	frame->vaf_frameid = next_id;

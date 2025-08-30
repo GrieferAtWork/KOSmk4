@@ -60,6 +60,7 @@ __pragma_GCC_diagnostic_push
 __pragma_GCC_diagnostic_ignored(Wsuggest_attribute_const)
 __pragma_GCC_diagnostic_ignored(Wsuggest_attribute_pure)
 __pragma_GCC_diagnostic_ignored(Wstringop_overflow)
+__pragma_GCC_diagnostic_ignored(Wrestrict)
 #pragma GCC visibility push(hidden) /* Don't export any of this stuff... */
 #include "lodepng/lodepng.h"
 #include "lodepng/lodepng.c"

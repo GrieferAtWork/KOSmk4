@@ -697,8 +697,10 @@
 #define __ATTR_EXTERNALLY_VISIBLE __attribute__((__externally_visible__))
 #define __ATTR_VISIBILITY(vis)    __attribute__((__visibility__(vis)))
 
-/* Suppress warnings about `-Wsuggest-attribute=const' or `-Wsuggest-attribute=pure' */
-#define __COMPILER_IMPURE() __asm__("")
+/* Suppress warnings about `-Wsuggest-attribute=const' or `-Wsuggest-attribute=pure'
+ * Must  add a single ";" because without it,  GCC seems to have gotten smart enough
+ * to understand that `__asm__("")' is not enough indicate something impure. */
+#define __COMPILER_IMPURE() __asm__(";")
 
 #ifdef __INTELLISENSE_GCC__
 #define __pragma(...) _Pragma(#__VA_ARGS__)

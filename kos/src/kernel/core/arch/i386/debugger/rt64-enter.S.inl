@@ -298,15 +298,23 @@ L(.Ldone_lapicid_lock):
 L(.Lalready_active):
 
 	/* Encode CFA as `x86_dbg_exitstate' */
-	EXTERN(x86_dbg_exitstate_b0); EXTERN(x86_dbg_exitstate_b1)
-	EXTERN(x86_dbg_exitstate_b2); EXTERN(x86_dbg_exitstate_b3)
-	EXTERN(x86_dbg_exitstate_b4); EXTERN(x86_dbg_exitstate_b5)
-	EXTERN(x86_dbg_exitstate_b6); EXTERN(x86_dbg_exitstate_b7)
-	.cfi_escape DW_CFA_def_cfa_expression, 9
-	.cfi_escape DW_OP_addr, x86_dbg_exitstate_b0, x86_dbg_exitstate_b1, \
-	                        x86_dbg_exitstate_b2, x86_dbg_exitstate_b3, \
-	                        x86_dbg_exitstate_b4, x86_dbg_exitstate_b5, \
-	                        x86_dbg_exitstate_b6, x86_dbg_exitstate_b7
+	EXTERN(x86_dbg_exitstate_b0)
+	EXTERN(x86_dbg_exitstate_b1)
+	EXTERN(x86_dbg_exitstate_b2)
+	EXTERN(x86_dbg_exitstate_b3)
+	EXTERN(x86_dbg_exitstate_b4)
+	EXTERN(x86_dbg_exitstate_b5)
+	EXTERN(x86_dbg_exitstate_b6)
+	EXTERN(x86_dbg_exitstate_b7)
+	.cfi_escape DW_OP_addr
+	.cfi_escape (x86_dbg_exitstate_b0 + 0)
+	.cfi_escape (x86_dbg_exitstate_b1 + 0)
+	.cfi_escape (x86_dbg_exitstate_b2 + 0)
+	.cfi_escape (x86_dbg_exitstate_b3 + 0)
+	.cfi_escape (x86_dbg_exitstate_b4 + 0)
+	.cfi_escape (x86_dbg_exitstate_b5 + 0)
+	.cfi_escape (x86_dbg_exitstate_b6 + 0)
+	.cfi_escape (x86_dbg_exitstate_b7 + 0)
 	ASM_CFI_OFFSET_RESTORE_FCPUSTATE(0)
 
 	/* Fixup control registers. */

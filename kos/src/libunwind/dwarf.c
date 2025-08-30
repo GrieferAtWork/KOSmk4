@@ -167,7 +167,7 @@ NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(NCX byte_t const **__restrict p_reade
 #endif /* __SIZEOF_POINTER__ > 4 */
 		} else if (addrsize >= 2) {
 			offset = UNALIGNED_GET16(reader);
-		} else if (addrsize >= 1) {
+		} else /*if (addrsize >= 1)*/ {
 			offset = UNALIGNED_GET8(reader);
 		}
 		reader += addrsize;

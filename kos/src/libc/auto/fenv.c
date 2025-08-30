@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ff88a32 */
+/* HASH CRC-32:0xbeb9c870 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,6 +152,7 @@ NOTHROW(LIBCCALL libc_fetestexcept)(int excepts) {
  *             ... `FE_TOWARDZERO': trunc() */
 INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_PURE WUNUSED int
 NOTHROW(LIBCCALL libc_fegetround)(void) {
+	COMPILER_IMPURE();
 	return __arch_fegetround();
 }
 #include <bits/crt/fenv-impl.h>
@@ -208,6 +209,7 @@ NOTHROW(LIBCCALL libc_fedisableexcept)(int excepts) {
 /* >> fegetexcept(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_PURE WUNUSED int
 NOTHROW(LIBCCALL libc_fegetexcept)(void) {
+	COMPILER_IMPURE();
 	return __arch_fegetexcept();
 }
 #include <bits/crt/fenv-impl.h>

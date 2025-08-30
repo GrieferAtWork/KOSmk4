@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b843246 */
+/* HASH CRC-32:0xcd20e112 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ __LOCAL int (__LIBCCALL __libc_core_feraiseexcept)(int __excepts) __THROWS(...) 
  *             ... `FE_DOWNWARD':   floor()
  *             ... `FE_UPWARD':     ceil()
  *             ... `FE_TOWARDZERO': trunc() */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(void),fegetround,{ return __arch_fegetround(); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(void),fegetround,{ __COMPILER_IMPURE(); return __arch_fegetround(); })
 #elif defined(__CRT_HAVE_fegetround)
 /* >> fegetround(3)
  * Get the current rounding direction
@@ -86,7 +86,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(voi
  *             ... `FE_DOWNWARD':   floor()
  *             ... `FE_UPWARD':     ceil()
  *             ... `FE_TOWARDZERO': trunc() */
-__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_core_fegetround)(void) { return __arch_fegetround(); }
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_core_fegetround)(void) { __COMPILER_IMPURE(); return __arch_fegetround(); }
 #else /* ... */
 #undef ____libc_core_fegetround_defined
 #endif /* !... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5786738b */
+/* HASH CRC-32:0xdcbc18e2 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -259,7 +259,7 @@ INTDEF WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fmapfile)
  * @return: -1: [errno=...]     s.a. `fmapfile(3)'
  * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and `fileno(stream)' didn't yield a valid file descriptor
  * @return: -1: [errno=*]       Read error */
-INTDEF WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_ffmapfile)(struct mapfile *__restrict mapping, FILE *stream, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
+INTDEF WUNUSED ATTR_INOUT(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_ffmapfile)(struct mapfile *__restrict mapping, FILE *stream, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> ffmapfile(3)
@@ -268,7 +268,7 @@ INTDEF WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_ffmapfile
  * @return: -1: [errno=...]     s.a. `fmapfile(3)'
  * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and `fileno(stream)' didn't yield a valid file descriptor
  * @return: -1: [errno=*]       Read error */
-INTDEF WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_ffmapfile)(struct mapfile *__restrict mapping, FILE *stream, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
+INTDEF WUNUSED ATTR_INOUT(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_ffmapfile)(struct mapfile *__restrict mapping, FILE *stream, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */

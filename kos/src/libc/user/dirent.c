@@ -615,11 +615,13 @@ NOTHROW_RPC(LIBCCALL libc_scandiratk)(fd_t dirfd,
 	if (!ents_list) {
 		/* Don't return a NULL-pointer on success! */
 		assert(ents_used == 0);
+__pragma_GCC_diagnostic_push_ignored(Walloc_size)
 #ifdef __MALLOC_ZERO_IS_NONNULL
 		ents_list = (struct dirent **)malloc(0);
 #else /* __MALLOC_ZERO_IS_NONNULL */
 		ents_list = (struct dirent **)malloc(1);
 #endif /* !__MALLOC_ZERO_IS_NONNULL */
+__pragma_GCC_diagnostic_pop_ignored(Walloc_size)
 		if unlikely(!ents_list)
 			result = -1;
 	} else if (ents_size > ents_used) {
@@ -837,11 +839,13 @@ NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd,
 	if (!ents_list) {
 		/* Don't return a NULL-pointer on success! */
 		assert(ents_used == 0);
+__pragma_GCC_diagnostic_push_ignored(Walloc_size)
 #ifdef __MALLOC_ZERO_IS_NONNULL
 		ents_list = (struct glibc_dirent32 **)malloc(0);
 #else /* __MALLOC_ZERO_IS_NONNULL */
 		ents_list = (struct glibc_dirent32 **)malloc(1);
 #endif /* !__MALLOC_ZERO_IS_NONNULL */
+__pragma_GCC_diagnostic_pop_ignored(Walloc_size)
 		if unlikely(!ents_list)
 			result = -1;
 	} else if (ents_size > ents_used) {
@@ -1037,11 +1041,13 @@ NOTHROW_RPC(LIBCCALL libc_scandirat64)(fd_t dirfd,
 	if (!ents_list) {
 		/* Don't return a NULL-pointer on success! */
 		assert(ents_used == 0);
+__pragma_GCC_diagnostic_push_ignored(Walloc_size)
 #ifdef __MALLOC_ZERO_IS_NONNULL
 		ents_list = (struct glibc_dirent64 **)malloc(0);
 #else /* __MALLOC_ZERO_IS_NONNULL */
 		ents_list = (struct glibc_dirent64 **)malloc(1);
 #endif /* !__MALLOC_ZERO_IS_NONNULL */
+__pragma_GCC_diagnostic_pop_ignored(Walloc_size)
 		if unlikely(!ents_list)
 			result = -1;
 	} else if (ents_size > ents_used) {

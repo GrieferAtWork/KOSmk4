@@ -120,7 +120,9 @@ NOTHROW(FCALL ctype_ptr)(struct ctyperef const *__restrict self,
 	}
 
 	/* Create a new sibling. */
+__pragma_GCC_diagnostic_push_ignored(Walloc_size)
 	result = (REF struct ctype *)dbx_malloc(offsetafter(struct ctype, ct_pointer));
+__pragma_GCC_diagnostic_pop_ignored(Walloc_size)
 	if unlikely(!result)
 		return NULL;
 	result->ct_refcnt = 1; /* Returned reference. */
@@ -152,7 +154,9 @@ NOTHROW(FCALL ctype_array)(struct ctyperef const *__restrict self,
 	}
 
 	/* Create a new sibling. */
+__pragma_GCC_diagnostic_push_ignored(Walloc_size)
 	result = (REF struct ctype *)dbx_malloc(offsetafter(struct ctype, ct_array));
+__pragma_GCC_diagnostic_pop_ignored(Walloc_size)
 	if unlikely(!result)
 		return NULL;
 	result->ct_refcnt = 1; /* Returned reference. */
@@ -1105,7 +1109,9 @@ again:
 				}
 			} else {
 				REF struct ctype *ct;
+__pragma_GCC_diagnostic_push_ignored(Walloc_size)
 				ct = (REF struct ctype *)dbx_malloc(sizeof(struct _basic_ctype));
+__pragma_GCC_diagnostic_pop_ignored(Walloc_size)
 				if unlikely(!ct)
 					goto err_nomem;
 				ct->ct_refcnt = 1;
@@ -1276,7 +1282,9 @@ got_elem_count:
 		REF struct ctype *result_type;
 		if (!typinfo.t_sizeof)
 			typinfo.t_sizeof = sizeof(int);
+__pragma_GCC_diagnostic_push_ignored(Walloc_size)
 		result_type = (REF struct ctype *)dbx_malloc(offsetafter(struct ctype, ct_enum));
+__pragma_GCC_diagnostic_pop_ignored(Walloc_size)
 		if unlikely(!result_type)
 			goto err_nomem;
 		result_type->ct_refcnt = 1;
@@ -1323,7 +1331,9 @@ got_elem_count:
 	case DW_TAG_union_type:
 	case DW_TAG_interface_type: {
 		REF struct ctype *struct_type;
+__pragma_GCC_diagnostic_push_ignored(Walloc_size)
 		struct_type = (REF struct ctype *)dbx_malloc(offsetafter(struct ctype, ct_struct));
+__pragma_GCC_diagnostic_pop_ignored(Walloc_size)
 		if unlikely(!struct_type)
 			goto err_nomem;
 		struct_type->ct_refcnt = 1;

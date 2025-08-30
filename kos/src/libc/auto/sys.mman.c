@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb5dec47 */
+/* HASH CRC-32:0xb16c6454 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -771,7 +771,7 @@ err_buf:
  * @return: -1: [errno=...]     s.a. `fmapfile(3)'
  * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and `fileno(stream)' didn't yield a valid file descriptor
  * @return: -1: [errno=*]       Read error */
-INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int
+INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED ATTR_INOUT(2) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_ffmapfile)(struct mapfile *__restrict mapping,
                                      FILE *stream,
                                      pos64_t offset,
@@ -1141,7 +1141,7 @@ DEFINE_PUBLIC_ALIAS_P(pkey_get,libc_pkey_get,,int,NOTHROW_NCX,LIBCCALL,(int pkey
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS_P(fmapfile,libc_fmapfile,WUNUSED ATTR_FDARG(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags),(mapping,fd,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags));
-DEFINE_PUBLIC_ALIAS_P(ffmapfile,libc_ffmapfile,WUNUSED ATTR_FDARG(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping, FILE *stream, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags),(mapping,stream,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags));
+DEFINE_PUBLIC_ALIAS_P(ffmapfile,libc_ffmapfile,WUNUSED ATTR_INOUT(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping, FILE *stream, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags),(mapping,stream,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags));
 DEFINE_PUBLIC_ALIAS_P(DOS$fmapfileat,libd_fmapfileat,WUNUSED ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBDCALL,(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags, atflag_t atflags),(mapping,dirfd,filename,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags,atflags));
 DEFINE_PUBLIC_ALIAS_P(fmapfileat,libc_fmapfileat,WUNUSED ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags, atflag_t atflags),(mapping,dirfd,filename,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags,atflags));
 DEFINE_PUBLIC_ALIAS_P(DOS$mapfile,libd_mapfile,WUNUSED ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBDCALL,(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags),(mapping,filename,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags));

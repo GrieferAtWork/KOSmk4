@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff270ecf */
+/* HASH CRC-32:0x1da4298a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -339,7 +339,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fetestexcept)(int __
  *             ... `FE_DOWNWARD':   floor()
  *             ... `FE_UPWARD':     ceil()
  *             ... `FE_TOWARDZERO': trunc() */
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetround,(void),{ return __arch_fegetround(); })
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetround,(void),{ __COMPILER_IMPURE(); return __arch_fegetround(); })
 #elif defined(__CRT_HAVE_fegetround)
 /* >> fegetround(3)
  * Get the current rounding direction
@@ -357,7 +357,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetround,(void),())
  *             ... `FE_DOWNWARD':   floor()
  *             ... `FE_UPWARD':     ceil()
  *             ... `FE_TOWARDZERO': trunc() */
-__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetround)(void) { return __arch_fegetround(); }
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetround)(void) { __COMPILER_IMPURE(); return __arch_fegetround(); }
 #endif /* ... */
 #if defined(__CRT_HAVE_fesetround) && defined(__arch_fesetround)
 /* >> fesetround(3)
@@ -493,13 +493,13 @@ __LOCAL int __NOTHROW(__LIBCCALL fedisableexcept)(int __excepts) { return __arch
 #endif /* ... */
 #if defined(__CRT_HAVE_fegetexcept) && defined(__arch_fegetexcept)
 /* >> fegetexcept(3) */
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetexcept,(void),{ return __arch_fegetexcept(); })
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetexcept,(void),{ __COMPILER_IMPURE(); return __arch_fegetexcept(); })
 #elif defined(__CRT_HAVE_fegetexcept)
 /* >> fegetexcept(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetexcept,(void),())
 #elif defined(__arch_fegetexcept)
 /* >> fegetexcept(3) */
-__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetexcept)(void) { return __arch_fegetexcept(); }
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetexcept)(void) { __COMPILER_IMPURE(); return __arch_fegetexcept(); }
 #endif /* ... */
 #endif /* __USE_GNU */
 

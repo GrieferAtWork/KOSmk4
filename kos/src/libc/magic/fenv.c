@@ -360,6 +360,7 @@ int fetestexcept(int excepts) {
 [[extern_inline, impl_include("<bits/crt/fenv-impl.h>")]]
 [[requires($extended_include_prefix("<bits/crt/fenv-impl.h>")defined(__arch_fegetround))]]
 int fegetround() {
+	COMPILER_IMPURE();
 	return __arch_fegetround();
 }
 
@@ -427,6 +428,7 @@ int fedisableexcept(int excepts) {
 [[wunused, nothrow, pure, extern_inline, impl_include("<bits/crt/fenv-impl.h>")]]
 [[requires($extended_include_prefix("<bits/crt/fenv-impl.h>")defined(__arch_fegetexcept))]]
 int fegetexcept() {
+	COMPILER_IMPURE();
 	return __arch_fegetexcept();
 }
 

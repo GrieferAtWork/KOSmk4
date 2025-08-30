@@ -1619,7 +1619,7 @@ err_buf:
 [[impl_include("<asm/os/mman.h>", "<libc/errno.h>")]]
 [[impl_include("<asm/os/stdio.h>", "<hybrid/__overflow.h>")]]
 [[impl_include("<asm/crt/malloc.h>")]]
-int ffmapfile([[out]] struct mapfile *__restrict mapping, [[fdarg]] $FILE *stream,
+int ffmapfile([[out]] struct mapfile *__restrict mapping, [[inout]] $FILE *stream,
               $pos64_t offset, size_t min_bytes, size_t max_bytes,
               size_t num_trailing_nulbytes, unsigned int flags) {
 	byte_t *buf;

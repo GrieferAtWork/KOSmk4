@@ -961,6 +961,7 @@ DEFINE_PUBLIC_ALIAS(__getfpucw, libc___getfpucw);
 INTERN ATTR_PURE ATTR_SECTION(".text.crt.math.float") fpu_control_t
 NOTHROW_NCX(LIBCCALL libc___getfpucw)(void) {
 	fpu_control_t word;
+	COMPILER_IMPURE();
 	_FPU_GETCW(word);
 	return word;
 }

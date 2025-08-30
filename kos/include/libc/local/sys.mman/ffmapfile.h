@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59a3b7aa */
+/* HASH CRC-32:0xfd529a3e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -319,7 +319,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__overflow.h>
 #include <asm/crt/malloc.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ffmapfile) __ATTR_WUNUSED __ATTR_FDARG(2) __ATTR_OUT(1) int
+__LOCAL_LIBC(ffmapfile) __ATTR_WUNUSED __ATTR_INOUT(2) __ATTR_OUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ffmapfile))(struct mapfile *__restrict __mapping, __FILE *__stream, __pos64_t __offset, __SIZE_TYPE__ __min_bytes, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes, unsigned int __flags) {
 	__BYTE_TYPE__ *__buf;
 	__SIZE_TYPE__ __bufsize;

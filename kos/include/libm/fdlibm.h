@@ -332,7 +332,7 @@ typedef union {
 #ifdef __COMPILER_HAVE_GCC_ASM
 #define __libm_math_opt_barrier(x, result) do { (result) = (x); __asm__("" : "+m" (result)); } __WHILE0
 #define __libm_math_force_eval(x)          do { __asm__ __volatile__("" : : "m" (x)); } __WHILE0
-#define __libm_math_force_eval_r(T, x)     do { T __x = (x); __asm__ __volatile__("" : : "m" (__x)); } __WHILE0
+#define __libm_math_force_eval_r(T, x)     do { T __lmmfe_x = (x); __asm__ __volatile__("" : : "m" (__lmmfe_x)); } __WHILE0
 #else /* __COMPILER_HAVE_GCC_ASM */
 #define __libm_math_opt_barrier(x, result) ((result) = (x))
 #define __libm_math_force_eval(x)          (void)(x) /* XXX: May not get evaluated... */

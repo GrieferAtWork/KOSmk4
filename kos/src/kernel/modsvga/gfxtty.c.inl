@@ -60,7 +60,13 @@ DECL_BEGIN
 #error "Invalid configuration"
 #endif /* ... */
 
-
+/* GCC does a bunch of warnings:
+ * >> assuming signed overflow does not occur when determining that expression is always non-negative
+ * ...  relating  to  unsigned   math  done  with  "uintptr_half_t".   This  is  because  that   math
+ * actually   happens  after  integer  promotion,  at  which   point  division  and  so  on  actually
+ * becomes  signed  again.  --  Maybe   figure  out  a  way  to   keep  division  unsigned,  so   gcc
+ * won't even try to use signed math? */
+__pragma_GCC_diagnostic_push_ignored(Wstrict_overflow)
 
 #ifdef BYTES_PER_PIXEL
 
@@ -869,6 +875,8 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 #endif /* !... */
 
 #undef BYTES_PER_PIXEL
+
+__pragma_GCC_diagnostic_pop_ignored(Wstrict_overflow)
 
 DECL_END
 

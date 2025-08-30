@@ -54,6 +54,11 @@ BEGIN
 		"-fini=libc_fini",
 		"--hash-style=gnu",
 
+		/* Disable warnings about RWX mappings (they're correct, and I should probably
+		 * re-think the whole idea of having a RWX section for the self-modifying code
+		 * currently used to wrap system calls; s.a. `libc___i386_syscall') */
+		"--no-warn-rwx-segments",
+
 		/* Set program entry when libc gets exec'd */
 		"-e", "libc_exec_main",
 	})

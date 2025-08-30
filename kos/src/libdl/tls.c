@@ -492,7 +492,9 @@ NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t min_alignment, size_t num_bytes,
 		             min_alignment);
 		goto err;
 	}
+__pragma_GCC_diagnostic_push_ignored(Walloc_size)
 	result = (DlModule *)malloc(SIZEOF_DL_MODULE_FOR_TLS);
+__pragma_GCC_diagnostic_pop_ignored(Walloc_size)
 	if unlikely(!result)
 		goto err_nomem;
 
