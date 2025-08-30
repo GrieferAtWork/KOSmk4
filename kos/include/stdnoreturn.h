@@ -22,6 +22,7 @@
 /* (#) Portability: FreeBSD       (/include/stdnoreturn.h) */
 /* (#) Portability: NetBSD        (/include/stdnoreturn.h) */
 /* (#) Portability: PDCLib        (/include/stdnoreturn.h) */
+/* (#) Portability: Windows Kits  (/ucrt/stdnoreturn.h) */
 /* (#) Portability: musl libc     (/include/stdnoreturn.h) */
 /*!ignore_unnecessary_include*/
 #ifndef _STDNORETURN_H

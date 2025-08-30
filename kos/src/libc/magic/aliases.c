@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: GNU C Library (/inet/aliases.h) */
+/* (#) Portability: GNU C Library (/nss/aliases.h) */
 /* (#) Portability: GNU Hurd      (/usr/include/aliases.h) */
 /* (#) Portability: libc6         (/include/aliases.h) */
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63908e1f */
+/* HASH CRC-32:0x6e89ac79 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* (#) Portability: DragonFly BSD (/include/grp.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/grp.h) */
 /* (#) Portability: FreeBSD       (/include/grp.h) */
-/* (#) Portability: GNU C Library (/grp/grp.h) */
+/* (#) Portability: GNU C Library (/nss/grp.h) */
 /* (#) Portability: GNU Hurd      (/usr/include/grp.h) */
 /* (#) Portability: NetBSD        (/include/grp.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/grp.h) */

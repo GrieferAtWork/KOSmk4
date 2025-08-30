@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60fbd32 */
+/* HASH CRC-32:0x77ef7c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/shadow/shadow.h) */
+/* (#) Portability: GNU C Library (/nss/shadow.h) */
 /* (#) Portability: GNU Hurd      (/usr/include/shadow.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/shadow.h) */
 /* (#) Portability: diet libc     (/include/shadow.h) */

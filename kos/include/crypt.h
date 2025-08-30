@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf902fe4c */
+/* HASH CRC-32:0x5c7f2154 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,15 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: EMX kLIBC     (/libc/include/crypt.h) */
-/* (#) Portability: FreeBSD       (/lib/libcrypt/crypt.h) */
-/* (#) Portability: GNU C Library (/crypt/crypt.h) */
-/* (#) Portability: GNU Hurd      (/usr/include/crypt.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/crypt.h) */
-/* (#) Portability: libc6         (/include/crypt.h) */
-/* (#) Portability: mintlib       (/include/crypt.h) */
-/* (#) Portability: musl libc     (/include/crypt.h) */
-/* (#) Portability: uClibc        (/include/crypt.h) */
+/* (#) Portability: EMX kLIBC   (/libc/include/crypt.h) */
+/* (#) Portability: FreeBSD     (/lib/libcrypt/crypt.h) */
+/* (#) Portability: GNU Hurd    (/usr/include/crypt.h) */
+/* (#) Portability: OpenSolaris (/usr/src/head/crypt.h) */
+/* (#) Portability: libc6       (/include/crypt.h) */
+/* (#) Portability: mintlib     (/include/crypt.h) */
+/* (#) Portability: musl libc   (/include/crypt.h) */
+/* (#) Portability: uClibc      (/include/crypt.h) */
 #ifndef _CRYPT_H
 #define _CRYPT_H 1
 

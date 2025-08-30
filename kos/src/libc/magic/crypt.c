@@ -18,15 +18,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: EMX kLIBC     (/libc/include/crypt.h) */
-/* (#) Portability: FreeBSD       (/lib/libcrypt/crypt.h) */
-/* (#) Portability: GNU C Library (/crypt/crypt.h) */
-/* (#) Portability: GNU Hurd      (/usr/include/crypt.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/crypt.h) */
-/* (#) Portability: libc6         (/include/crypt.h) */
-/* (#) Portability: mintlib       (/include/crypt.h) */
-/* (#) Portability: musl libc     (/include/crypt.h) */
-/* (#) Portability: uClibc        (/include/crypt.h) */
+/* (#) Portability: EMX kLIBC   (/libc/include/crypt.h) */
+/* (#) Portability: FreeBSD     (/lib/libcrypt/crypt.h) */
+/* (#) Portability: GNU Hurd    (/usr/include/crypt.h) */
+/* (#) Portability: OpenSolaris (/usr/src/head/crypt.h) */
+/* (#) Portability: libc6       (/include/crypt.h) */
+/* (#) Portability: mintlib     (/include/crypt.h) */
+/* (#) Portability: musl libc   (/include/crypt.h) */
+/* (#) Portability: uClibc      (/include/crypt.h) */
 }
 
 %[default:section(".text.crt{|.dos}.string.encrypt")]

@@ -1,0 +1,766 @@
+/* Copyright (c) 2019-2025 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2025 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import fs;
+import isFileGitIgnored from ..libgen.gitignore;
+
+#define PATHPAIR(b, p) (p, b p)
+
+global final SYSPORT_PATHS: {string: {string: string}} = {
+	"OpenSolaris" : {
+		PATHPAIR(r"E:\home\src\opensolaris", "/usr/src/head"),
+		PATHPAIR(r"E:\home\src\opensolaris", "/usr/src/uts/common"),
+		PATHPAIR(r"E:\home\src\opensolaris", "/usr/src/lib/libbc/inc/include"),
+#define OPENSOLARIS_SYSARCH(name) \
+		("/usr/src/uts/[...]", r"E:\home\src\opensolaris/usr/src/uts/" name)
+		OPENSOLARIS_SYSARCH("i86pc"), OPENSOLARIS_SYSARCH("i86xpv"), OPENSOLARIS_SYSARCH("intel"),
+		OPENSOLARIS_SYSARCH("sfmmu"), OPENSOLARIS_SYSARCH("sparc"), OPENSOLARIS_SYSARCH("sun"),
+		OPENSOLARIS_SYSARCH("sun4"), OPENSOLARIS_SYSARCH("sun4u"), OPENSOLARIS_SYSARCH("sun4v"),
+#undef OPENSOLARIS_SYSARCH
+	},
+	"DragonFly BSD" : {
+		PATHPAIR(r"E:\home\src\dragonfly-6.2.2-ea40b427c14dfd838774e8187c834e52af97123a", "/include"),
+		PATHPAIR(r"E:\home\src\dragonfly-6.2.2-ea40b427c14dfd838774e8187c834e52af97123a", "/sys"),
+	},
+	"OpenBSD" : {
+		PATHPAIR(r"E:\home\src\OpenBSD", "/include"),
+		PATHPAIR(r"E:\home\src\OpenBSD", "/sys"),
+#define OPENBSD_SYSARCH(name) \
+		("/sys/arch/[...]/include", r"E:\home\src\OpenBSD/sys/arch/" name "/include")
+		OPENBSD_SYSARCH("alpha"), OPENBSD_SYSARCH("amd64"), OPENBSD_SYSARCH("arm"), OPENBSD_SYSARCH("arm64"),
+		OPENBSD_SYSARCH("armv7"), OPENBSD_SYSARCH("hppa"), OPENBSD_SYSARCH("i386"), OPENBSD_SYSARCH("landisk"),
+		OPENBSD_SYSARCH("loongson"), OPENBSD_SYSARCH("luna88k"), OPENBSD_SYSARCH("m88k"), OPENBSD_SYSARCH("macppc"),
+		OPENBSD_SYSARCH("mips64"), OPENBSD_SYSARCH("octeon"), OPENBSD_SYSARCH("powerpc"), OPENBSD_SYSARCH("powerpc64"),
+		OPENBSD_SYSARCH("sgi"), OPENBSD_SYSARCH("sh"), OPENBSD_SYSARCH("sparc64"),
+#undef OPENBSD_SYSARCH
+		PATHPAIR(r"E:\home\src\OpenBSD", "/lib/libagentx"),
+		PATHPAIR(r"E:\home\src\OpenBSD", "/lib/libcrypto"),
+		PATHPAIR(r"E:\home\src\OpenBSD", "/lib/libcsi"),
+		PATHPAIR(r"E:\home\src\OpenBSD", "/lib/libcurses"),
+		PATHPAIR(r"E:\home\src\OpenBSD", "/lib/libelf"),
+		PATHPAIR(r"E:\home\src\OpenBSD", "/lib/libusbhid"),
+		PATHPAIR(r"E:\home\src\OpenBSD", "/lib/libutil"),
+		PATHPAIR(r"E:\home\src\OpenBSD", "/lib/libz"),
+	},
+	"FreeBSD" : {
+		PATHPAIR(r"E:\home\src\FreeBSD", "/include"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/sys"),
+#define FREEBSD_SYSARCH(name) \
+		("/sys/[...]/include", r"E:\home\src\FreeBSD/sys/" name "/include")
+		FREEBSD_SYSARCH("amd64"), FREEBSD_SYSARCH("arm"), FREEBSD_SYSARCH("arm64"), FREEBSD_SYSARCH("bsm"),
+		FREEBSD_SYSARCH("cam"), FREEBSD_SYSARCH("cddl"), FREEBSD_SYSARCH("contrib"), FREEBSD_SYSARCH("crypto"),
+		FREEBSD_SYSARCH("ddb"), FREEBSD_SYSARCH("dts"), FREEBSD_SYSARCH("fs"), FREEBSD_SYSARCH("gdb"),
+		FREEBSD_SYSARCH("geom"), FREEBSD_SYSARCH("i386"), FREEBSD_SYSARCH("kgssapi"), FREEBSD_SYSARCH("mips"),
+		FREEBSD_SYSARCH("net"), FREEBSD_SYSARCH("net80211"), FREEBSD_SYSARCH("netgraph"), FREEBSD_SYSARCH("netinet"),
+		FREEBSD_SYSARCH("netinet6"), FREEBSD_SYSARCH("netipsec"), FREEBSD_SYSARCH("netpfil"), FREEBSD_SYSARCH("netsmb"),
+		FREEBSD_SYSARCH("nfs"), FREEBSD_SYSARCH("nfsclient"), FREEBSD_SYSARCH("nfsserver"), FREEBSD_SYSARCH("nlm"),
+		FREEBSD_SYSARCH("ofed"), FREEBSD_SYSARCH("opencrypto"), FREEBSD_SYSARCH("powerpc"), FREEBSD_SYSARCH("riscv"),
+		FREEBSD_SYSARCH("rpc"), FREEBSD_SYSARCH("security"), FREEBSD_SYSARCH("sys"), FREEBSD_SYSARCH("teken"),
+		FREEBSD_SYSARCH("tools"), FREEBSD_SYSARCH("ufs"), FREEBSD_SYSARCH("vm"), FREEBSD_SYSARCH("x86"),
+		FREEBSD_SYSARCH("xdr"), FREEBSD_SYSARCH("xen"),
+#undef FREEBSD_SYSARCH
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libbe"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libbluetooth"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libbsdstat"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libcam"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libcrypt"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libdevctl"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libdevinfo"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libdevstat"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libefivar"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libmd"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libmemstat"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libmp"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libmt"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libomp"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libopenbsd"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libpathconv"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libpjdlog"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libpmc"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libpmcstat"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libproc"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libprocstat"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libradius"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/librpcsec_gss"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/librss"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/librt"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/librtld_db"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libsdp"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libstdthreads"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libsysdecode"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libthread_db"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libufs"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libutil"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libveriexec"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libvgl"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libvmmapi"),
+		PATHPAIR(r"E:\home\src\FreeBSD", "/lib/libypclnt"),
+	},
+	"Cygwin" : {
+		PATHPAIR(r"E:\home\src\cygwin-20210105", "/newlib/libc/include"),
+		PATHPAIR(r"E:\home\src\cygwin-20210105", "/newlib/libc/posix"),
+		PATHPAIR(r"E:\home\src\cygwin-20210105", "/winsup/cygwin/include"),
+	},
+	"Newlib" : {
+		PATHPAIR(r"E:\home\src\newlib-4.1.0", "/newlib/libc/include"),
+		PATHPAIR(r"E:\home\src\newlib-4.1.0", "/newlib/libc/posix"),
+	},
+	"uClibc" : {
+		PATHPAIR(r"E:\home\src\uClibc-0.9.33.2", "/include"),
+		PATHPAIR(r"E:\home\src\uClibc-0.9.33.2", "/libpthread/nptl/sysdeps/pthread"),
+		PATHPAIR(r"E:\home\src\uClibc-0.9.33.2", "/libpthread/nptl"),
+		("/include", { "spawn.h", "uchar.h" }),
+	},
+	"NetBSD" : {
+		PATHPAIR(r"E:\home\src\NetBSD", "/include"),
+		PATHPAIR(r"E:\home\src\NetBSD", "/sys"),
+		("/sys/arch/[...]/include", r"E:\home\src\NetBSD/sys/arch/x86/include"),
+#define NETBSD_SYSARCH(name) \
+		("/sys/arch/[...]/include", r"E:\home\src\NetBSD/sys/arch/" name "/include")
+		NETBSD_SYSARCH("aarch64"), NETBSD_SYSARCH("acorn32"), NETBSD_SYSARCH("algor"),
+		NETBSD_SYSARCH("alpha"), NETBSD_SYSARCH("amd64"), NETBSD_SYSARCH("amiga"),
+		NETBSD_SYSARCH("amigappc"), NETBSD_SYSARCH("arc"), NETBSD_SYSARCH("arm"),
+		NETBSD_SYSARCH("atari"), NETBSD_SYSARCH("bebox"), NETBSD_SYSARCH("cats"),
+		NETBSD_SYSARCH("cesfic"), NETBSD_SYSARCH("cobalt"), NETBSD_SYSARCH("dreamcast"),
+		NETBSD_SYSARCH("emips"), NETBSD_SYSARCH("epoc32"), NETBSD_SYSARCH("evbarm"),
+		NETBSD_SYSARCH("evbcf"), NETBSD_SYSARCH("evbmips"), NETBSD_SYSARCH("evbppc"),
+		NETBSD_SYSARCH("evbsh3"), NETBSD_SYSARCH("evbsh5"), NETBSD_SYSARCH("ews4800mips"),
+		NETBSD_SYSARCH("hp300"), NETBSD_SYSARCH("hpc"), NETBSD_SYSARCH("hpcarm"),
+		NETBSD_SYSARCH("hpcmips"), NETBSD_SYSARCH("hpcsh"), NETBSD_SYSARCH("hppa"),
+		NETBSD_SYSARCH("i386"), NETBSD_SYSARCH("ia64"), NETBSD_SYSARCH("ibmnws"),
+		NETBSD_SYSARCH("iyonix"), NETBSD_SYSARCH("landisk"), NETBSD_SYSARCH("luna68k"),
+		NETBSD_SYSARCH("m68k"), NETBSD_SYSARCH("mac68k"), NETBSD_SYSARCH("macppc"),
+		NETBSD_SYSARCH("mips"), NETBSD_SYSARCH("mipsco"), NETBSD_SYSARCH("mmeye"),
+		NETBSD_SYSARCH("mvme68k"), NETBSD_SYSARCH("mvmeppc"), NETBSD_SYSARCH("netwinder"),
+		NETBSD_SYSARCH("news68k"), NETBSD_SYSARCH("newsmips"), NETBSD_SYSARCH("next68k"),
+		NETBSD_SYSARCH("ofppc"), NETBSD_SYSARCH("or1k"), NETBSD_SYSARCH("playstation2"),
+		NETBSD_SYSARCH("pmax"), NETBSD_SYSARCH("powerpc"), NETBSD_SYSARCH("prep"),
+		NETBSD_SYSARCH("riscv"), NETBSD_SYSARCH("rs6000"), NETBSD_SYSARCH("sandpoint"),
+		NETBSD_SYSARCH("sbmips"), NETBSD_SYSARCH("sgimips"), NETBSD_SYSARCH("sh3"),
+		NETBSD_SYSARCH("sh5"), NETBSD_SYSARCH("shark"), NETBSD_SYSARCH("sparc"),
+		NETBSD_SYSARCH("sparc64"), NETBSD_SYSARCH("sun2"), NETBSD_SYSARCH("sun3"),
+		NETBSD_SYSARCH("sun68k"), NETBSD_SYSARCH("usermode"), NETBSD_SYSARCH("vax"),
+		NETBSD_SYSARCH("x68k"), NETBSD_SYSARCH("x86"), NETBSD_SYSARCH("xen"),
+		NETBSD_SYSARCH("zaurus"),
+#undef NETBSD_SYSARCH
+		PATHPAIR(r"E:\home\src\NetBSD", "/sys/lib/libunwind"),
+	},
+	"GNU C Library" : {
+#define GLIBC_PATH(name) PATHPAIR(r"E:\home\src\glibc-2.41", name)
+		GLIBC_PATH(""), GLIBC_PATH("/argp"), GLIBC_PATH("/assert"),
+		GLIBC_PATH("/catgets"), GLIBC_PATH("/conform"), GLIBC_PATH("/crypt"),
+		GLIBC_PATH("/csu"), GLIBC_PATH("/ctype"), GLIBC_PATH("/debug"),
+		GLIBC_PATH("/dirent"), GLIBC_PATH("/dlfcn"), GLIBC_PATH("/elf"),
+		GLIBC_PATH("/gmon"), GLIBC_PATH("/gnulib"), GLIBC_PATH("/grp"),
+		GLIBC_PATH("/gshadow"), GLIBC_PATH("/hesiod"), GLIBC_PATH("/htl"),
+		GLIBC_PATH("/hurd"), GLIBC_PATH("/iconv"), GLIBC_PATH("/iconvdata"),
+		GLIBC_PATH("/inet"), GLIBC_PATH("/intl"), GLIBC_PATH("/io"),
+		GLIBC_PATH("/libio"), GLIBC_PATH("/locale"), GLIBC_PATH("/localedata"),
+		GLIBC_PATH("/login"), GLIBC_PATH("/mach"), GLIBC_PATH("/malloc"),
+		GLIBC_PATH("/manual"), GLIBC_PATH("/math"), GLIBC_PATH("/mathvec"),
+		GLIBC_PATH("/misc"), GLIBC_PATH("/nis"), GLIBC_PATH("/nptl"),
+		GLIBC_PATH("/nptl_db"), GLIBC_PATH("/nscd"), GLIBC_PATH("/nss"),
+		GLIBC_PATH("/po"), GLIBC_PATH("/posix"), GLIBC_PATH("/pwd"),
+		GLIBC_PATH("/resolv"), GLIBC_PATH("/resource"), GLIBC_PATH("/rt"),
+		GLIBC_PATH("/scripts"), GLIBC_PATH("/setjmp"), GLIBC_PATH("/shadow"),
+		GLIBC_PATH("/signal"), GLIBC_PATH("/socket"), GLIBC_PATH("/soft"),
+		GLIBC_PATH("/fp"), GLIBC_PATH("/stdio"), GLIBC_PATH("/common"),
+		GLIBC_PATH("/stdlib"), GLIBC_PATH("/string"), GLIBC_PATH("/sunrpc"),
+		GLIBC_PATH("/support"), GLIBC_PATH("/sysvipc"), GLIBC_PATH("/termios"),
+		GLIBC_PATH("/time"), GLIBC_PATH("/timezone"), GLIBC_PATH("/wcsmbs"),
+		GLIBC_PATH("/wctype"), GLIBC_PATH("/sysdeps/unix/sysv/linux"),
+#define GLIBC_SYSPATH(name) \
+		("/sysdeps/[...]", r"E:\home\src\glibc-2.41/sysdeps/" name)
+		GLIBC_SYSPATH("aarch64"), GLIBC_SYSPATH("alpha"), GLIBC_SYSPATH("arc"),
+		GLIBC_SYSPATH("arm"), GLIBC_SYSPATH("csky"), GLIBC_SYSPATH("generic"),
+		GLIBC_SYSPATH("gnu"), GLIBC_SYSPATH("hppa"), GLIBC_SYSPATH("htl"),
+		GLIBC_SYSPATH("hurd"), GLIBC_SYSPATH("i386"), GLIBC_SYSPATH("ia64"),
+		GLIBC_SYSPATH("ieee754"), GLIBC_SYSPATH("m68k"), GLIBC_SYSPATH("mach"),
+		GLIBC_SYSPATH("microblaze"), GLIBC_SYSPATH("mips"), GLIBC_SYSPATH("nios2"),
+		GLIBC_SYSPATH("nptl"), GLIBC_SYSPATH("posix"), GLIBC_SYSPATH("powerpc"),
+		GLIBC_SYSPATH("pthread"), GLIBC_SYSPATH("riscv"), GLIBC_SYSPATH("s390"),
+		GLIBC_SYSPATH("sh"), GLIBC_SYSPATH("sparc"), GLIBC_SYSPATH("unix"),
+		GLIBC_SYSPATH("wordsize-32"), GLIBC_SYSPATH("wordsize-64"),
+		GLIBC_SYSPATH("x86"), GLIBC_SYSPATH("x86_64"),
+#undef GLIBC_SYSPATH
+#define GLIBC_LINUX_SYSPATH(name) \
+		("/sysdeps/unix/sysv/linux/[...]", r"E:\home\src\glibc-2.41/sysdeps/unix/sysv/linux/" name)
+		GLIBC_LINUX_SYSPATH("aarch64"), GLIBC_LINUX_SYSPATH("alpha"), GLIBC_LINUX_SYSPATH("arc"),
+		GLIBC_LINUX_SYSPATH("arm"), GLIBC_LINUX_SYSPATH("bits"), GLIBC_LINUX_SYSPATH("csky"),
+		GLIBC_LINUX_SYSPATH("generic"), GLIBC_LINUX_SYSPATH("hppa"), GLIBC_LINUX_SYSPATH("i386"),
+		GLIBC_LINUX_SYSPATH("ia64"), GLIBC_LINUX_SYSPATH("include"), GLIBC_LINUX_SYSPATH("m68k"),
+		GLIBC_LINUX_SYSPATH("microblaze"), GLIBC_LINUX_SYSPATH("mips"), GLIBC_LINUX_SYSPATH("net"),
+		GLIBC_LINUX_SYSPATH("netash"), GLIBC_LINUX_SYSPATH("netatalk"), GLIBC_LINUX_SYSPATH("netax25"),
+		GLIBC_LINUX_SYSPATH("neteconet"), GLIBC_LINUX_SYSPATH("netinet"), GLIBC_LINUX_SYSPATH("netipx"),
+		GLIBC_LINUX_SYSPATH("netiucv"), GLIBC_LINUX_SYSPATH("netpacket"), GLIBC_LINUX_SYSPATH("netrom"),
+		GLIBC_LINUX_SYSPATH("netrose"), GLIBC_LINUX_SYSPATH("nfs"), GLIBC_LINUX_SYSPATH("nios2"),
+		GLIBC_LINUX_SYSPATH("powerpc"), GLIBC_LINUX_SYSPATH("riscv"), GLIBC_LINUX_SYSPATH("s390"),
+		GLIBC_LINUX_SYSPATH("scsi"), GLIBC_LINUX_SYSPATH("sh"), GLIBC_LINUX_SYSPATH("sparc"),
+		GLIBC_LINUX_SYSPATH("wordsize"), GLIBC_LINUX_SYSPATH("64"),
+		GLIBC_LINUX_SYSPATH("x86"), GLIBC_LINUX_SYSPATH("x86_64"),
+#undef GLIBC_LINUX_SYSPATH
+		GLIBC_PATH("/include"),
+#undef GLIBC_PATH
+	},
+	"libc4/5" : {
+		PATHPAIR(r"E:\home\src\libc-4.6.27", "/include"),
+	},
+	"libc6" : {
+		("/include", r"E:\home\src\libc6-dev_2.28-10"),
+	},
+	"musl libc" : {
+		PATHPAIR(r"E:\home\src\musl-1.2.2", "/include"),
+	},
+	"diet libc" : {
+		PATHPAIR(r"E:\home\src\dietlibc-0.34", "/include"),
+	},
+	"DJGPP" : {
+		PATHPAIR(r"E:\home\src\djdev-2.05", "/include"),
+	},
+	"EMX kLIBC" : {
+		PATHPAIR(r"E:\home\src\klibc", "/libc/include"),
+	},
+	"mintlib" : {
+		PATHPAIR(r"E:\home\src\mintlib-0.60.1", "/include"),
+	},
+	"libcmini" : {
+		PATHPAIR(r"E:\home\src\libcmini-master", "/include"),
+	},
+	"avr-libc" : {
+		PATHPAIR(r"E:\home\src\avr-libc-2.1.0", "/include"),
+	},
+	"PDCLib" : {
+		PATHPAIR(r"E:\home\src\pdclib-master", "/include"),
+	},
+	"Windows Kits" : {
+		PATHPAIR(r"D:\Windows Kits\10\Include\10.0.22621.0", "/ucrt"),
+		PATHPAIR(r"D:\Windows Kits\10\Include\10.0.22621.0", "/um"),
+		PATHPAIR(r"D:\Windows Kits\10\Include\10.0.22621.0", "/shared"),
+	},
+	"MinGW" : {
+		PATHPAIR(r"E:\home\src\mingw-w64-v6.0.0", "/mingw-w64-headers/crt"),
+		PATHPAIR(r"E:\home\src\mingw-w64-v6.0.0", "/mingw-w64-headers/include"),
+		PATHPAIR(r"E:\home\src\mingw-w64-v6.0.0", "/mingw-w64-libraries/libmangle/include"),
+		PATHPAIR(r"E:\home\src\mingw-w64-v6.0.0", "/mingw-w64-libraries/pseh/include"),
+		PATHPAIR(r"E:\home\src\mingw-w64-v6.0.0", "/mingw-w64-libraries/winpthreads/include"),
+		PATHPAIR(r"E:\home\src\mingwrt-5.0.2", "/include"),
+		("/mingw-w64-headers/crt", {
+			"corecrt.h"
+		})
+	},
+	"MSVC" : {
+		("/include", {
+			"assert.h", "atomic", "cassert", "ciso646", "climits", "crtdbg.h", "csetjmp", "cstdarg", "cstdbool",
+			"cstddef", "cstdint", "ctype.h", "direct.h", "dos.h", "errno.h", "exception", "fcntl.h", "fenv.h",
+			"float.h", "initializer_list", "inttypes.h", "io.h", "iterator", "locale.h", "malloc.h", "math.h",
+			"memory", "mutex", "new", "process.h", "search.h", "signal.h", "stdio.h", "stdlib.h", "string.h",
+			"time.h", "type_traits", "typeinfo", "utility", "wchar.h", "wctype.h", "sys/stat.h", "sys/timeb.h",
+			"sys/types.h", "sys/utime.h", "ConcurrencySal.h", "crtdefs.h", "iso646.h", "memory.h", "minmax.h",
+			"setjmp.h", "share.h", "stdarg.h", "stdbool.h", "stddef.h", "stdint.h", "vadefs.h", "intrin.h",
+			"limits.h"
+		}),
+	},
+	"libstdc++" : {
+		("/include", r"E:\c\kls\kos\kos\include\i386-kos\c++\12.1.0"),
+		("/include", r"E:\c\kls\kos\binutils\src\gcc-12.1.0\libstdc++-v3/include"),
+		("/include", r"E:\c\kls\kos\binutils\src\gcc-12.1.0\libstdc++-v3/include/c_global"),
+		("/include", r"E:\c\kls\kos\binutils\src\gcc-12.1.0\libstdc++-v3/include/std"),
+		("/include", {
+			"atomic",
+			"stdatomic.h",
+		}),
+	},
+	"libbsd" : {
+		PATHPAIR(r"E:\home\src\libbsd-0.11.3", "/include"),
+		PATHPAIR(r"E:\home\src\libbsd-0.11.3", "/include/bsd"),
+	},
+	"libiberty" : {
+		("/include", r"E:\home\src\libiberty-dev_20210106-1_amd64\include\libiberty"),
+		("/include", r"E:\home\src\libiberty-dev_20210106-1_amd64\include"),
+		("/include", r"E:\home\src\libiberty-dev_20210106-1_amd64\include"),
+		("/include", { "symcat.h" }),
+	},
+	"libattr" : {
+		("/include", {
+			"attr/attributes.h" : "attributes.h",
+			"attr/error_context.h" : "error_context.h",
+			"attr/libattr.h" : "libattr.h"
+		})
+	},
+	"GNU Hurd" : {
+		("/usr/include", r"E:\home\src\hurd\include"),
+//		("/usr/include", r"E:\home\src\hurd-debian-20220824\usr\include"),
+	},
+	"Linux" : {
+		("/usr/include", {
+			"linux/target_core_user.h", "linux/nl80211.h", "linux/atmioc.h", "linux/poll.h", "linux/random.h",
+			"linux/times.h", "linux/seccomp.h", "linux/timex.h", "linux/phonet.h", "linux/i8k.h",
+			"linux/if_slip.h", "linux/dm-log-userspace.h", "linux/atmapi.h", "linux/l2tp.h",
+			"linux/param.h", "linux/xilinx-v4l2-controls.h", "linux/termios.h", "linux/timerfd.h", "linux/qnx4_fs.h",
+			"linux/netfilter_bridge.h", "linux/virtio_rng.h", "linux/posix_types.h", "linux/telephony.h",
+			"linux/atmclip.h", "linux/if_bridge.h", "linux/hyperv.h", "linux/atm_eni.h", "linux/fou.h", "linux/tty.h",
+			"linux/baycom.h", "linux/net.h", "linux/uuid.h", "linux/watchdog.h", "linux/binfmts.h",
+			"linux/cramfs_fs.h", "linux/agpgart.h", "linux/virtio_console.h", "linux/nfs4.h", "linux/patchkey.h",
+			"linux/coda_psdev.h", "linux/version.h", "linux/prctl.h", "linux/isdn_ppp.h", "linux/meye.h",
+			"linux/mroute6.h", "linux/in6.h", "linux/atm_tcp.h", "linux/kernelcapi.h", "linux/atmbr2684.h",
+			"linux/mdio.h", "linux/atm_zatm.h", "linux/if_arp.h", "linux/if_fc.h", "linux/netlink_diag.h",
+			"linux/if_x25.h", "linux/cn_proc.h", "linux/elf.h", "linux/pps.h", "linux/virtio_ring.h",
+			"linux/virtio_ids.h", "linux/dlm_device.h", "linux/ipmi_msgdefs.h", "linux/xfrm.h", "linux/bpf_common.h",
+			"linux/kernel.h", "linux/kernel-page-flags.h", "linux/sonypi.h", "linux/fsl_hypervisor.h",
+			"linux/icmpv6.h", "linux/blktrace_api.h", "linux/omap3isp.h", "linux/aufs_type.h", "linux/netfilter_ipv6.h",
+			"linux/x25.h", "linux/auto_fs4.h", "linux/kvm.h", "linux/hdreg.h", "linux/utsname.h",
+			"linux/suspend_ioctls.h", "linux/v4l2-subdev.h", "linux/nfs3.h", "linux/nbd.h", "linux/gameport.h",
+			"linux/cuda.h", "linux/cciss_ioctl.h", "linux/atm_nicstar.h", "linux/xattr.h", "linux/if_bonding.h",
+			"linux/tcp_metrics.h", "linux/atm_idt77105.h", "linux/pktcdvd.h", "linux/soundcard.h", "linux/personality.h",
+			"linux/ipc.h", "linux/kexec.h", "linux/tipc.h", "linux/gfs2_ondisk.h", "linux/ipx.h", "linux/neighbour.h",
+			"linux/unistd.h", "linux/hw_breakpoint.h", "linux/msg.h", "linux/audit.h", "linux/ethtool.h",
+			"linux/types.h", "linux/irda.h", "linux/securebits.h", "linux/openvswitch.h", "linux/net_tstamp.h",
+			"linux/atmsvc.h", "linux/if_fddi.h", "linux/synclink.h", "linux/virtio_pci.h", "linux/hdlcdrv.h",
+			"linux/affs_hardblocks.h", "linux/if_pppox.h", "linux/errno.h", "linux/elfcore.h", "linux/nubus.h",
+			"linux/elf-em.h", "linux/arcfb.h", "linux/dqblk_xfs.h", "linux/if_infiniband.h", "linux/tty_flags.h",
+			"linux/nfs_idmap.h", "linux/un.h", "linux/romfs_fs.h", "linux/ipv6_route.h", "linux/inet_diag.h",
+			"linux/pmu.h", "linux/pkt_sched.h", "linux/ip_vs.h", "linux/msdos_fs.h", "linux/sem.h",
+			"linux/connector.h", "linux/omapfb.h", "linux/sysctl.h", "linux/pg.h", "linux/input.h",
+			"linux/genetlink.h", "linux/if_vlan.h", "linux/ixjuser.h", "linux/firewire-constants.h", "linux/a.out.h",
+			"linux/fuse.h", "linux/if_arcnet.h", "linux/psci.h", "linux/nfs4_mount.h", "linux/if_ether.h",
+			"linux/raw.h", "linux/blkpg.h", "linux/phantom.h", "linux/if_plip.h", "linux/if_packet.h",
+			"linux/pci_regs.h", "linux/memfd.h", "linux/perf_event.h", "linux/usbip.h", "linux/hpet.h", "linux/fdreg.h",
+			"linux/serio.h", "linux/virtio_blk.h", "linux/ip.h", "linux/if_cablemodem.h", "linux/v4l2-dv-timings.h",
+			"linux/scc.h", "linux/rfkill.h", "linux/joystick.h", "linux/pkt_cls.h", "linux/netfilter_arp.h",
+			"linux/net_dropmon.h", "linux/vt.h", "linux/fadvise.h", "linux/udf_fs_i.h", "linux/ivtvfb.h",
+			"linux/if.h", "linux/sockios.h", "linux/nfs_mount.h", "linux/v4l2-mediabus.h", "linux/shm.h",
+			"linux/acct.h", "linux/ncp_mount.h", "linux/mempolicy.h", "linux/taskstats.h", "linux/stat.h",
+			"linux/capi.h", "linux/mmtimer.h", "linux/am437x-vpfe.h", "linux/uinput.h", "linux/tipc_netlink.h",
+			"linux/ivtv.h", "linux/if_hippi.h", "linux/major.h", "linux/v4l2-controls.h", "linux/can.h",
+			"linux/atmarp.h", "linux/in_route.h", "linux/matroxfb.h", "linux/bpqether.h", "linux/cdrom.h",
+			"linux/ppp-ioctl.h", "linux/loop.h", "linux/signal.h", "linux/in.h", "linux/efs_fs_sb.h",
+			"linux/radeonfb.h", "linux/netlink.h", "linux/aio_abi.h", "linux/if_tunnel.h", "linux/virtio_types.h",
+			"linux/rtnetlink.h", "linux/net_namespace.h", "linux/adb.h", "linux/atmlec.h", "linux/usbdevice_fs.h",
+			"linux/wait.h", "linux/ioctl.h", "linux/virtio_config.h", "linux/sched.h", "linux/mpls_iptunnel.h",
+			"linux/ptp_clock.h", "linux/atmdev.h", "linux/hiddev.h", "linux/fd.h", "linux/reiserfs_xattr.h",
+			"linux/input-event-codes.h", "linux/hdlc.h", "linux/wanrouter.h", "linux/if_link.h", "linux/virtio_net.h",
+			"linux/ipsec.h", "linux/wimax.h", "linux/fib_rules.h", "linux/inotify.h", "linux/dlm_netlink.h",
+			"linux/virtio_input.h", "linux/ptrace.h", "linux/dlmconstants.h", "linux/atm.h", "linux/elf-fdpic.h",
+			"linux/mic_ioctl.h", "linux/if_phonet.h", "linux/capability.h", "linux/smiapp.h", "linux/fiemap.h",
+			"linux/unix_diag.h", "linux/tcp.h", "linux/gsmmux.h", "linux/mii.h", "linux/virtio_balloon.h",
+			"linux/reiserfs_fs.h", "linux/nvme_ioctl.h", "linux/atalk.h", "linux/cgroupstats.h", "linux/rose.h",
+			"linux/sysinfo.h", "linux/dlm.h", "linux/sock_diag.h", "linux/coff.h", "linux/ncp_fs.h", "linux/hidraw.h",
+			"linux/rds.h", "linux/vhost.h", "linux/wireless.h", "linux/netfilter.h", "linux/socket.h",
+			"linux/isdn_divertif.h", "linux/atm_he.h", "linux/serial_reg.h", "linux/nfs2.h", "linux/icmp.h",
+			"linux/mei.h", "linux/zorro_ids.h", "linux/uvcvideo.h", "linux/kvm_para.h", "linux/falloc.h",
+			"linux/uhid.h", "linux/if_ppp.h", "linux/virtio_gpu.h", "linux/mman.h", "linux/signalfd.h",
+			"linux/ndctl.h", "linux/if_addr.h", "linux/sdla.h", "linux/edd.h", "linux/nfs_fs.h",
+			"linux/netfilter_ipv4.h", "linux/iso_fs.h", "linux/virtio_scsi.h", "linux/i2o-dev.h",
+			"linux/ila.h", "linux/media-bus-format.h", "linux/stddef.h", "linux/if_ltalk.h", "linux/packet_diag.h",
+			"linux/mqueue.h", "linux/v4l2-common.h", "linux/libc-compat.h", "linux/nfsacl.h", "linux/qnxtypes.h",
+			"linux/dm-ioctl.h", "linux/b1lli.h", "linux/resource.h", "linux/futex.h", "linux/if_eql.h",
+			"linux/screen_info.h", "linux/cycx_cfm.h", "linux/dn.h", "linux/ppp_defs.h", "linux/jffs2.h", "linux/fb.h",
+			"linux/isdn.h", "linux/membarrier.h", "linux/btrfs.h", "linux/atmmpc.h", "linux/mtio.h",
+			"linux/route.h", "linux/if_pppol2tp.h", "linux/bcm933xx_hcs.h", "linux/thermal.h", "linux/zorro.h",
+			"linux/rtc.h", "linux/netfilter_decnet.h", "linux/sonet.h", "linux/quota.h", "linux/videodev2.h",
+			"linux/netconf.h", "linux/userfaultfd.h", "linux/const.h", "linux/time.h", "linux/cm4000_cs.h",
+			"linux/atmppp.h", "linux/fs.h", "linux/scif_ioctl.h", "linux/nfs.h", "linux/swab.h", "linux/hid.h",
+			"linux/llc.h", "linux/ultrasound.h", "linux/tiocl.h", "linux/fanotify.h", "linux/mpls.h",
+			"linux/bfs_fs.h", "linux/hsr_netlink.h", "linux/sctp.h", "linux/sound.h", "linux/flat.h", "linux/dcbnl.h",
+			"linux/reboot.h", "linux/veth.h", "linux/filter.h", "linux/n_r3964.h", "linux/ncp.h", "linux/lwtunnel.h",
+			"linux/parport.h", "linux/nvram.h", "linux/gen_stats.h", "linux/oom.h", "linux/errqueue.h",
+			"linux/bsg.h", "linux/netdevice.h", "linux/if_tun.h", "linux/snmp.h", "linux/string.h",
+			"linux/hysdn_if.h", "linux/tipc_config.h", "linux/ip6_tunnel.h", "linux/if_alg.h", "linux/minix_fs.h",
+			"linux/if_frad.h", "linux/atmsap.h", "linux/magic.h", "linux/igmp.h", "linux/vfio.h",
+			"linux/serial.h", "linux/gigaset_dev.h", "linux/kd.h", "linux/chio.h", "linux/i2c-dev.h",
+			"linux/virtio_9p.h", "linux/if_team.h", "linux/pfkeyv2.h", "linux/mic_common.h", "linux/ipmi.h",
+			"linux/irqnr.h", "linux/auxvec.h", "linux/dccp.h", "linux/uio.h", "linux/firewire-cdev.h",
+			"linux/eventpoll.h", "linux/serial_core.h", "linux/ppp-comp.h", "linux/udp.h", "linux/if_addrlabel.h",
+			"linux/ncp_no.h", "linux/coda.h", "linux/kcmp.h", "linux/bpf.h", "linux/nfc.h", "linux/utime.h",
+			"linux/apm_bios.h", "linux/isdnif.h", "linux/keyctl.h", "linux/auto_fs.h", "linux/cyclades.h",
+			"linux/vm_sockets.h", "linux/fcntl.h", "linux/dlm_plock.h", "linux/selinux_netlink.h", "linux/netrom.h",
+			"linux/ipv6.h", "linux/lp.h", "linux/ppdev.h", "linux/adfs_fs.h", "linux/kdev_t.h", "linux/cciss_defs.h",
+			"linux/i2c.h", "linux/toshiba.h", "linux/keyboard.h", "linux/map_to_7segment.h", "linux/mroute.h",
+			"linux/ax25.h", "linux/pci.h", "linux/limits.h", "linux/media.h",
+			"linux/netfilter_ipv6/ip6t_mh.h", "linux/netfilter_ipv6/ip6_tables.h",
+			"linux/netfilter_ipv6/ip6t_LOG.h", "linux/netfilter_ipv6/ip6t_opts.h",
+			"linux/netfilter_ipv6/ip6t_NPT.h", "linux/netfilter_ipv6/ip6t_rt.h",
+			"linux/netfilter_ipv6/ip6t_frag.h", "linux/netfilter_ipv6/ip6t_ah.h",
+			"linux/netfilter_ipv6/ip6t_HL.h", "linux/netfilter_ipv6/ip6t_REJECT.h",
+			"linux/netfilter_ipv6/ip6t_ipv6header.h", "linux/netfilter_ipv6/ip6t_hl.h", "linux/android/binder.h",
+			"linux/can/raw.h", "linux/can/netlink.h", "linux/can/gw.h", "linux/can/bcm.h",
+			"linux/can/error.h", "linux/netfilter_bridge/ebt_arp.h",
+			"linux/netfilter_bridge/ebt_mark_m.h", "linux/netfilter_bridge/ebt_vlan.h",
+			"linux/netfilter_bridge/ebt_limit.h", "linux/netfilter_bridge/ebt_arpreply.h",
+			"linux/netfilter_bridge/ebt_redirect.h", "linux/netfilter_bridge/ebt_ip6.h",
+			"linux/netfilter_bridge/ebt_802_3.h", "linux/netfilter_bridge/ebt_mark_t.h",
+			"linux/netfilter_bridge/ebt_ip.h", "linux/netfilter_bridge/ebt_nat.h",
+			"linux/netfilter_bridge/ebt_stp.h", "linux/netfilter_bridge/ebt_among.h",
+			"linux/netfilter_bridge/ebt_nflog.h", "linux/netfilter_bridge/ebt_pkttype.h",
+			"linux/netfilter_bridge/ebt_log.h", "linux/netfilter_bridge/ebtables.h", "linux/hsi/cs-protocol.h",
+			"linux/hsi/hsi_char.h", "linux/mmc/ioctl.h", "linux/spi/spidev.h", "linux/isdn/capicmd.h",
+			"linux/raid/md_u.h", "linux/raid/md_p.h", "linux/wimax/i2400m.h", "linux/dvb/audio.h",
+			"linux/dvb/net.h", "linux/dvb/version.h", "linux/dvb/dmx.h", "linux/dvb/osd.h", "linux/dvb/frontend.h",
+			"linux/dvb/video.h", "linux/dvb/ca.h", "linux/byteorder/little_endian.h",
+			"linux/byteorder/big_endian.h", "linux/tc_ematch/tc_em_meta.h",
+			"linux/tc_ematch/tc_em_nbyte.h", "linux/tc_ematch/tc_em_cmp.h", "linux/tc_ematch/tc_em_text.h",
+			"linux/usb/audio.h", "linux/usb/tmc.h", "linux/usb/cdc.h", "linux/usb/ch11.h", "linux/usb/functionfs.h",
+			"linux/usb/midi.h", "linux/usb/cdc-wdm.h", "linux/usb/gadgetfs.h", "linux/usb/g_printer.h",
+			"linux/usb/video.h", "linux/usb/ch9.h", "linux/nfsd/nfsfh.h", "linux/nfsd/cld.h",
+			"linux/nfsd/stats.h", "linux/nfsd/export.h", "linux/nfsd/debug.h",
+			"linux/netfilter_ipv4/ipt_REJECT.h", "linux/netfilter_ipv4/ipt_ECN.h",
+			"linux/netfilter_ipv4/ipt_ttl.h", "linux/netfilter_ipv4/ipt_ah.h",
+			"linux/netfilter_ipv4/ipt_TTL.h", "linux/netfilter_ipv4/ipt_LOG.h",
+			"linux/netfilter_ipv4/ipt_CLUSTERIP.h", "linux/netfilter_ipv4/ip_tables.h",
+			"linux/netfilter_ipv4/ipt_ecn.h", "linux/sunrpc/debug.h", "linux/hdlc/ioctl.h",
+			"linux/netfilter/nf_conntrack_sctp.h", "linux/netfilter/nf_nat.h", "linux/netfilter/xt_dccp.h",
+			"linux/netfilter/xt_LED.h", "linux/netfilter/nf_conntrack_tuple_common.h",
+			"linux/netfilter/xt_iprange.h", "linux/netfilter/xt_CT.h", "linux/netfilter/xt_TPROXY.h",
+			"linux/netfilter/xt_TCPMSS.h", "linux/netfilter/xt_time.h", "linux/netfilter/xt_CHECKSUM.h",
+			"linux/netfilter/xt_devgroup.h", "linux/netfilter/xt_connbytes.h",
+			"linux/netfilter/xt_socket.h", "linux/netfilter/nf_tables_compat.h",
+			"linux/netfilter/xt_length.h", "linux/netfilter/nfnetlink_cthelper.h",
+			"linux/netfilter/xt_realm.h", "linux/netfilter/xt_RATEEST.h", "linux/netfilter/xt_dscp.h",
+			"linux/netfilter/xt_string.h", "linux/netfilter/nf_conntrack_common.h",
+			"linux/netfilter/nf_tables.h", "linux/netfilter/nfnetlink_cttimeout.h",
+			"linux/netfilter/xt_helper.h", "linux/netfilter/xt_AUDIT.h", "linux/netfilter/xt_MARK.h",
+			"linux/netfilter/xt_ecn.h", "linux/netfilter/xt_CONNSECMARK.h",
+			"linux/netfilter/nfnetlink_acct.h", "linux/netfilter/xt_state.h", "linux/netfilter/xt_cluster.h",
+			"linux/netfilter/xt_LOG.h", "linux/netfilter/xt_tcpudp.h",
+			"linux/netfilter/xt_recent.h", "linux/netfilter/nfnetlink_conntrack.h",
+			"linux/netfilter/xt_u32.h", "linux/netfilter/xt_multiport.h", "linux/netfilter/nfnetlink.h",
+			"linux/netfilter/xt_connmark.h", "linux/netfilter/xt_quota.h", "linux/netfilter/xt_mark.h",
+			"linux/netfilter/xt_owner.h", "linux/netfilter/xt_hashlimit.h",
+			"linux/netfilter/xt_NFQUEUE.h", "linux/netfilter/xt_CONNMARK.h",
+			"linux/netfilter/xt_conntrack.h", "linux/netfilter/xt_osf.h", "linux/netfilter/xt_sctp.h",
+			"linux/netfilter/xt_policy.h", "linux/netfilter/xt_ipcomp.h", "linux/netfilter/xt_addrtype.h",
+			"linux/netfilter/x_tables.h", "linux/netfilter/xt_TCPOPTSTRIP.h",
+			"linux/netfilter/nf_conntrack_ftp.h", "linux/netfilter/xt_CLASSIFY.h",
+			"linux/netfilter/xt_nfacct.h", "linux/netfilter/xt_cpu.h", "linux/netfilter/xt_cgroup.h",
+			"linux/netfilter/xt_DSCP.h", "linux/netfilter/xt_comment.h", "linux/netfilter/xt_pkttype.h",
+			"linux/netfilter/xt_ipvs.h", "linux/netfilter/nfnetlink_compat.h", "linux/netfilter/xt_tcpmss.h",
+			"linux/netfilter/xt_bpf.h", "linux/netfilter/xt_IDLETIMER.h", "linux/netfilter/xt_l2tp.h",
+			"linux/netfilter/xt_esp.h", "linux/netfilter/xt_connlabel.h",
+			"linux/netfilter/xt_rpfilter.h", "linux/netfilter/xt_physdev.h",
+			"linux/netfilter/xt_connlimit.h", "linux/netfilter/xt_mac.h", "linux/netfilter/xt_rateest.h",
+			"linux/netfilter/xt_HMARK.h", "linux/netfilter/nfnetlink_log.h",
+			"linux/netfilter/xt_SECMARK.h", "linux/netfilter/xt_NFLOG.h",
+			"linux/netfilter/nf_conntrack_tcp.h", "linux/netfilter/xt_TEE.h", "linux/netfilter/xt_set.h",
+			"linux/netfilter/xt_limit.h", "linux/netfilter/nfnetlink_queue.h",
+			"linux/netfilter/xt_statistic.h", "linux/netfilter/ipset/ip_set_bitmap.h",
+			"linux/netfilter/ipset/ip_set.h", "linux/netfilter/ipset/ip_set_list.h",
+			"linux/netfilter/ipset/ip_set_hash.h", "linux/tc_act/tc_csum.h", "linux/tc_act/tc_gact.h",
+			"linux/tc_act/tc_defact.h", "linux/tc_act/tc_pedit.h", "linux/tc_act/tc_skbedit.h",
+			"linux/tc_act/tc_nat.h", "linux/tc_act/tc_bpf.h", "linux/tc_act/tc_ipt.h",
+			"linux/tc_act/tc_vlan.h", "linux/tc_act/tc_mirred.h", "linux/tc_act/tc_connmark.h",
+			"linux/netfilter_arp/arp_tables.h", "linux/netfilter_arp/arpt_mangle.h", "linux/caif/if_caif.h",
+			"linux/caif/caif_socket.h", "linux/iio/types.h", "linux/iio/events.h",
+
+			/* asm-generic headers */
+			"asm-generic/auxvec.h", "asm-generic/errno.h", "asm-generic/int-ll64.h", "asm-generic/kvm_para.h",
+			"asm-generic/param.h", "asm-generic/sembuf.h", "asm-generic/signal-defs.h", "asm-generic/statfs.h",
+			"asm-generic/termios.h", "asm-generic/bitsperlong.h", "asm-generic/fcntl.h", "asm-generic/ioctl.h",
+			"asm-generic/mman-common.h", "asm-generic/poll.h", "asm-generic/setup.h", "asm-generic/signal.h",
+			"asm-generic/stat.h", "asm-generic/types.h", "asm-generic/bpf_perf_event.h",
+			"asm-generic/hugetlb_encode.h", "asm-generic/ioctls.h", "asm-generic/mman.h",
+			"asm-generic/posix_types.h", "asm-generic/shmbuf.h", "asm-generic/socket.h", "asm-generic/swab.h",
+			"asm-generic/ucontext.h", "asm-generic/errno-base.h", "asm-generic/int-l64.h", "asm-generic/ipcbuf.h",
+			"asm-generic/msgbuf.h", "asm-generic/resource.h", "asm-generic/siginfo.h", "asm-generic/sockios.h",
+			"asm-generic/termbits.h", "asm-generic/unistd.h",
+		}),
+		("/usr/include/[...]", {
+			/* asm headers */
+			"asm/auxvec.h", "asm/bitsperlong.h", "asm/bpf_perf_event.h", "asm/byteorder.h", "asm/errno.h",
+			"asm/fcntl.h", "asm/hwcap.h", "asm/ioctl.h", "asm/ioctls.h", "asm/ipcbuf.h", "asm/kvm.h",
+			"asm/kvm_para.h", "asm/mman.h", "asm/msgbuf.h", "asm/param.h", "asm/perf_regs.h", "asm/poll.h",
+			"asm/posix_types.h", "asm/ptrace.h", "asm/resource.h", "asm/sembuf.h", "asm/setup.h", "asm/shmbuf.h",
+			"asm/sigcontext.h", "asm/siginfo.h", "asm/signal.h", "asm/socket.h", "asm/sockios.h", "asm/statfs.h",
+			"asm/stat.h", "asm/sve_context.h", "asm/swab.h", "asm/termbits.h", "asm/termios.h", "asm/types.h",
+			"asm/ucontext.h", "asm/unistd.h",
+		}),
+	},
+};
+#undef PATHPAIR
+
+global final STD_HEADERS: {string: {string...}} = {
+	"ISO C89 (ANSI X3.159-1989)" : {
+		"assert.h", "ctype.h", "errno.h", "float.h", "limits.h", "locale.h",
+		"math.h", "setjmp.h", "signal.h", "stdarg.h", "stddef.h", "stdio.h",
+		"stdlib.h", "string.h", "time.h",
+	},
+	"ISO C95 (ISO/IEC 9899:1990/AMD1:1995)" : {
+		"iso646.h", "wchar.h", "wctype.h",
+	},
+	"ISO C99 (ISO/IEC 9899:1999)" : {
+		"fenv.h", "inttypes.h", "stdbool.h", "stdint.h",
+	},
+	"ISO C11 (ISO/IEC 9899:2011)" : {
+		"stdalign.h", "stdatomic.h", "stdnoreturn.h", "threads.h", "uchar.h",
+	},
+	"ISO C17 (ISO/IEC 9899:2018)": {
+	},
+	"ISO C23 (ISO/IEC 9899:2024)": {
+		"stdbit.h", "stdckdint.h",
+	},
+	"ISO C++98 (ISO/IEC 14882:1998)" : {
+		"cstdlib", "csignal", "csetjmp", "cstdarg", "typeinfo", "bitset", "functional", "utility",
+		"ctime", "new", "memory", "climits", "cfloat", "limits", "exception", "stdexcept", "cassert",
+		"cerrno", "cctype", "cwctype", "cstring", "cwchar", "string", "vector", "deque", "list",
+		"set", "map", "stack", "queue", "iterator", "algorithm", "cmath", "complex", "valarray", "numeric",
+		"locale", "clocale", "cstddef", "iosfwd", "ios", "istream", "ostream", "iostream", "fstream",
+		"sstream", "iomanip", "streambuf", "cstdio", "strstream",
+	},
+	"ISO C++03 (ISO/IEC 14882:2003)" : {
+		/* TODO: Split from ISO C++98 */
+	},
+	"ISO C++11 (ISO/IEC 14882:2011)" : {
+		"typeindex", "type_traits", "chrono", "initializer_list", "tuple", "scoped_allocator",
+		"cstdint", "cinttypes", "system_error", "cuchar", "array", "forward_list", "unordered_set",
+		"unordered_map", "random", "ratio", "cfenv", "codecvt", "regex", "atomic", "thread",
+		"future", "condition_variable", "mutex",
+	},
+	"ISO C++14 (ISO/IEC 14882:2014)" : {
+		"shared_mutex",
+	},
+	"ISO C++17 (ISO/IEC 14882:2017)" : {
+		"any", "optional", "variant", "memory_resource", "string_view", "charconv", "execution",
+		"filesystem",
+	},
+	"ISO C++20 (ISO/IEC 14882:2020)" : {
+		"concepts", "coroutine", "compare", "version", "source_location", "format", "span",
+		"ranges", "bit", "numbers", "syncstream", "stop_token", "semaphore", "latch",
+	},
+	"ISO C++23 (ISO/IEC 14882:2024)" : {
+		"expected", "flat_map", "flat_set", "generator", "mdspan", "print",
+		"spanstream", "stacktrace", "stdfloat",
+	},
+	"ISO C++23 (ISO/IEC 14882:2024)" : {
+		"expected", "flat_map", "flat_set", "generator", "mdspan", "print",
+		"spanstream", "stacktrace", "stdfloat",
+	},
+	"ISO C++26 (TBA)" : {
+		"contracts", "debugging", "hazard_pointer", "hive", "inplace_vector",
+		"linalg", "rcu", "simd", "text_encoding",
+	},
+	"POSIX.1 (Issue 1, IEEE Std 1003.1-1988)" : {
+		"assert.h", "ctype.h", "errno.h", "fcntl.h", "ftw.h", "grp.h",
+		"limits.h", "math.h", "pwd.h", "search.h", "setjmp.h", "signal.h",
+		"stdio.h", "string.h", "sys/stat.h", "sys/times.h", "sys/types.h",
+		"sys/utsname.h", "time.h", "ulimit.h", "unistd.h",
+	},
+	"POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001)" : {
+		"aio.h", "dlfcn.h", "inttypes.h", "iso646.h", "mqueue.h", "pthread.h",
+		"sched.h", "semaphore.h", "wctype.h",
+	},
+	"POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004)" : {
+		"arpa/inet.h", "fenv.h", "net/if.h", "netdb.h", "netinet/in.h",
+		"netinet/tcp.h", "spawn.h", "stdbool.h", "stdint.h", "sys/select.h",
+		"sys/socket.h", "sys/un.h",
+	},
+	"POSIX.1b (Issue 2, IEEE Std 1003.1b-1993)" : {
+		"dirent.h", "sys/ipc.h", "sys/msg.h", "sys/sem.h", "sys/shm.h",
+	},
+	"POSIX.1c (Issue 3, IEEE Std 1003.1c-1995)" : {
+		"cpio.h", "locale.h", "stdlib.h", "sys/wait.h", "tar.h",
+		"termios.h", "utime.h",
+	},
+	"POSIX.2 (Issue 4, IEEE Std 1003.2-1992)" : {
+		"float.h", "fnmatch.h", "glob.h", "libgen.h", "monetary.h", "poll.h",
+		"regex.h", "stdarg.h", "stddef.h", "strings.h", "stropts.h",
+		"sys/mman.h", "sys/resource.h", "sys/statvfs.h", "sys/time.h",
+		"sys/uio.h", "syslog.h", "utmpx.h", "wchar.h",
+	},
+};
+
+
+function filesTxtContainsLine(line: Bytes): bool {
+	static local knownFiles = File.open("files-sorted.txt", "rb").readall();
+	local lo = 0, hi = #knownFiles;
+	while (lo < hi) {
+		local startOfLine = (lo + hi) / 2;
+		local endOfLine = startOfLine;
+		while (startOfLine > 0 && !knownFiles.islf(startOfLine - 1))
+			--startOfLine;
+		while (endOfLine < #knownFiles && !knownFiles.islf(endOfLine))
+			++endOfLine;
+		local knownLine = knownFiles[startOfLine:endOfLine];
+		if (line < knownLine) {
+			hi = startOfLine;
+		} else if (line > knownLine) {
+			lo = endOfLine + 1;
+		} else {
+			return true;
+		}
+	}
+	return false;
+}
+
+function fileExists(path: string): bool {
+#if 1
+	final local E_HOME_SRC = r"E:\home\src\";
+	if (path.startswith(E_HOME_SRC)) {
+		local relPath = "./" + path[#E_HOME_SRC:].replace(r"\", r"/");
+		if (filesTxtContainsLine(relPath.encode("utf-8")))
+			return true;
+	}
+#endif
+	return fs.stat.exists(path);
+}
+
+
+@@Enumerate pairs of (SystemName, InSourcePath) for @headname
+function enumerateSystemPorts(headname: string): {(string, string)...} {
+	for (local sysname, paths: SYSPORT_PATHS) {
+		for (local inSourcePrefix, relPath: paths) {
+			if (relPath !is string) {
+				if (headname in relPath) {
+					if (relPath is Mapping)
+						headname = relPath[headname];
+					goto gotit;
+				}
+			} else {
+				local fullPath = relPath + "/" + headname;
+				if (fileExists(fullPath)) {
+gotit:
+					yield (sysname, inSourcePrefix.rstrip("/") + "/" + headname);
+					goto nextsys;
+				}
+			}
+		}
+nextsys:
+		;
+	}
+}
+
+function enumerateStdPorts(headname: string): {string...} {
+	for (local stdname, heads: STD_HEADERS) {
+		if (headname in heads)
+			yield stdname;
+	}
+}
+
+function enumerateStdComments(headname: string): {string...} {
+	local std = List(enumerateStdPorts(headname));
+	local sys = List(enumerateSystemPorts(headname));
+	std.sort();
+	sys.sort([](x) -> x.first);
+	for (local s: std)
+		yield "/* (>) Standard: {} */".format({ s });
+	local longestSysnameLength = sys.each.first.length > ...;
+	for (local sysnam, path: sys)
+		yield "/* (#) Portability: {} ({}) */"
+			.format({ sysnam.ljust(longestSysnameLength), path });
+}
+
+
+function updateStdCommentsInFile(filename: string, headname: string) {
+	local comments = enumerateStdComments(headname);
+	if (!comments)
+		return; /* Nothing to say about this one... */
+	local oldData = File.open(filename, "r").read();
+	local newData = oldData.unifylines();
+	if (newData.startswith("/* HASH "))
+		return; /* Don't update hashed files! */
+	local insertStart = 0;
+	while (insertStart < #newData) {
+		if (newData.isspace(insertStart)) {
+			++insertStart;
+			continue;
+		}
+		if (newData.startswith("/*", insertStart)) {
+			if (newData.startswith("/* (>)", insertStart) ||
+			    newData.startswith("/* (#)", insertStart))
+				break;
+			insertStart = newData.index("*/", insertStart + 2) + 2;
+			continue;
+		}
+		if (newData.startswith("//", insertStart)) {
+			insertStart = newData.index("\n", insertStart + 2) + 1;
+			continue;
+		}
+		if (newData.startswith("%(c_prefix){", insertStart)) {
+			insertStart += 12;
+			continue;
+		}
+		break;
+	}
+	local insertEnd = insertStart;
+	while (insertEnd < #newData) {
+		if (newData.isspace(insertEnd)) {
+			++insertEnd;
+			continue;
+		}
+		if (newData.startswith("/* (>)", insertEnd) ||
+		    newData.startswith("/* (#)", insertEnd)) {
+			insertEnd = newData.index("*/", insertEnd + 6) + 2;
+			continue;
+		}
+		break;
+	}
+	local newLines = "\n".join(comments).encode("utf-8");
+	local newData = newData[:insertStart] + newLines + "\n" + newData[insertEnd:];
+	if (newData != oldData) {
+		print "Updating file:", repr filename;
+		/* Must update this file! */
+		with (local fp = File.open(filename, "w"))
+			fp.write(newData);
+	}
+}
+
+function updateStdCommentsInPath(
+		path: string, headPrefix: string, recursive: bool = false) {
+	for (local e: fs.dir(path)) {
+		local fullent = fs.joinpath(path, e);
+		if (fs.stat.isdir(fullent)) {
+			if (recursive)
+				updateStdCommentsInPath(fullent, headPrefix + e + "/", recursive);
+			continue;
+		}
+		if (isFileGitIgnored(fullent))
+			continue;
+		local headname = headPrefix + e;
+		updateStdCommentsInFile(fullent, headname);
+	}
+}
+
+
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include", "");
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\arpa", "arpa/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\asm-generic", "asm-generic/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\asm", "asm/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\attr", "attr/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\bits", "bits/");
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\bsd", "bsd/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\gnu", "gnu/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\i386-kos", "");
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\i386-kos/asm", "asm/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\i386-kos/bits", "bits/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\i386-kos/linux", "linux/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\i386-kos/sys", "sys/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\libiberty", "libiberty/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\linux", "linux/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\machine", "machine/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\net", "net/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\netinet", "netinet/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\netpacket", "netpacket/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\rpc", "rpc/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\ssp", "ssp/", recursive: true);
+updateStdCommentsInPath(r"E:\c\kls\kos\kos\include\sys", "sys/", recursive: true);
+
+global final LIBC_MAGIC_PATH = r"E:\c\kls\kos\kos\src\libc\magic";
+for (local e: fs.query(LIBC_MAGIC_PATH + "/*.c")) {
+	updateStdCommentsInFile(LIBC_MAGIC_PATH + "/" + e, e[:-2].replace(".", "/") + ".h");
+}

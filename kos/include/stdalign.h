@@ -22,6 +22,7 @@
 /* (#) Portability: FreeBSD       (/include/stdalign.h) */
 /* (#) Portability: NetBSD        (/include/stdalign.h) */
 /* (#) Portability: PDCLib        (/include/stdalign.h) */
+/* (#) Portability: Windows Kits  (/ucrt/stdalign.h) */
 /* (#) Portability: musl libc     (/include/stdalign.h) */
 /*!ignore_unnecessary_include*/
 #ifndef _STDALIGN_H

@@ -39,6 +39,8 @@ The only purpose of portability notes is to give the Programmer an idea of how w
 	- ISO C95 (ISO/IEC 9899:1990/AMD1:1995)
 	- ISO C99 (ISO/IEC 9899:1999)
 	- ISO C11 (ISO/IEC 9899:2011)
+	- ISO C17 (ISO/IEC 9899:2018)
+	- ISO C23 (ISO/IEC 9899:2024)
 - [ISO C++](https://de.wikipedia.org/wiki/C++)
 	- ISO C++98 (ISO/IEC 14882:1998)
 	- ISO C++03 (ISO/IEC 14882:2003)
@@ -46,6 +48,7 @@ The only purpose of portability notes is to give the Programmer an idea of how w
 	- ISO C++14 (ISO/IEC 14882:2014)
 	- ISO C++17 (ISO/IEC 14882:2017)
 	- ISO C++20 (ISO/IEC 14882:2020)
+	- ISO C++23 (ISO/IEC 14882:2024)
 
 
 #### Mentioned Libraries
