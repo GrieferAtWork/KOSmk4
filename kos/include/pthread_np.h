@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3b859ff */
+/* HASH CRC-32:0x8538ccf9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,19 +130,19 @@ __CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthrea
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t __self, const char *__name),pthread_setname_np,(__self,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t __self, char const *__name),pthread_setname_np,(__self,__name))
 #elif defined(__CRT_HAVE_pthread_set_name_np)
 /* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-__CDECLARE(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t __self, const char *__name),(__self,__name))
+__CDECLARE(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t __self, char const *__name),(__self,__name))
 #elif defined(__CRT_HAVE_cthread_set_name)
 /* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t __self, const char *__name),cthread_set_name,(__self,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t __self, char const *__name),cthread_set_name,(__self,__name))
 #endif /* ... */
 #ifndef __pthread_setname_np_defined
 #define __pthread_setname_np_defined
@@ -151,19 +151,19 @@ __CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t 
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-__CDECLARE(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, const char *__name),(__self,__name))
+__CDECLARE(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, char const *__name),(__self,__name))
 #elif defined(__CRT_HAVE_pthread_set_name_np)
 /* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, const char *__name),pthread_set_name_np,(__self,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, char const *__name),pthread_set_name_np,(__self,__name))
 #elif defined(__CRT_HAVE_cthread_set_name)
 /* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, const char *__name),cthread_set_name,(__self,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, char const *__name),cthread_set_name,(__self,__name))
 #else /* ... */
 #undef __pthread_setname_np_defined
 #endif /* !... */

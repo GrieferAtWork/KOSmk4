@@ -172,12 +172,12 @@ static_assert(offsetof(pthread_barrier_t, b_out) == __OFFSET_PTHREAD_BARRIER_OUT
  * Exposed as `__libc_single_threaded(3)' in `<sys/single_threaded.h>' */
 #undef __libc_single_threaded
 DEFINE_PUBLIC_ALIAS(__libc_single_threaded, libc___libc_single_threaded);
-INTERN ATTR_SECTION(".data.crt.sched.pthread") char libc___libc_single_threaded = (char)1;
+INTERN ATTR_SECTION(".data.crt.sched.pthread.core.thread") char libc___libc_single_threaded = (char)1;
 #define __libc_single_threaded GET_NOREL_GLOBAL(__libc_single_threaded)
 
 
 /* Destroy a given `pthread' `self' */
-LOCAL ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
+LOCAL ATTR_SECTION(".text.crt.sched.pthread.core.exit") NONNULL((1)) void
 NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 	/* Destroy TLS globals (if used) */
 	if (self->pt_tglobals && likely(self->pt_tglobals != &libc_mainthread_tlsglobals)) {
@@ -193,13 +193,13 @@ NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 	dltlsfreeseg(self->pt_tls);
 }
 
-LOCAL ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
+LOCAL ATTR_SECTION(".text.crt.sched.pthread.core.exit") NONNULL((1)) void
 NOTHROW(LIBCCALL decref)(struct pthread *__restrict self) {
 	if (atomic_fetchdec(&self->pt_refcnt) == 1)
 		destroy(self);
 }
 
-LOCAL WUNUSED ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) bool
+LOCAL WUNUSED ATTR_SECTION(".text.crt.sched.pthread.core.thread") NONNULL((1)) bool
 NOTHROW(LIBCCALL tryincref)(struct pthread *__restrict self) {
 	refcnt_t refcnt;
 	do {
@@ -210,7 +210,7 @@ NOTHROW(LIBCCALL tryincref)(struct pthread *__restrict self) {
 	return true;
 }
 
-LOCAL WUNUSED ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) bool
+LOCAL WUNUSED ATTR_SECTION(".text.crt.sched.pthread.core.thread") NONNULL((1)) bool
 NOTHROW(LIBCCALL wasdestroyed)(struct pthread *__restrict self) {
 	refcnt_t refcnt = atomic_read(&self->pt_refcnt);
 	return refcnt == 0;
@@ -219,8 +219,8 @@ NOTHROW(LIBCCALL wasdestroyed)(struct pthread *__restrict self) {
 
 /* Attributes  used  by  `pthread_create()'  when  the  given  `ATTR'  is  NULL
  * NOTE: When `pa_stacksize' is zero, `PTHREAD_STACK_MIN' will be used instead! */
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") pthread_attr_t pthread_default_attr = {};
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct atomic_rwlock pthread_default_attr_lock = ATOMIC_RWLOCK_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.core.thread") pthread_attr_t pthread_default_attr = {};
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.core.thread") struct atomic_rwlock pthread_default_attr_lock = ATOMIC_RWLOCK_INIT;
 
 /* Helper macros for `pthread_default_attr_lock' */
 #define pthread_default_attr_mustreap()   0
@@ -250,7 +250,7 @@ PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct atomic_rwlock pthread_defa
 
 /* Called just before a thread exits (used to destroy() the thread's
  * `pthread_self'   structure  in  case  the  thread  was  detached) */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") void
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.exit") void
 NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
 	if (atomic_fetchdec(&me->pt_refcnt) == 1) {
 		/* At some point,  our thread got  detached from its  creator,
@@ -275,7 +275,7 @@ libc_pthread_unmap_stack_and_exit(void *stackaddr,
 
 
 /* Perform cleanup & terminate the current thread `me'. */
-PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread") void
+PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.core.exit") void
 NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcode) {
 	/* Mask _all_ posix signals for our thread.
 	 *
@@ -344,7 +344,7 @@ NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcod
 	void *(LIBCCALL *start)(void *arg)
 #endif /* !LIBC_PTHREAD_MAIN_ARGS */
 
-INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread") void
+INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.core.thread") void
 NOTHROW(LIBC_PTHREAD_MAIN_CC libc_pthread_main)(LIBC_PTHREAD_MAIN_ARGS) {
 	/* NOTE: At this point, me == &current */
 	int exitcode = 0;
@@ -461,7 +461,7 @@ pthread_start_suspended_cb(void *arg) {
 }
 
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2, 3)) errno_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.thread") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
                                              pthread_attr_t const *__restrict attr,
                                              void *(LIBCCALL start_routine)(void *arg),
@@ -607,7 +607,7 @@ struct libd_pthread_create_wrapper_struct {
 	void *(LIBDCALL *start_routine)(void *arg);
 	void *arg;
 };
-PRIVATE ATTR_SECTION(".text.crt.dos.sched.pthread") void *LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.pthread.core.thread") void *LIBCCALL
 libd_pthread_create_wrapper(struct libd_pthread_create_wrapper_struct *arg) {
 	struct libd_pthread_create_wrapper_struct cookie = *arg;
 	free(arg);
@@ -615,7 +615,7 @@ libd_pthread_create_wrapper(struct libd_pthread_create_wrapper_struct *arg) {
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 
-/*[[[head:libd_pthread_create,hash:CRC-32=0xf7f76d81]]]*/
+/*[[[head:libd_pthread_create,hash:CRC-32=0xc44bb33]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 /* >> pthread_create(3)
  * Create a  new thread,  starting with  execution of  `start_routine'
@@ -625,7 +625,7 @@ libd_pthread_create_wrapper(struct libd_pthread_create_wrapper_struct *arg) {
  * @return: EAGAIN: Insufficient resources, or operation-not-permitted
  *                  (read: `ENOMEM', but posix didn't want to use that
  *                  errno for whatever reason...) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.pthread") ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.pthread.core.thread") ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)) errno_t
 NOTHROW_NCX(LIBDCALL libd_pthread_create)(pthread_t *__restrict p_newthread,
                                           pthread_attr_t const *__restrict attr,
                                           void *(LIBDCALL *start_routine)(void *arg),
@@ -647,7 +647,7 @@ NOTHROW_NCX(LIBDCALL libd_pthread_create)(pthread_t *__restrict p_newthread,
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_pthread_create]]]*/
 
-/*[[[head:libc_pthread_create,hash:CRC-32=0x84c0daa9]]]*/
+/*[[[head:libc_pthread_create,hash:CRC-32=0x494b360c]]]*/
 /* >> pthread_create(3)
  * Create a  new thread,  starting with  execution of  `start_routine'
  * getting passed `arg'. Creation attributed come from `attr'. The new
@@ -656,7 +656,7 @@ NOTHROW_NCX(LIBDCALL libd_pthread_create)(pthread_t *__restrict p_newthread,
  * @return: EAGAIN: Insufficient resources, or operation-not-permitted
  *                  (read: `ENOMEM', but posix didn't want to use that
  *                  errno for whatever reason...) */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.thread") ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict p_newthread,
                                           pthread_attr_t const *__restrict attr,
                                           void *(LIBCCALL *start_routine)(void *arg),
@@ -684,11 +684,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict p_newthread,
 }
 /*[[[end:libc_pthread_create]]]*/
 
-/*[[[head:libc_pthread_exit,hash:CRC-32=0x9ec8695]]]*/
+/*[[[head:libc_pthread_exit,hash:CRC-32=0xe62538a9]]]*/
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_NORETURN ATTR_ACCESS_NONE(1) void
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.exit") ATTR_NORETURN ATTR_ACCESS_NONE(1) void
 (LIBCCALL libc_pthread_exit)(void *retval)
 /*[[[body:libc_pthread_exit]]]*/
 {
@@ -704,13 +704,13 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_NORETURN ATTR_ACCESS_NONE(1)
 }
 /*[[[end:libc_pthread_exit]]]*/
 
-/*[[[head:libc_pthread_join,hash:CRC-32=0xee232dd1]]]*/
+/*[[[head:libc_pthread_join,hash:CRC-32=0x53c2c1fd]]]*/
 /* >> pthread_join(3)
  * Make calling thread wait for termination of the thread  `self'.
  * The exit status of the thread is stored in `*thread_return', if
  * `thread_return' is not `NULL'.
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.thread") ATTR_OUT_OPT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_join)(pthread_t self,
                                         void **thread_return)
 /*[[[body:libc_pthread_join]]]*/
@@ -723,13 +723,13 @@ NOTHROW_RPC(LIBCCALL libc_pthread_join)(pthread_t self,
 }
 /*[[[end:libc_pthread_join]]]*/
 
-/*[[[head:libc_pthread_getresult_np,hash:CRC-32=0x9ef50d18]]]*/
+/*[[[head:libc_pthread_getresult_np,hash:CRC-32=0x8b23be81]]]*/
 /* >> pthread_getresult_np(3)
  * Same as `pthread_join(3)', but don't destroy `self' at the end.
  * Instead, the caller must destroy `self' themselves via  another
  * call to `pthread_detach(3)'.
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.thread") ATTR_OUT_OPT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_getresult_np)(pthread_t self,
                                                 void **thread_return)
 /*[[[body:libc_pthread_getresult_np]]]*/
@@ -743,14 +743,14 @@ NOTHROW_RPC(LIBCCALL libc_pthread_getresult_np)(pthread_t self,
 }
 /*[[[end:libc_pthread_getresult_np]]]*/
 
-/*[[[head:libc_pthread_tryjoin_np,hash:CRC-32=0x9638c834]]]*/
+/*[[[head:libc_pthread_tryjoin_np,hash:CRC-32=0x7f9d6acd]]]*/
 /* >> pthread_tryjoin_np(3)
  * Check whether thread  `self' has terminated.  If so return  the
  * status of the thread in `*thread_return', if `thread_return' is
  * not `NULL'.
  * @return: EOK:   Success
  * @return: EBUSY: The thread has yet to terminate */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.thread") ATTR_OUT_OPT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t self,
                                               void **thread_return)
 /*[[[body:libc_pthread_tryjoin_np]]]*/
@@ -767,7 +767,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t self,
 }
 /*[[[end:libc_pthread_tryjoin_np]]]*/
 
-/*[[[head:libc_pthread_timedjoin_np,hash:CRC-32=0x61606dc1]]]*/
+/*[[[head:libc_pthread_timedjoin_np,hash:CRC-32=0xa6e7c558]]]*/
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
  * Make calling thread  wait for termination  of the thread  `self',
  * but only until `timeout'. The exit status of the thread is stored
@@ -775,7 +775,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t self,
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(3) ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed.thread") ATTR_IN_OPT(3) ATTR_OUT_OPT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t self,
                                                 void **thread_return,
                                                 struct timespec const *abstime)
@@ -785,7 +785,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t self,
 }
 /*[[[end:libc_pthread_timedjoin_np]]]*/
 
-/*[[[head:libc_pthread_clockjoin_np,hash:CRC-32=0xbdcc80d8]]]*/
+/*[[[head:libc_pthread_clockjoin_np,hash:CRC-32=0x18ae7f6c]]]*/
 /* >> pthread_clockjoin_np(3), pthread_clockjoin64_np(3)
  * Same  as `pthread_timedjoin_np(3)', but  the given `abstime'  is relative to `clock_id',
  * whereas when using `pthread_timedjoin_np(3)', it is always relative to `CLOCK_REALTIME'.
@@ -793,7 +793,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t self,
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: EINVAL:    Invalid/unsupported `clock_id'
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(4) ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.clock.thread") ATTR_IN_OPT(4) ATTR_OUT_OPT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_clockjoin_np)(pthread_t self,
                                                 void **thread_return,
                                                 clockid_t clock_id,
@@ -831,7 +831,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_clockjoin_np)(pthread_t self,
 }
 /*[[[end:libc_pthread_clockjoin_np]]]*/
 
-/*[[[head:libc_pthread_timedjoin64_np,hash:CRC-32=0x5093588f]]]*/
+/*[[[head:libc_pthread_timedjoin64_np,hash:CRC-32=0x1602fe45]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_timedjoin64_np, libc_pthread_timedjoin_np);
 #else /* MAGIC:alias */
@@ -842,7 +842,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_timedjoin64_np, libc_pthread_timedjoin_np);
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(3) ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed64.thread") ATTR_IN_OPT(3) ATTR_OUT_OPT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t self,
                                                   void **thread_return,
                                                   struct timespec64 const *abstime)
@@ -853,7 +853,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t self,
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_timedjoin64_np]]]*/
 
-/*[[[head:libc_pthread_clockjoin64_np,hash:CRC-32=0xde547845]]]*/
+/*[[[head:libc_pthread_clockjoin64_np,hash:CRC-32=0xfbce9b12]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_clockjoin64_np, libc_pthread_clockjoin_np);
 #else /* MAGIC:alias */
@@ -864,7 +864,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_clockjoin64_np, libc_pthread_clockjoin_np);
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: EINVAL:    Invalid/unsupported `clock_id'
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(4) ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.clock64.thread") ATTR_IN_OPT(4) ATTR_OUT_OPT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_clockjoin64_np)(pthread_t self,
                                                   void **thread_return,
                                                   clockid_t clock_id,
@@ -911,13 +911,13 @@ NOTHROW_RPC(LIBCCALL libc_pthread_clockjoin64_np)(pthread_t self,
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_clockjoin64_np]]]*/
 
-/*[[[head:libc_pthread_detach,hash:CRC-32=0xbab1a98c]]]*/
+/*[[[head:libc_pthread_detach,hash:CRC-32=0xf32b4a2e]]]*/
 /* >> pthread_detach(3)
  * Indicate that the thread `self' is  never to be joined with  `pthread_join(3)'.
  * The resources of `self' will therefore be freed immediately when it terminates,
  * instead of waiting for another thread to perform `pthread_join(3)' on it
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.thread") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t self)
 /*[[[body:libc_pthread_detach]]]*/
 {
@@ -955,11 +955,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t self)
 }
 /*[[[end:libc_pthread_detach]]]*/
 
-/*[[[head:libc_pthread_self,hash:CRC-32=0xaad45458]]]*/
+/*[[[head:libc_pthread_self,hash:CRC-32=0xaef88c55]]]*/
 /* >> pthread_self(3)
  * Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST WUNUSED pthread_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.thread") ATTR_CONST WUNUSED pthread_t
 NOTHROW(LIBCCALL libc_pthread_self)(void)
 /*[[[body:libc_pthread_self]]]*/
 {
@@ -977,13 +977,13 @@ NOTHROW(LIBCCALL libc_pthread_self)(void)
 }
 /*[[[end:libc_pthread_self]]]*/
 
-/*[[[head:libc_pthread_gettid_np,hash:CRC-32=0x259fbef2]]]*/
+/*[[[head:libc_pthread_gettid_np,hash:CRC-32=0x8b5628fb]]]*/
 /* >> pthread_gettid_np(3)
  * Return the TID of the given `self'.
  * If `self' has already terminated, 0 is returned
  * @return: * : The TID of the given thread
  * @return: 0 : The given `self' has already terminated */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_PURE WUNUSED pid_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.tid") ATTR_PURE WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
 /*[[[body:libc_pthread_gettid_np]]]*/
 {
@@ -993,7 +993,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
 }
 /*[[[end:libc_pthread_gettid_np]]]*/
 
-/*[[[head:libc_pthread_getpidfd_np,hash:CRC-32=0x7b1a3fd8]]]*/
+/*[[[head:libc_pthread_getpidfd_np,hash:CRC-32=0x52356833]]]*/
 /* >> pthread_getpidfd_np(3)
  * Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
  * To  guaranty that a PIDfd is available for a given thread, you can make use of
@@ -1004,7 +1004,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
  * @return: EMFILE: Too many open files (process) (only when not already allocated)
  * @return: ENFILE: Too many open files (system) (only when not already allocated)
  * @return: ENOMEM: Insufficient memory (only when not already allocated) */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_PURE WUNUSED ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.tid") ATTR_PURE WUNUSED ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getpidfd_np)(pthread_t self,
                                                fd_t *__restrict p_pidfd)
 /*[[[body:libc_pthread_getpidfd_np]]]*/
@@ -1035,7 +1035,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getpidfd_np)(pthread_t self,
 }
 /*[[[end:libc_pthread_getpidfd_np]]]*/
 
-/*[[[head:libc_pthread_attr_setpidfdallocated_np,hash:CRC-32=0x4006fea]]]*/
+/*[[[head:libc_pthread_attr_setpidfdallocated_np,hash:CRC-32=0x6591c253]]]*/
 /* >> pthread_attr_setpidfdallocated_np(3)
  * Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
  * Said PIDfd can be retrieved (or lazily allocated when not pre-allocated)
@@ -1043,7 +1043,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getpidfd_np)(pthread_t self,
  * @param: allocated: 0=no (default) or 1=yes
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `allocated' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.tid") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setpidfdallocated_np)(pthread_attr_t *self,
                                                              int allocated)
 /*[[[body:libc_pthread_attr_setpidfdallocated_np]]]*/
@@ -1059,12 +1059,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setpidfdallocated_np)(pthread_attr_t *sel
 }
 /*[[[end:libc_pthread_attr_setpidfdallocated_np]]]*/
 
-/*[[[head:libc_pthread_attr_getpidfdallocated_np,hash:CRC-32=0x439b2183]]]*/
+/*[[[head:libc_pthread_attr_getpidfdallocated_np,hash:CRC-32=0x70d649c1]]]*/
 /* >> pthread_attr_getpidfdallocated_np(3)
  * Write 0=no or  1=yes to `*allocated',  indicative of  `pthread_create(3)'
  * automatically allocating a PIDfd descriptor for the newly spawned thread.
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.tid") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getpidfdallocated_np)(pthread_attr_t const *__restrict self,
                                                              int *__restrict allocated)
 /*[[[body:libc_pthread_attr_getpidfdallocated_np]]]*/
@@ -1074,11 +1074,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getpidfdallocated_np)(pthread_attr_t cons
 }
 /*[[[end:libc_pthread_attr_getpidfdallocated_np]]]*/
 
-/*[[[head:libc_pthread_mainthread_np,hash:CRC-32=0xaf00cabf]]]*/
+/*[[[head:libc_pthread_mainthread_np,hash:CRC-32=0xe4576ff2]]]*/
 /* >> pthread_mainthread_np(3)
  * Obtain the identifier of the main thread
  * @return: * : Handle for the main thread */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_CONST WUNUSED pthread_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.thread") ATTR_CONST WUNUSED pthread_t
 NOTHROW(LIBCCALL libc_pthread_mainthread_np)(void)
 /*[[[body:libc_pthread_mainthread_np]]]*/
 {
@@ -1102,12 +1102,12 @@ NOTHROW(LIBCCALL libc_pthread_mainthread_np)(void)
 }
 /*[[[end:libc_pthread_mainthread_np]]]*/
 
-/*[[[head:libc_pthread_attr_init,hash:CRC-32=0x739a4d95]]]*/
+/*[[[head:libc_pthread_attr_init,hash:CRC-32=0x8b96dbeb]]]*/
 /* >> pthread_attr_init(3)
  * Initialize thread  attribute `*self'  with default  attributes (detachstate  is
  * `PTHREAD_JOINABLE', scheduling policy is `SCHED_OTHER', no user-provided stack)
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_init)(pthread_attr_t *self)
 /*[[[body:libc_pthread_attr_init]]]*/
 {
@@ -1117,11 +1117,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_init)(pthread_attr_t *self)
 }
 /*[[[end:libc_pthread_attr_init]]]*/
 
-/*[[[head:libc_pthread_attr_destroy,hash:CRC-32=0x6a457bd2]]]*/
+/*[[[head:libc_pthread_attr_destroy,hash:CRC-32=0x95e6b393]]]*/
 /* >> pthread_attr_destroy(3)
  * Destroy thread attribute `*self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_destroy)(pthread_attr_t *self)
 /*[[[body:libc_pthread_attr_destroy]]]*/
 {
@@ -1133,12 +1133,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_destroy)(pthread_attr_t *self)
 }
 /*[[[end:libc_pthread_attr_destroy]]]*/
 
-/*[[[head:libc_pthread_attr_getdetachstate,hash:CRC-32=0xcebb493f]]]*/
+/*[[[head:libc_pthread_attr_getdetachstate,hash:CRC-32=0x16a27b22]]]*/
 /* >> pthread_attr_getdetachstate(3)
  * Get   detach   state    attribute
  * @param: *detachstate: One of `PTHREAD_CREATE_JOINABLE', `PTHREAD_CREATE_DETACHED'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getdetachstate)(pthread_attr_t const *__restrict self,
                                                        int *__restrict detachstate)
 /*[[[body:libc_pthread_attr_getdetachstate]]]*/
@@ -1150,13 +1150,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getdetachstate)(pthread_attr_t const *__r
 }
 /*[[[end:libc_pthread_attr_getdetachstate]]]*/
 
-/*[[[head:libc_pthread_attr_setdetachstate,hash:CRC-32=0x14a32c51]]]*/
+/*[[[head:libc_pthread_attr_setdetachstate,hash:CRC-32=0xad629399]]]*/
 /* >> pthread_attr_setdetachstate(3)
  * Set   detach   state    attribute
  * @param: detachstate: One of `PTHREAD_CREATE_JOINABLE', `PTHREAD_CREATE_DETACHED'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `detachstate' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setdetachstate)(pthread_attr_t *self,
                                                        int detachstate)
 /*[[[body:libc_pthread_attr_setdetachstate]]]*/
@@ -1172,11 +1172,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setdetachstate)(pthread_attr_t *self,
 }
 /*[[[end:libc_pthread_attr_setdetachstate]]]*/
 
-/*[[[head:libc_pthread_attr_getguardsize,hash:CRC-32=0xb70cadb9]]]*/
+/*[[[head:libc_pthread_attr_getguardsize,hash:CRC-32=0x54716f07]]]*/
 /* >> pthread_attr_getguardsize(3)
  * Get the size of the guard area created for stack overflow protection
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getguardsize)(pthread_attr_t const *__restrict self,
                                                      size_t *__restrict guardsize)
 /*[[[body:libc_pthread_attr_getguardsize]]]*/
@@ -1186,11 +1186,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getguardsize)(pthread_attr_t const *__res
 }
 /*[[[end:libc_pthread_attr_getguardsize]]]*/
 
-/*[[[head:libc_pthread_attr_setguardsize,hash:CRC-32=0x17bf6287]]]*/
+/*[[[head:libc_pthread_attr_setguardsize,hash:CRC-32=0x28113fa3]]]*/
 /* >> pthread_attr_setguardsize(3)
  * Set the size of the guard area created for stack overflow protection
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setguardsize)(pthread_attr_t *self,
                                                      size_t guardsize)
 /*[[[body:libc_pthread_attr_setguardsize]]]*/
@@ -1200,11 +1200,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setguardsize)(pthread_attr_t *self,
 }
 /*[[[end:libc_pthread_attr_setguardsize]]]*/
 
-/*[[[head:libc_pthread_attr_getschedparam,hash:CRC-32=0x5e592381]]]*/
+/*[[[head:libc_pthread_attr_getschedparam,hash:CRC-32=0x617f2bdb]]]*/
 /* >> pthread_attr_getschedparam(3)
  * Return in `*param' the scheduling parameters of `*self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getschedparam)(pthread_attr_t const *__restrict self,
                                                       struct sched_param *__restrict param)
 /*[[[body:libc_pthread_attr_getschedparam]]]*/
@@ -1214,12 +1214,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getschedparam)(pthread_attr_t const *__re
 }
 /*[[[end:libc_pthread_attr_getschedparam]]]*/
 
-/*[[[head:libc_pthread_attr_setschedparam,hash:CRC-32=0x32b01c4d]]]*/
+/*[[[head:libc_pthread_attr_setschedparam,hash:CRC-32=0x34fc0f60]]]*/
 /* >> pthread_attr_setschedparam(3)
  * Set scheduling parameters (priority, etc) in `*self' according to `param'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `param' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setschedparam)(pthread_attr_t *__restrict self,
                                                       struct sched_param const *__restrict param)
 /*[[[body:libc_pthread_attr_setschedparam]]]*/
@@ -1229,11 +1229,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setschedparam)(pthread_attr_t *__restrict
 }
 /*[[[end:libc_pthread_attr_setschedparam]]]*/
 
-/*[[[head:libc_pthread_attr_getschedpolicy,hash:CRC-32=0xd3e0f6f1]]]*/
+/*[[[head:libc_pthread_attr_getschedpolicy,hash:CRC-32=0xb6687e1e]]]*/
 /* >> pthread_attr_getschedpolicy(3)
  * Return in `*policy' the scheduling policy of `*self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getschedpolicy)(pthread_attr_t const *__restrict self,
                                                        int *__restrict policy)
 /*[[[body:libc_pthread_attr_getschedpolicy]]]*/
@@ -1243,12 +1243,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getschedpolicy)(pthread_attr_t const *__r
 }
 /*[[[end:libc_pthread_attr_getschedpolicy]]]*/
 
-/*[[[head:libc_pthread_attr_setschedpolicy,hash:CRC-32=0x4764d59c]]]*/
+/*[[[head:libc_pthread_attr_setschedpolicy,hash:CRC-32=0x4e1219d0]]]*/
 /* >> pthread_attr_setschedpolicy(3)
  * Set scheduling policy in `*self' according to `policy'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `policy' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setschedpolicy)(pthread_attr_t *self,
                                                        int policy)
 /*[[[body:libc_pthread_attr_setschedpolicy]]]*/
@@ -1261,11 +1261,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setschedpolicy)(pthread_attr_t *self,
 }
 /*[[[end:libc_pthread_attr_setschedpolicy]]]*/
 
-/*[[[head:libc_pthread_attr_getinheritsched,hash:CRC-32=0xd9d3ae28]]]*/
+/*[[[head:libc_pthread_attr_getinheritsched,hash:CRC-32=0xd17aa405]]]*/
 /* >> pthread_attr_getinheritsched(3)
  * Return in `*inherit' the scheduling inheritance mode of `*self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getinheritsched)(pthread_attr_t const *__restrict self,
                                                         int *__restrict inherit)
 /*[[[body:libc_pthread_attr_getinheritsched]]]*/
@@ -1277,12 +1277,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getinheritsched)(pthread_attr_t const *__
 }
 /*[[[end:libc_pthread_attr_getinheritsched]]]*/
 
-/*[[[head:libc_pthread_attr_setinheritsched,hash:CRC-32=0x2fcd95fa]]]*/
+/*[[[head:libc_pthread_attr_setinheritsched,hash:CRC-32=0xeff96728]]]*/
 /* >> pthread_attr_setinheritsched(3)
  * Set scheduling inheritance mode in `*self' according to `inherit'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `inherit' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setinheritsched)(pthread_attr_t *self,
                                                         int inherit)
 /*[[[body:libc_pthread_attr_setinheritsched]]]*/
@@ -1298,12 +1298,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setinheritsched)(pthread_attr_t *self,
 }
 /*[[[end:libc_pthread_attr_setinheritsched]]]*/
 
-/*[[[head:libc_pthread_attr_getscope,hash:CRC-32=0x625ad59b]]]*/
+/*[[[head:libc_pthread_attr_getscope,hash:CRC-32=0x863e3318]]]*/
 /* >> pthread_attr_getscope(3)
  * Return in `*scope' the scheduling contention scope of `*self'
  * @param:  scope: Filled with one of `PTHREAD_SCOPE_*'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getscope)(pthread_attr_t const *__restrict self,
                                                  int *__restrict scope)
 /*[[[body:libc_pthread_attr_getscope]]]*/
@@ -1315,13 +1315,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getscope)(pthread_attr_t const *__restric
 }
 /*[[[end:libc_pthread_attr_getscope]]]*/
 
-/*[[[head:libc_pthread_attr_setscope,hash:CRC-32=0x85cdecc7]]]*/
+/*[[[head:libc_pthread_attr_setscope,hash:CRC-32=0x5022488a]]]*/
 /* >> pthread_attr_setscope(3)
  * Set scheduling contention scope in `*self' according to `scope'
  * @param:  scope:  One of `PTHREAD_SCOPE_*'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `scope' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setscope)(pthread_attr_t *self,
                                                  int scope)
 /*[[[body:libc_pthread_attr_setscope]]]*/
@@ -1337,11 +1337,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setscope)(pthread_attr_t *self,
 }
 /*[[[end:libc_pthread_attr_setscope]]]*/
 
-/*[[[head:libc_pthread_attr_getstackaddr,hash:CRC-32=0xa04ef8eb]]]*/
+/*[[[head:libc_pthread_attr_getstackaddr,hash:CRC-32=0x8520d0a7]]]*/
 /* >> pthread_attr_getstackaddr(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_DEPRECATED("Use pthread_attr_getstack()") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_DEPRECATED("Use pthread_attr_getstack()") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstackaddr)(pthread_attr_t const *__restrict self,
                                                      void **__restrict stackaddr)
 /*[[[body:libc_pthread_attr_getstackaddr]]]*/
@@ -1351,7 +1351,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstackaddr)(pthread_attr_t const *__res
 }
 /*[[[end:libc_pthread_attr_getstackaddr]]]*/
 
-/*[[[head:libc_pthread_attr_setstackaddr,hash:CRC-32=0x8a4c7144]]]*/
+/*[[[head:libc_pthread_attr_setstackaddr,hash:CRC-32=0xeccff7fc]]]*/
 /* >> pthread_attr_setstackaddr(3)
  * Set the starting address  of the stack of  the thread to be  created.
  * Depending on whether the stack grows up or down the value must either
@@ -1359,7 +1359,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstackaddr)(pthread_attr_t const *__res
  * minimal size of the block must be `PTHREAD_STACK_MIN'
  * @return: EOK:    Success
  * @return: EINVAL: The stack isn't suitably aligned */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_DEPRECATED("Use pthread_attr_setstack()") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_DEPRECATED("Use pthread_attr_setstack()") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstackaddr)(pthread_attr_t *self,
                                                      void *stackaddr)
 /*[[[body:libc_pthread_attr_setstackaddr]]]*/
@@ -1370,11 +1370,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstackaddr)(pthread_attr_t *self,
 }
 /*[[[end:libc_pthread_attr_setstackaddr]]]*/
 
-/*[[[head:libc_pthread_attr_getstacksize,hash:CRC-32=0x5401da42]]]*/
+/*[[[head:libc_pthread_attr_getstacksize,hash:CRC-32=0x792b7a5d]]]*/
 /* >> pthread_attr_getstacksize(3)
  * Return the currently used minimal stack size
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstacksize)(pthread_attr_t const *__restrict self,
                                                      size_t *__restrict stacksize)
 /*[[[body:libc_pthread_attr_getstacksize]]]*/
@@ -1384,14 +1384,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstacksize)(pthread_attr_t const *__res
 }
 /*[[[end:libc_pthread_attr_getstacksize]]]*/
 
-/*[[[head:libc_pthread_attr_setstacksize,hash:CRC-32=0x24e35461]]]*/
+/*[[[head:libc_pthread_attr_setstacksize,hash:CRC-32=0x7e1c1b1e]]]*/
 /* >> pthread_attr_setstacksize(3)
  * Add information about the minimum  stack size needed for the  thread
  * to be started. This size must never be less than `PTHREAD_STACK_MIN'
  * and must also not exceed the system limits
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstacksize)(pthread_attr_t *self,
                                                      size_t stacksize)
 /*[[[body:libc_pthread_attr_setstacksize]]]*/
@@ -1403,11 +1403,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstacksize)(pthread_attr_t *self,
 }
 /*[[[end:libc_pthread_attr_setstacksize]]]*/
 
-/*[[[head:libc_pthread_attr_getstack,hash:CRC-32=0x1ee1a4db]]]*/
+/*[[[head:libc_pthread_attr_getstack,hash:CRC-32=0xb2a12e4a]]]*/
 /* >> pthread_attr_getstack(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstack)(pthread_attr_t const *__restrict self,
                                                  void **__restrict stackaddr,
                                                  size_t *__restrict stacksize)
@@ -1423,14 +1423,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstack)(pthread_attr_t const *__restric
 }
 /*[[[end:libc_pthread_attr_getstack]]]*/
 
-/*[[[head:libc_pthread_attr_setstack,hash:CRC-32=0x1e0d9b13]]]*/
+/*[[[head:libc_pthread_attr_setstack,hash:CRC-32=0xb97f12f2]]]*/
 /* >> pthread_attr_setstack(3)
  * The following two interfaces are intended to replace the last two. They
  * require setting the address as well as the size since only setting  the
  * address will make the implementation on some architectures impossible
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstack)(pthread_attr_t *self,
                                                  void *stackaddr,
                                                  size_t stacksize)
@@ -1449,13 +1449,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstack)(pthread_attr_t *self,
 }
 /*[[[end:libc_pthread_attr_setstack]]]*/
 
-/*[[[head:libc_pthread_attr_setaffinity_np,hash:CRC-32=0xef941d67]]]*/
+/*[[[head:libc_pthread_attr_setaffinity_np,hash:CRC-32=0x43c2f4fc]]]*/
 /* >> pthread_attr_setaffinity_np(3)
  * Set cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: The given set contains a non-existent CPU
  * @return: ENOMEM: Insufficient memory */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) ATTR_IN_OPT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.affinity") ATTR_INOUT(1) ATTR_IN_OPT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setaffinity_np)(pthread_attr_t *self,
                                                        size_t cpusetsize,
                                                        cpu_set_t const *cpuset)
@@ -1505,12 +1505,12 @@ use_newset:
 }
 /*[[[end:libc_pthread_attr_setaffinity_np]]]*/
 
-/*[[[head:libc_pthread_attr_getaffinity_np,hash:CRC-32=0x926faf2b]]]*/
+/*[[[head:libc_pthread_attr_getaffinity_np,hash:CRC-32=0x6283abd1]]]*/
 /* >> pthread_attr_getaffinity_np(3)
  * Get cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: `cpusetsize' is too small */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT_OPT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.affinity") ATTR_IN(1) ATTR_OUT_OPT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getaffinity_np)(pthread_attr_t const *self,
                                                        size_t cpusetsize,
                                                        cpu_set_t *cpuset)
@@ -1539,12 +1539,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getaffinity_np)(pthread_attr_t const *sel
 }
 /*[[[end:libc_pthread_attr_getaffinity_np]]]*/
 
-/*[[[head:libc_pthread_getattr_default_np,hash:CRC-32=0x71962db]]]*/
+/*[[[head:libc_pthread_getattr_default_np,hash:CRC-32=0xaf2c24f]]]*/
 /* >> pthread_getattr_default_np(3)
  * Get the default attributes used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.thread") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getattr_default_np)(pthread_attr_t *attr)
 /*[[[body:libc_pthread_getattr_default_np]]]*/
 {
@@ -1580,12 +1580,12 @@ again:
 }
 /*[[[end:libc_pthread_getattr_default_np]]]*/
 
-/*[[[head:libc_pthread_setattr_default_np,hash:CRC-32=0x18810153]]]*/
+/*[[[head:libc_pthread_setattr_default_np,hash:CRC-32=0xfff2fd62]]]*/
 /* >> pthread_setattr_default_np(3)
  * Set the default attributes to be used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.thread") ATTR_IN(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setattr_default_np)(pthread_attr_t const *attr)
 /*[[[body:libc_pthread_setattr_default_np]]]*/
 {
@@ -1629,13 +1629,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setattr_default_np)(pthread_attr_t const *attr
 }
 /*[[[end:libc_pthread_setattr_default_np]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") void PRPC_EXEC_CALLBACK_CC
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.ext.gnu") void PRPC_EXEC_CALLBACK_CC
 get_stack_pointer_rpc(struct rpc_context *__restrict ctx, void *cookie) {
 	*(void **)cookie = ctx;
 }
 
 /* Use /proc/self/maps to figure out the mapping containing `pointer' */
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") int LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.ext.gnu") int LIBCCALL
 get_mapping_from_pointer(void *pointer, void **p_minaddr, void **p_endaddr) {
 	char *line;
 	FILE *fp = fopen("/proc/self/maps", "r");
@@ -1655,14 +1655,14 @@ err:
 	return -1;
 }
 
-/*[[[head:libc_pthread_getattr_np,hash:CRC-32=0x135709b1]]]*/
+/*[[[head:libc_pthread_getattr_np,hash:CRC-32=0xfb4835b1]]]*/
 /* >> pthread_getattr_np(3)
  * Initialize thread attribute `*attr' with attributes corresponding to  the
  * already running thread `self'. It shall be called on uninitialized `attr'
  * and destroyed with `pthread_attr_destroy(3)' when no longer needed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.thread") ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t self,
                                               pthread_attr_t *attr)
 /*[[[body:libc_pthread_getattr_np]]]*/
@@ -1792,14 +1792,14 @@ done:
 }
 /*[[[end:libc_pthread_getattr_np]]]*/
 
-/*[[[head:libc_pthread_setschedparam,hash:CRC-32=0x7276a977]]]*/
+/*[[[head:libc_pthread_setschedparam,hash:CRC-32=0x15d09074]]]*/
 /* >> pthread_setschedparam(3)
  * Set the scheduling parameters for `self' according to `policy' and `*param'
  * @return: EOK:    Success
  * @return: EPERM:  The caller isn't allowed to specify `policy' and `param'
  * @return: ESRCH:  `self' has already exited
  * @return: EINVAL: Invalid/unsupported `policy', or `param' is malformed for `policy' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_IN(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t self,
                                                  int policy,
                                                  struct sched_param const *param)
@@ -1833,12 +1833,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t self,
 }
 /*[[[end:libc_pthread_setschedparam]]]*/
 
-/*[[[head:libc_pthread_getschedparam,hash:CRC-32=0x52db51d3]]]*/
+/*[[[head:libc_pthread_getschedparam,hash:CRC-32=0x264f22b8]]]*/
 /* >> pthread_getschedparam(3)
  * Return in `*policy' and `*param' the scheduling parameters for `self'
  * @return: EOK:   Success
  * @return: ESRCH: `self' has already exited */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(2) ATTR_OUT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") ATTR_OUT(2) ATTR_OUT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getschedparam)(pthread_t self,
                                                  int *__restrict policy,
                                                  struct sched_param *__restrict param)
@@ -1867,14 +1867,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getschedparam)(pthread_t self,
 }
 /*[[[end:libc_pthread_getschedparam]]]*/
 
-/*[[[head:libc_pthread_setschedprio,hash:CRC-32=0x98c6a6f3]]]*/
+/*[[[head:libc_pthread_setschedprio,hash:CRC-32=0x1bfb0427]]]*/
 /* >> pthread_setschedprio(3)
  * Set the scheduling priority for `self'
  * @return: EOK:    Success
  * @return: EPERM:  The caller isn't allowed to specify `prio'
  * @return: ESRCH:  `self' has already exited
  * @return: EINVAL: Invalid/unsupported `prio' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.thread") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t self,
                                                 int prio)
 /*[[[body:libc_pthread_setschedprio]]]*/
@@ -1902,12 +1902,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t self,
 }
 /*[[[end:libc_pthread_setschedprio]]]*/
 
-/*[[[head:libc_pthread_getname_np,hash:CRC-32=0x5fc6cd63]]]*/
+/*[[[head:libc_pthread_getname_np,hash:CRC-32=0xab158113]]]*/
 /* >> pthread_getname_np(3)
  * Get thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `buflen' is too small */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUTS(2, 3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.thread.name") ATTR_OUTS(2, 3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t self,
                                               char *buf,
                                               size_t buflen)
@@ -1936,14 +1936,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t self,
 }
 /*[[[end:libc_pthread_getname_np]]]*/
 
-/*[[[head:libc_pthread_setname_np,hash:CRC-32=0x61c87132]]]*/
+/*[[[head:libc_pthread_setname_np,hash:CRC-32=0x1b29a55d]]]*/
 /* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.thread.name") ATTR_IN(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t self,
-                                              const char *name)
+                                              char const *name)
 /*[[[body:libc_pthread_setname_np]]]*/
 {
 	pid_t tid;
@@ -1986,13 +1986,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t self,
 /*[[[end:libc_pthread_setname_np]]]*/
 
 /* Unused... (pthread threads on KOS are controlled entirely by the kernel) */
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") int pthread_concurrency_level = 0;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.ext.concurrency") int pthread_concurrency_level = 0;
 
-/*[[[head:libc_pthread_getconcurrency,hash:CRC-32=0x2040f7e9]]]*/
+/*[[[head:libc_pthread_getconcurrency,hash:CRC-32=0x8ce40da4]]]*/
 /* >> pthread_getconcurrency(3)
  * Determine level of concurrency
  * @return: * : The current concurrency level */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_PURE int
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.concurrency") ATTR_PURE int
 NOTHROW_NCX(LIBCCALL libc_pthread_getconcurrency)(void)
 /*[[[body:libc_pthread_getconcurrency]]]*/
 {
@@ -2000,12 +2000,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getconcurrency)(void)
 }
 /*[[[end:libc_pthread_getconcurrency]]]*/
 
-/*[[[head:libc_pthread_setconcurrency,hash:CRC-32=0xed028bd5]]]*/
+/*[[[head:libc_pthread_setconcurrency,hash:CRC-32=0xd3fe63c4]]]*/
 /* >> pthread_setconcurrency(3)
  * Set new concurrency level to `level'
  * @return: EOK:    Success
  * @return: EINVAL: The given `level' is negative */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.concurrency") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setconcurrency)(int level)
 /*[[[body:libc_pthread_setconcurrency]]]*/
 {
@@ -2016,12 +2016,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setconcurrency)(int level)
 }
 /*[[[end:libc_pthread_setconcurrency]]]*/
 
-/*[[[head:libc_pthread_setaffinity_np,hash:CRC-32=0xd601eb4d]]]*/
+/*[[[head:libc_pthread_setaffinity_np,hash:CRC-32=0x1a7c7133]]]*/
 /* >> pthread_setaffinity_np(3)
  * Limit specified thread `self' to run only on the processors represented in `cpuset'
  * @return: EOK:   Success
  * @return: ESRCH: `self' has already exited */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_IN_OPT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.affinity") ATTR_IN_OPT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setaffinity_np)(pthread_t self,
                                                   size_t cpusetsize,
                                                   cpu_set_t const *cpuset)
@@ -2086,12 +2086,12 @@ err:
 }
 /*[[[end:libc_pthread_setaffinity_np]]]*/
 
-/*[[[head:libc_pthread_getaffinity_np,hash:CRC-32=0x6a957791]]]*/
+/*[[[head:libc_pthread_getaffinity_np,hash:CRC-32=0xc28cbe50]]]*/
 /* >> pthread_getaffinity_np(3)
  * Get bit set in `cpuset' representing the processors `self' can run on
  * @return: EOK:   Success
  * @return: ESRCH: `self' has already exited */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_OUT_OPT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.affinity") ATTR_OUT_OPT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthread_t self,
                                                   size_t cpusetsize,
                                                   cpu_set_t *cpuset)
@@ -2115,13 +2115,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthread_t self,
 /*[[[end:libc_pthread_getaffinity_np]]]*/
 
 
-/*[[[head:libc_pthread_setcancelstate,hash:CRC-32=0x96bf0b1e]]]*/
+/*[[[head:libc_pthread_setcancelstate,hash:CRC-32=0x5c287a71]]]*/
 /* >> pthread_setcancelstate(3)
  * Set  cancelability  state   of  current   thread  to   `state',
  * returning old state in `*oldstate' if `oldstate' is not `NULL'.
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `state' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.cancel") ATTR_OUT_OPT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setcancelstate)(int state,
                                                   int *oldstate)
 /*[[[body:libc_pthread_setcancelstate]]]*/
@@ -2133,13 +2133,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcancelstate)(int state,
 }
 /*[[[end:libc_pthread_setcancelstate]]]*/
 
-/*[[[head:libc_pthread_setcanceltype,hash:CRC-32=0x3e41f119]]]*/
+/*[[[head:libc_pthread_setcanceltype,hash:CRC-32=0xeed82416]]]*/
 /* >> pthread_setcanceltype(3)
  * Set cancellation state of current thread to `type',
  * returning the old type in `*oldtype' if `oldtype' is not `NULL'.
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `type' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.cancel") ATTR_OUT_OPT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setcanceltype)(int type,
                                                  int *oldtype)
 /*[[[body:libc_pthread_setcanceltype]]]*/
@@ -2151,18 +2151,18 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcanceltype)(int type,
 }
 /*[[[end:libc_pthread_setcanceltype]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.cancel") NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 pthread_cancel_self_rpc(struct rpc_context *__restrict UNUSED(ctx), void *UNUSED(cookie)) {
 	THROW(E_EXIT_THREAD);
 }
 
 
-/*[[[head:libc_pthread_cancel,hash:CRC-32=0xa016301a]]]*/
+/*[[[head:libc_pthread_cancel,hash:CRC-32=0xfb0df65]]]*/
 /* >> pthread_cancel(3)
  * Cancel `self' immediately or at the next possibility
  * @return: EOK:   Success
  * @return: ESRCH: `self' has already exited */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.cancel") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t self)
 /*[[[body:libc_pthread_cancel]]]*/
 {
@@ -2200,11 +2200,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t self)
 }
 /*[[[end:libc_pthread_cancel]]]*/
 
-/*[[[head:libc_pthread_testcancel,hash:CRC-32=0xde2da9fc]]]*/
+/*[[[head:libc_pthread_testcancel,hash:CRC-32=0xf82260a4]]]*/
 /* >> pthread_testcancel(3)
  * Test for pending cancellation for the current thread and terminate the
  * thread as per `pthread_exit(PTHREAD_CANCELED)' if it has been canceled */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") void
+INTERN ATTR_SECTION(".text.crt.sched.pthread.cancel") void
 NOTHROW_RPC(LIBCCALL libc_pthread_testcancel)(void)
 /*[[[body:libc_pthread_testcancel]]]*/
 {
@@ -2212,11 +2212,11 @@ NOTHROW_RPC(LIBCCALL libc_pthread_testcancel)(void)
 }
 /*[[[end:libc_pthread_testcancel]]]*/
 
-/*[[[head:libc_pthread_getcpuclockid,hash:CRC-32=0xe8f1a8f9]]]*/
+/*[[[head:libc_pthread_getcpuclockid,hash:CRC-32=0xec70f85e]]]*/
 /* >> pthread_getcpuclockid(3)
  * Get the ID of CPU-time clock for thread `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.misc") ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t self,
                                                  clockid_t *clock_id)
 /*[[[body:libc_pthread_getcpuclockid]]]*/
@@ -2228,7 +2228,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t self,
 }
 /*[[[end:libc_pthread_getcpuclockid]]]*/
 
-/*[[[head:libc_pthread_rpc_exec,hash:CRC-32=0x7217b7e1]]]*/
+/*[[[head:libc_pthread_rpc_exec,hash:CRC-32=0xaa77afb3]]]*/
 /* >> pthread_rpc_exec(3)
  * Schedule an RPC for `self' to-be  executed the next time it  makes
  * a call to a cancellation-point system call (or interrupt an active
@@ -2238,7 +2238,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t self,
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient system memory
  * @return: ESRCH:  The given thread `self' has already terminated */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") WUNUSED errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.thread") WUNUSED errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rpc_exec)(pthread_t self,
                                             void (LIBKCALL *func)(struct rpc_context *__restrict ctx, void *cookie),
                                             void *cookie)
@@ -2278,14 +2278,14 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rpc_exec)(pthread_t self,
 /* PTHREAD SUSPEND API                                                  */
 /************************************************************************/
 
-/*[[[head:libc_pthread_attr_setstartsuspended_np,hash:CRC-32=0x59f7ff81]]]*/
+/*[[[head:libc_pthread_attr_setstartsuspended_np,hash:CRC-32=0xc144401f]]]*/
 /* >> pthread_attr_setstartsuspended_np(3)
  * Specify if `pthread_create(3)' should start the thread in a suspended state.
  * @param: start_suspended: 0=no (default) or 1=yes
  * @see pthread_resume_np, pthread_continue_np
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `start_suspended' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.suspend") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstartsuspended_np)(pthread_attr_t *__restrict self,
                                                              int start_suspended)
 /*[[[body:libc_pthread_attr_setstartsuspended_np]]]*/
@@ -2301,13 +2301,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstartsuspended_np)(pthread_attr_t *__r
 }
 /*[[[end:libc_pthread_attr_setstartsuspended_np]]]*/
 
-/*[[[head:libc_pthread_attr_getstartsuspended_np,hash:CRC-32=0xacfcf6d3]]]*/
+/*[[[head:libc_pthread_attr_getstartsuspended_np,hash:CRC-32=0x8e393509]]]*/
 /* >> pthread_attr_getpidfdallocated_np(3)
  * Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
  * starting  newly spawned thread  in a suspended  state (requiring the creator
  * to resume the thread at least once before execution actually starts)
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.suspend") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstartsuspended_np)(pthread_attr_t const *__restrict self,
                                                              int *start_suspended)
 /*[[[body:libc_pthread_attr_getstartsuspended_np]]]*/
@@ -2358,7 +2358,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_resume)(pthread_t self) {
 	return likely(self->pt_tid) ? EOK : ESRCH;
 }
 
-/*[[[head:libc_pthread_suspend2_np,hash:CRC-32=0x16166dee]]]*/
+/*[[[head:libc_pthread_suspend2_np,hash:CRC-32=0x4328d84f]]]*/
 /* >> pthread_suspend2_np(3)
  * Increment the given thread's suspend-counter. If the counter was `0' before,
  * then the thread is suspended and this function only returns once the  thread
@@ -2373,7 +2373,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_resume)(pthread_t self) {
  * @return: ESRCH:     The thread has already been terminated
  * @return: ENOMEM:    Insufficient memory
  * @return: EOVERFLOW: The suspension counter can't go any higher */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.suspend") ATTR_OUT_OPT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_suspend2_np)(pthread_t self,
                                                uint32_t *p_old_suspend_counter)
 /*[[[body:libc_pthread_suspend2_np]]]*/
@@ -2402,7 +2402,7 @@ done:
 }
 /*[[[end:libc_pthread_suspend2_np]]]*/
 
-/*[[[head:libc_pthread_resume2_np,hash:CRC-32=0xd7d2bd84]]]*/
+/*[[[head:libc_pthread_resume2_np,hash:CRC-32=0x80683906]]]*/
 /* >> pthread_resume2_np(3)
  * Decrement the given thread's suspend-counter. If the counter was already `0',
  * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
@@ -2414,7 +2414,7 @@ done:
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume_np, pthread_continue_np
  * @return: EOK:   Success
  * @return: ESRCH: The thread has already been terminated */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_OUT_OPT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.suspend") ATTR_OUT_OPT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_resume2_np)(pthread_t self,
                                               uint32_t *p_old_suspend_counter)
 /*[[[body:libc_pthread_resume2_np]]]*/
@@ -2444,7 +2444,7 @@ done:
 }
 /*[[[end:libc_pthread_resume2_np]]]*/
 
-/*[[[head:libc_pthread_continue_np,hash:CRC-32=0x71ae5472]]]*/
+/*[[[head:libc_pthread_continue_np,hash:CRC-32=0x373ebd4b]]]*/
 /* >> pthread_continue_np(3), pthread_unsuspend_np(3)
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
@@ -2454,7 +2454,7 @@ done:
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
  * @return: ESRCH: The thread has already been terminated */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.suspend") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_continue_np)(pthread_t self)
 /*[[[body:libc_pthread_continue_np]]]*/
 {
@@ -2680,7 +2680,7 @@ done_threads_unlock:
 
 
 
-/*[[[head:libc_pthread_suspend_all_np,hash:CRC-32=0x860fb262]]]*/
+/*[[[head:libc_pthread_suspend_all_np,hash:CRC-32=0x596d9a26]]]*/
 /* >> pthread_suspend_all_np(3)
  * Calls  `pthread_suspend_np(3)' once for every running thread but the calling one
  * After a call to this function, the calling thread is the only one running within
@@ -2692,7 +2692,7 @@ done_threads_unlock:
  * @return: EOK:       Success
  * @return: ENOMEM:    Insufficient memory
  * @return: EOVERFLOW: The suspension counter of some thread can't go any higher */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.suspend") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_suspend_all_np)(void)
 /*[[[body:libc_pthread_suspend_all_np]]]*/
 {
@@ -2713,11 +2713,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_resume_all_dlauxctrl_cb)(void *cookie, void *t
 	return NULL;
 }
 
-/*[[[head:libc_pthread_multi_np,hash:CRC-32=0xb344491b]]]*/
+/*[[[head:libc_pthread_multi_np,hash:CRC-32=0x98fed148]]]*/
 /* >> pthread_resume_all_np(3)
  * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
  * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.suspend") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_multi_np)(void)
 /*[[[body:libc_pthread_multi_np]]]*/
 {
@@ -2752,11 +2752,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_multi_np)(void)
 /* KOS PTHREAD (RE-)ATTACH API                                          */
 /************************************************************************/
 
-/*[[[head:libc_pthread_attach_np,hash:CRC-32=0x60f5b7c8]]]*/
+/*[[[head:libc_pthread_attach_np,hash:CRC-32=0x37598579]]]*/
 /* >> pthread_attach_np(3)
  * Attach  to `self' for a second time. After a call to this function, `pthread_detach(3)'
  * must be called one extra time before the thread descriptor `self' is actually destroyed */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") void
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.tid") void
 NOTHROW_NCX(LIBCCALL libc_pthread_attach_np)(pthread_t self)
 /*[[[body:libc_pthread_attach_np]]]*/
 {
@@ -2764,7 +2764,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attach_np)(pthread_t self)
 }
 /*[[[end:libc_pthread_attach_np]]]*/
 
-/*[[[head:libc_pthread_enumthreads_np,hash:CRC-32=0x16a7501d]]]*/
+/*[[[head:libc_pthread_enumthreads_np,hash:CRC-32=0x129d6f43]]]*/
 /* >> pthread_enumthreads_np(3)
  * Enumerate all threads created by `pthread_create(3)' by invoking `cb' once for each of them.
  * Only threads whose descriptors have yet to be destroyed are enumerated, and care is taken to
@@ -2774,7 +2774,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attach_np)(pthread_t self)
  * @return: * :     A call to `cb' returned a value other than `EOK', and enumeration was halted
  * @return: EOK:    All threads were enumerated by being passed to `cb'
  * @return: ENOMEM: Insufficient memory to allocate a required, internal buffer */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.tid") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_enumthreads_np)(errno_t (__LIBKCALL *cb)(void *cookie, pthread_t thrd),
                                                   void *cookie)
 /*[[[body:libc_pthread_enumthreads_np]]]*/
@@ -2803,7 +2803,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attachtid_dlauxctrl_cb)(void *cookie, void *tl
 	return NULL;
 }
 
-/*[[[head:libc_pthread_attachtid_np,hash:CRC-32=0xc82b4316]]]*/
+/*[[[head:libc_pthread_attachtid_np,hash:CRC-32=0x9ba25f1]]]*/
 /* >> pthread_attachtid_np(3)
  * Return a descriptor for a (potentially, previously detached) thread `tid'.
  * This function cannot be used to attach threads created by means other than
@@ -2819,7 +2819,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attachtid_dlauxctrl_cb)(void *cookie, void *tl
  * @return: ESRCH:  Descriptor for thread with `tid' has already been destroyed,
  *                  or didn't exist  (within the calling  process) in the  first
  *                  place. */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.tid") ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attachtid_np)(pid_t tid,
                                                 pthread_t *__restrict result)
 /*[[[body:libc_pthread_attachtid_np]]]*/
@@ -2847,7 +2847,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attachpidfd_dlauxctrl_cb)(void *cookie, void *
 	return NULL;
 }
 
-/*[[[head:libc_pthread_attachpidfd_np,hash:CRC-32=0xe01e563]]]*/
+/*[[[head:libc_pthread_attachpidfd_np,hash:CRC-32=0xcd04f7ee]]]*/
 /* >> pthread_attachpidfd_np(3)
  * Similar to `pthread_attachtid_np(3)', but search for a thread that has an
  * allocated PIDfd descriptor (as returned by `pthread_getpidfd_np(3)'), and
@@ -2863,7 +2863,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attachpidfd_dlauxctrl_cb)(void *cookie, void *
  *                  or  didn't  exist (within  the  calling process)  in  the first
  *                  place, or the given `pidfd' is not what was originally returned
  *                  by  `pthread_getpidfd_np(3)'  (but is  the result  of `dup(2)') */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.tid") ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attachpidfd_np)(fd_t pidfd,
                                                   pthread_t *__restrict result)
 /*[[[body:libc_pthread_attachpidfd_np]]]*/
@@ -2924,7 +2924,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attachpidfd_np)(fd_t pidfd,
 /* MISC PTHREAD FUNCTIONS                                               */
 /************************************************************************/
 
-/*[[[head:libc_pthread_atfork,hash:CRC-32=0xaf6eedad]]]*/
+/*[[[head:libc_pthread_atfork,hash:CRC-32=0xd4af661c]]]*/
 /* >> pthread_atfork(3)
  * Install handlers to be called when a new process is created with  `fork(2)'.
  * The `prepare' handler is called in the parent process just before performing
@@ -2938,7 +2938,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attachpidfd_np)(fd_t pidfd,
  * called in FIFO order (first added -> first called)
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.misc") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(void (LIBCCALL *prepare)(void),
                                           void (LIBCCALL *parent)(void),
                                           void (LIBCCALL *child)(void))
@@ -2952,8 +2952,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(void (LIBCCALL *prepare)(void),
 }
 /*[[[end:libc_pthread_atfork]]]*/
 
-/*[[[head:libc___pthread_register_cancel,hash:CRC-32=0xa8bf5df4]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.pthread") __cleanup_fct_attribute void
+/*[[[head:libc___pthread_register_cancel,hash:CRC-32=0x2018766f]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.cleanup") __cleanup_fct_attribute void
 NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel)(__pthread_unwind_buf_t *buf)
 /*[[[body:libc___pthread_register_cancel]]]*/
 /*AUTO*/{
@@ -2963,8 +2963,8 @@ NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel)(__pthread_unwind_buf_t *buf
 }
 /*[[[end:libc___pthread_register_cancel]]]*/
 
-/*[[[head:libc___pthread_unregister_cancel,hash:CRC-32=0x79cf6309]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.pthread") __cleanup_fct_attribute ATTR_INOUT(1) void
+/*[[[head:libc___pthread_unregister_cancel,hash:CRC-32=0x1e4cc83e]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.cleanup") __cleanup_fct_attribute ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel)(__pthread_unwind_buf_t *buf)
 /*[[[body:libc___pthread_unregister_cancel]]]*/
 /*AUTO*/{
@@ -2974,8 +2974,8 @@ NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel)(__pthread_unwind_buf_t *b
 }
 /*[[[end:libc___pthread_unregister_cancel]]]*/
 
-/*[[[head:libc___pthread_register_cancel_defer,hash:CRC-32=0xe3d84e6b]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.pthread") __cleanup_fct_attribute ATTR_INOUT(1) void
+/*[[[head:libc___pthread_register_cancel_defer,hash:CRC-32=0x98710381]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.cleanup") __cleanup_fct_attribute ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_t *buf)
 /*[[[body:libc___pthread_register_cancel_defer]]]*/
 /*AUTO*/{
@@ -2985,8 +2985,8 @@ NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_
 }
 /*[[[end:libc___pthread_register_cancel_defer]]]*/
 
-/*[[[head:libc___pthread_unregister_cancel_restore,hash:CRC-32=0x76a3bdce]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.pthread") __cleanup_fct_attribute ATTR_INOUT(1) void
+/*[[[head:libc___pthread_unregister_cancel_restore,hash:CRC-32=0xf31ad15]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.cleanup") __cleanup_fct_attribute ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel_restore)(__pthread_unwind_buf_t *buf)
 /*[[[body:libc___pthread_unregister_cancel_restore]]]*/
 /*AUTO*/{
@@ -2996,9 +2996,9 @@ NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel_restore)(__pthread_unwind_
 }
 /*[[[end:libc___pthread_unregister_cancel_restore]]]*/
 
-/*[[[head:libc___pthread_unwind_next,hash:CRC-32=0xf9e7c536]]]*/
+/*[[[head:libc___pthread_unwind_next,hash:CRC-32=0x941102b4]]]*/
 /* Internal interface to initiate cleanup */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_WEAK __cleanup_fct_attribute ATTR_INOUT(1) void
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.cleanup") ATTR_WEAK __cleanup_fct_attribute ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf)
 /*[[[body:libc___pthread_unwind_next]]]*/
 /*AUTO*/{
@@ -3026,12 +3026,12 @@ NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf)
 /* pthread_mutexattr_t                                                  */
 /************************************************************************/
 
-/*[[[head:libc_pthread_mutexattr_init,hash:CRC-32=0x1d37791b]]]*/
+/*[[[head:libc_pthread_mutexattr_init,hash:CRC-32=0x59d0c6d0]]]*/
 /* >> pthread_mutexattr_init(3)
  * Initialize mutex attribute object `self' with default
  * attributes    (kind    is   `PTHREAD_MUTEX_TIMED_NP')
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_init)(pthread_mutexattr_t *self)
 /*[[[body:libc_pthread_mutexattr_init]]]*/
 {
@@ -3040,11 +3040,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_init)(pthread_mutexattr_t *self)
 }
 /*[[[end:libc_pthread_mutexattr_init]]]*/
 
-/*[[[head:libc_pthread_mutexattr_destroy,hash:CRC-32=0x2f93c49a]]]*/
+/*[[[head:libc_pthread_mutexattr_destroy,hash:CRC-32=0xf9b5e96f]]]*/
 /* >> pthread_mutexattr_destroy(3)
  * Destroy mutex attribute object `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_destroy)(pthread_mutexattr_t *self)
 /*[[[body:libc_pthread_mutexattr_destroy]]]*/
 {
@@ -3054,11 +3054,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_destroy)(pthread_mutexattr_t *self)
 }
 /*[[[end:libc_pthread_mutexattr_destroy]]]*/
 
-/*[[[head:libc_pthread_mutexattr_getpshared,hash:CRC-32=0xdb56f3c4]]]*/
+/*[[[head:libc_pthread_mutexattr_getpshared,hash:CRC-32=0xdf875046]]]*/
 /* >> pthread_mutexattr_getpshared(3)
  * Get the process-shared flag of the mutex attribute `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getpshared)(pthread_mutexattr_t const *__restrict self,
                                                         int *__restrict pshared)
 /*[[[body:libc_pthread_mutexattr_getpshared]]]*/
@@ -3070,12 +3070,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getpshared)(pthread_mutexattr_t cons
 }
 /*[[[end:libc_pthread_mutexattr_getpshared]]]*/
 
-/*[[[head:libc_pthread_mutexattr_setpshared,hash:CRC-32=0x829b2182]]]*/
+/*[[[head:libc_pthread_mutexattr_setpshared,hash:CRC-32=0xb0f5b772]]]*/
 /* >> pthread_mutexattr_setpshared(3)
  * Set the process-shared flag of the mutex attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setpshared)(pthread_mutexattr_t *self,
                                                         int pshared)
 /*[[[body:libc_pthread_mutexattr_setpshared]]]*/
@@ -3090,11 +3090,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setpshared)(pthread_mutexattr_t *sel
 }
 /*[[[end:libc_pthread_mutexattr_setpshared]]]*/
 
-/*[[[head:libc_pthread_mutexattr_gettype,hash:CRC-32=0xd184342e]]]*/
+/*[[[head:libc_pthread_mutexattr_gettype,hash:CRC-32=0xe14d7d4]]]*/
 /* >> pthread_mutexattr_gettype(3)
  * Return in `*kind' the mutex kind attribute in `*self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_gettype)(pthread_mutexattr_t const *__restrict self,
                                                      int *__restrict kind)
 /*[[[body:libc_pthread_mutexattr_gettype]]]*/
@@ -3104,13 +3104,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_gettype)(pthread_mutexattr_t const *
 }
 /*[[[end:libc_pthread_mutexattr_gettype]]]*/
 
-/*[[[head:libc_pthread_mutexattr_settype,hash:CRC-32=0x75d19ad2]]]*/
+/*[[[head:libc_pthread_mutexattr_settype,hash:CRC-32=0x6f801d21]]]*/
 /* >> pthread_mutexattr_settype(3)
  * Set  the mutex kind attribute in `*self' to `kind' (either `PTHREAD_MUTEX_NORMAL',
  * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_settype)(pthread_mutexattr_t *self,
                                                      int kind)
 /*[[[body:libc_pthread_mutexattr_settype]]]*/
@@ -3126,11 +3126,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_settype)(pthread_mutexattr_t *self,
 }
 /*[[[end:libc_pthread_mutexattr_settype]]]*/
 
-/*[[[head:libc_pthread_mutexattr_getprotocol,hash:CRC-32=0x52c75902]]]*/
+/*[[[head:libc_pthread_mutexattr_getprotocol,hash:CRC-32=0xbcff9dec]]]*/
 /* >> pthread_mutexattr_getprotocol(3)
  * Return in `*protocol' the mutex protocol attribute in `*self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getprotocol)(pthread_mutexattr_t const *__restrict self,
                                                          int *__restrict protocol)
 /*[[[body:libc_pthread_mutexattr_getprotocol]]]*/
@@ -3141,13 +3141,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getprotocol)(pthread_mutexattr_t con
 }
 /*[[[end:libc_pthread_mutexattr_getprotocol]]]*/
 
-/*[[[head:libc_pthread_mutexattr_setprotocol,hash:CRC-32=0x9604323a]]]*/
+/*[[[head:libc_pthread_mutexattr_setprotocol,hash:CRC-32=0x6e9059d0]]]*/
 /* >> pthread_mutexattr_setprotocol(3)
  * Set  the  mutex protocol  attribute  in `*self'  to  `protocol' (either
  * `PTHREAD_PRIO_NONE', `PTHREAD_PRIO_INHERIT', or `PTHREAD_PRIO_PROTECT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `protocol' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setprotocol)(pthread_mutexattr_t *self,
                                                          int protocol)
 /*[[[body:libc_pthread_mutexattr_setprotocol]]]*/
@@ -3162,11 +3162,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setprotocol)(pthread_mutexattr_t *se
 }
 /*[[[end:libc_pthread_mutexattr_setprotocol]]]*/
 
-/*[[[head:libc_pthread_mutexattr_getprioceiling,hash:CRC-32=0x556f9a8]]]*/
+/*[[[head:libc_pthread_mutexattr_getprioceiling,hash:CRC-32=0xf61c4af3]]]*/
 /* >> pthread_mutexattr_getprioceiling(3)
  * Return in `*prioceiling' the mutex prioceiling attribute in `*self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getprioceiling)(pthread_mutexattr_t const *__restrict self,
                                                             int *__restrict prioceiling)
 /*[[[body:libc_pthread_mutexattr_getprioceiling]]]*/
@@ -3177,12 +3177,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getprioceiling)(pthread_mutexattr_t 
 }
 /*[[[end:libc_pthread_mutexattr_getprioceiling]]]*/
 
-/*[[[head:libc_pthread_mutexattr_setprioceiling,hash:CRC-32=0x2ffc1b2]]]*/
+/*[[[head:libc_pthread_mutexattr_setprioceiling,hash:CRC-32=0xc04987ff]]]*/
 /* >> pthread_mutexattr_setprioceiling(3)
  * Set the mutex prioceiling attribute in `*self' to `prioceiling'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `prioceiling' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setprioceiling)(pthread_mutexattr_t *self,
                                                             int prioceiling)
 /*[[[body:libc_pthread_mutexattr_setprioceiling]]]*/
@@ -3204,11 +3204,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setprioceiling)(pthread_mutexattr_t 
 }
 /*[[[end:libc_pthread_mutexattr_setprioceiling]]]*/
 
-/*[[[head:libc_pthread_mutexattr_getrobust,hash:CRC-32=0x53764969]]]*/
+/*[[[head:libc_pthread_mutexattr_getrobust,hash:CRC-32=0x9cf0bc17]]]*/
 /* >> pthread_mutexattr_getrobust(3)
  * Get the robustness flag of the mutex attribute `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getrobust)(pthread_mutexattr_t const *__restrict self,
                                                        int *__restrict robustness)
 /*[[[body:libc_pthread_mutexattr_getrobust]]]*/
@@ -3220,12 +3220,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getrobust)(pthread_mutexattr_t const
 }
 /*[[[end:libc_pthread_mutexattr_getrobust]]]*/
 
-/*[[[head:libc_pthread_mutexattr_setrobust,hash:CRC-32=0xfda7ba20]]]*/
+/*[[[head:libc_pthread_mutexattr_setrobust,hash:CRC-32=0x98ade26]]]*/
 /* >> pthread_mutexattr_setrobust(3)
  * Set the robustness flag of the mutex attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `robustness' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setrobust)(pthread_mutexattr_t *self,
                                                        int robustness)
 /*[[[body:libc_pthread_mutexattr_setrobust]]]*/
@@ -3258,11 +3258,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setrobust)(pthread_mutexattr_t *self
 /* pthread_rwlockattr_t                                                 */
 /************************************************************************/
 
-/*[[[head:libc_pthread_rwlockattr_init,hash:CRC-32=0xe883b94f]]]*/
+/*[[[head:libc_pthread_rwlockattr_init,hash:CRC-32=0xa933dba5]]]*/
 /* >> pthread_rwlockattr_init(3)
  * Initialize attribute object `self' with default values
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.rwlock") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_init)(pthread_rwlockattr_t *self)
 /*[[[body:libc_pthread_rwlockattr_init]]]*/
 {
@@ -3272,11 +3272,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_init)(pthread_rwlockattr_t *self)
 }
 /*[[[end:libc_pthread_rwlockattr_init]]]*/
 
-/*[[[head:libc_pthread_rwlockattr_destroy,hash:CRC-32=0x82896a10]]]*/
+/*[[[head:libc_pthread_rwlockattr_destroy,hash:CRC-32=0xfc742e]]]*/
 /* >> pthread_rwlockattr_destroy(3)
  * Destroy attribute object  `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.rwlock") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_destroy)(pthread_rwlockattr_t *self)
 /*[[[body:libc_pthread_rwlockattr_destroy]]]*/
 {
@@ -3286,11 +3286,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_destroy)(pthread_rwlockattr_t *self
 }
 /*[[[end:libc_pthread_rwlockattr_destroy]]]*/
 
-/*[[[head:libc_pthread_rwlockattr_getpshared,hash:CRC-32=0x7b09106e]]]*/
+/*[[[head:libc_pthread_rwlockattr_getpshared,hash:CRC-32=0x4f0cfd93]]]*/
 /* >> pthread_rwlockattr_getpshared(3)
  * Return current setting of process-shared attribute of `self' in `*pshared'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.rwlock") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getpshared)(pthread_rwlockattr_t const *__restrict self,
                                                          int *__restrict pshared)
 /*[[[body:libc_pthread_rwlockattr_getpshared]]]*/
@@ -3300,12 +3300,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getpshared)(pthread_rwlockattr_t co
 }
 /*[[[end:libc_pthread_rwlockattr_getpshared]]]*/
 
-/*[[[head:libc_pthread_rwlockattr_setpshared,hash:CRC-32=0xc6c60179]]]*/
+/*[[[head:libc_pthread_rwlockattr_setpshared,hash:CRC-32=0x2ecee3a1]]]*/
 /* >> pthread_rwlockattr_setpshared(3)
  * Set process-shared attribute of `self' to `pshared'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.rwlock") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setpshared)(pthread_rwlockattr_t *self,
                                                          int pshared)
 /*[[[body:libc_pthread_rwlockattr_setpshared]]]*/
@@ -3318,11 +3318,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setpshared)(pthread_rwlockattr_t *s
 }
 /*[[[end:libc_pthread_rwlockattr_setpshared]]]*/
 
-/*[[[head:libc_pthread_rwlockattr_getkind_np,hash:CRC-32=0xdfc0c9e]]]*/
+/*[[[head:libc_pthread_rwlockattr_getkind_np,hash:CRC-32=0xa63b2bec]]]*/
 /* >> pthread_rwlockattr_getkind_np(3)
  * Return current setting of reader/writer preference
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.misc") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getkind_np)(pthread_rwlockattr_t const *__restrict self,
                                                          int *__restrict pref)
 /*[[[body:libc_pthread_rwlockattr_getkind_np]]]*/
@@ -3332,12 +3332,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getkind_np)(pthread_rwlockattr_t co
 }
 /*[[[end:libc_pthread_rwlockattr_getkind_np]]]*/
 
-/*[[[head:libc_pthread_rwlockattr_setkind_np,hash:CRC-32=0x243ff0b2]]]*/
+/*[[[head:libc_pthread_rwlockattr_setkind_np,hash:CRC-32=0xdaf3cc23]]]*/
 /* >> pthread_rwlockattr_setkind_np(3)
  * Set     reader/write     preference
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pref' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.misc") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setkind_np)(pthread_rwlockattr_t *self,
                                                          int pref)
 /*[[[body:libc_pthread_rwlockattr_setkind_np]]]*/
@@ -3369,11 +3369,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setkind_np)(pthread_rwlockattr_t *s
 /* pthread_condattr_t                                                   */
 /************************************************************************/
 
-/*[[[head:libc_pthread_condattr_init,hash:CRC-32=0xf8d59b7d]]]*/
+/*[[[head:libc_pthread_condattr_init,hash:CRC-32=0xe66f19a4]]]*/
 /* >> pthread_condattr_init(3)
  * Initialize condition variable attribute `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.cond") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_init)(pthread_condattr_t *self)
 /*[[[body:libc_pthread_condattr_init]]]*/
 {
@@ -3382,11 +3382,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_init)(pthread_condattr_t *self)
 }
 /*[[[end:libc_pthread_condattr_init]]]*/
 
-/*[[[head:libc_pthread_condattr_destroy,hash:CRC-32=0xca0c953c]]]*/
+/*[[[head:libc_pthread_condattr_destroy,hash:CRC-32=0x94fad35f]]]*/
 /* >> pthread_condattr_destroy(3)
  * Destroy condition variable attribute `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.cond") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_destroy)(pthread_condattr_t *self)
 /*[[[body:libc_pthread_condattr_destroy]]]*/
 {
@@ -3396,11 +3396,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_destroy)(pthread_condattr_t *self)
 }
 /*[[[end:libc_pthread_condattr_destroy]]]*/
 
-/*[[[head:libc_pthread_condattr_getpshared,hash:CRC-32=0x22d4819b]]]*/
+/*[[[head:libc_pthread_condattr_getpshared,hash:CRC-32=0xb795077a]]]*/
 /* >> pthread_condattr_getpshared(3)
  * Get the process-shared flag of the condition variable attribute `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.cond") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getpshared)(pthread_condattr_t const *__restrict self,
                                                        int *__restrict pshared)
 /*[[[body:libc_pthread_condattr_getpshared]]]*/
@@ -3412,12 +3412,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getpshared)(pthread_condattr_t const 
 }
 /*[[[end:libc_pthread_condattr_getpshared]]]*/
 
-/*[[[head:libc_pthread_condattr_setpshared,hash:CRC-32=0x964edaed]]]*/
+/*[[[head:libc_pthread_condattr_setpshared,hash:CRC-32=0x697d91b9]]]*/
 /* >> pthread_condattr_setpshared(3)
  * Set the process-shared flag of the condition variable attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.cond") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setpshared)(pthread_condattr_t *self,
                                                        int pshared)
 /*[[[body:libc_pthread_condattr_setpshared]]]*/
@@ -3432,11 +3432,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setpshared)(pthread_condattr_t *self,
 }
 /*[[[end:libc_pthread_condattr_setpshared]]]*/
 
-/*[[[head:libc_pthread_condattr_getclock,hash:CRC-32=0x741c8231]]]*/
+/*[[[head:libc_pthread_condattr_getclock,hash:CRC-32=0xcf8f34e2]]]*/
 /* >> pthread_condattr_getclock(3)
  * Get the clock selected for the condition variable attribute `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed64.cond") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getclock)(pthread_condattr_t const *__restrict self,
                                                      clockid_t *__restrict clock_id)
 /*[[[body:libc_pthread_condattr_getclock]]]*/
@@ -3446,12 +3446,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getclock)(pthread_condattr_t const *_
 }
 /*[[[end:libc_pthread_condattr_getclock]]]*/
 
-/*[[[head:libc_pthread_condattr_setclock,hash:CRC-32=0x8c9d8ed7]]]*/
+/*[[[head:libc_pthread_condattr_setclock,hash:CRC-32=0x2a37add7]]]*/
 /* >> pthread_condattr_setclock(3)
  * Set the clock selected for the condition variable attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `clock_id' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed64.cond") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setclock)(pthread_condattr_t *self,
                                                      clockid_t clock_id)
 /*[[[body:libc_pthread_condattr_setclock]]]*/
@@ -3483,11 +3483,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setclock)(pthread_condattr_t *self,
 /* pthread_barrierattr_t                                                */
 /************************************************************************/
 
-/*[[[head:libc_pthread_barrierattr_init,hash:CRC-32=0xb8bff386]]]*/
+/*[[[head:libc_pthread_barrierattr_init,hash:CRC-32=0x2b4eeb0e]]]*/
 /* >> pthread_barrierattr_init(3)
  * Initialize barrier attribute `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.barrier") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_init)(pthread_barrierattr_t *self)
 /*[[[body:libc_pthread_barrierattr_init]]]*/
 {
@@ -3496,11 +3496,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_init)(pthread_barrierattr_t *self)
 }
 /*[[[end:libc_pthread_barrierattr_init]]]*/
 
-/*[[[head:libc_pthread_barrierattr_destroy,hash:CRC-32=0x682c2131]]]*/
+/*[[[head:libc_pthread_barrierattr_destroy,hash:CRC-32=0x34e2efbd]]]*/
 /* >> pthread_barrierattr_destroy(3)
  * Destroy previously dynamically initialized barrier attribute `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.barrier") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_destroy)(pthread_barrierattr_t *self)
 /*[[[body:libc_pthread_barrierattr_destroy]]]*/
 {
@@ -3510,11 +3510,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_destroy)(pthread_barrierattr_t *se
 }
 /*[[[end:libc_pthread_barrierattr_destroy]]]*/
 
-/*[[[head:libc_pthread_barrierattr_getpshared,hash:CRC-32=0xf234828e]]]*/
+/*[[[head:libc_pthread_barrierattr_getpshared,hash:CRC-32=0x50e6e76]]]*/
 /* >> pthread_barrierattr_getpshared(3)
  * Get the process-shared flag of the barrier attribute `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.barrier") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_getpshared)(pthread_barrierattr_t const *__restrict self,
                                                           int *__restrict pshared)
 /*[[[body:libc_pthread_barrierattr_getpshared]]]*/
@@ -3524,12 +3524,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_getpshared)(pthread_barrierattr_t 
 }
 /*[[[end:libc_pthread_barrierattr_getpshared]]]*/
 
-/*[[[head:libc_pthread_barrierattr_setpshared,hash:CRC-32=0xdd6e0678]]]*/
+/*[[[head:libc_pthread_barrierattr_setpshared,hash:CRC-32=0xba6879e]]]*/
 /* >> pthread_barrierattr_setpshared(3)
  * Set the process-shared flag of the barrier attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.barrier") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_setpshared)(pthread_barrierattr_t *self,
                                                           int pshared)
 /*[[[body:libc_pthread_barrierattr_setpshared]]]*/
@@ -3560,11 +3560,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_setpshared)(pthread_barrierattr_t 
 /* pthread_mutex_t                                                      */
 /************************************************************************/
 
-/*[[[head:libc_pthread_mutex_init,hash:CRC-32=0xa87bbc25]]]*/
+/*[[[head:libc_pthread_mutex_init,hash:CRC-32=0x3e90eee6]]]*/
 /* >> pthread_mutex_init(3)
  * Initialize the given mutex `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *self,
                                               pthread_mutexattr_t const *mutexattr)
 /*[[[body:libc_pthread_mutex_init]]]*/
@@ -3584,11 +3584,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *self,
 }
 /*[[[end:libc_pthread_mutex_init]]]*/
 
-/*[[[head:libc_pthread_mutex_destroy,hash:CRC-32=0x59132563]]]*/
+/*[[[head:libc_pthread_mutex_destroy,hash:CRC-32=0x5f49c596]]]*/
 /* >> pthread_mutex_destroy(3)
  * Destroy the given mutex `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_destroy)(pthread_mutex_t *self)
 /*[[[body:libc_pthread_mutex_destroy]]]*/
 {
@@ -3598,7 +3598,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_destroy)(pthread_mutex_t *self)
 }
 /*[[[end:libc_pthread_mutex_destroy]]]*/
 
-LOCAL ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+LOCAL ATTR_SECTION(".text.crt.sched.pthread.core.mutex") WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW_NCX(LIBCCALL mutex_trylock)(pthread_mutex_t *__restrict self,
                                     uint32_t *__restrict plock) {
 	uint32_t lock;
@@ -3629,7 +3629,7 @@ again:
 	return EBUSY;
 }
 
-LOCAL ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+LOCAL ATTR_SECTION(".text.crt.sched.pthread.core.mutex") WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW_NCX(LIBCCALL mutex_trylock_waiters)(pthread_mutex_t *__restrict self,
                                             uint32_t *__restrict plock) {
 	errno_t result;
@@ -3648,14 +3648,14 @@ again:
 	return result;
 }
 
-/*[[[head:libc_pthread_mutex_trylock,hash:CRC-32=0x37cadc10]]]*/
+/*[[[head:libc_pthread_mutex_trylock,hash:CRC-32=0x3695854c]]]*/
 /* >> pthread_mutex_trylock(3)
  * Try locking the given mutex `self'
  * @return: EOK:   Success
  * @return: EBUSY: The  mutex  has  already  been   locked
  *                 In case of  a recursive mutex,  another
  *                 thread was the one to acquire the lock. */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.mutex") WUNUSED ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_trylock)(pthread_mutex_t *self)
 /*[[[body:libc_pthread_mutex_trylock]]]*/
 {
@@ -3664,11 +3664,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_trylock)(pthread_mutex_t *self)
 }
 /*[[[end:libc_pthread_mutex_trylock]]]*/
 
-/*[[[head:libc_pthread_mutex_lock,hash:CRC-32=0xa9c55256]]]*/
+/*[[[head:libc_pthread_mutex_lock,hash:CRC-32=0x3ea30966]]]*/
 /* >> pthread_mutex_lock(3)
  * Lock the given mutex `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.mutex") ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_mutex_lock)(pthread_mutex_t *self)
 /*[[[body:libc_pthread_mutex_lock]]]*/
 {
@@ -3685,13 +3685,13 @@ again:
 }
 /*[[[end:libc_pthread_mutex_lock]]]*/
 
-/*[[[head:libc_pthread_mutex_timedlock,hash:CRC-32=0xb9808ba8]]]*/
+/*[[[head:libc_pthread_mutex_timedlock,hash:CRC-32=0x7e2c5967]]]*/
 /* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
  * Wait until lock becomes available, or specified time passes
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed.mutex") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock)(pthread_mutex_t *__restrict self,
                                                    struct timespec const *__restrict abstime)
 /*[[[body:libc_pthread_mutex_timedlock]]]*/
@@ -3744,7 +3744,7 @@ static_assert(LFUTEX_WAIT_FLAG_TIMEOUT_FROMLINUX(FUTEX_PRIVATE_FLAG) == LFUTEX_W
 #endif /* !... */
 
 
-/*[[[head:libc_pthread_mutex_timedlock64,hash:CRC-32=0x4978df62]]]*/
+/*[[[head:libc_pthread_mutex_timedlock64,hash:CRC-32=0xc84ca706]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_mutex_timedlock64, libc_pthread_mutex_timedlock);
 #else /* MAGIC:alias */
@@ -3753,7 +3753,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_mutex_timedlock64, libc_pthread_mutex_timedlock
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed64.mutex") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock64)(pthread_mutex_t *__restrict self,
                                                      struct timespec64 const *__restrict abstime)
 /*[[[body:libc_pthread_mutex_timedlock64]]]*/
@@ -3775,13 +3775,13 @@ again:
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_mutex_timedlock64]]]*/
 
-/*[[[head:libc_pthread_mutex_reltimedlock_np,hash:CRC-32=0xd027d496]]]*/
+/*[[[head:libc_pthread_mutex_reltimedlock_np,hash:CRC-32=0x5eb241a8]]]*/
 /* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
  * Wait until lock becomes available, or specified amount of time has passed
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.reltimed.mutex") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_mutex_reltimedlock_np)(pthread_mutex_t *__restrict self,
                                                          struct timespec const *__restrict reltime)
 /*[[[body:libc_pthread_mutex_reltimedlock_np]]]*/
@@ -3806,7 +3806,7 @@ again:
 }
 /*[[[end:libc_pthread_mutex_reltimedlock_np]]]*/
 
-/*[[[head:libc_pthread_mutex_reltimedlock64_np,hash:CRC-32=0x2bf50c96]]]*/
+/*[[[head:libc_pthread_mutex_reltimedlock64_np,hash:CRC-32=0x9fab7e67]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_mutex_reltimedlock64_np, libc_pthread_mutex_reltimedlock_np);
 #else /* MAGIC:alias */
@@ -3815,7 +3815,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_mutex_reltimedlock64_np, libc_pthread_mutex_rel
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.reltimed64.mutex") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_mutex_reltimedlock64_np)(pthread_mutex_t *__restrict self,
                                                            struct timespec64 const *__restrict reltime)
 /*[[[body:libc_pthread_mutex_reltimedlock64_np]]]*/
@@ -3838,7 +3838,7 @@ again:
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_mutex_reltimedlock64_np]]]*/
 
-/*[[[head:libc_pthread_mutex_clocklock,hash:CRC-32=0xb8d0349]]]*/
+/*[[[head:libc_pthread_mutex_clocklock,hash:CRC-32=0x5f27fa1f]]]*/
 /* >> pthread_mutex_clocklock(3), pthread_mutex_clocklock64(3)
  * Same  as `pthread_mutex_timedwait(3)', but  the given `abstime'  is relative to `clock_id',
  * whereas when using `pthread_mutex_timedwait(3)', it is always relative to `CLOCK_REALTIME'.
@@ -3846,7 +3846,7 @@ again:
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: EINVAL:    Invalid/unsupported `clock_id'
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.clock.mutex") WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_mutex_clocklock)(pthread_mutex_t *__restrict self,
                                                    clockid_t clock_id,
                                                    struct timespec const *__restrict abstime)
@@ -3880,7 +3880,7 @@ again:
 }
 /*[[[end:libc_pthread_mutex_clocklock]]]*/
 
-/*[[[head:libc_pthread_mutex_clocklock64,hash:CRC-32=0xa3966ac]]]*/
+/*[[[head:libc_pthread_mutex_clocklock64,hash:CRC-32=0x10aeb03b]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_mutex_clocklock64, libc_pthread_mutex_clocklock);
 #else /* MAGIC:alias */
@@ -3891,7 +3891,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_mutex_clocklock64, libc_pthread_mutex_clocklock
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: EINVAL:    Invalid/unsupported `clock_id'
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.clock64.mutex") WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_mutex_clocklock64)(pthread_mutex_t *__restrict self,
                                                      clockid_t clock_id,
                                                      struct timespec64 const *__restrict abstime)
@@ -3923,11 +3923,11 @@ again:
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_mutex_clocklock64]]]*/
 
-/*[[[head:libc_pthread_mutex_unlock,hash:CRC-32=0x5caeb000]]]*/
+/*[[[head:libc_pthread_mutex_unlock,hash:CRC-32=0xb440ec42]]]*/
 /* >> pthread_mutex_unlock(3)
  * Unlock the given mutex `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.mutex") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *self)
 /*[[[body:libc_pthread_mutex_unlock]]]*/
 {
@@ -3961,12 +3961,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *self)
 }
 /*[[[end:libc_pthread_mutex_unlock]]]*/
 
-/*[[[head:libc_pthread_mutex_isowned_np,hash:CRC-32=0x6382533d]]]*/
+/*[[[head:libc_pthread_mutex_isowned_np,hash:CRC-32=0x37c193e4]]]*/
 /* >> pthread_mutex_isowned_np(3)
  * Check if the calling thread is holding a lock to `mutex' (for use by assertions)
  * @return: 1 : Yes, you are holding a lock to `mutex'
  * @return: 0 : Either `mutex' isn't locked, or it isn't you that's holding the lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_PURE WUNUSED ATTR_IN(1) int
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos") ATTR_PURE WUNUSED ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_isowned_np)(pthread_mutex_t __KOS_FIXED_CONST *mutex)
 /*[[[body:libc_pthread_mutex_isowned_np]]]*/
 {
@@ -3978,11 +3978,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_isowned_np)(pthread_mutex_t __KOS_FIXED_
 }
 /*[[[end:libc_pthread_mutex_isowned_np]]]*/
 
-/*[[[head:libc_pthread_mutex_getprioceiling,hash:CRC-32=0x1dcc0815]]]*/
+/*[[[head:libc_pthread_mutex_getprioceiling,hash:CRC-32=0xb6acdcca]]]*/
 /* >> pthread_mutex_getprioceiling(3)
  * Get the priority ceiling of `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_getprioceiling)(pthread_mutex_t const *__restrict self,
                                                         int *__restrict prioceiling)
 /*[[[body:libc_pthread_mutex_getprioceiling]]]*/
@@ -3994,13 +3994,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_getprioceiling)(pthread_mutex_t const *_
 }
 /*[[[end:libc_pthread_mutex_getprioceiling]]]*/
 
-/*[[[head:libc_pthread_mutex_setprioceiling,hash:CRC-32=0x1075b320]]]*/
+/*[[[head:libc_pthread_mutex_setprioceiling,hash:CRC-32=0x2455709e]]]*/
 /* >> pthread_mutex_setprioceiling(3)
  * Set the priority ceiling of `self' to `prioceiling',
  * return  old priority ceiling value in `*old_ceiling'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `prioceiling' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) ATTR_OUT_OPT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_INOUT(1) ATTR_OUT_OPT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_setprioceiling)(pthread_mutex_t *__restrict self,
                                                         int prioceiling,
                                                         int *__restrict old_ceiling)
@@ -4014,13 +4014,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_setprioceiling)(pthread_mutex_t *__restr
 }
 /*[[[end:libc_pthread_mutex_setprioceiling]]]*/
 
-/*[[[head:libc_pthread_mutex_consistent,hash:CRC-32=0xb143af0e]]]*/
+/*[[[head:libc_pthread_mutex_consistent,hash:CRC-32=0x31560b32]]]*/
 /* >> pthread_mutex_consistent(3)
  * Declare the state protected by `self' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.mutex") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_consistent)(pthread_mutex_t *self)
 /*[[[body:libc_pthread_mutex_consistent]]]*/
 /*AUTO*/{
@@ -4099,7 +4099,7 @@ struct readlock_tls_data {
 };
 
 /* Rehash with the given list buffer */
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) void CC
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") NONNULL((1, 2)) void CC
 readlock_tls_data_rehash_with(struct readlock_tls_data *__restrict self,
                               struct readlock_bucket *__restrict new_list,
                               size_t new_mask) {
@@ -4129,7 +4129,7 @@ readlock_tls_data_rehash_with(struct readlock_tls_data *__restrict self,
 	self->rtd_rdlock_size = self->rtd_rdlock_used; /* All deleted entries were removed... */
 }
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") WUNUSED NONNULL((1, 2)) errno_t
 readlock_tls_data_doadd_impl(struct readlock_tls_data *__restrict self,
                              pthread_rwlock_t *__restrict lck) {
 	uintptr_t hash, i, perturb;
@@ -4168,7 +4168,7 @@ readlock_tls_data_doadd_impl(struct readlock_tls_data *__restrict self,
 /*[[[end]]]*/
 
 /* Add the given `lck' to `self' */
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t CC
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") NONNULL((1, 2)) errno_t CC
 readlock_tls_data_doadd(struct readlock_tls_data *__restrict self,
                         pthread_rwlock_t *__restrict lck)
 		THROWS(E_BADALLOC) {
@@ -4199,7 +4199,7 @@ doadd:
 }
 
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void CC
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") NONNULL((1)) void CC
 readlock_tls_data_rehash_after_remove(struct readlock_tls_data *__restrict self) {
 	if ((self->rtd_rdlock_used < (self->rtd_rdlock_mask / 3)) &&
 	    self->rtd_rdlock_mask > CONFIG_LIBC_READLOCK_TLS_DATA_INITIAL_MASK) {
@@ -4220,7 +4220,7 @@ readlock_tls_data_rehash_after_remove(struct readlock_tls_data *__restrict self)
 }
 
 /* Remove `lck' from the set of locks of `self' */
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t CC
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") NONNULL((1, 2)) errno_t CC
 readlock_tls_data_dodel(struct readlock_tls_data *__restrict self,
                         pthread_rwlock_t *__restrict lck) {
 	uintptr_t hash, i, perturb;
@@ -4243,7 +4243,7 @@ readlock_tls_data_dodel(struct readlock_tls_data *__restrict self,
 }
 
 /* Remove `lck' from the set of locks of `self' */
-ATTR_SECTION(".text.crt.sched.pthread")
+ATTR_SECTION(".text.crt.sched.pthread.core.rwlock")
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(CC readlock_tls_data_contains)(struct readlock_tls_data const *__restrict self,
                                        pthread_rwlock_t const *__restrict lck) {
@@ -4262,7 +4262,7 @@ NOTHROW(CC readlock_tls_data_contains)(struct readlock_tls_data const *__restric
 
 
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") void
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") void
 NOTHROW_NCX(LIBCCALL readlock_tls_destroy)(void *data) {
 	struct readlock_tls_data *me;
 	if (!data)
@@ -4272,16 +4272,16 @@ NOTHROW_NCX(LIBCCALL readlock_tls_destroy)(void *data) {
 	free(me);
 }
 
-PRIVATE ATTR_SECTION(".data.crt.sched.pthread")
+PRIVATE ATTR_SECTION(".data.crt.sched.pthread.core.rwlock")
 pthread_key_t readlock_tls_key = PTHREAD_ONCE_KEY_NP;
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") pthread_key_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") pthread_key_t
 NOTHROW_NCX(LIBCCALL readlock_tls_getkey)(void) {
 	if (pthread_key_create_once_np(&readlock_tls_key, &readlock_tls_destroy) != EOK)
 		return (pthread_key_t)-1;
 	return readlock_tls_key;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") struct readlock_tls_data *
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") struct readlock_tls_data *
 NOTHROW_NCX(LIBCCALL readlock_tls_getdata)(void) {
 	pthread_key_t key;
 	struct readlock_tls_data *data;
@@ -4306,7 +4306,7 @@ NOTHROW_NCX(LIBCCALL readlock_tls_getdata)(void) {
 /* @return: EOK:     Success
  * @return: ENOMEM:  Out of memory
  * @return: EDEADLK: Already reading */
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL pthread_rwlock_addreading)(pthread_rwlock_t *__restrict self) {
 	struct readlock_tls_data *data;
 	data = readlock_tls_getdata();
@@ -4317,7 +4317,7 @@ NOTHROW_NCX(LIBCCALL pthread_rwlock_addreading)(pthread_rwlock_t *__restrict sel
 
 /* @return: EOK:    Success
  * @return: EPERM:  Not reading */
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL pthread_rwlock_delreading)(pthread_rwlock_t *__restrict self) {
 	errno_t result;
 	struct readlock_tls_data *data;
@@ -4330,7 +4330,7 @@ NOTHROW_NCX(LIBCCALL pthread_rwlock_delreading)(pthread_rwlock_t *__restrict sel
 	return result;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) bool
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") NONNULL((1)) bool
 NOTHROW_NCX(LIBCCALL pthread_rwlock_isreading)(pthread_rwlock_t *__restrict self) {
 	struct readlock_tls_data *data;
 	if (readlock_tls_key == (pthread_key_t)-1)
@@ -4344,7 +4344,7 @@ NOTHROW_NCX(LIBCCALL pthread_rwlock_isreading)(pthread_rwlock_t *__restrict self
 
 
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBCCALL pthread_rwlock_acquireread)(pthread_rwlock_t *__restrict self,
                                                  struct timespec64 const *timeout,
                                                  syscall_ulong_t timeout_flags) {
@@ -4409,7 +4409,7 @@ handle_EBUSY:
 	goto again;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBCCALL pthread_rwlock_acquirewrite)(pthread_rwlock_t *__restrict self,
                                                   struct timespec64 const *timeout,
                                                   syscall_ulong_t timeout_flags) {
@@ -4460,12 +4460,12 @@ again:
 }
 
 
-/*[[[head:libc_pthread_rwlock_init,hash:CRC-32=0xd88c3238]]]*/
+/*[[[head:libc_pthread_rwlock_init,hash:CRC-32=0x8f197445]]]*/
 /* >> pthread_rwlock_init(3)
  * Initialize read-write lock `self' using attributes `attr',
  * or  use   the  default   values   if  later   is   `NULL'.
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(2) ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.rwlock") ATTR_IN_OPT(2) ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_init)(pthread_rwlock_t *__restrict self,
                                                pthread_rwlockattr_t const *__restrict attr)
 /*[[[body:libc_pthread_rwlock_init]]]*/
@@ -4477,11 +4477,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_init)(pthread_rwlock_t *__restrict self
 }
 /*[[[end:libc_pthread_rwlock_init]]]*/
 
-/*[[[head:libc_pthread_rwlock_destroy,hash:CRC-32=0xc59a18bd]]]*/
+/*[[[head:libc_pthread_rwlock_destroy,hash:CRC-32=0x3f9f2b3f]]]*/
 /* >> pthread_rwlock_destroy(3)
  * Destroy read-write lock `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.rwlock") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_destroy)(pthread_rwlock_t *self)
 /*[[[body:libc_pthread_rwlock_destroy]]]*/
 {
@@ -4491,7 +4491,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_destroy)(pthread_rwlock_t *self)
 }
 /*[[[end:libc_pthread_rwlock_destroy]]]*/
 
-/*[[[head:libc_pthread_rwlock_rdlock,hash:CRC-32=0x875b892c]]]*/
+/*[[[head:libc_pthread_rwlock_rdlock,hash:CRC-32=0x81e863cf]]]*/
 /* >> pthread_rwlock_rdlock(3)
  * Acquire read lock for `self'
  * @return: EOK:     Success
@@ -4499,7 +4499,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_destroy)(pthread_rwlock_t *self)
  * @return: EDEADLK: You're already holding a write-lock
  * @return: EDEADLK: [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                   You're already holding a read-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_rdlock)(pthread_rwlock_t *self)
 /*[[[body:libc_pthread_rwlock_rdlock]]]*/
 {
@@ -4507,14 +4507,14 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_rdlock)(pthread_rwlock_t *self)
 }
 /*[[[end:libc_pthread_rwlock_rdlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_tryrdlock,hash:CRC-32=0x5f5326f6]]]*/
+/*[[[head:libc_pthread_rwlock_tryrdlock,hash:CRC-32=0x53ed9e99]]]*/
 /* >> pthread_rwlock_tryrdlock(3)
  * Try to acquire read lock for `self'
  * @return: EOK:    Success
  * @return: EBUSY:  A read-lock cannot be acquired at the moment,
  *                  because a write-lock  is already being  held.
  * @return: EAGAIN: The maximum # of read-locks has been acquired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") WUNUSED ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *self)
 /*[[[body:libc_pthread_rwlock_tryrdlock]]]*/
 {
@@ -4531,7 +4531,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *self)
 }
 /*[[[end:libc_pthread_rwlock_tryrdlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedrdlock,hash:CRC-32=0xfead65ba]]]*/
+/*[[[head:libc_pthread_rwlock_timedrdlock,hash:CRC-32=0xf481ec0c]]]*/
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
  * Try to acquire read lock for `self' or return after the specified time
  * @return: EOK:       Success
@@ -4541,7 +4541,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *self)
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed.rwlock") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict self,
                                                       struct timespec const *__restrict abstime)
 /*[[[body:libc_pthread_rwlock_timedrdlock]]]*/
@@ -4557,7 +4557,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restri
 }
 /*[[[end:libc_pthread_rwlock_timedrdlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedrdlock64,hash:CRC-32=0xb38af6c7]]]*/
+/*[[[head:libc_pthread_rwlock_timedrdlock64,hash:CRC-32=0x215a620d]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock);
 #else /* MAGIC:alias */
@@ -4570,7 +4570,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timed
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed64.rwlock") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict self,
                                                         struct timespec64 const *__restrict abstime)
 /*[[[body:libc_pthread_rwlock_timedrdlock64]]]*/
@@ -4580,14 +4580,14 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__rest
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_timedrdlock64]]]*/
 
-/*[[[head:libc_pthread_rwlock_wrlock,hash:CRC-32=0x2c9b6a44]]]*/
+/*[[[head:libc_pthread_rwlock_wrlock,hash:CRC-32=0x26d9ddfe]]]*/
 /* >> pthread_rwlock_wrlock(3)
  * Acquire write lock for `self'
  * @return: EOK:     Success
  * @return: EDEADLK: You're already holding a read-lock
  * @return: EDEADLK: [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                   You're already holding a write-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_wrlock)(pthread_rwlock_t *self)
 /*[[[body:libc_pthread_rwlock_wrlock]]]*/
 {
@@ -4595,13 +4595,13 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_wrlock)(pthread_rwlock_t *self)
 }
 /*[[[end:libc_pthread_rwlock_wrlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_trywrlock,hash:CRC-32=0xdc436a4e]]]*/
+/*[[[head:libc_pthread_rwlock_trywrlock,hash:CRC-32=0xacddf438]]]*/
 /* >> pthread_rwlock_trywrlock(3)
  * Try to acquire write lock for `self'
  * @return: EOK:   Success
  * @return: EBUSY: A write-lock cannot be acquired at the moment,
  *                 because read-locks  are  already  being  held. */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") WUNUSED ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *self)
 /*[[[body:libc_pthread_rwlock_trywrlock]]]*/
 {
@@ -4622,7 +4622,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *self)
 }
 /*[[[end:libc_pthread_rwlock_trywrlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedwrlock,hash:CRC-32=0xdf875398]]]*/
+/*[[[head:libc_pthread_rwlock_timedwrlock,hash:CRC-32=0x7db3dc41]]]*/
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
  * Try to acquire write lock for `self' or return after the specified time
  * @return: EOK:       Success
@@ -4631,7 +4631,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *self)
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed.rwlock") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict self,
                                                       struct timespec const *__restrict abstime)
 /*[[[body:libc_pthread_rwlock_timedwrlock]]]*/
@@ -4647,7 +4647,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restri
 }
 /*[[[end:libc_pthread_rwlock_timedwrlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedwrlock64,hash:CRC-32=0x15172d71]]]*/
+/*[[[head:libc_pthread_rwlock_timedwrlock64,hash:CRC-32=0x8ae9f639]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock);
 #else /* MAGIC:alias */
@@ -4659,7 +4659,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timed
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed64.rwlock") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict self,
                                                         struct timespec64 const *__restrict abstime)
 /*[[[body:libc_pthread_rwlock_timedwrlock64]]]*/
@@ -4669,7 +4669,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__rest
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_timedwrlock64]]]*/
 
-/*[[[head:libc_pthread_rwlock_reltimedrdlock_np,hash:CRC-32=0x5ed4adab]]]*/
+/*[[[head:libc_pthread_rwlock_reltimedrdlock_np,hash:CRC-32=0x23af656]]]*/
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
  * Try to  acquire read  lock for  `self'  or return  after the  specified  time
  * @return: EOK:       Success
@@ -4679,7 +4679,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__rest
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.reltimed.rwlock") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__restrict self,
                                                             struct timespec const *__restrict reltime)
 /*[[[body:libc_pthread_rwlock_reltimedrdlock_np]]]*/
@@ -4695,7 +4695,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__
 }
 /*[[[end:libc_pthread_rwlock_reltimedrdlock_np]]]*/
 
-/*[[[head:libc_pthread_rwlock_reltimedwrlock_np,hash:CRC-32=0xab72dbb9]]]*/
+/*[[[head:libc_pthread_rwlock_reltimedwrlock_np,hash:CRC-32=0x5b7f8ac6]]]*/
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
  * Try to  acquire write  lock for  `self' or  return after  the specified  time
  * @return: EOK:       Success
@@ -4704,7 +4704,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.reltimed.rwlock") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__restrict self,
                                                             struct timespec const *__restrict reltime)
 /*[[[body:libc_pthread_rwlock_reltimedwrlock_np]]]*/
@@ -4720,7 +4720,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__
 }
 /*[[[end:libc_pthread_rwlock_reltimedwrlock_np]]]*/
 
-/*[[[head:libc_pthread_rwlock_reltimedrdlock64_np,hash:CRC-32=0xce8c47ca]]]*/
+/*[[[head:libc_pthread_rwlock_reltimedrdlock64_np,hash:CRC-32=0xc0a35097]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_reltimedrdlock64_np, libc_pthread_rwlock_reltimedrdlock_np);
 #else /* MAGIC:alias */
@@ -4733,7 +4733,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_rwlock_reltimedrdlock64_np, libc_pthread_rwlock
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.reltimed64.rwlock") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *__restrict self,
                                                               struct timespec64 const *__restrict reltime)
 /*[[[body:libc_pthread_rwlock_reltimedrdlock64_np]]]*/
@@ -4743,7 +4743,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_reltimedrdlock64_np]]]*/
 
-/*[[[head:libc_pthread_rwlock_reltimedwrlock64_np,hash:CRC-32=0xe683f722]]]*/
+/*[[[head:libc_pthread_rwlock_reltimedwrlock64_np,hash:CRC-32=0x56d9aa74]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_reltimedwrlock64_np, libc_pthread_rwlock_reltimedwrlock_np);
 #else /* MAGIC:alias */
@@ -4755,7 +4755,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_rwlock_reltimedwrlock64_np, libc_pthread_rwlock
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.reltimed64.rwlock") WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict self,
                                                               struct timespec64 const *__restrict reltime)
 /*[[[body:libc_pthread_rwlock_reltimedwrlock64_np]]]*/
@@ -4765,12 +4765,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_reltimedwrlock64_np]]]*/
 
-/*[[[head:libc_pthread_rwlock_unlock,hash:CRC-32=0x33bbd2bd]]]*/
+/*[[[head:libc_pthread_rwlock_unlock,hash:CRC-32=0x32b19d0a]]]*/
 /* >> pthread_rwlock_unlock(3)
  * Unlock `self'
  * @return: EOK:   Success
  * @return: EPERM: You're not holding a read- or write-lock */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.rwlock") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_unlock)(pthread_rwlock_t *self)
 /*[[[body:libc_pthread_rwlock_unlock]]]*/
 {
@@ -4881,12 +4881,12 @@ do_release_write_lock:
  */
 
 
-/*[[[head:libc_pthread_cond_init,hash:CRC-32=0x3f803c7b]]]*/
+/*[[[head:libc_pthread_cond_init,hash:CRC-32=0x7a1afffd]]]*/
 /* >> pthread_cond_init(3)
  * Initialize condition variable `self' using attributes
  * `attr', or use the default values if later is `NULL'.
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(2) ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.cond") ATTR_IN_OPT(2) ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict self,
                                              pthread_condattr_t const *__restrict cond_attr)
 /*[[[body:libc_pthread_cond_init]]]*/
@@ -4902,11 +4902,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict self,
 }
 /*[[[end:libc_pthread_cond_init]]]*/
 
-/*[[[head:libc_pthread_cond_destroy,hash:CRC-32=0x1f6b1984]]]*/
+/*[[[head:libc_pthread_cond_destroy,hash:CRC-32=0xff5ddcb1]]]*/
 /* >> pthread_cond_destroy(3)
  * Destroy condition variable `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.cond") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_destroy)(pthread_cond_t *self)
 /*[[[body:libc_pthread_cond_destroy]]]*/
 {
@@ -4916,7 +4916,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_destroy)(pthread_cond_t *self)
 }
 /*[[[end:libc_pthread_cond_destroy]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.core.cond") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_wake)(pthread_cond_t *__restrict self,
                                              uint32_t how_many) {
 	uint32_t ctl, newctl;
@@ -4963,11 +4963,11 @@ again:
 	return EOK;
 }
 
-/*[[[head:libc_pthread_cond_signal,hash:CRC-32=0xa1924ce8]]]*/
+/*[[[head:libc_pthread_cond_signal,hash:CRC-32=0x5d26db9e]]]*/
 /* >> pthread_cond_signal(3)
  * Wake up one thread waiting for condition variable `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.cond") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_signal)(pthread_cond_t *self)
 /*[[[body:libc_pthread_cond_signal]]]*/
 {
@@ -4975,11 +4975,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_signal)(pthread_cond_t *self)
 }
 /*[[[end:libc_pthread_cond_signal]]]*/
 
-/*[[[head:libc_pthread_cond_broadcast,hash:CRC-32=0x3441967b]]]*/
+/*[[[head:libc_pthread_cond_broadcast,hash:CRC-32=0x9e8c03ea]]]*/
 /* >> pthread_cond_broadcast(3)
  * Wake up all threads waiting for condition variables `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.cond") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_broadcast)(pthread_cond_t *self)
 /*[[[body:libc_pthread_cond_broadcast]]]*/
 {
@@ -4987,12 +4987,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_broadcast)(pthread_cond_t *self)
 }
 /*[[[end:libc_pthread_cond_broadcast]]]*/
 
-/*[[[head:libc_pthread_cond_wait,hash:CRC-32=0x73a5222a]]]*/
+/*[[[head:libc_pthread_cond_wait,hash:CRC-32=0x237e057a]]]*/
 /* >> pthread_cond_wait(3)
  * Wait for condition variable `self' to be signaled or broadcast.
  * `mutex' is assumed to be locked before.
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.cond") ATTR_INOUT(1) ATTR_INOUT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict self,
                                              pthread_mutex_t *__restrict mutex)
 /*[[[body:libc_pthread_cond_wait]]]*/
@@ -5018,7 +5018,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict self,
 }
 /*[[[end:libc_pthread_cond_wait]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.ext.timed") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait_impl)(pthread_cond_t *__restrict self,
                                                        pthread_mutex_t *__restrict mutex,
                                                        struct timespec const *__restrict abstime,
@@ -5048,7 +5048,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait_impl)(pthread_cond_t *__restric
 }
 
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.ext.timed") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64_impl)(pthread_cond_t *__restrict self,
                                                          pthread_mutex_t *__restrict mutex,
                                                          struct timespec64 const *__restrict abstime,
@@ -5079,7 +5079,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64_impl)(pthread_cond_t *__restr
 
 
 
-/*[[[head:libc_pthread_cond_timedwait,hash:CRC-32=0x4b17dcbf]]]*/
+/*[[[head:libc_pthread_cond_timedwait,hash:CRC-32=0xae32fe2e]]]*/
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
  * Wait for condition variable `self' to be signaled or broadcast
  * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
@@ -5088,7 +5088,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64_impl)(pthread_cond_t *__restr
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed.cond") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict self,
                                                   pthread_mutex_t *__restrict mutex,
                                                   struct timespec const *__restrict abstime)
@@ -5098,7 +5098,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict sel
 }
 /*[[[end:libc_pthread_cond_timedwait]]]*/
 
-/*[[[head:libc_pthread_cond_timedwait64,hash:CRC-32=0x152106c5]]]*/
+/*[[[head:libc_pthread_cond_timedwait64,hash:CRC-32=0x43973376]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_cond_timedwait64, libc_pthread_cond_timedwait);
 #else /* MAGIC:alias */
@@ -5110,7 +5110,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_cond_timedwait64, libc_pthread_cond_timedwait);
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.timed64.cond") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict self,
                                                     pthread_mutex_t *__restrict mutex,
                                                     struct timespec64 const *__restrict abstime)
@@ -5121,14 +5121,14 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict s
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_cond_timedwait64]]]*/
 
-/*[[[head:libc_pthread_cond_reltimedwait_np,hash:CRC-32=0xbb9a09f4]]]*/
+/*[[[head:libc_pthread_cond_reltimedwait_np,hash:CRC-32=0xacb42da7]]]*/
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
  * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.reltimed.cond") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait_np)(pthread_cond_t *__restrict self,
                                                         pthread_mutex_t *__restrict mutex,
                                                         struct timespec const *__restrict reltime)
@@ -5159,7 +5159,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait_np)(pthread_cond_t *__restri
 }
 /*[[[end:libc_pthread_cond_reltimedwait_np]]]*/
 
-/*[[[head:libc_pthread_cond_reltimedwait64_np,hash:CRC-32=0xba4e6421]]]*/
+/*[[[head:libc_pthread_cond_reltimedwait64_np,hash:CRC-32=0x82fd775f]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_cond_reltimedwait64_np, libc_pthread_cond_reltimedwait_np);
 #else /* MAGIC:alias */
@@ -5169,7 +5169,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_cond_reltimedwait64_np, libc_pthread_cond_relti
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.reltimed64.cond") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait64_np)(pthread_cond_t *__restrict self,
                                                           pthread_mutex_t *__restrict mutex,
                                                           struct timespec64 const *__restrict reltime)
@@ -5200,7 +5200,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait64_np)(pthread_cond_t *__rest
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_cond_reltimedwait64_np]]]*/
 
-/*[[[head:libc_pthread_cond_clockwait,hash:CRC-32=0x130e52e9]]]*/
+/*[[[head:libc_pthread_cond_clockwait,hash:CRC-32=0xc7ea21e1]]]*/
 /* >> pthread_cond_clockwait(3), pthread_cond_clockwait64(3)
  * Same as `pthread_cond_timedwait(3)', but the given `abstime' is relative to `clock_id',
  * whereas  when using `pthread_cond_timedwait(3)',  it is relative  to whatever clock was
@@ -5210,7 +5210,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait64_np)(pthread_cond_t *__rest
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: EINVAL:    Invalid/unsupported `clock_id'
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.clock.cond") WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_clockwait)(pthread_cond_t *__restrict self,
                                                   pthread_mutex_t *__restrict mutex,
                                                   clockid_t clock_id,
@@ -5233,7 +5233,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_clockwait)(pthread_cond_t *__restrict sel
 }
 /*[[[end:libc_pthread_cond_clockwait]]]*/
 
-/*[[[head:libc_pthread_cond_clockwait64,hash:CRC-32=0x91ec9b9d]]]*/
+/*[[[head:libc_pthread_cond_clockwait64,hash:CRC-32=0x192127c5]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_cond_clockwait64, libc_pthread_cond_clockwait);
 #else /* MAGIC:alias */
@@ -5246,7 +5246,7 @@ DEFINE_INTERN_ALIAS(libc_pthread_cond_clockwait64, libc_pthread_cond_clockwait);
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: EINVAL:    Invalid/unsupported `clock_id'
  * @return: ETIMEDOUT: The given `abstime' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.clock64.cond") WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_clockwait64)(pthread_cond_t *__restrict self,
                                                     pthread_mutex_t *__restrict mutex,
                                                     clockid_t clock_id,
@@ -5288,13 +5288,13 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_clockwait64)(pthread_cond_t *__restrict s
 /* pthread_barrier_t                                                    */
 /************************************************************************/
 
-/*[[[head:libc_pthread_barrier_init,hash:CRC-32=0x7ef96a2d]]]*/
+/*[[[head:libc_pthread_barrier_init,hash:CRC-32=0x9a01e1a1]]]*/
 /* >> pthread_barrier_init(3)
  * Initialize `self' with  the attributes in  `attr'.
  * The barrier is opened when `count' waiters arrived
  * @return: EOK:    Success
  * @return: EINVAL: The given `count' is ZERO(0) */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(2) ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.barrier") ATTR_IN_OPT(2) ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict self,
                                                 pthread_barrierattr_t const *__restrict attr,
                                                 unsigned int count)
@@ -5309,11 +5309,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict se
 }
 /*[[[end:libc_pthread_barrier_init]]]*/
 
-/*[[[head:libc_pthread_barrier_destroy,hash:CRC-32=0xba2938c5]]]*/
+/*[[[head:libc_pthread_barrier_destroy,hash:CRC-32=0x1646a508]]]*/
 /* >> pthread_barrier_destroy(3)
  * Destroy the given (previously dynamically initialized) `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.attr.barrier") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_barrier_destroy)(pthread_barrier_t *self)
 /*[[[body:libc_pthread_barrier_destroy]]]*/
 {
@@ -5323,12 +5323,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrier_destroy)(pthread_barrier_t *self)
 }
 /*[[[end:libc_pthread_barrier_destroy]]]*/
 
-/*[[[head:libc_pthread_barrier_wait,hash:CRC-32=0x51605d32]]]*/
+/*[[[head:libc_pthread_barrier_wait,hash:CRC-32=0x855a2760]]]*/
 /* >> pthread_barrier_wait(3)
  * Wait on  the given  `self'
  * @return: 0 :                            Success
  * @return: PTHREAD_BARRIER_SERIAL_THREAD: Success, and you were picked to be the "serialization" thread. */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.barrier") ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_barrier_wait)(pthread_barrier_t *self)
 /*[[[body:libc_pthread_barrier_wait]]]*/
 {
@@ -5632,7 +5632,7 @@ PRIVATE ATTR_SECTION(".text.crt.sched.pthread")
 void LIBKCALL noop_dtor(void *UNUSED(value)) {
 }
 
-/*[[[head:libc_pthread_key_create,hash:CRC-32=0xa6ac1564]]]*/
+/*[[[head:libc_pthread_key_create,hash:CRC-32=0xcb38f5f1]]]*/
 /* >> pthread_key_create(3)
  * Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
@@ -5642,7 +5642,7 @@ void LIBKCALL noop_dtor(void *UNUSED(value)) {
  * when the key is destroyed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.tls") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key,
                                               void (LIBKCALL *destr_function)(void *value))
 /*[[[body:libc_pthread_key_create]]]*/
@@ -5717,12 +5717,12 @@ use_ith_slot:
 }
 /*[[[end:libc_pthread_key_create]]]*/
 
-/*[[[head:libc_pthread_key_delete,hash:CRC-32=0x685944ff]]]*/
+/*[[[head:libc_pthread_key_delete,hash:CRC-32=0xbc1039eb]]]*/
 /* >> pthread_key_delete(3)
  * Destroy the given  `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.tls") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
 /*[[[body:libc_pthread_key_delete]]]*/
 {
@@ -5760,14 +5760,14 @@ done:
 }
 /*[[[end:libc_pthread_key_delete]]]*/
 
-/*[[[head:libc_pthread_getspecific,hash:CRC-32=0xf0163f03]]]*/
+/*[[[head:libc_pthread_getspecific,hash:CRC-32=0x403e7933]]]*/
 /* >> pthread_getspecific(3)
  * Return current value of the thread-specific data slot identified by `key'
  * @return: * :   The value currently associated with `key' in the calling thread
  * @return: NULL: The current value is `NULL'
  * @return: NULL: No value has been bound, yet
  * @return: NULL: Invalid `key' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED void *
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.tls") WUNUSED void *
 NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
 /*[[[body:libc_pthread_getspecific]]]*/
 {
@@ -5792,14 +5792,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
 }
 /*[[[end:libc_pthread_getspecific]]]*/
 
-/*[[[head:libc_pthread_setspecific,hash:CRC-32=0x60e794ce]]]*/
+/*[[[head:libc_pthread_setspecific,hash:CRC-32=0x6aff8fa3]]]*/
 /* >> pthread_setspecific(3)
  * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
  *                  calling  thread, and an attempt to allocate it just now failed */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_ACCESS_NONE(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.tls") ATTR_ACCESS_NONE(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
                                                void const *pointer)
 /*[[[body:libc_pthread_setspecific]]]*/
@@ -5825,14 +5825,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 }
 /*[[[end:libc_pthread_setspecific]]]*/
 
-/*[[[head:libc_pthread_getspecificptr_np,hash:CRC-32=0x939db1f4]]]*/
+/*[[[head:libc_pthread_getspecificptr_np,hash:CRC-32=0xcba4eb13]]]*/
 /* >> pthread_getspecificptr_np(3)
  * Return a pointer to the per-thread storage location associated with `key'
  * @return: * :   The address read/written by `pthread_getspecific()' / `pthread_setspecific()'
  * @return: NULL: `key' had yet to be allocated for the calling thread,
  *                and an  attempt  to  allocate  it  just  now  failed.
  * @return: NULL: Invalid `key'. */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_PURE WUNUSED void **
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.tls") ATTR_PURE WUNUSED void **
 NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 /*[[[body:libc_pthread_getspecificptr_np]]]*/
 {
@@ -5856,7 +5856,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6c56c7f4]]]*/
+/*[[[start:exports,hash:CRC-32=0xd0165e2d]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -5917,9 +5917,9 @@ DEFINE_PUBLIC_ALIAS_P(pthread_getschedparam,libc_pthread_getschedparam,ATTR_OUT(
 DEFINE_PUBLIC_ALIAS_P(pthread_setschedprio,libc_pthread_setschedprio,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, int prio),(self,prio));
 DEFINE_PUBLIC_ALIAS_P(pthread_get_name_np,libc_pthread_getname_np,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, char *buf, size_t buflen),(self,buf,buflen));
 DEFINE_PUBLIC_ALIAS_P(pthread_getname_np,libc_pthread_getname_np,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, char *buf, size_t buflen),(self,buf,buflen));
-DEFINE_PUBLIC_ALIAS_P(pthread_set_name_np,libc_pthread_setname_np,ATTR_IN(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, const char *name),(self,name));
-DEFINE_PUBLIC_ALIAS_P(cthread_set_name,libc_pthread_setname_np,ATTR_IN(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, const char *name),(self,name));
-DEFINE_PUBLIC_ALIAS_P(pthread_setname_np,libc_pthread_setname_np,ATTR_IN(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, const char *name),(self,name));
+DEFINE_PUBLIC_ALIAS_P(pthread_set_name_np,libc_pthread_setname_np,ATTR_IN(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, char const *name),(self,name));
+DEFINE_PUBLIC_ALIAS_P(cthread_set_name,libc_pthread_setname_np,ATTR_IN(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, char const *name),(self,name));
+DEFINE_PUBLIC_ALIAS_P(pthread_setname_np,libc_pthread_setname_np,ATTR_IN(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, char const *name),(self,name));
 DEFINE_PUBLIC_ALIAS_P(pthread_gettid_np,libc_pthread_gettid_np,ATTR_PURE WUNUSED,pid_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_getpidfd_np,libc_pthread_getpidfd_np,ATTR_PURE WUNUSED ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, fd_t *__restrict p_pidfd),(self,p_pidfd));
 DEFINE_PUBLIC_ALIAS_P(pthread_attr_setpidfdallocated_np,libc_pthread_attr_setpidfdallocated_np,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t *self, int allocated),(self,allocated));

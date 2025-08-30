@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf216ada9 */
+/* HASH CRC-32:0xb9c36ef4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ DECL_BEGIN
  * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST WUNUSED int
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.thread") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
                                      pthread_t thr2) {
 	return thr1 == thr2;
@@ -53,7 +53,7 @@ NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.once") ATTR_INOUT(1) NONNULL((2)) errno_t
 NOTHROW_CB(LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
                                        void (LIBCCALL *init_routine)(void)) {
 #undef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
@@ -180,7 +180,7 @@ again:
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
  * needed or fall back on the copy which must exist somewhere else */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) void
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.gnu.cleanup") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_frame *frame) {
 	if (frame->__do_it)
 		(*frame->__cancel_routine)(frame->__cancel_arg);
@@ -190,7 +190,7 @@ NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_fr
  * Initialize the spinlock `self'. If `pshared' is nonzero
  * the  spinlock can be shared between different processes
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.spin") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *self,
                                              int pshared) {
 	(void)pshared;
@@ -200,7 +200,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *self,
 /* >> pthread_spin_destroy(3)
  * Destroy the spinlock `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.spin") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *self) {
 	COMPILER_IMPURE();
 	(void)self; /* no-op */
@@ -211,7 +211,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *self) {
 /* >> pthread_spin_lock(3)
  * Wait until spinlock `self' is retrieved
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.spin") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *self) {
 	while (libc_pthread_spin_trylock(self) != 0)
 		__hybrid_yield();
@@ -223,7 +223,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *self) {
  * Try to lock spinlock `self'
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.spin") WUNUSED ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *self) {
 	if (__hybrid_atomic_xch(self, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
@@ -241,7 +241,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *self) {
 /* >> pthread_spin_unlock(3)
  * Release  spinlock  `self'
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.spin") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *self) {
 	__hybrid_atomic_store(self, 0, __ATOMIC_RELEASE);
 	return 0;
@@ -256,7 +256,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *self) {
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.core.tls") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_key_create_once_np)(pthread_key_t *key,
                                                       void (LIBKCALL *destr_function)(void *)) {
 	pthread_key_t kv;
@@ -301,7 +301,7 @@ again:
 #include <bits/os/cpu_set.h>
 /* >> pthread_num_processors_np(3)
  * @return: * : The number of cpus that the calling thread is able to run on */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") WUNUSED __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.misc.affinity") WUNUSED __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
 	cpu_set_t cset;
 	if unlikely(libc_sched_getaffinity(0, sizeof(cset), &cset) != 0)
@@ -315,7 +315,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
  * @return: EOK:    Success
  * @return: EINVAL: `n' was specified as less than `1'
  * @return: * :     Same as `errno' after a call to `sched_setaffinity(2)' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.misc.affinity") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n) {
 	int i, result;
 	cpu_set_t cset;
@@ -342,7 +342,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n) {
  * calling program), and 0  otherwise. Additionally, -1 is  returned
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_CONST WUNUSED int
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.tls_globals") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_pthread_main_np)(void) {
 
 	return libc_pthread_equal(libc_pthread_mainthread_np(), libc_pthread_self());
@@ -358,7 +358,7 @@ NOTHROW(LIBCCALL libc_pthread_main_np)(void) {
  *  - `pthread_resume_all_np(3)'
  * Alias for `pthread_attr_setstartsuspended_np(self, 1)'
  * @return: EOK: Always returned */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.suspend") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setcreatesuspend_np)(pthread_attr_t *__restrict self) {
 	return libc_pthread_attr_setstartsuspended_np(self, 1);
 }
@@ -375,7 +375,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setcreatesuspend_np)(pthread_attr_t *__re
  * @return: ESRCH:     The thread has already been terminated
  * @return: ENOMEM:    Insufficient memory
  * @return: EOVERFLOW: The suspension counter can't go any higher */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.suspend") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_suspend_np)(pthread_t self) {
 	return libc_pthread_suspend2_np(self, NULL);
 }
@@ -388,7 +388,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_suspend_np)(pthread_t self) {
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
  * @return: EOK:   Success
  * @return: ESRCH: The thread has already been terminated */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.suspend") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_resume_np)(pthread_t self) {
 	return libc_pthread_resume2_np(self, NULL);
 }
@@ -398,7 +398,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_resume_np)(pthread_t self) {
 #include <libc/errno.h>
 /* >> pthread_getunique_np(3)
  * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_PURE WUNUSED errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.tid") ATTR_PURE WUNUSED errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getunique_np)(pthread_t self,
                                                 pthread_id_np_t *ptid) {
 	if unlikely((*ptid = crt_pthread_gettid_np(self)) == 0) {
@@ -410,7 +410,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getunique_np)(pthread_t self,
 	}
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") WUNUSED NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.misc") WUNUSED NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_switch_add_np)(pthread_switch_routine_t routine) {
 	/* This right here also matches what FreeBSD current does (that is: returning "ENOTSUP") */
 	COMPILER_IMPURE();
@@ -425,12 +425,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_switch_add_np)(pthread_switch_routine_t routin
 }
 DEFINE_INTERN_ALIAS_P(libc_pthread_switch_delete_np,libc_pthread_switch_add_np,WUNUSED NONNULL((1)),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_switch_routine_t routine),(routine));
 #include <sys/single_threaded.h>
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.misc") int
 NOTHROW_NCX(LIBCCALL libc_pthread_is_threaded_np)(void) {
 	return !__libc_single_threaded;
 }
 #include <bits/crt/pthreadtypes.h>
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") size_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.misc") size_t
 NOTHROW_NCX(LIBCCALL libc_pthread_get_stacksize_np)(pthread_t self) {
 	size_t result = 0;
 	pthread_attr_t attr;
@@ -444,7 +444,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_get_stacksize_np)(pthread_t self) {
 	return result;
 }
 #include <bits/crt/pthreadtypes.h>
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") void *
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.misc") void *
 NOTHROW_NCX(LIBCCALL libc_pthread_get_stackaddr_np)(pthread_t self) {
 	void *result = NULL;
 	pthread_attr_t attr;

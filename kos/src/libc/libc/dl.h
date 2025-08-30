@@ -86,26 +86,26 @@ DECL_BEGIN
  *   - __cxa_end_catch    (Defined by libc.so itself, but may be overwritten by `libstdc++.so')
  */
 
-#define LIBC_DLOPEN_SECTION          ".crt.except"        /* Used by `except_handler*()' */
-#define LIBC_DLCLOSE_SECTION         ".crt.sched.process" /* Used by `__cxa_atexit()' (among others) */
-#define LIBC_DLTLSALLOCSEG_SECTION   ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLTLSFREESEG_SECTION    ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLGETHANDLE_SECTION     ".crt.sched.process" /* Used by `__cxa_atexit()' */
-#define LIBC_DLGETMODULE_SECTION     ".crt.system.auxv"   /* Used by `getauxval()' */
-#define LIBC_DLMODULEFD_SECTION      ".crt.system.auxv"   /* Used by `getauxval()' */
-#define LIBC_DLMODULENAME_SECTION    ".crt.system.auxv"   /* Used by `getauxval()' */
-#define LIBC_DLAUXCTRL_SECTION       ".crt.sched.process" /* Used by `__cxa_atexit()' */
-#define LIBC_DLINFO_SECTION          ".crt.compat.glibc"  /* Used by `_dl_find_object()' */
-#define LIBC_DLLOCKSECTION_SECTION   ".crt.compat.glibc"  /* Used by `_dl_find_object()' */
-#define LIBC_DLUNLOCKSECTION_SECTION ".crt.compat.glibc"  /* Used by `_dl_find_object()' */
-#define LIBC_DLERROR_SECTION         ".crt.heap.utility"  /* Used by `sbrk()' */
-#define LIBC_DLMODULEBASE_SECTION    ".crt.system.auxv"   /* Used by `getauxval()' */
-#define LIBC_DLEXCEPTAWARE_SECTION   ".crt.except"        /* Used by `except_handler4()' */
-#define LIBC_DLTLSADDR_SECTION       ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLTLSADDR2_SECTION      ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLTLSALLOC_SECTION      ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLTLSFREE_SECTION       ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLADDR_SECTION          ".crt.math.math"     /* Used for <math.h> -- `struct exception::name' */
+#define LIBC_DLOPEN_SECTION          ".crt.except"                    /* Used by `except_handler*()' */
+#define LIBC_DLCLOSE_SECTION         ".crt.sched.process"             /* Used by `__cxa_atexit()' (among others) */
+#define LIBC_DLTLSALLOCSEG_SECTION   ".crt.sched.pthread.core.thread" /* Used by pthread (core.thread) */
+#define LIBC_DLTLSFREESEG_SECTION    ".crt.sched.pthread.core.thread" /* Used by pthread (core.thread) */
+#define LIBC_DLGETHANDLE_SECTION     ".crt.sched.process"             /* Used by `__cxa_atexit()' */
+#define LIBC_DLGETMODULE_SECTION     ".crt.system.auxv"               /* Used by `getauxval()' */
+#define LIBC_DLMODULEFD_SECTION      ".crt.system.auxv"               /* Used by `getauxval()' */
+#define LIBC_DLMODULENAME_SECTION    ".crt.system.auxv"               /* Used by `getauxval()' */
+#define LIBC_DLAUXCTRL_SECTION       ".crt.sched.process"             /* Used by `__cxa_atexit()' */
+#define LIBC_DLINFO_SECTION          ".crt.compat.glibc"              /* Used by `_dl_find_object()' */
+#define LIBC_DLLOCKSECTION_SECTION   ".crt.compat.glibc"              /* Used by `_dl_find_object()' */
+#define LIBC_DLUNLOCKSECTION_SECTION ".crt.compat.glibc"              /* Used by `_dl_find_object()' */
+#define LIBC_DLERROR_SECTION         ".crt.heap.utility"              /* Used by `sbrk()' */
+#define LIBC_DLMODULEBASE_SECTION    ".crt.system.auxv"               /* Used by `getauxval()' */
+#define LIBC_DLEXCEPTAWARE_SECTION   ".crt.except"                    /* Used by `except_handler4()' */
+#define LIBC_DLTLSADDR_SECTION       ".crt.sched.pthread.core.tls"    /* Used by pthread (core.tls) */
+#define LIBC_DLTLSADDR2_SECTION      ".crt.sched.pthread.core.tls"    /* Used by pthread (core.tls) */
+#define LIBC_DLTLSALLOC_SECTION      ".crt.sched.pthread.core.tls"    /* Used by pthread (core.tls) */
+#define LIBC_DLTLSFREE_SECTION       ".crt.sched.pthread.core.tls"    /* Used by pthread (core.tls) */
+#define LIBC_DLADDR_SECTION          ".crt.math.math"                 /* Used for <math.h> -- `struct exception::name' */
 
 typedef WUNUSED_T void *(DLFCN_CC *PDLOPEN)(char const *filename, int mode) /*THROWS(...)*/;
 typedef NONNULL_T((1)) int (DLFCN_CC *PDLCLOSE)(void *handle) /*THROWS(...)*/;

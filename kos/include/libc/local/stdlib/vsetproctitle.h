@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb33df8f6 */
+/* HASH CRC-32:0xd812d85 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,19 +78,19 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setname_np,(__pthread_t __self, const char *__name),pthread_setname_np,(__self,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setname_np,(__pthread_t __self, char const *__name),pthread_setname_np,(__self,__name))
 #elif defined(__CRT_HAVE_pthread_set_name_np)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setname_np,(__pthread_t __self, const char *__name),pthread_set_name_np,(__self,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setname_np,(__pthread_t __self, char const *__name),pthread_set_name_np,(__self,__name))
 #elif defined(__CRT_HAVE_cthread_set_name)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setname_np,(__pthread_t __self, const char *__name),cthread_set_name,(__self,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setname_np,(__pthread_t __self, char const *__name),cthread_set_name,(__self,__name))
 #else /* ... */
 #undef __local___localdep_pthread_setname_np_defined
 #endif /* !... */

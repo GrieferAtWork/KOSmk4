@@ -59,10 +59,17 @@
 
 # Process sub-system
 	.fs.exec.exec  .sched.access      # Keep fork() and exec() functions together
-	.sched.thread
+	.sched.thread .sched.thread.*
+	.sched.pthread.core.thread .sched.pthread.core.thread.*
+	.sched.pthread.core.exit .sched.pthread.core.exit.*
+	.sched.pthread.core .sched.pthread.core.*
 	.sched.pthread
 	.sched.futex .sched.futexlock .sched.futexexpr .sched.futexlockexpr
 	.sched.semaphore
+	.sched.pthread.cancel .sched.pthread.cancel.* # pthread_cancel() & friends
+	.sched.pthread.attr .sched.pthread.attr.*     # pthread *_attr_t initializer/functions
+	.sched.pthread.ext .sched.pthread.ext.*       # Place pthread extensions at the end here
+	.sched.pthread.*
 	.sched.lockop
 	.sched.param
 	.sched.process
@@ -247,9 +254,15 @@
 	CB(PREFIX.crt.application.exit) \
 	CB(PREFIX.crt.fs.exec.exec PREFIX.crt.sched.access) \
 	CB(PREFIX.crt.sched.thread) \
+	CB(PREFIX.crt.sched.pthread.core.thread) \
+	CB(PREFIX.crt.sched.pthread.core.exit) \
+	CB(PREFIX.crt.sched.pthread.core.barrier PREFIX.crt.sched.pthread.core.cond PREFIX.crt.sched.pthread.core.mutex PREFIX.crt.sched.pthread.core.once PREFIX.crt.sched.pthread.core.rwlock PREFIX.crt.sched.pthread.core.spin PREFIX.crt.sched.pthread.core.tls) \
 	CB(PREFIX.crt.sched.pthread) \
 	CB(PREFIX.crt.sched.futex PREFIX.crt.sched.futexlockexpr) \
 	CB(PREFIX.crt.sched.semaphore) \
+	CB(PREFIX.crt.sched.pthread.cancel) \
+	CB(PREFIX.crt.sched.pthread.attr.barrier PREFIX.crt.sched.pthread.attr.cond PREFIX.crt.sched.pthread.attr.mutex PREFIX.crt.sched.pthread.attr.rwlock PREFIX.crt.sched.pthread.attr.thread) \
+	CB(PREFIX.crt.sched.pthread.ext.clock.cond PREFIX.crt.sched.pthread.ext.clock.mutex PREFIX.crt.sched.pthread.ext.clock.thread PREFIX.crt.sched.pthread.ext.clock64.cond PREFIX.crt.sched.pthread.ext.clock64.mutex PREFIX.crt.sched.pthread.ext.clock64.thread PREFIX.crt.sched.pthread.ext.concurrency PREFIX.crt.sched.pthread.ext.gnu PREFIX.crt.sched.pthread.ext.gnu.affinity PREFIX.crt.sched.pthread.ext.gnu.cleanup PREFIX.crt.sched.pthread.ext.gnu.thread PREFIX.crt.sched.pthread.ext.gnu.thread.name PREFIX.crt.sched.pthread.ext.kos PREFIX.crt.sched.pthread.ext.kos.suspend PREFIX.crt.sched.pthread.ext.kos.thread PREFIX.crt.sched.pthread.ext.kos.tid PREFIX.crt.sched.pthread.ext.misc PREFIX.crt.sched.pthread.ext.misc.affinity PREFIX.crt.sched.pthread.ext.reltimed.cond PREFIX.crt.sched.pthread.ext.reltimed.mutex PREFIX.crt.sched.pthread.ext.reltimed.rwlock PREFIX.crt.sched.pthread.ext.reltimed64.cond PREFIX.crt.sched.pthread.ext.reltimed64.mutex PREFIX.crt.sched.pthread.ext.reltimed64.rwlock PREFIX.crt.sched.pthread.ext.timed PREFIX.crt.sched.pthread.ext.timed.cond PREFIX.crt.sched.pthread.ext.timed.mutex PREFIX.crt.sched.pthread.ext.timed.rwlock PREFIX.crt.sched.pthread.ext.timed.thread PREFIX.crt.sched.pthread.ext.timed64.cond PREFIX.crt.sched.pthread.ext.timed64.mutex PREFIX.crt.sched.pthread.ext.timed64.rwlock PREFIX.crt.sched.pthread.ext.timed64.thread PREFIX.crt.sched.pthread.ext.tls_globals) \
 	CB(PREFIX.crt.sched.lockop) \
 	CB(PREFIX.crt.sched.param) \
 	CB(PREFIX.crt.sched.process) \
@@ -439,8 +452,14 @@
 	CB(PREFIX.crt.dos.application.exit) \
 	CB(PREFIX.crt.dos.fs.exec.exec PREFIX.crt.dos.sched.access) \
 	CB(PREFIX.crt.dos.sched.thread) \
+	CB(PREFIX.crt.dos.sched.pthread.core.thread) \
+	CB(PREFIX.crt.dos.sched.pthread.core.exit) \
+	CB(PREFIX.crt.dos.sched.pthread.core.barrier PREFIX.crt.dos.sched.pthread.core.cond PREFIX.crt.dos.sched.pthread.core.mutex PREFIX.crt.dos.sched.pthread.core.once PREFIX.crt.dos.sched.pthread.core.rwlock PREFIX.crt.dos.sched.pthread.core.spin PREFIX.crt.dos.sched.pthread.core.tls) \
 	CB(PREFIX.crt.dos.sched.pthread) \
 	CB(PREFIX.crt.dos.sched.semaphore) \
+	CB(PREFIX.crt.dos.sched.pthread.cancel) \
+	CB(PREFIX.crt.dos.sched.pthread.attr.barrier PREFIX.crt.dos.sched.pthread.attr.cond PREFIX.crt.dos.sched.pthread.attr.mutex PREFIX.crt.dos.sched.pthread.attr.rwlock PREFIX.crt.dos.sched.pthread.attr.thread) \
+	CB(PREFIX.crt.dos.sched.pthread.ext.clock.cond PREFIX.crt.dos.sched.pthread.ext.clock.mutex PREFIX.crt.dos.sched.pthread.ext.clock.thread PREFIX.crt.dos.sched.pthread.ext.clock64.cond PREFIX.crt.dos.sched.pthread.ext.clock64.mutex PREFIX.crt.dos.sched.pthread.ext.clock64.thread PREFIX.crt.dos.sched.pthread.ext.concurrency PREFIX.crt.dos.sched.pthread.ext.gnu.affinity PREFIX.crt.dos.sched.pthread.ext.gnu.cleanup PREFIX.crt.dos.sched.pthread.ext.gnu.thread PREFIX.crt.dos.sched.pthread.ext.gnu.thread.name PREFIX.crt.dos.sched.pthread.ext.kos PREFIX.crt.dos.sched.pthread.ext.kos.suspend PREFIX.crt.dos.sched.pthread.ext.kos.thread PREFIX.crt.dos.sched.pthread.ext.kos.tid PREFIX.crt.dos.sched.pthread.ext.misc PREFIX.crt.dos.sched.pthread.ext.misc.affinity PREFIX.crt.dos.sched.pthread.ext.reltimed.cond PREFIX.crt.dos.sched.pthread.ext.reltimed.mutex PREFIX.crt.dos.sched.pthread.ext.reltimed.rwlock PREFIX.crt.dos.sched.pthread.ext.reltimed64.cond PREFIX.crt.dos.sched.pthread.ext.reltimed64.mutex PREFIX.crt.dos.sched.pthread.ext.reltimed64.rwlock PREFIX.crt.dos.sched.pthread.ext.timed.cond PREFIX.crt.dos.sched.pthread.ext.timed.mutex PREFIX.crt.dos.sched.pthread.ext.timed.rwlock PREFIX.crt.dos.sched.pthread.ext.timed.thread PREFIX.crt.dos.sched.pthread.ext.timed64.cond PREFIX.crt.dos.sched.pthread.ext.timed64.mutex PREFIX.crt.dos.sched.pthread.ext.timed64.rwlock PREFIX.crt.dos.sched.pthread.ext.timed64.thread) \
 	CB(PREFIX.crt.dos.sched.param) \
 	CB(PREFIX.crt.dos.sched.process) \
 	CB(PREFIX.crt.dos.sched.signal) \
@@ -541,7 +560,6 @@
 	CB(PREFIX.crt.dos.string.encrypt) \
 	CB(PREFIX.crt.dos.string.match) \
 	CB(PREFIX.crt.dos.string.argz PREFIX.crt.dos.string.envz) \
-	CB(PREFIX.crt.dos.sched.pthread_ext) \
 	CB(PREFIX.crt.dos.system.configuration) \
 	CB(PREFIX.crt.dos.system.random) \
 	CB(PREFIX.crt.dos.wordexp) \

@@ -40,9 +40,10 @@
 
 DECL_BEGIN
 
-INTERN ATTR_SECTION(".bss.crt.sched.pthread") struct libc_tlsglobals libc_mainthread_tlsglobals = {};
+INTERN ATTR_SECTION(".bss.crt.sched.pthread.ext.tls_globals")
+struct libc_tlsglobals libc_mainthread_tlsglobals = {};
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") WUNUSED bool
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.ext.tls_globals") WUNUSED bool
 NOTHROW(LIBCCALL get_LIBC_TLS_GLOBALS_ALLOW_UNSAFE)(void) {
 	int *sym;
 	char *env;
@@ -62,7 +63,7 @@ NOTHROW(LIBCCALL get_LIBC_TLS_GLOBALS_ALLOW_UNSAFE)(void) {
 	return false;
 }
 
-PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread") void
+PRIVATE ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.ext.tls_globals") void
 NOTHROW(LIBCCALL abort_tls_globals_alloc_failed)(void) {
 	/* Allow applications to define a function which we call here:
 	 * >> PUBLIC void __libc_tls_globals_alloc_failed(void); */
@@ -78,7 +79,7 @@ NOTHROW(LIBCCALL abort_tls_globals_alloc_failed)(void) {
 }
 
 /* Return a pointer to the calling thread's tls-globals controller. */
-ATTR_SECTION(".text.crt.sched.pthread")
+ATTR_SECTION(".text.crt.sched.pthread.ext.tls_globals")
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED struct libc_tlsglobals *
 NOTHROW(LIBCCALL libc_get_tlsglobals)(void) {
 	struct libc_tlsglobals *result = current.pt_tglobals;
@@ -101,7 +102,7 @@ NOTHROW(LIBCCALL libc_get_tlsglobals)(void) {
 }
 
 /* Finalize `self' (called when a pthread is destroyed, but not called for the main thread) */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.tls_globals") NONNULL((1)) void
 NOTHROW(LIBCCALL libc_fini_tlsglobals)(struct libc_tlsglobals *__restrict self) {
 	free(self->ltg_re_comp_buffer);
 /*[[[begin:libc_fini_tlsglobals]]]*/

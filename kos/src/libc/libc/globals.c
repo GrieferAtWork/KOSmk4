@@ -160,7 +160,7 @@ DEFINE_NOREL_GLOBAL_META(char *, libiberty_concat_ptr, ".crt.libiberty");
 
 /* <sys/single_threaded.h> */
 #undef __libc_single_threaded
-DEFINE_NOREL_GLOBAL_META(char, __libc_single_threaded, ".crt.sched.pthread");
+DEFINE_NOREL_GLOBAL_META(char, __libc_single_threaded, ".crt.sched.pthread.core.thread");
 
 
 /* <wchar.h> */

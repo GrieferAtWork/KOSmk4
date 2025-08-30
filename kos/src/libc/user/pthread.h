@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc584ffd8 */
+/* HASH CRC-32:0xd4e9bb8b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -272,7 +272,7 @@ INTDEF ATTR_OUTS(2, 3) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pth
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-INTDEF ATTR_IN(2) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t self, const char *name);
+INTDEF ATTR_IN(2) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t self, char const *name);
 /* >> pthread_gettid_np(3)
  * Return the TID of the given `self'.
  * If `self' has already terminated, 0 is returned

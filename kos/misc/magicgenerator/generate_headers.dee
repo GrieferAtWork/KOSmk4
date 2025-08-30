@@ -910,8 +910,8 @@ function doPrint_src_libc_crtOrder() {
 	}
 	/* Resolve wildcard rules. */
 	wildcardRules.sort(key: x -> {
-		x.pattern.length, /* Sort by length first... */
-		x.pattern,        /* ... and then alphabetically */
+		-x.pattern.length, /* Sort by "length DESC" first... */
+		x.pattern,         /* ... and then alphabetically */
 	});
 	for (local rule: wildcardRules) {
 		local sections: {string...} = [];

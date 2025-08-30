@@ -49,7 +49,7 @@
 
 
 #ifndef __x86_64__
-.section .text.crt.sched.pthread
+.section .text.crt.sched.pthread.core.thread
 INTERN_FUNCTION(libc_handle)
 	.cfi_startproc
 	/* Hacky code to quickly get a DL handle for libc itself. */
@@ -89,7 +89,7 @@ END(libc_handle)
 /* >> INTERN NONNULL((1, 2)) pid_t
  * >> NOTHROW(__FCALL libc_pthread_clone)(struct pthread_clone_args *__restrict args,
  * >>                                     struct pthread *__restrict thread); */
-.section .text.crt.sched.pthread
+.section .text.crt.sched.pthread.core.thread
 INTERN_FUNCTION(libc_pthread_clone)
 	.cfi_startproc
 #ifndef __x86_64__
@@ -142,7 +142,7 @@ END(libc_pthread_clone)
  * >> libc_pthread_unmap_stack_and_exit(void  *stackaddr,
  * >>                                   size_t stacksize,
  * >>                                   int    exitcode); */
-.section .text.crt.sched.pthread
+.section .text.crt.sched.pthread.core.exit
 INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
 	/* NOTE: We  must use `int 80h' for syscalls here, since the (more efficient)
 	 *       method of using `__i386_syscall()' would require use of stack memory
