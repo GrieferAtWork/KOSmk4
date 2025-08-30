@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6e88c22 */
+/* HASH CRC-32:0x9d401e72 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1923,6 +1923,8 @@ DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_timedwait, libc_pthread_co
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_timedwait64, libc_pthread_cond_timedwait64, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_reltimedwait_np, libc_pthread_cond_reltimedwait_np, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_reltimedwait64_np, libc_pthread_cond_reltimedwait64_np, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_clockwait, libc_pthread_cond_clockwait, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TIn(__SIZEOF_CLOCKID_T__), TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_clockwait64, libc_pthread_cond_clockwait64, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TIn(__SIZEOF_CLOCKID_T__), TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_condattr_init, libc_pthread_condattr_init, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_condattr_destroy, libc_pthread_condattr_destroy, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_condattr_getpshared, libc_pthread_condattr_getpshared, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)

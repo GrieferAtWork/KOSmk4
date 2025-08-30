@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32f0751b */
+/* HASH CRC-32:0xb912f9bd */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -664,6 +664,26 @@ INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t NOTHROW_RPC(LIBCCA
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
 INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait64_np)(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict reltime);
+/* >> pthread_cond_clockwait(3), pthread_cond_clockwait64(3)
+ * Same as `pthread_cond_timedwait(3)', but the given `abstime' is relative to `clock_id',
+ * whereas  when using `pthread_cond_timedwait(3)',  it is relative  to whatever clock was
+ * previously  set  by  `pthread_condattr_setclock(3)'  (or  `CLOCK_REALTIME'  when  never
+ * overwritten).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTDEF WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_cond_clockwait)(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, clockid_t clock_id, struct timespec const *__restrict abstime);
+/* >> pthread_cond_clockwait(3), pthread_cond_clockwait64(3)
+ * Same as `pthread_cond_timedwait(3)', but the given `abstime' is relative to `clock_id',
+ * whereas  when using `pthread_cond_timedwait(3)',  it is relative  to whatever clock was
+ * previously  set  by  `pthread_condattr_setclock(3)'  (or  `CLOCK_REALTIME'  when  never
+ * overwritten).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTDEF WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_cond_clockwait64)(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, clockid_t clock_id, struct timespec64 const *__restrict abstime);
 /* >> pthread_condattr_init(3)
  * Initialize condition variable attribute `self'
  * @return: EOK: Success */

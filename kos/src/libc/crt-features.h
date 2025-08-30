@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50e43a7b */
+/* HASH CRC-32:0xb4ee0715 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2822,6 +2822,8 @@
 #define __CRT_HAVE_DOS$pthread_barrierattr_setpshared
 #define __CRT_HAVE_DOS$pthread_cancel
 #define __CRT_HAVE_DOS$pthread_cond_broadcast
+#define __CRT_HAVE_DOS$pthread_cond_clockwait
+#define __CRT_HAVE_DOS$pthread_cond_clockwait64
 #define __CRT_HAVE_DOS$pthread_cond_destroy
 #define __CRT_HAVE_DOS$pthread_cond_init
 #define __CRT_HAVE_DOS$pthread_cond_reltimedwait64_np
@@ -7345,6 +7347,8 @@
 #define __CRT_HAVE_pthread_barrierattr_setpshared
 #define __CRT_HAVE_pthread_cancel
 #define __CRT_HAVE_pthread_cond_broadcast
+#define __CRT_HAVE_pthread_cond_clockwait
+#define __CRT_HAVE_pthread_cond_clockwait64
 #define __CRT_HAVE_pthread_cond_destroy
 #define __CRT_HAVE_pthread_cond_init
 #define __CRT_HAVE_pthread_cond_reltimedwait64_np

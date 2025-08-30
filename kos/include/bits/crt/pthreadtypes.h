@@ -445,7 +445,7 @@ typedef union __pthread_condattr {
 #endif /* __CC__ */
 #endif /* !__USE_PTHREAD_INTERNALS */
 
-#define __OFFSET_PTHREAD_COND_LOCK          0
+#define __OFFSET_PTHREAD_COND_FLAGS         0
 #define __OFFSET_PTHREAD_COND_FUTEX         4
 #define __OFFSET_PTHREAD_COND_TOTAL_SEQ     8
 #define __OFFSET_PTHREAD_COND_WAKEUP_SEQ    16
@@ -456,7 +456,7 @@ typedef union __pthread_condattr {
 #ifdef __CC__
 struct __pthread_cond_s {
 #ifdef __USE_PTHREAD_INTERNALS
-	__INT32_TYPE__            _c_lock;          /* Unused (on KOS) */
+	__UINT32_TYPE__            c_flags;         /* Set of `LFUTEX_WAIT_FLAG_TIMEOUT_PRIVATE | LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME' */
 	__UINT32_TYPE__            c_futex;         /* Futex control word & condition-version counter. */
 	__UINT64_TYPE__           _c_total_seq;     /* Unused (on KOS) */
 	__UINT64_TYPE__           _c_wakeup_seq;    /* Unused (on KOS) */

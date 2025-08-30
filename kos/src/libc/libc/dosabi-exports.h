@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4c92618 */
+/* HASH CRC-32:0xfbdb2c8c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1885,6 +1885,11 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_reltimedwait_np, libd_pthread_cond_reltimed
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_timedwait_relative64_np, libd_pthread_cond_reltimedwait64_np);
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_reltimedwait64_np, libd_pthread_cond_reltimedwait64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_clockwait, libd_pthread_cond_clockwait);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_cond_clockwait64, libd_pthread_cond_clockwait64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_clockwait64, libd_pthread_cond_clockwait64);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_condattr_init, libd_pthread_condattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_condattr_destroy, libd_pthread_condattr_destroy);

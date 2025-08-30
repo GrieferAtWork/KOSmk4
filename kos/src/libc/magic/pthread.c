@@ -2551,6 +2551,69 @@ $errno_t pthread_cond_reltimedwait64_np([[inout]] pthread_cond_t *__restrict sel
 %#endif /* __USE_APPLE || __USE_WINPTHREADS */
 
 
+
+%#ifdef __USE_GNU
+@@>> pthread_cond_clockwait(3), pthread_cond_clockwait64(3)
+@@Same as `pthread_cond_timedwait(3)', but the given `abstime' is relative to `clock_id',
+@@whereas  when using `pthread_cond_timedwait(3)',  it is relative  to whatever clock was
+@@previously  set  by  `pthread_condattr_setclock(3)'  (or  `CLOCK_REALTIME'  when  never
+@@overwritten).
+@@@return: EOK:       Success
+@@@return: EINVAL:    The given `abstime' is invalid
+@@@return: EINVAL:    Invalid/unsupported `clock_id'
+@@@return: ETIMEDOUT: The given `abstime' has expired
+[[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_clockwait")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_clockwait64", "__pthread_cond_clockwait64")]]
+[[userimpl, requires($has_function(crt_pthread_cond_clockwait32) ||
+                     $has_function(pthread_cond_clockwait64))]]
+$errno_t pthread_cond_clockwait([[inout]] pthread_cond_t *__restrict self,
+                                [[inout]] pthread_mutex_t *__restrict mutex, $clockid_t clock_id,
+                                [[in]] struct timespec const *__restrict abstime) {
+@@pp_if $has_function(crt_pthread_cond_clockwait32)@@
+	$errno_t result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = crt_pthread_cond_clockwait32(self, mutex, clock_id, &abstime32);
+	return result;
+@@pp_else@@
+	$errno_t result;
+	struct timespec64 abstime64;
+	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
+	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_cond_clockwait64(self, mutex, clock_id, &abstime64);
+	return result;
+@@pp_endif@@
+}
+
+%#ifdef __USE_TIME64
+[[cp, wunused, doc_alias("pthread_cond_clockwait")]]
+[[ignore, nocrt, alias("pthread_cond_clockwait")]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
+$errno_t crt_pthread_cond_clockwait32([[inout]] pthread_cond_t *__restrict self,
+                                      [[inout]] pthread_mutex_t *__restrict mutex, $clockid_t clock_id,
+                                      [[in]] struct timespec32 const *__restrict abstime);
+
+[[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
+[[preferred_time64_variant_of(pthread_cond_clockwait), doc_alias("pthread_cond_clockwait")]]
+[[userimpl, requires_function(crt_pthread_cond_clockwait32)]]
+[[export_alias("__pthread_cond_clockwait64")]]
+$errno_t pthread_cond_clockwait64([[inout]] pthread_cond_t *__restrict self,
+                                  [[inout]] pthread_mutex_t *__restrict mutex, $clockid_t clock_id,
+                                  [[in]] struct timespec64 const *__restrict abstime) {
+	$errno_t result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = crt_pthread_cond_clockwait32(self, mutex, &abstime32);
+	return result;
+}
+
+%#endif /* __USE_TIME64 */
+%#endif /* __USE_GNU */
+
+
 %
 %
 %/************************************************************************/

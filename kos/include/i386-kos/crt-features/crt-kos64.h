@@ -1259,6 +1259,7 @@
 #define __CRT_HAVE___pthread_barrier_init
 #define __CRT_HAVE___pthread_barrier_wait
 #define __CRT_HAVE___pthread_cleanup_routine
+#define __CRT_HAVE___pthread_cond_clockwait64
 #define __CRT_HAVE___pthread_cond_destroy
 #define __CRT_HAVE___pthread_cond_init
 #define __CRT_HAVE___pthread_getspecific
@@ -4350,6 +4351,7 @@
 #define __CRT_HAVE_pthread_barrierattr_setpshared
 #define __CRT_HAVE_pthread_cancel
 #define __CRT_HAVE_pthread_cond_broadcast
+#define __CRT_HAVE_pthread_cond_clockwait
 #define __CRT_HAVE_pthread_cond_destroy
 #define __CRT_HAVE_pthread_cond_init
 #define __CRT_HAVE_pthread_cond_reltimedwait_np
@@ -7653,6 +7655,7 @@
 #define __CRT_HAVE_KOS$__pthread_barrier_init
 #define __CRT_HAVE_KOS$__pthread_barrier_wait
 #define __CRT_HAVE_KOS$__pthread_cleanup_routine
+#define __CRT_HAVE_KOS$__pthread_cond_clockwait64
 #define __CRT_HAVE_KOS$__pthread_cond_destroy
 #define __CRT_HAVE_KOS$__pthread_cond_init
 #define __CRT_HAVE_KOS$__pthread_getspecific
@@ -10248,6 +10251,7 @@
 #define __CRT_HAVE_KOS$pthread_barrierattr_setpshared
 #define __CRT_HAVE_KOS$pthread_cancel
 #define __CRT_HAVE_KOS$pthread_cond_broadcast
+#define __CRT_HAVE_KOS$pthread_cond_clockwait
 #define __CRT_HAVE_KOS$pthread_cond_destroy
 #define __CRT_HAVE_KOS$pthread_cond_init
 #define __CRT_HAVE_KOS$pthread_cond_reltimedwait_np
@@ -12233,6 +12237,7 @@
 #define __CRT_HAVE_DOS$__pthread_barrier_init
 #define __CRT_HAVE_DOS$__pthread_barrier_wait
 #define __CRT_HAVE_DOS$__pthread_cleanup_routine
+#define __CRT_HAVE_DOS$__pthread_cond_clockwait64
 #define __CRT_HAVE_DOS$__pthread_cond_destroy
 #define __CRT_HAVE_DOS$__pthread_cond_init
 #define __CRT_HAVE_DOS$__pthread_getspecific
@@ -15124,6 +15129,7 @@
 #define __CRT_HAVE_DOS$pthread_barrierattr_setpshared
 #define __CRT_HAVE_DOS$pthread_cancel
 #define __CRT_HAVE_DOS$pthread_cond_broadcast
+#define __CRT_HAVE_DOS$pthread_cond_clockwait
 #define __CRT_HAVE_DOS$pthread_cond_destroy
 #define __CRT_HAVE_DOS$pthread_cond_init
 #define __CRT_HAVE_DOS$pthread_cond_reltimedwait_np

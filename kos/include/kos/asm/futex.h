@@ -114,8 +114,16 @@
 
 /* Flags for waiter futex functions. */
 #define LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE __UINT32_C(0x00000000) /* Default: Timeouts are given as absolute positions of CPU quantum time (`CLOCK_PROCESS_CPUTIME_ID') */
-#define LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE __UINT32_C(0x40000000) /* The given timeout argument describes a timeout relative to the point when waiting starts */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL  __UINT32_C(0x10000000) /* Connect to signals for polling. (s.a. `task_connect_for_poll()') */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE __UINT32_C(0x20000000) /* The given timeout argument describes a timeout relative to the point when waiting starts */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_PRIVATE  __UINT32_C(0x40000000) /* Unused (but meant to represent linux's `FUTEX_PRIVATE_FLAG') */
 #define LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME __UINT32_C(0x80000000) /* The given timeout argument is in absolute realtime (`CLOCK_REALTIME') */
-#define LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL  __UINT32_C(0x20000000) /* Connect to signals for polling. (s.a. `task_connect_for_poll()') */
+
+/* Convert linux futex flags to KOS:
+ * >> LFUTEX_WAIT_FLAG_TIMEOUT_FROMLINUX(0)                    == LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE
+ * >> LFUTEX_WAIT_FLAG_TIMEOUT_FROMLINUX(FUTEX_CLOCK_REALTIME) == LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME
+ * >> LFUTEX_WAIT_FLAG_TIMEOUT_FROMLINUX(FUTEX_PRIVATE_FLAG)   == LFUTEX_WAIT_FLAG_TIMEOUT_PRIVATE */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_FROMLINUX(x) (__CCAST(__UINT32_TYPE__)(x) << 23)
+#define LFUTEX_WAIT_FLAG_TIMEOUT_TOLINUX(x)   (__CCAST(__INT32_TYPE__)(x) >> 23)
 
 #endif /* !_KOS_ASM_FUTEX_H */

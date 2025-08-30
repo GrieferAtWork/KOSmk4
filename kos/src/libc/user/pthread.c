@@ -125,7 +125,7 @@ static_assert(offsetof(pthread_condattr_t, ca_value) == __OFFSET_PTHREAD_CONDATT
 
 /* pthread_cond_t */
 static_assert(sizeof(pthread_cond_t) <= __SIZEOF_PTHREAD_COND_T);
-static_assert(offsetof(pthread_cond_t, _c_lock) == __OFFSET_PTHREAD_COND_LOCK);
+static_assert(offsetof(pthread_cond_t, c_flags) == __OFFSET_PTHREAD_COND_FLAGS);
 static_assert(offsetof(pthread_cond_t, c_futex) == __OFFSET_PTHREAD_COND_FUTEX);
 static_assert(offsetof(pthread_cond_t, _c_total_seq) == __OFFSET_PTHREAD_COND_TOTAL_SEQ);
 static_assert(offsetof(pthread_cond_t, _c_wakeup_seq) == __OFFSET_PTHREAD_COND_WAKEUP_SEQ);
@@ -3659,6 +3659,10 @@ again:
 }
 /*[[[end:libc_pthread_mutex_timedlock]]]*/
 
+static_assert(LFUTEX_WAIT_FLAG_TIMEOUT_FROMLINUX(0) == LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE);
+static_assert(LFUTEX_WAIT_FLAG_TIMEOUT_FROMLINUX(FUTEX_CLOCK_REALTIME) == LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME);
+static_assert(LFUTEX_WAIT_FLAG_TIMEOUT_FROMLINUX(FUTEX_PRIVATE_FLAG) == LFUTEX_WAIT_FLAG_TIMEOUT_PRIVATE);
+
 /* With a 64-bit timeout, wait  while a 32-bit control word  matches
  * the given value. Note that this function may access up to 8 bytes
  * starting at the base of the  futex control word, though only  the
@@ -3667,17 +3671,17 @@ again:
  *       done  by  making  use  of   `LFUTEX_WAIT_WHILE_BITMASK' */
 #if __SIZEOF_POINTER__ == 4
 #define sys_lfutex32_waitwhile64(uaddr, val, timeout, flags) \
-	sys_lfutex(uaddr, LFUTEX_WAIT_WHILE | flags, val, timeout, 0)
+	sys_lfutex(uaddr, LFUTEX_WAIT_WHILE | (flags), val, timeout, 0)
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define sys_lfutex32_waitwhile64(uaddr, val, timeout, flags) \
 	sys_lfutex((uint64_t *)(uaddr),                          \
-	           LFUTEX_WAIT_WHILE_BITMASK | flags,            \
+	           LFUTEX_WAIT_WHILE_BITMASK | (flags),          \
 	           (uint64_t)UINT32_MAX, timeout,                \
 	           (uint64_t)(uint32_t)(val))
 #else /* ... */
 #define sys_lfutex32_waitwhile64(uaddr, val, timeout, flags) \
 	sys_lfutex((uint64_t *)(uaddr),                          \
-	           LFUTEX_WAIT_WHILE_BITMASK | flags,            \
+	           LFUTEX_WAIT_WHILE_BITMASK | (flags),          \
 	           (uint64_t)UINT32_MAX << 32, timeout,          \
 	           (uint64_t)(uint32_t)(val) << 32)
 #endif /* !... */
@@ -4745,8 +4749,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict self,
                                              pthread_condattr_t const *__restrict cond_attr)
 /*[[[body:libc_pthread_cond_init]]]*/
 {
+	clockid_t clock_id;
 	bzero(self, sizeof(*self));
-	(void)cond_attr;
+	clock_id = (cond_attr->ca_value & PTHREAD_CONDATTR_CLOCKID_MASK) >> PTHREAD_CONDATTR_CLOCKID_SHIFT;
+	if (clock_id == CLOCK_REALTIME)
+		self->c_flags |= LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
+	if (!(cond_attr->ca_value & PTHREAD_CONDATTR_FLAG_PSHARED))
+		self->c_flags |= LFUTEX_WAIT_FLAG_TIMEOUT_PRIVATE;
 	return EOK;
 }
 /*[[[end:libc_pthread_cond_init]]]*/
@@ -4858,12 +4867,75 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict self,
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */
-	sys_futex(&self->c_futex, FUTEX_WAIT, lock, NULL, NULL, 0);
+	sys_futex(&self->c_futex,
+	          FUTEX_WAIT | LFUTEX_WAIT_FLAG_TIMEOUT_TOLINUX(self->c_flags),
+	          lock, NULL, NULL, 0);
 	/* Return-path */
 	libc_pthread_mutex_lock(mutex);
 	return EOK;
 }
 /*[[[end:libc_pthread_cond_wait]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait_impl)(pthread_cond_t *__restrict self,
+                                                       pthread_mutex_t *__restrict mutex,
+                                                       struct timespec const *__restrict abstime,
+                                                       syscall_ulong_t lfutex_op_flags) {
+	errno_t result;
+	uint32_t lock;
+	/* Interlocked:begin */
+	lock = atomic_read(&self->c_futex);
+	/* Interlocked:op */
+	libc_pthread_mutex_unlock(mutex);
+	if (!(lock & FUTEX_WAITERS)) {
+		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
+		 *       we've released `mutex',  else there'd be  a race  condition! */
+		atomic_or(&self->c_futex, FUTEX_WAITERS);
+		lock |= FUTEX_WAITERS;
+	}
+	/* Interlocked:wait */
+	result = (errno_t)-sys_futex(&self->c_futex,
+	                             FUTEX_WAIT_BITSET | LFUTEX_WAIT_FLAG_TIMEOUT_TOLINUX(lfutex_op_flags),
+	                             lock, abstime, NULL, FUTEX_BITSET_MATCH_ANY);
+	/* Check for timeout. */
+	if (result != ETIMEDOUT && result != EINVAL)
+		result = EOK;
+	/* Return-path */
+	libc_pthread_mutex_lock(mutex);
+	return result;
+}
+
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64_impl)(pthread_cond_t *__restrict self,
+                                                         pthread_mutex_t *__restrict mutex,
+                                                         struct timespec64 const *__restrict abstime,
+                                                         syscall_ulong_t lfutex_op_flags) {
+	errno_t result;
+	uint32_t lock;
+	/* Interlocked:begin */
+	lock = atomic_read(&self->c_futex);
+	/* Interlocked:op */
+	libc_pthread_mutex_unlock(mutex);
+	if (!(lock & FUTEX_WAITERS)) {
+		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
+		 *       we've released `mutex',  else there'd be  a race  condition! */
+		atomic_or(&self->c_futex, FUTEX_WAITERS);
+		lock |= FUTEX_WAITERS;
+	}
+	/* Interlocked:wait */
+	result = (errno_t)-sys_lfutex32_waitwhile64(&self->c_futex, lock, abstime, lfutex_op_flags);
+	/* Check for timeout. */
+	if (result != ETIMEDOUT && result != EINVAL)
+		result = EOK;
+	/* Return-path */
+	libc_pthread_mutex_lock(mutex);
+	return result;
+}
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+
+
+
 
 /*[[[head:libc_pthread_cond_timedwait,hash:CRC-32=0x4b17dcbf]]]*/
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
@@ -4880,27 +4952,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict sel
                                                   struct timespec const *__restrict abstime)
 /*[[[body:libc_pthread_cond_timedwait]]]*/
 {
-	errno_t result;
-	uint32_t lock;
-	/* Interlocked:begin */
-	lock = atomic_read(&self->c_futex);
-	/* Interlocked:op */
-	libc_pthread_mutex_unlock(mutex);
-	if (!(lock & FUTEX_WAITERS)) {
-		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
-		 *       we've released `mutex',  else there'd be  a race  condition! */
-		atomic_or(&self->c_futex, FUTEX_WAITERS);
-		lock |= FUTEX_WAITERS;
-	}
-	/* Interlocked:wait */
-	result = (errno_t)-sys_futex(&self->c_futex, FUTEX_WAIT_BITSET, lock,
-	                             abstime, NULL, FUTEX_BITSET_MATCH_ANY);
-	/* Check for timeout. */
-	if (result != ETIMEDOUT && result != EINVAL)
-		result = EOK;
-	/* Return-path */
-	libc_pthread_mutex_lock(mutex);
-	return result;
+	return libc_pthread_cond_timedwait_impl(self, mutex, abstime, self->c_flags);
 }
 /*[[[end:libc_pthread_cond_timedwait]]]*/
 
@@ -4922,26 +4974,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict s
                                                     struct timespec64 const *__restrict abstime)
 /*[[[body:libc_pthread_cond_timedwait64]]]*/
 {
-	errno_t result;
-	uint32_t lock;
-	/* Interlocked:begin */
-	lock = atomic_read(&self->c_futex);
-	/* Interlocked:op */
-	libc_pthread_mutex_unlock(mutex);
-	if (!(lock & FUTEX_WAITERS)) {
-		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
-		 *       we've released `mutex',  else there'd be  a race  condition! */
-		atomic_or(&self->c_futex, FUTEX_WAITERS);
-		lock |= FUTEX_WAITERS;
-	}
-	/* Interlocked:wait */
-	result = (errno_t)-sys_lfutex32_waitwhile64(&self->c_futex, lock, abstime, 0);
-	/* Check for timeout. */
-	if (result != ETIMEDOUT && result != EINVAL)
-		result = EOK;
-	/* Return-path */
-	libc_pthread_mutex_lock(mutex);
-	return result;
+	return libc_pthread_cond_timedwait64_impl(self, mutex, abstime, self->c_flags);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_cond_timedwait64]]]*/
@@ -4972,7 +5005,8 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait_np)(pthread_cond_t *__restri
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */
-	result = (errno_t)-sys_futex(&self->c_futex, FUTEX_WAIT,
+	result = (errno_t)-sys_futex(&self->c_futex,
+	                             FUTEX_WAIT | (LFUTEX_WAIT_FLAG_TIMEOUT_TOLINUX(self->c_flags) & ~FUTEX_CLOCK_REALTIME),
 	                             lock, reltime, NULL, 0);
 	/* Check for timeout. */
 	if (result != ETIMEDOUT && result != EINVAL)
@@ -5023,6 +5057,76 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait64_np)(pthread_cond_t *__rest
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_cond_reltimedwait64_np]]]*/
+
+/*[[[head:libc_pthread_cond_clockwait,hash:CRC-32=0x130e52e9]]]*/
+/* >> pthread_cond_clockwait(3), pthread_cond_clockwait64(3)
+ * Same as `pthread_cond_timedwait(3)', but the given `abstime' is relative to `clock_id',
+ * whereas  when using `pthread_cond_timedwait(3)',  it is relative  to whatever clock was
+ * previously  set  by  `pthread_condattr_setclock(3)'  (or  `CLOCK_REALTIME'  when  never
+ * overwritten).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_cond_clockwait)(pthread_cond_t *__restrict self,
+                                                  pthread_mutex_t *__restrict mutex,
+                                                  clockid_t clock_id,
+                                                  struct timespec const *__restrict abstime)
+/*[[[body:libc_pthread_cond_clockwait]]]*/
+{
+	syscall_ulong_t lfutex_op_flags;
+	lfutex_op_flags = self->c_flags & ~(LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE |
+	                                    LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME);
+	switch (clock_id) {
+	case CLOCK_REALTIME:
+		lfutex_op_flags |= LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
+		break;
+	case CLOCK_MONOTONIC:
+		break;
+	default:
+		return EINVAL;
+	}
+	return libc_pthread_cond_timedwait_impl(self, mutex, abstime, lfutex_op_flags);
+}
+/*[[[end:libc_pthread_cond_clockwait]]]*/
+
+/*[[[head:libc_pthread_cond_clockwait64,hash:CRC-32=0x91ec9b9d]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_cond_clockwait64, libc_pthread_cond_clockwait);
+#else /* MAGIC:alias */
+/* >> pthread_cond_clockwait(3), pthread_cond_clockwait64(3)
+ * Same as `pthread_cond_timedwait(3)', but the given `abstime' is relative to `clock_id',
+ * whereas  when using `pthread_cond_timedwait(3)',  it is relative  to whatever clock was
+ * previously  set  by  `pthread_condattr_setclock(3)'  (or  `CLOCK_REALTIME'  when  never
+ * overwritten).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_cond_clockwait64)(pthread_cond_t *__restrict self,
+                                                    pthread_mutex_t *__restrict mutex,
+                                                    clockid_t clock_id,
+                                                    struct timespec64 const *__restrict abstime)
+/*[[[body:libc_pthread_cond_clockwait64]]]*/
+{
+	syscall_ulong_t lfutex_op_flags;
+	lfutex_op_flags = self->c_flags & ~(LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE |
+	                                    LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME);
+	switch (clock_id) {
+	case CLOCK_REALTIME:
+		lfutex_op_flags |= LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
+		break;
+	case CLOCK_MONOTONIC:
+		break;
+	default:
+		return EINVAL;
+	}
+	return libc_pthread_cond_timedwait64_impl(self, mutex, abstime, lfutex_op_flags);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_pthread_cond_clockwait64]]]*/
 
 
 
@@ -5610,7 +5714,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x45f58231]]]*/
+/*[[[start:exports,hash:CRC-32=0xaacccc38]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -5788,6 +5892,11 @@ DEFINE_PUBLIC_ALIAS_P(pthread_cond_reltimedwait_np,libc_pthread_cond_reltimedwai
 DEFINE_PUBLIC_ALIAS_P(pthread_cond_timedwait_relative64_np,libc_pthread_cond_reltimedwait64_np,WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict reltime),(self,mutex,reltime));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS_P(pthread_cond_reltimedwait64_np,libc_pthread_cond_reltimedwait64_np,WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict reltime),(self,mutex,reltime));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS_P(pthread_cond_clockwait,libc_pthread_cond_clockwait,WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, clockid_t clock_id, struct timespec const *__restrict abstime),(self,mutex,clock_id,abstime));
+DEFINE_PUBLIC_ALIAS_P(__pthread_cond_clockwait64,libc_pthread_cond_clockwait64,WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, clockid_t clock_id, struct timespec64 const *__restrict abstime),(self,mutex,clock_id,abstime));
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(pthread_cond_clockwait64,libc_pthread_cond_clockwait64,WUNUSED ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, clockid_t clock_id, struct timespec64 const *__restrict abstime),(self,mutex,clock_id,abstime));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS_P(pthread_condattr_init,libc_pthread_condattr_init,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_condattr_t *self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_condattr_destroy,libc_pthread_condattr_destroy,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_condattr_t *self),(self));
