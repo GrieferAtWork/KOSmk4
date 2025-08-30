@@ -4436,6 +4436,8 @@
 #define __CRT_HAVE_pthread_resume_all_np
 #define __CRT_HAVE_pthread_resume_np
 #define __CRT_HAVE_pthread_rpc_exec
+#define __CRT_HAVE_pthread_rwlock_clockrdlock
+#define __CRT_HAVE_pthread_rwlock_clockwrlock
 #define __CRT_HAVE_pthread_rwlock_destroy
 #define __CRT_HAVE_pthread_rwlock_init
 #define __CRT_HAVE_pthread_rwlock_rdlock
@@ -10328,6 +10330,8 @@
 #define __CRT_HAVE_KOS$pthread_peekjoin_np
 #define __CRT_HAVE_KOS$pthread_resume2_np
 #define __CRT_HAVE_KOS$pthread_resume_np
+#define __CRT_HAVE_KOS$pthread_rwlock_clockrdlock
+#define __CRT_HAVE_KOS$pthread_rwlock_clockwrlock
 #define __CRT_HAVE_KOS$pthread_rwlock_destroy
 #define __CRT_HAVE_KOS$pthread_rwlock_init
 #define __CRT_HAVE_KOS$pthread_rwlock_rdlock
@@ -15209,6 +15213,8 @@
 #define __CRT_HAVE_DOS$pthread_peekjoin_np
 #define __CRT_HAVE_DOS$pthread_resume2_np
 #define __CRT_HAVE_DOS$pthread_resume_np
+#define __CRT_HAVE_DOS$pthread_rwlock_clockrdlock
+#define __CRT_HAVE_DOS$pthread_rwlock_clockwrlock
 #define __CRT_HAVE_DOS$pthread_rwlock_destroy
 #define __CRT_HAVE_DOS$pthread_rwlock_init
 #define __CRT_HAVE_DOS$pthread_rwlock_rdlock

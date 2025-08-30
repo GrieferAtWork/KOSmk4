@@ -1338,6 +1338,8 @@
 #define __CRT_HAVE___pthread_once
 #define __CRT_HAVE___pthread_register_cancel
 #define __CRT_HAVE___pthread_register_cancel_defer
+#define __CRT_HAVE___pthread_rwlock_clockrdlock64
+#define __CRT_HAVE___pthread_rwlock_clockwrlock64
 #define __CRT_HAVE___pthread_rwlock_destroy
 #define __CRT_HAVE___pthread_rwlock_init
 #define __CRT_HAVE___pthread_rwlock_rdlock
@@ -4760,6 +4762,10 @@
 #define __CRT_HAVE_pthread_resume_all_np
 #define __CRT_HAVE_pthread_resume_np
 #define __CRT_HAVE_pthread_rpc_exec
+#define __CRT_HAVE_pthread_rwlock_clockrdlock
+#define __CRT_HAVE_pthread_rwlock_clockrdlock64
+#define __CRT_HAVE_pthread_rwlock_clockwrlock
+#define __CRT_HAVE_pthread_rwlock_clockwrlock64
 #define __CRT_HAVE_pthread_rwlock_destroy
 #define __CRT_HAVE_pthread_rwlock_init
 #define __CRT_HAVE_pthread_rwlock_rdlock

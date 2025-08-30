@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4e9bb8b */
+/* HASH CRC-32:0x71b0ae1e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -611,6 +611,52 @@ INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pthrea
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
 INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict self, struct timespec64 const *__restrict reltime);
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_clockrdlock)(pthread_rwlock_t *__restrict self, clockid_t clock_id, struct timespec const *__restrict abstime);
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_clockwrlock)(pthread_rwlock_t *__restrict self, clockid_t clock_id, struct timespec const *__restrict abstime);
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_clockrdlock64)(pthread_rwlock_t *__restrict self, clockid_t clock_id, struct timespec64 const *__restrict abstime);
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_clockwrlock64)(pthread_rwlock_t *__restrict self, clockid_t clock_id, struct timespec64 const *__restrict abstime);
 /* >> pthread_rwlock_unlock(3)
  * Unlock `self'
  * @return: EOK:   Success

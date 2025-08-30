@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb852f287 */
+/* HASH CRC-32:0x5ecc7c65 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2591,6 +2591,218 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock64_np, __FORCELOCAL
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
+#ifdef __USE_GNU
+#if defined(__CRT_HAVE_pthread_rwlock_clockrdlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockrdlock,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime),(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_clockrdlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockrdlock,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime),pthread_rwlock_clockrdlock64,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE___pthread_rwlock_clockrdlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockrdlock,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime),__pthread_rwlock_clockrdlock64,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_clockrdlock64) || defined(__CRT_HAVE___pthread_rwlock_clockrdlock64) || defined(__CRT_HAVE_pthread_rwlock_clockrdlock)
+#include <libc/local/pthread/pthread_rwlock_clockrdlock.h>
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_clockrdlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_clockrdlock)(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_clockrdlock))(__self, __clock_id, __abstime); })
+#endif /* ... */
+#if defined(__CRT_HAVE_pthread_rwlock_clockwrlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockwrlock,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime),(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_clockwrlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockwrlock,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime),pthread_rwlock_clockwrlock64,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE___pthread_rwlock_clockwrlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockwrlock,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime),__pthread_rwlock_clockwrlock64,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_clockwrlock64) || defined(__CRT_HAVE___pthread_rwlock_clockwrlock64) || defined(__CRT_HAVE_pthread_rwlock_clockwrlock)
+#include <libc/local/pthread/pthread_rwlock_clockwrlock.h>
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_clockwrlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_clockwrlock)(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_clockwrlock))(__self, __clock_id, __abstime); })
+#endif /* ... */
+#ifdef __USE_TIME64
+#if defined(__CRT_HAVE_pthread_rwlock_clockrdlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockrdlock64,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime),pthread_rwlock_clockrdlock,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_clockrdlock64)
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockrdlock64,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime),(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE___pthread_rwlock_clockrdlock64)
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockrdlock64,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime),__pthread_rwlock_clockrdlock64,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_clockrdlock)
+#include <libc/local/pthread/pthread_rwlock_clockrdlock64.h>
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_clockrdlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_clockrdlock64)(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_clockrdlock64))(__self, __clock_id, __abstime); })
+#endif /* ... */
+#if defined(__CRT_HAVE_pthread_rwlock_clockwrlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockwrlock64,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime),pthread_rwlock_clockwrlock,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_clockwrlock64)
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockwrlock64,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime),(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE___pthread_rwlock_clockwrlock64)
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_clockwrlock64,(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime),__pthread_rwlock_clockwrlock64,(__self,__clock_id,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_clockwrlock)
+#include <libc/local/pthread/pthread_rwlock_clockwrlock64.h>
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_clockwrlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_clockwrlock64)(pthread_rwlock_t *__restrict __self, __clockid_t __clock_id, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_clockwrlock64))(__self, __clock_id, __abstime); })
+#endif /* ... */
+#endif /* __USE_TIME64 */
+#endif /* __USE_GNU */
 #ifdef __CRT_HAVE_pthread_rwlock_unlock
 /* >> pthread_rwlock_unlock(3)
  * Unlock `self'

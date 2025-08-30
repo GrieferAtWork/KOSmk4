@@ -4547,12 +4547,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restri
 /*[[[body:libc_pthread_rwlock_timedrdlock]]]*/
 {
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-	return pthread_rwlock_acquireread(self, abstime, 0);
+	return pthread_rwlock_acquireread(self, abstime, LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 	struct timespec64 ts64;
 	ts64.tv_sec  = (time_t)abstime->tv_sec;
 	ts64.tv_nsec = (syscall_ulong_t)abstime->tv_nsec;
-	return pthread_rwlock_acquireread(self, &ts64, 0);
+	return pthread_rwlock_acquireread(self, &ts64, LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 }
 /*[[[end:libc_pthread_rwlock_timedrdlock]]]*/
@@ -4575,7 +4575,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__rest
                                                         struct timespec64 const *__restrict abstime)
 /*[[[body:libc_pthread_rwlock_timedrdlock64]]]*/
 {
-	return pthread_rwlock_acquireread(self, abstime, 0);
+	return pthread_rwlock_acquireread(self, abstime, LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_timedrdlock64]]]*/
@@ -4637,12 +4637,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restri
 /*[[[body:libc_pthread_rwlock_timedwrlock]]]*/
 {
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-	return pthread_rwlock_acquirewrite(self, abstime, 0);
+	return pthread_rwlock_acquirewrite(self, abstime, LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 	struct timespec64 ts64;
 	ts64.tv_sec  = (time_t)abstime->tv_sec;
 	ts64.tv_nsec = (syscall_ulong_t)abstime->tv_nsec;
-	return pthread_rwlock_acquirewrite(self, &ts64, 0);
+	return pthread_rwlock_acquirewrite(self, &ts64, LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 }
 /*[[[end:libc_pthread_rwlock_timedwrlock]]]*/
@@ -4664,7 +4664,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__rest
                                                         struct timespec64 const *__restrict abstime)
 /*[[[body:libc_pthread_rwlock_timedwrlock64]]]*/
 {
-	return pthread_rwlock_acquirewrite(self, abstime, 0);
+	return pthread_rwlock_acquirewrite(self, abstime, LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_timedwrlock64]]]*/
@@ -4764,6 +4764,158 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_reltimedwrlock64_np]]]*/
+
+/*[[[head:libc_pthread_rwlock_clockrdlock,hash:CRC-32=0x532c3ea5]]]*/
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.clock.rwlock") WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_clockrdlock)(pthread_rwlock_t *__restrict self,
+                                                      clockid_t clock_id,
+                                                      struct timespec const *__restrict abstime)
+/*[[[body:libc_pthread_rwlock_clockrdlock]]]*/
+{
+	syscall_ulong_t timeout_flags;
+	switch (clock_id) {
+	case CLOCK_MONOTONIC:
+		timeout_flags = 0;
+		break;
+	case CLOCK_REALTIME:
+		timeout_flags = LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
+		break;
+	default:
+		return EINVAL;
+	}
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+	return pthread_rwlock_acquireread(self, abstime, timeout_flags);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+	struct timespec64 ts64;
+	ts64.tv_sec  = (time_t)abstime->tv_sec;
+	ts64.tv_nsec = (syscall_ulong_t)abstime->tv_nsec;
+	return pthread_rwlock_acquireread(self, &ts64, timeout_flags);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+}
+/*[[[end:libc_pthread_rwlock_clockrdlock]]]*/
+
+/*[[[head:libc_pthread_rwlock_clockwrlock,hash:CRC-32=0xfbcd461c]]]*/
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.clock.rwlock") WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_clockwrlock)(pthread_rwlock_t *__restrict self,
+                                                      clockid_t clock_id,
+                                                      struct timespec const *__restrict abstime)
+/*[[[body:libc_pthread_rwlock_clockwrlock]]]*/
+{
+	syscall_ulong_t timeout_flags;
+	switch (clock_id) {
+	case CLOCK_MONOTONIC:
+		timeout_flags = 0;
+		break;
+	case CLOCK_REALTIME:
+		timeout_flags = LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
+		break;
+	default:
+		return EINVAL;
+	}
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+	return pthread_rwlock_acquirewrite(self, abstime, timeout_flags);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+	struct timespec64 ts64;
+	ts64.tv_sec  = (time_t)abstime->tv_sec;
+	ts64.tv_nsec = (syscall_ulong_t)abstime->tv_nsec;
+	return pthread_rwlock_acquirewrite(self, &ts64, timeout_flags);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+}
+/*[[[end:libc_pthread_rwlock_clockwrlock]]]*/
+
+/*[[[head:libc_pthread_rwlock_clockrdlock64,hash:CRC-32=0xdea13917]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_rwlock_clockrdlock64, libc_pthread_rwlock_clockrdlock);
+#else /* MAGIC:alias */
+/* >> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+ * Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.clock64.rwlock") WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_clockrdlock64)(pthread_rwlock_t *__restrict self,
+                                                        clockid_t clock_id,
+                                                        struct timespec64 const *__restrict abstime)
+/*[[[body:libc_pthread_rwlock_clockrdlock64]]]*/
+{
+	syscall_ulong_t timeout_flags;
+	switch (clock_id) {
+	case CLOCK_MONOTONIC:
+		timeout_flags = 0;
+		break;
+	case CLOCK_REALTIME:
+		timeout_flags = LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
+		break;
+	default:
+		return EINVAL;
+	}
+	return pthread_rwlock_acquireread(self, abstime, timeout_flags);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_pthread_rwlock_clockrdlock64]]]*/
+
+/*[[[head:libc_pthread_rwlock_clockwrlock64,hash:CRC-32=0x2306e134]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_rwlock_clockwrlock64, libc_pthread_rwlock_clockwrlock);
+#else /* MAGIC:alias */
+/* >> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+ * Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+ * whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: EINVAL:    Invalid/unsupported `clock_id'
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.clock64.rwlock") WUNUSED ATTR_IN(3) ATTR_INOUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_clockwrlock64)(pthread_rwlock_t *__restrict self,
+                                                        clockid_t clock_id,
+                                                        struct timespec64 const *__restrict abstime)
+/*[[[body:libc_pthread_rwlock_clockwrlock64]]]*/
+{
+	syscall_ulong_t timeout_flags;
+	switch (clock_id) {
+	case CLOCK_MONOTONIC:
+		timeout_flags = 0;
+		break;
+	case CLOCK_REALTIME:
+		timeout_flags = LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME;
+		break;
+	default:
+		return EINVAL;
+	}
+	return pthread_rwlock_acquirewrite(self, abstime, timeout_flags);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_pthread_rwlock_clockwrlock64]]]*/
 
 /*[[[head:libc_pthread_rwlock_unlock,hash:CRC-32=0x32b19d0a]]]*/
 /* >> pthread_rwlock_unlock(3)
@@ -5856,7 +6008,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd0165e2d]]]*/
+/*[[[start:exports,hash:CRC-32=0x8a35782b]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -6015,6 +6167,14 @@ DEFINE_PUBLIC_ALIAS_P(pthread_rwlock_reltimedwrlock_np,libc_pthread_rwlock_relti
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS_P(pthread_rwlock_reltimedrdlock64_np,libc_pthread_rwlock_reltimedrdlock64_np,WUNUSED ATTR_IN(2) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_rwlock_t *__restrict self, struct timespec64 const *__restrict reltime),(self,reltime));
 DEFINE_PUBLIC_ALIAS_P(pthread_rwlock_reltimedwrlock64_np,libc_pthread_rwlock_reltimedwrlock64_np,WUNUSED ATTR_IN(2) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_rwlock_t *__restrict self, struct timespec64 const *__restrict reltime),(self,reltime));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS_P(pthread_rwlock_clockrdlock,libc_pthread_rwlock_clockrdlock,WUNUSED ATTR_IN(3) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_rwlock_t *__restrict self, clockid_t clock_id, struct timespec const *__restrict abstime),(self,clock_id,abstime));
+DEFINE_PUBLIC_ALIAS_P(pthread_rwlock_clockwrlock,libc_pthread_rwlock_clockwrlock,WUNUSED ATTR_IN(3) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_rwlock_t *__restrict self, clockid_t clock_id, struct timespec const *__restrict abstime),(self,clock_id,abstime));
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(__pthread_rwlock_clockrdlock64,libc_pthread_rwlock_clockrdlock64,WUNUSED ATTR_IN(3) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_rwlock_t *__restrict self, clockid_t clock_id, struct timespec64 const *__restrict abstime),(self,clock_id,abstime));
+DEFINE_PUBLIC_ALIAS_P(pthread_rwlock_clockrdlock64,libc_pthread_rwlock_clockrdlock64,WUNUSED ATTR_IN(3) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_rwlock_t *__restrict self, clockid_t clock_id, struct timespec64 const *__restrict abstime),(self,clock_id,abstime));
+DEFINE_PUBLIC_ALIAS_P(__pthread_rwlock_clockwrlock64,libc_pthread_rwlock_clockwrlock64,WUNUSED ATTR_IN(3) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_rwlock_t *__restrict self, clockid_t clock_id, struct timespec64 const *__restrict abstime),(self,clock_id,abstime));
+DEFINE_PUBLIC_ALIAS_P(pthread_rwlock_clockwrlock64,libc_pthread_rwlock_clockwrlock64,WUNUSED ATTR_IN(3) ATTR_INOUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_rwlock_t *__restrict self, clockid_t clock_id, struct timespec64 const *__restrict abstime),(self,clock_id,abstime));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS_P(__pthread_rwlock_unlock,libc_pthread_rwlock_unlock,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_rwlock_t *self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_rwlock_unlock,libc_pthread_rwlock_unlock,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_rwlock_t *self),(self));

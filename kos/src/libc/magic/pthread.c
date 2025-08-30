@@ -2529,6 +2529,122 @@ $errno_t pthread_rwlock_reltimedwrlock64_np([[inout]] pthread_rwlock_t *__restri
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_SOLARIS */
 
+
+%#ifdef __USE_GNU
+@@>> pthread_rwlock_clockrdlock(3), pthread_rwlock_clockrdlock64(3)
+@@Same  as `pthread_rwlock_timedrdlock(3)', but  the given `abstime'  is relative to `clock_id',
+@@whereas when using `pthread_rwlock_timedrdlock(3)', it is always relative to `CLOCK_REALTIME'.
+@@@return: EOK:       Success
+@@@return: EINVAL:    The given `abstime' is invalid
+@@@return: EINVAL:    Invalid/unsupported `clock_id'
+@@@return: ETIMEDOUT: The given `abstime' has expired
+@@@return: EAGAIN:    The maximum # of read-locks has been acquired
+@@@return: EDEADLK:   You're already holding a write-lock
+@@@return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+@@                    You're already holding a read-lock
+[[section(".text.crt{|.dos}.sched.pthread.ext.clock.rwlock")]]
+[[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_clockrdlock")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_clockrdlock64", "__pthread_rwlock_clockrdlock64")]]
+[[userimpl, requires($has_function(crt_pthread_rwlock_clockrdlock32) ||
+                     $has_function(pthread_rwlock_clockrdlock64))]]
+$errno_t pthread_rwlock_clockrdlock([[inout]] pthread_rwlock_t *__restrict self, $clockid_t clock_id,
+                                    [[in]] struct timespec const *__restrict abstime) {
+@@pp_if $has_function(crt_pthread_rwlock_clockrdlock32)@@
+	$errno_t result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = crt_pthread_rwlock_clockrdlock32(self, clock_id, &abstime32);
+	return result;
+@@pp_else@@
+	$errno_t result;
+	struct timespec64 abstime64;
+	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
+	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_rwlock_clockrdlock64(self, clock_id, &abstime32);
+	return result;
+@@pp_endif@@
+}
+
+@@>> pthread_rwlock_clockwrlock(3), pthread_rwlock_clockwrlock64(3)
+@@Same  as `pthread_rwlock_timedwrlock(3)', but  the given `abstime'  is relative to `clock_id',
+@@whereas when using `pthread_rwlock_timedwrlock(3)', it is always relative to `CLOCK_REALTIME'.
+@@@return: EOK:       Success
+@@@return: EINVAL:    The given `abstime' is invalid
+@@@return: EINVAL:    Invalid/unsupported `clock_id'
+@@@return: ETIMEDOUT: The given `abstime' has expired
+@@@return: EDEADLK:   You're already holding a read-lock
+@@@return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+@@                    You're already holding a write-lock
+[[section(".text.crt{|.dos}.sched.pthread.ext.clock.rwlock")]]
+[[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_clockwrlock")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_clockwrlock64", "__pthread_rwlock_clockwrlock64")]]
+[[userimpl, requires($has_function(crt_pthread_rwlock_clockwrlock32) ||
+                     $has_function(pthread_rwlock_clockwrlock64))]]
+$errno_t pthread_rwlock_clockwrlock([[inout]] pthread_rwlock_t *__restrict self, $clockid_t clock_id,
+                                    [[in]] struct timespec const *__restrict abstime) {
+@@pp_if $has_function(crt_pthread_rwlock_clockwrlock32)@@
+	$errno_t result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = crt_pthread_rwlock_clockwrlock32(self, clock_id, &abstime32);
+	return result;
+@@pp_else@@
+	$errno_t result;
+	struct timespec64 abstime64;
+	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
+	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_rwlock_clockwrlock64(self, clock_id, &abstime32);
+	return result;
+@@pp_endif@@
+}
+
+%#ifdef __USE_TIME64
+[[cp, doc_alias("pthread_rwlock_clockrdlock"), ignore, nocrt, alias("pthread_rwlock_clockrdlock")]]
+[[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
+$errno_t crt_pthread_rwlock_clockrdlock32([[inout]] pthread_rwlock_t *__restrict self, $clockid_t clock_id,
+                                          [[in]] struct timespec32 const *__restrict abstime);
+[[cp, doc_alias("pthread_rwlock_clockwrlock"), wunused, ignore, nocrt, alias("pthread_rwlock_clockwrlock")]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
+$errno_t crt_pthread_rwlock_clockwrlock32([[inout]] pthread_rwlock_t *__restrict self, $clockid_t clock_id,
+                                          [[in]] struct timespec32 const *__restrict abstime);
+
+[[section(".text.crt{|.dos}.sched.pthread.ext.clock64.rwlock")]]
+[[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
+[[preferred_time64_variant_of(pthread_rwlock_clockrdlock), doc_alias("pthread_rwlock_clockrdlock")]]
+[[time64_export_alias("__pthread_rwlock_clockrdlock64")]]
+[[userimpl, requires_function(crt_pthread_rwlock_clockrdlock32)]]
+$errno_t pthread_rwlock_clockrdlock64([[inout]] pthread_rwlock_t *__restrict self, $clockid_t clock_id,
+                                      [[in]] struct timespec64 const *__restrict abstime) {
+	$errno_t result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = crt_pthread_rwlock_clockrdlock32(self, clock_id, &abstime32);
+	return result;
+}
+
+[[section(".text.crt{|.dos}.sched.pthread.ext.clock64.rwlock")]]
+[[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
+[[preferred_time64_variant_of(pthread_rwlock_clockwrlock), doc_alias("pthread_rwlock_clockwrlock")]]
+[[time64_export_alias("__pthread_rwlock_clockwrlock64")]]
+[[userimpl, requires_function(crt_pthread_rwlock_clockwrlock32)]]
+$errno_t pthread_rwlock_clockwrlock64([[inout]] pthread_rwlock_t *__restrict self, $clockid_t clock_id,
+                                      [[in]] struct timespec64 const *__restrict abstime) {
+	$errno_t result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = crt_pthread_rwlock_clockwrlock32(self, clock_id, &abstime32);
+	return result;
+}
+%#endif /* __USE_TIME64 */
+%#endif /* __USE_GNU */
+
+
 @@>> pthread_rwlock_unlock(3)
 @@Unlock `self'
 @@@return: EOK:   Success

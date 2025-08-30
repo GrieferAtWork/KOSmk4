@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc93a9024 */
+/* HASH CRC-32:0x5425232c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1866,6 +1866,14 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedwrlock_np, libd_pthread_rwlock_re
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedrdlock64_np, libd_pthread_rwlock_reltimedrdlock64_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedwrlock64_np, libd_pthread_rwlock_reltimedwrlock64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_clockrdlock, libd_pthread_rwlock_clockrdlock);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_clockwrlock, libd_pthread_rwlock_clockwrlock);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_clockrdlock64, libd_pthread_rwlock_clockrdlock64);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_clockrdlock64, libd_pthread_rwlock_clockrdlock64);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_clockwrlock64, libd_pthread_rwlock_clockwrlock64);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_clockwrlock64, libd_pthread_rwlock_clockwrlock64);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_unlock, libd_pthread_rwlock_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_unlock, libd_pthread_rwlock_unlock);

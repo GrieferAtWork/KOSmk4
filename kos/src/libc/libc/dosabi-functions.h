@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74428868 */
+/* HASH CRC-32:0xb2e30206 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1911,6 +1911,10 @@ DFUN(".text.crt.dos.sched.pthread.ext.reltimed.rwlock", libd_pthread_rwlock_relt
 DFUN(".text.crt.dos.sched.pthread.ext.reltimed.rwlock", libd_pthread_rwlock_reltimedwrlock_np, libc_pthread_rwlock_reltimedwrlock_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread.ext.reltimed64.rwlock", libd_pthread_rwlock_reltimedrdlock64_np, libc_pthread_rwlock_reltimedrdlock64_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread.ext.reltimed64.rwlock", libd_pthread_rwlock_reltimedwrlock64_np, libc_pthread_rwlock_reltimedwrlock64_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread.ext.clock.rwlock", libd_pthread_rwlock_clockrdlock, libc_pthread_rwlock_clockrdlock, TIn(__SIZEOF_ERRNO_T__), 3, TP, TIn(__SIZEOF_CLOCKID_T__), TP)
+DFUN(".text.crt.dos.sched.pthread.ext.clock.rwlock", libd_pthread_rwlock_clockwrlock, libc_pthread_rwlock_clockwrlock, TIn(__SIZEOF_ERRNO_T__), 3, TP, TIn(__SIZEOF_CLOCKID_T__), TP)
+DFUN(".text.crt.dos.sched.pthread.ext.clock64.rwlock", libd_pthread_rwlock_clockrdlock64, libc_pthread_rwlock_clockrdlock64, TIn(__SIZEOF_ERRNO_T__), 3, TP, TIn(__SIZEOF_CLOCKID_T__), TP)
+DFUN(".text.crt.dos.sched.pthread.ext.clock64.rwlock", libd_pthread_rwlock_clockwrlock64, libc_pthread_rwlock_clockwrlock64, TIn(__SIZEOF_ERRNO_T__), 3, TP, TIn(__SIZEOF_CLOCKID_T__), TP)
 DFUN(".text.crt.dos.sched.pthread.core.rwlock", libd_pthread_rwlock_unlock, libc_pthread_rwlock_unlock, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread.attr.rwlock", libd_pthread_rwlockattr_init, libc_pthread_rwlockattr_init, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread.attr.rwlock", libd_pthread_rwlockattr_destroy, libc_pthread_rwlockattr_destroy, TIn(__SIZEOF_ERRNO_T__), 1, TP)

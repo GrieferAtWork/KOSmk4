@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19ab72ee */
+/* HASH CRC-32:0xc155a0d9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2897,6 +2897,10 @@
 #define __CRT_HAVE_DOS$pthread_once
 #define __CRT_HAVE_DOS$pthread_resume2_np
 #define __CRT_HAVE_DOS$pthread_resume_np
+#define __CRT_HAVE_DOS$pthread_rwlock_clockrdlock
+#define __CRT_HAVE_DOS$pthread_rwlock_clockrdlock64
+#define __CRT_HAVE_DOS$pthread_rwlock_clockwrlock
+#define __CRT_HAVE_DOS$pthread_rwlock_clockwrlock64
 #define __CRT_HAVE_DOS$pthread_rwlock_destroy
 #define __CRT_HAVE_DOS$pthread_rwlock_init
 #define __CRT_HAVE_DOS$pthread_rwlock_rdlock
@@ -7431,6 +7435,10 @@
 #define __CRT_HAVE_pthread_resume2_np
 #define __CRT_HAVE_pthread_resume_np
 #define __CRT_HAVE_pthread_rpc_exec
+#define __CRT_HAVE_pthread_rwlock_clockrdlock
+#define __CRT_HAVE_pthread_rwlock_clockrdlock64
+#define __CRT_HAVE_pthread_rwlock_clockwrlock
+#define __CRT_HAVE_pthread_rwlock_clockwrlock64
 #define __CRT_HAVE_pthread_rwlock_destroy
 #define __CRT_HAVE_pthread_rwlock_init
 #define __CRT_HAVE_pthread_rwlock_rdlock
