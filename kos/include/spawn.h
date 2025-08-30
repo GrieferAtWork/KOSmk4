@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1116c254 */
+/* HASH CRC-32:0x76f915d2 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,6 +80,12 @@ __SYSDECL_BEGIN
 #ifdef __POSIX_SPAWN_USEVFORK
 #define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK /* Ignored on KOS, which always uses vfork(2) */
 #endif /* __POSIX_SPAWN_USEVFORK */
+#ifdef __POSIX_SPAWN_SETSID
+#define POSIX_SPAWN_SETSID __POSIX_SPAWN_SETSID /* Call `setsid(2)' within the context of the new process */
+#endif /* __POSIX_SPAWN_SETSID */
+#ifdef __POSIX_SPAWN_SETCGROUP
+#define POSIX_SPAWN_SETCGROUP __POSIX_SPAWN_SETCGROUP /* Set `CLONE_INTO_CGROUP' when spawning a new process (Not implemented on KOS) */
+#endif /* __POSIX_SPAWN_SETCGROUP */
 #endif /* __USE_GNU */
 
 #ifdef __POSIX_SPAWN_NOEXECERR
@@ -299,7 +305,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_getflags, __FORCELOCAL __ATTR_AR
  *   - POSIX_SPAWN_SETPGROUP:     s.a. posix_spawnattr_setpgroup(3)
  *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
  *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
- * @return: 0 : Success */
+ * @return: 0 : Success
+ * @return: EINVAL: The given `flags' has unknown/unsupported bits set */
 __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawnattr_setflags,(posix_spawnattr_t *__restrict __attr, short int __flags),(__attr,__flags))
 #elif defined(__POSIX_SPAWN_USE_KOS)
 #include <libc/local/spawn/posix_spawnattr_setflags.h>
@@ -312,7 +319,8 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawnattr_setflags,(pos
  *   - POSIX_SPAWN_SETPGROUP:     s.a. posix_spawnattr_setpgroup(3)
  *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
  *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
- * @return: 0 : Success */
+ * @return: 0 : Success
+ * @return: EINVAL: The given `flags' has unknown/unsupported bits set */
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_setflags, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_setflags)(posix_spawnattr_t *__restrict __attr, short int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_setflags))(__attr, __flags); })
 #endif /* ... */
 #ifdef __CRT_HAVE_posix_spawnattr_getsigdefault
@@ -526,7 +534,7 @@ __CDECLARE(__ATTR_FDARG(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawn_f
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_adddup2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(2) __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __oldfd, __fd_t __newfd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_adddup2))(__file_actions, __oldfd, __newfd); })
 #endif /* ... */
 
-#ifdef __USE_KOS
+#if defined(__USE_MISC) || defined(__USE_KOS)
 #ifdef __CRT_HAVE_posix_spawn_file_actions_addtcsetpgrp_np
 /* >> posix_spawn_file_actions_addtcsetpgrp_np(3)
  * Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
@@ -541,9 +549,9 @@ __CDECLARE(__ATTR_FDARG(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawn_f
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addtcsetpgrp_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(2) __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addtcsetpgrp_np))(__file_actions, __fd); })
 #endif /* ... */
-#endif /* __USE_KOS */
+#endif /* __USE_MISC || __USE_KOS */
 
-#ifdef __USE_SOLARIS
+#if defined(__USE_MISC) || defined(__USE_SOLARIS)
 #ifdef __CRT_HAVE_posix_spawn_file_actions_addclosefrom_np
 /* >> posix_spawn_file_actions_addclosefrom_np(3)
  * Enqueue a call `closefrom(lowfd)' to be performed by the child process
@@ -558,9 +566,9 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_addc
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addclosefrom_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addclosefrom_np)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __lowfd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addclosefrom_np))(__file_actions, __lowfd); })
 #endif /* ... */
-#endif /* __USE_SOLARIS */
+#endif /* __USE_MISC || __USE_SOLARIS */
 
-#ifdef __USE_GNU
+#if defined(__USE_MISC) || defined(__USE_GNU)
 #ifdef __CRT_HAVE_posix_spawn_file_actions_addchdir_np
 /* >> posix_spawn_file_actions_addchdir_np(3)
  * Enqueue a call `chdir(path)' to be performed by the child process
@@ -589,7 +597,7 @@ __CDECLARE(__ATTR_FDARG(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawn_f
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addfchdir_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(2) __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __dfd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addfchdir_np))(__file_actions, __dfd); })
 #endif /* ... */
-#endif /* __USE_GNU */
+#endif /* __USE_MISC || __USE_GNU */
 
 #endif /* __CC__ */
 

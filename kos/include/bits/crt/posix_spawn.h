@@ -57,15 +57,20 @@ struct __posix_spawnattr {
 /* Data structure to contain information about the actions to  be
  * performed in the new process with respect to file descriptors. */
 #ifdef __POSIX_SPAWN_USE_KOS
-#define __POSIX_SPAWN_ACTION_CLOSE  0 /* Close a file handle */
-#define __POSIX_SPAWN_ACTION_DUP2   1 /* Duplicate a file handle */
-#define __POSIX_SPAWN_ACTION_OPEN   2 /* Open a file using `open(2)' */
-#define __POSIX_SPAWN_ACTION_CHDIR  3 /* Change direction using `chdir(2)' */
-#define __POSIX_SPAWN_ACTION_FCHDIR 4 /* Change direction using `fchdir(2)' */
-#ifdef __CRT_KOS
-#define __POSIX_SPAWN_ACTION_TCSETPGRP 5 /* Call `tcsetpgrp(fd, getpid())' */
-#define __POSIX_SPAWN_ACTION_CLOSEFROM 6 /* Call `closefrom(fd)' */
-#endif /* __CRT_KOS */
+#define __POSIX_SPAWN_ACTION_CLOSE     0 /* Close a file handle */
+#define __POSIX_SPAWN_ACTION_DUP2      1 /* Duplicate a file handle */
+#define __POSIX_SPAWN_ACTION_OPEN      2 /* Open a file using `open(2)' */
+#if defined(__CRT_KOS) || (defined(__GLIBC_VERSION__) && __GLIBC_VERSION__ >= 22900)
+#define __POSIX_SPAWN_ACTION_CHDIR     3 /* Change direction using `chdir(2)' */
+#define __POSIX_SPAWN_ACTION_FCHDIR    4 /* Change direction using `fchdir(2)' */
+#endif /* __CRT_KOS || __GLIBC_VERSION__ >= 22900 */
+#if defined(__CRT_KOS) || (defined(__GLIBC_VERSION__) && __GLIBC_VERSION__ >= 23400)
+#define __POSIX_SPAWN_ACTION_CLOSEFROM 5 /* Call `closefrom(fd)' */
+#endif /* __CRT_KOS || __GLIBC_VERSION__ >= 23400 */
+#if defined(__CRT_KOS) || (defined(__GLIBC_VERSION__) && __GLIBC_VERSION__ >= 23500)
+#define __POSIX_SPAWN_ACTION_TCSETPGRP 6 /* Call `tcsetpgrp(fd, getpid())' */
+#endif /* __CRT_KOS || __GLIBC_VERSION__ >= 23500 */
+
 struct __spawn_action {
 	unsigned int __sa_tag; /* Action type (one of `__POSIX_SPAWN_ACTION_*') */
 	union {
@@ -86,23 +91,29 @@ struct __spawn_action {
 			__mode_t  __sa_mode;  /* Open mode. */
 		} __sa_open_action;  /* __POSIX_SPAWN_ACTION_OPEN */
 
+#ifdef __POSIX_SPAWN_ACTION_CHDIR
 		struct {
 			char *__sa_path;  /* [1..1][owned] Path to chdir(2) to. */
 		} __sa_chdir_action;  /* __POSIX_SPAWN_ACTION_CHDIR */
+#endif /* __POSIX_SPAWN_ACTION_CHDIR */
 
+#ifdef __POSIX_SPAWN_ACTION_FCHDIR
 		struct {
 			__fd_t __sa_fd;   /* Fd to fchdir(2) to. */
 		} __sa_fchdir_action; /* __POSIX_SPAWN_ACTION_FCHDIR */
+#endif /* __POSIX_SPAWN_ACTION_FCHDIR */
 
-#ifdef __CRT_KOS
-		struct {
-			__fd_t __sa_fd;  /* `tcsetpgrp(__sa_fd, getpid())' */
-		} __sa_tcsetpgrp_action; /* __POSIX_SPAWN_ACTION_TCSETPGRP */
-
+#ifdef __POSIX_SPAWN_ACTION_CLOSEFROM
 		struct {
 			__fd_t __sa_fd;  /* `closefrom(__sa_fd)' */
 		} __sa_closefrom_action; /* __POSIX_SPAWN_ACTION_CLOSEFROM */
-#endif /* __CRT_KOS */
+#endif /* __POSIX_SPAWN_ACTION_CLOSEFROM */
+
+#ifdef __POSIX_SPAWN_ACTION_TCSETPGRP
+		struct {
+			__fd_t __sa_fd;  /* `tcsetpgrp(__sa_fd, getpid())' */
+		} __sa_tcsetpgrp_action; /* __POSIX_SPAWN_ACTION_TCSETPGRP */
+#endif /* __POSIX_SPAWN_ACTION_TCSETPGRP */
 
 	} __sa_action; /* Action-specific data. */
 };

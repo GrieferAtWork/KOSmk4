@@ -70,6 +70,8 @@
 %[assume_defined_in_kos_userspace(__POSIX_SPAWN_SETSCHEDPARAM)]
 %[assume_defined_in_kos_userspace(__POSIX_SPAWN_SETSCHEDULER)]
 %[assume_defined_in_kos_userspace(__POSIX_SPAWN_USEVFORK)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_SETSID)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_SETCGROUP)]
 %[assume_defined_in_kos_userspace(__POSIX_SPAWN_NOEXECERR)]
 
 
@@ -119,6 +121,12 @@ __SYSDECL_BEGIN
 #ifdef __POSIX_SPAWN_USEVFORK
 #define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK /* Ignored on KOS, which always uses vfork(2) */
 #endif /* __POSIX_SPAWN_USEVFORK */
+#ifdef __POSIX_SPAWN_SETSID
+#define POSIX_SPAWN_SETSID __POSIX_SPAWN_SETSID /* Call `setsid(2)' within the context of the new process */
+#endif /* __POSIX_SPAWN_SETSID */
+#ifdef __POSIX_SPAWN_SETCGROUP
+#define POSIX_SPAWN_SETCGROUP __POSIX_SPAWN_SETCGROUP /* Set `CLONE_INTO_CGROUP' when spawning a new process (Not implemented on KOS) */
+#endif /* __POSIX_SPAWN_SETCGROUP */
 #endif /* __USE_GNU */
 
 #ifdef __POSIX_SPAWN_NOEXECERR
@@ -353,7 +361,8 @@ do_exec:
 @@pp_endif@@
 
 
-@@pp_if !$has_function(chdir)@@
+@@pp_ifdef __POSIX_SPAWN_ACTION_CHDIR@@
+@@pp_if         !$has_function(chdir)@@
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
 @@pp_else@@
 			case __POSIX_SPAWN_ACTION_CHDIR: {
@@ -364,9 +373,11 @@ do_exec:
 					goto child_error;
 			}	break;
 @@pp_endif@@
+@@pp_endif@@
 
 
-@@pp_if !$has_function(fchdir)@@
+@@pp_ifdef __POSIX_SPAWN_ACTION_FCHDIR@@
+@@pp_if         !$has_function(fchdir)@@
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
 @@pp_else@@
 			case __POSIX_SPAWN_ACTION_FCHDIR: {
@@ -376,6 +387,7 @@ do_exec:
 				if unlikely(error != 0)
 					goto child_error;
 			}	break;
+@@pp_endif@@
 @@pp_endif@@
 
 
@@ -529,6 +541,12 @@ do_exec:
 			goto child_error;
 @@pp_endif@@
 		}
+@@pp_if defined(__POSIX_SPAWN_SETSID) && $has_function(setsid)@@
+		if (attrp->@__flags@ & __POSIX_SPAWN_SETSID) {
+			if unlikely(setsid() < 0)
+				goto child_error;
+		}
+@@pp_endif@@
 	}
 	/* When the exec succeeds, the pipe is auto-
 	 * closed because it's marked as  O_CLOEXEC! */
@@ -768,11 +786,54 @@ $errno_t posix_spawnattr_getflags([[in]] posix_spawnattr_t const *__restrict att
 @@  - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
 @@  - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
 @@@return: 0 : Success
+@@@return: EINVAL: The given `flags' has unknown/unsupported bits set
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
+[[impl_include("<asm/crt/posix_spawn.h>")]]
+[[impl_include("<asm/os/errno.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
 $errno_t posix_spawnattr_setflags([[inout]] posix_spawnattr_t *__restrict attr,
                                   short int flags) {
+	enum {
+		ALL_FLAGS = 0
+#ifdef __POSIX_SPAWN_RESETIDS
+		| __POSIX_SPAWN_RESETIDS
+#endif /* __POSIX_SPAWN_RESETIDS */
+#ifdef __POSIX_SPAWN_SETPGROUP
+		| __POSIX_SPAWN_SETPGROUP
+#endif /* __POSIX_SPAWN_SETPGROUP */
+#ifdef __POSIX_SPAWN_SETSIGDEF
+		| __POSIX_SPAWN_SETSIGDEF
+#endif /* __POSIX_SPAWN_SETSIGDEF */
+#ifdef __POSIX_SPAWN_SETSIGMASK
+		| __POSIX_SPAWN_SETSIGMASK
+#endif /* __POSIX_SPAWN_SETSIGMASK */
+#ifdef __POSIX_SPAWN_SETSCHEDPARAM
+		| __POSIX_SPAWN_SETSCHEDPARAM
+#endif /* __POSIX_SPAWN_SETSCHEDPARAM */
+#ifdef __POSIX_SPAWN_SETSCHEDULER
+		| __POSIX_SPAWN_SETSCHEDULER
+#endif /* __POSIX_SPAWN_SETSCHEDULER */
+#ifdef __POSIX_SPAWN_USEVFORK
+		| __POSIX_SPAWN_USEVFORK
+#endif /* __POSIX_SPAWN_USEVFORK */
+#ifdef __POSIX_SPAWN_SETSID
+		| __POSIX_SPAWN_SETSID
+#endif /* __POSIX_SPAWN_SETSID */
+#ifdef __POSIX_SPAWN_SETCGROUP
+		| __POSIX_SPAWN_SETCGROUP
+#endif /* __POSIX_SPAWN_SETCGROUP */
+#ifdef __POSIX_SPAWN_NOEXECERR
+		| __POSIX_SPAWN_NOEXECERR
+#endif /* __POSIX_SPAWN_NOEXECERR */
+	};
+	if unlikely((unsigned short int)flags & ~(unsigned short int)ALL_FLAGS) {
+@@pp_ifdef EINVAL@@
+		return EINVAL;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
 	attr->@__flags@ = (uint16_t)(unsigned short int)flags;
 	return 0;
 }
@@ -1096,7 +1157,7 @@ err:
 }
 
 %
-%#ifdef __USE_KOS
+%#if defined(__USE_MISC) || defined(__USE_KOS)
 @@>> posix_spawn_file_actions_addtcsetpgrp_np(3)
 @@Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
 @@@return: 0     : Success
@@ -1122,10 +1183,10 @@ err:
 	return 1;
 @@pp_endif@@
 }
-%#endif /* __USE_KOS */
+%#endif /* __USE_MISC || __USE_KOS */
 
 %
-%#ifdef __USE_SOLARIS
+%#if defined(__USE_MISC) || defined(__USE_SOLARIS)
 @@>> posix_spawn_file_actions_addclosefrom_np(3)
 @@Enqueue a call `closefrom(lowfd)' to be performed by the child process
 @@@return: 0     : Success
@@ -1151,11 +1212,11 @@ err:
 	return 1;
 @@pp_endif@@
 }
-%#endif /* __USE_SOLARIS */
+%#endif /* __USE_MISC || __USE_SOLARIS */
 
 
 %
-%#ifdef __USE_GNU
+%#if defined(__USE_MISC) || defined(__USE_GNU)
 @@>> posix_spawn_file_actions_addchdir_np(3)
 @@Enqueue a call `chdir(path)' to be performed by the child process
 @@@return: 0     : Success
@@ -1211,7 +1272,7 @@ err:
 	return 1;
 @@pp_endif@@
 }
-%#endif /* __USE_GNU */
+%#endif /* __USE_MISC || __USE_GNU */
 
 
 /* XXX:

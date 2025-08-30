@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd17395ce */
+/* HASH CRC-32:0x2135d34d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -212,6 +212,7 @@ do_exec:
 
 
 
+
 			case __POSIX_SPAWN_ACTION_CHDIR: {
 				/* Change direction using `chdir(2)' */
 				int error;
@@ -225,6 +226,8 @@ do_exec:
 
 
 
+
+
 			case __POSIX_SPAWN_ACTION_FCHDIR: {
 				/* Change direction using `fchdir(2)' */
 				int error;
@@ -232,6 +235,7 @@ do_exec:
 				if unlikely(error != 0)
 					goto child_error;
 			}	break;
+
 
 
 
@@ -385,6 +389,12 @@ do_exec:
 
 
 		}
+
+		if (attrp->__flags & __POSIX_SPAWN_SETSID) {
+			if unlikely(libc_setsid() < 0)
+				goto child_error;
+		}
+
 	}
 	/* When the exec succeeds, the pipe is auto-
 	 * closed because it's marked as  O_CLOEXEC! */
@@ -592,6 +602,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(posix_spawnattr_t const *__r
 	*pflags = (short int)(unsigned short int)attr->__flags;
 	return 0;
 }
+#include <asm/crt/posix_spawn.h>
+#include <asm/os/errno.h>
 /* >> posix_spawnattr_setflags(3)
  * Specify the  set of  additional operations  to-be performed  by  the
  * child process prior to being started. The given `flags' is a set of:
@@ -601,10 +613,51 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(posix_spawnattr_t const *__r
  *   - POSIX_SPAWN_SETPGROUP:     s.a. posix_spawnattr_setpgroup(3)
  *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
  *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
- * @return: 0 : Success */
+ * @return: 0 : Success
+ * @return: EINVAL: The given `flags' has unknown/unsupported bits set */
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr,
                                                     short int flags) {
+	enum {
+		ALL_FLAGS = 0
+#ifdef __POSIX_SPAWN_RESETIDS
+		| __POSIX_SPAWN_RESETIDS
+#endif /* __POSIX_SPAWN_RESETIDS */
+#ifdef __POSIX_SPAWN_SETPGROUP
+		| __POSIX_SPAWN_SETPGROUP
+#endif /* __POSIX_SPAWN_SETPGROUP */
+#ifdef __POSIX_SPAWN_SETSIGDEF
+		| __POSIX_SPAWN_SETSIGDEF
+#endif /* __POSIX_SPAWN_SETSIGDEF */
+#ifdef __POSIX_SPAWN_SETSIGMASK
+		| __POSIX_SPAWN_SETSIGMASK
+#endif /* __POSIX_SPAWN_SETSIGMASK */
+#ifdef __POSIX_SPAWN_SETSCHEDPARAM
+		| __POSIX_SPAWN_SETSCHEDPARAM
+#endif /* __POSIX_SPAWN_SETSCHEDPARAM */
+#ifdef __POSIX_SPAWN_SETSCHEDULER
+		| __POSIX_SPAWN_SETSCHEDULER
+#endif /* __POSIX_SPAWN_SETSCHEDULER */
+#ifdef __POSIX_SPAWN_USEVFORK
+		| __POSIX_SPAWN_USEVFORK
+#endif /* __POSIX_SPAWN_USEVFORK */
+#ifdef __POSIX_SPAWN_SETSID
+		| __POSIX_SPAWN_SETSID
+#endif /* __POSIX_SPAWN_SETSID */
+#ifdef __POSIX_SPAWN_SETCGROUP
+		| __POSIX_SPAWN_SETCGROUP
+#endif /* __POSIX_SPAWN_SETCGROUP */
+#ifdef __POSIX_SPAWN_NOEXECERR
+		| __POSIX_SPAWN_NOEXECERR
+#endif /* __POSIX_SPAWN_NOEXECERR */
+	};
+	if unlikely((unsigned short int)flags & ~(unsigned short int)ALL_FLAGS) {
+
+		return EINVAL;
+
+
+
+	}
 	attr->__flags = (uint16_t)(unsigned short int)flags;
 	return 0;
 }

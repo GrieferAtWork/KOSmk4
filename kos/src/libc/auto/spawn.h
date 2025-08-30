@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x542ec1cd */
+/* HASH CRC-32:0x6bd5b89c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -195,7 +195,8 @@ INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_
  *   - POSIX_SPAWN_SETPGROUP:     s.a. posix_spawnattr_setpgroup(3)
  *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
  *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
- * @return: 0 : Success */
+ * @return: 0 : Success
+ * @return: EINVAL: The given `flags' has unknown/unsupported bits set */
 INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr, short int flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -208,7 +209,8 @@ INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setflags)
  *   - POSIX_SPAWN_SETPGROUP:     s.a. posix_spawnattr_setpgroup(3)
  *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
  *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
- * @return: 0 : Success */
+ * @return: 0 : Success
+ * @return: EINVAL: The given `flags' has unknown/unsupported bits set */
 INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr, short int flags);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

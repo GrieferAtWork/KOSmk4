@@ -81,6 +81,10 @@
 #define __POSIX_SPAWN_SETSCHEDPARAM 0x0010 /* s.a. `posix_spawnattr_setschedparam(3)' */
 #define __POSIX_SPAWN_SETSCHEDULER  0x0020 /* s.a. `posix_spawnattr_setschedpolicy(3)' */
 #define __POSIX_SPAWN_USEVFORK      0x0040 /* Ignored */
+#if defined(__CRT_HAVE_setsid) || defined(__CRT_HAVE___setsid) || defined(__CRT_HAVE___libc_setsid)
+#define __POSIX_SPAWN_SETSID        0x0080 /* Call `setsid(2)' within the context of the new process */
+#endif /* ... */
+#define __POSIX_SPAWN_SETCGROUP     0x0100 /* Set `CLONE_INTO_CGROUP' when spawning a new process (Not implemented on KOS) */
 #ifdef __CRT_KOS
 #define __POSIX_SPAWN_NOEXECERR     0x1000 /* Don't propagate exec() error, and leave the
                                             * child as  unreaped with  exit status  `127' */

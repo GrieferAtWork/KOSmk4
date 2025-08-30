@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x889b5fd8 */
+/* HASH CRC-32:0x649ea05c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -362,6 +362,18 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setpgid,(__pid_t __pid, __pid_t __pgid
 #undef __local___localdep_setpgid_defined
 #endif /* !... */
 #endif /* !__local___localdep_setpgid_defined */
+#ifndef __local___localdep_setsid_defined
+#define __local___localdep_setsid_defined
+#ifdef __CRT_HAVE_setsid
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_setsid,(void),setsid,())
+#elif defined(__CRT_HAVE___setsid)
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_setsid,(void),__setsid,())
+#elif defined(__CRT_HAVE___libc_setsid)
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_setsid,(void),__libc_setsid,())
+#else /* ... */
+#undef __local___localdep_setsid_defined
+#endif /* !... */
+#endif /* !__local___localdep_setsid_defined */
 #ifndef __local___localdep_sigaction_defined
 #define __local___localdep_sigaction_defined
 #ifdef __CRT_HAVE_sigaction
@@ -755,6 +767,7 @@ __do_exec:
 #endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 || __CRT_HAVE___libc_dup2) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close) */
 
 
+#ifdef __POSIX_SPAWN_ACTION_CHDIR
 #if !defined(__CRT_HAVE_chdir) && !defined(__CRT_HAVE__chdir) && !defined(__CRT_HAVE___chdir) && !defined(__CRT_HAVE___libc_chdir) && (!defined(__AT_FDCWD) || !defined(__CRT_HAVE_fchdirat))
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
 #else /* !__CRT_HAVE_chdir && !__CRT_HAVE__chdir && !__CRT_HAVE___chdir && !__CRT_HAVE___libc_chdir && (!__AT_FDCWD || !__CRT_HAVE_fchdirat) */
@@ -766,8 +779,10 @@ __do_exec:
 					goto __child_error;
 			}	break;
 #endif /* __CRT_HAVE_chdir || __CRT_HAVE__chdir || __CRT_HAVE___chdir || __CRT_HAVE___libc_chdir || (__AT_FDCWD && __CRT_HAVE_fchdirat) */
+#endif /* __POSIX_SPAWN_ACTION_CHDIR */
 
 
+#ifdef __POSIX_SPAWN_ACTION_FCHDIR
 #if !defined(__CRT_HAVE_fchdir) && !defined(__CRT_HAVE___fchdir) && !defined(__CRT_HAVE___libc_fchdir)
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
 #else /* !__CRT_HAVE_fchdir && !__CRT_HAVE___fchdir && !__CRT_HAVE___libc_fchdir */
@@ -779,6 +794,7 @@ __do_exec:
 					goto __child_error;
 			}	break;
 #endif /* __CRT_HAVE_fchdir || __CRT_HAVE___fchdir || __CRT_HAVE___libc_fchdir */
+#endif /* __POSIX_SPAWN_ACTION_FCHDIR */
 
 
 #ifdef __POSIX_SPAWN_ACTION_TCSETPGRP
@@ -931,6 +947,12 @@ __do_exec:
 			goto __child_error;
 #endif /* (!__CRT_HAVE_sched_setscheduler && !__CRT_HAVE___sched_setscheduler && !__CRT_HAVE___libc_sched_setscheduler) || (!__CRT_HAVE_sched_setparam && !__CRT_HAVE___sched_setparam && !__CRT_HAVE___libc_sched_setparam) || (!__CRT_HAVE_sched_getparam && !__CRT_HAVE___sched_getparam && !__CRT_HAVE___libc_sched_getparam) */
 		}
+#if defined(__POSIX_SPAWN_SETSID) && (defined(__CRT_HAVE_setsid) || defined(__CRT_HAVE___setsid) || defined(__CRT_HAVE___libc_setsid))
+		if (__attrp->__flags & __POSIX_SPAWN_SETSID) {
+			if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_setsid)() < 0)
+				goto __child_error;
+		}
+#endif /* __POSIX_SPAWN_SETSID && (__CRT_HAVE_setsid || __CRT_HAVE___setsid || __CRT_HAVE___libc_setsid) */
 	}
 	/* When the exec succeeds, the pipe is auto-
 	 * closed because it's marked as  O_CLOEXEC! */
