@@ -763,8 +763,11 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 [[std, const, nothrow, crtbuiltin, decl_include("<hybrid/typecore.h>"), extern_inline]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_INT__),       alias("abs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),      alias("labs")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("llabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("llabs", "qabs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),                    alias("_abs64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_INT__),       alias("uabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),      alias("ulabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("ullabs")]]
 /* -- local functions don't exist for `abs(3)' & friends because of extern_inline -- */
 /*[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_INT__),       bind_local_function(abs)]]*/
 /*[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),      bind_local_function(labs)]]*/
@@ -773,6 +776,7 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 [[crt_impl_if($extended_include_prefix("<hybrid/typecore.h>")!defined(__KERNEL__) &&
               __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ &&
               __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8)]]
+[[export_as("uimaxabs")]]
 [[section(".text.crt{|.dos}.math.utility")]]
 $intmax_t imaxabs($intmax_t x) {
 	return x < 0 ? -x : x;
@@ -792,6 +796,11 @@ $imaxdiv_t imaxdiv($intmax_t numer, $intmax_t denom) {
 	result.@rem@  = numer % denom;
 	return result;
 }
+
+%(std, c, ccompat)#ifdef __USE_ISOC2Y
+[[std]] $uintmax_t uimaxabs($intmax_t x) = imaxabs;
+%(std, c, ccompat)#endif /* __USE_ISOC2Y */
+
 
 
 [[std, leaf, decl_include("<features.h>", "<hybrid/typecore.h>")]]

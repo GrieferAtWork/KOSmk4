@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50df26da */
+/* HASH CRC-32:0xa2a4d6c4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,12 +83,21 @@ __NAMESPACE_STD_USING(bsearch)
 #endif /* !__bsearch_defined && __std_bsearch_defined */
 __NAMESPACE_STD_USING(abs)
 __NAMESPACE_STD_USING(labs)
+#ifdef __USE_ISOC2Y
+__NAMESPACE_STD_USING(uabs)
+__NAMESPACE_STD_USING(ulabs)
+#endif /* __USE_ISOC2Y */
 __NAMESPACE_STD_USING(div)
 __NAMESPACE_STD_USING(ldiv)
+#ifdef __COMPILER_HAVE_LONGLONG
 #ifdef __USE_ISOC99
 __NAMESPACE_STD_USING(llabs)
 __NAMESPACE_STD_USING(lldiv)
 #endif /* __USE_ISOC99 */
+#ifdef __USE_ISOC2Y
+__NAMESPACE_STD_USING(ullabs)
+#endif /* __USE_ISOC2Y */
+#endif /* __COMPILER_HAVE_LONGLONG */
 #include <libc/template/environ.h>
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
 __NAMESPACE_STD_USING(getenv)
@@ -435,6 +444,12 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),qabs,{ ret
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),imaxabs,{ return __x < 0 ? -__x : __x; })
 #elif defined(__CRT_HAVE__abs64) && __SIZEOF_INT__ == 8
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ulabs) && __SIZEOF_INT__ == __SIZEOF_LONG__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),ulabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ullabs) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),ullabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_INT__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
 #else /* ... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL abs)(int __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
@@ -452,9 +467,63 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,labs,(long __x),qabs,{ 
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,labs,(long __x),imaxabs,{ return __x < 0 ? -__x : __x; })
 #elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG__ == 8
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,labs,(long __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,labs,(long __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ullabs) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,labs,(long __x),ullabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,labs,(long __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
 #else /* ... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED long __NOTHROW(__LIBCCALL labs)(long __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
+#ifdef __USE_ISOC2Y
+#if __has_builtin(__builtin_abs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_abs)
+__CEIREDIRECT(,unsigned int,__NOTHROW_NCX,uabs,(int __x),abs,{ return __builtin_abs(__x); })
+#elif defined(__CRT_HAVE_abs)
+__CEIREDIRECT(,unsigned int,__NOTHROW_NCX,uabs,(int __x),abs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_labs) && __SIZEOF_INT__ == __SIZEOF_LONG__
+__CEIREDIRECT(,unsigned int,__NOTHROW_NCX,uabs,(int __x),labs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_llabs) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(,unsigned int,__NOTHROW_NCX,uabs,(int __x),llabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_qabs) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(,unsigned int,__NOTHROW_NCX,uabs,(int __x),qabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_INT__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(,unsigned int,__NOTHROW_NCX,uabs,(int __x),imaxabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE__abs64) && __SIZEOF_INT__ == 8
+__CEIREDIRECT(,unsigned int,__NOTHROW_NCX,uabs,(int __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ulabs) && __SIZEOF_INT__ == __SIZEOF_LONG__
+__CEIREDIRECT(,unsigned int,__NOTHROW_NCX,uabs,(int __x),ulabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ullabs) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(,unsigned int,__NOTHROW_NCX,uabs,(int __x),ullabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_INT__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(,unsigned int,__NOTHROW_NCX,uabs,(int __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
+#else /* ... */
+__LOCAL unsigned int __NOTHROW_NCX(__LIBCCALL uabs)(int __x) { return __x < 0 ? -__x : __x; }
+#endif /* !... */
+#if __has_builtin(__builtin_labs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_labs)
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,ulabs,(long __x),labs,{ return __builtin_labs(__x); })
+#elif defined(__CRT_HAVE_labs)
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,ulabs,(long __x),labs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_abs) && __SIZEOF_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,ulabs,(long __x),abs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_llabs) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,ulabs,(long __x),llabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_qabs) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,ulabs,(long __x),qabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,ulabs,(long __x),imaxabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG__ == 8
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,ulabs,(long __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,ulabs,(long __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ullabs) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,ulabs,(long __x),ullabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,ulabs,(long __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
+#else /* ... */
+__LOCAL unsigned long __NOTHROW_NCX(__LIBCCALL ulabs)(long __x) { return __x < 0 ? -__x : __x; }
+#endif /* !... */
+#endif /* __USE_ISOC2Y */
 #ifdef __CRT_HAVE_div
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && __SIZEOF_INT__ == __SIZEOF_LONG__
@@ -487,6 +556,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(ldiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST struct __ldiv_struct __NOTHROW_NCX(__LIBCCALL ldiv)(long __numer, long __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldiv))(__numer, __denom); })
 #endif /* !... */
+#ifdef __COMPILER_HAVE_LONGLONG
 #ifdef __USE_ISOC99
 #if __has_builtin(__builtin_llabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llabs)
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llabs,(__LONGLONG __x),{ return __builtin_llabs(__x); })
@@ -502,6 +572,12 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llabs,(__LONGLONG
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llabs,(__LONGLONG __x),imaxabs,{ return __x < 0 ? -__x : __x; })
 #elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG_LONG__ == 8
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llabs,(__LONGLONG __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llabs,(__LONGLONG __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ulabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llabs,(__LONGLONG __x),ulabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llabs,(__LONGLONG __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
 #else /* ... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llabs)(__LONGLONG __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
@@ -522,6 +598,32 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(lldiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL lldiv)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); })
 #endif /* !... */
 #endif /* __USE_ISOC99 */
+#ifdef __USE_ISOC2Y
+#if __has_builtin(__builtin_llabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llabs)
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,ullabs,(__LONGLONG __x),llabs,{ return __builtin_llabs(__x); })
+#elif defined(__CRT_HAVE_llabs)
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,ullabs,(__LONGLONG __x),llabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_qabs)
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,ullabs,(__LONGLONG __x),qabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_abs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,ullabs,(__LONGLONG __x),abs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_labs) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,ullabs,(__LONGLONG __x),labs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,ullabs,(__LONGLONG __x),imaxabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG_LONG__ == 8
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,ullabs,(__LONGLONG __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,ullabs,(__LONGLONG __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ulabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,ullabs,(__LONGLONG __x),ulabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,ullabs,(__LONGLONG __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
+#else /* ... */
+__LOCAL __ULONGLONG __NOTHROW_NCX(__LIBCCALL ullabs)(__LONGLONG __x) { return __x < 0 ? -__x : __x; }
+#endif /* !... */
+#endif /* __USE_ISOC2Y */
+#endif /* __COMPILER_HAVE_LONGLONG */
 #ifdef __cplusplus
 #ifdef __CORRECT_ISO_CPP_STDLIB_H_PROTO
 extern "C++" {
@@ -539,6 +641,12 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),qabs,{ r
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),imaxabs,{ return __x < 0 ? -__x : __x; })
 #elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG__ == 8
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ullabs) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),ullabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
 #else /* ... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED long __NOTHROW(__LIBCCALL abs)(long __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
@@ -577,6 +685,12 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG _
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),imaxabs,{ return __x < 0 ? -__x : __x; })
 #elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG_LONG__ == 8
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ulabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),ulabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
 #else /* ... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL abs)(__LONGLONG __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
@@ -600,6 +714,60 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST struct __lldiv_struct
 #endif /* !... */
 } /* extern "C++" */
 #endif /* __USE_ISOC99 && __COMPILER_HAVE_LONGLONG */
+#ifdef __USE_ISOC2Y
+extern "C++" {
+#if __has_builtin(__builtin_labs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_labs)
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,uabs,(long __x),labs,{ return __builtin_labs(__x); })
+#elif defined(__CRT_HAVE_labs)
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,uabs,(long __x),labs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_abs) && __SIZEOF_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,uabs,(long __x),abs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_llabs) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,uabs,(long __x),llabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_qabs) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,uabs,(long __x),qabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,uabs,(long __x),imaxabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG__ == 8
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,uabs,(long __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,uabs,(long __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ullabs) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,uabs,(long __x),ullabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(,unsigned long,__NOTHROW_NCX,uabs,(long __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
+#else /* ... */
+__LOCAL unsigned long __NOTHROW_NCX(__LIBCCALL uabs)(long __x) { return __x < 0 ? -__x : __x; }
+#endif /* !... */
+} /* extern "C++" */
+#ifdef __COMPILER_HAVE_LONGLONG
+extern "C++" {
+#if __has_builtin(__builtin_llabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llabs)
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,uabs,(__LONGLONG __x),llabs,{ return __builtin_llabs(__x); })
+#elif defined(__CRT_HAVE_llabs)
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,uabs,(__LONGLONG __x),llabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_qabs)
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,uabs,(__LONGLONG __x),qabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_abs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,uabs,(__LONGLONG __x),abs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_labs) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,uabs,(__LONGLONG __x),labs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,uabs,(__LONGLONG __x),imaxabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG_LONG__ == 8
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,uabs,(__LONGLONG __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,uabs,(__LONGLONG __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ulabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,uabs,(__LONGLONG __x),ulabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(,__ULONGLONG,__NOTHROW_NCX,uabs,(__LONGLONG __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
+#else /* ... */
+__LOCAL __ULONGLONG __NOTHROW_NCX(__LIBCCALL uabs)(__LONGLONG __x) { return __x < 0 ? -__x : __x; }
+#endif /* !... */
+} /* extern "C++" */
+#endif /* __COMPILER_HAVE_LONGLONG */
+#endif /* __USE_ISOC2Y */
 #endif /* __CORRECT_ISO_CPP_STDLIB_H_PROTO */
 #if defined(__CORRECT_ISO_CPP_MATH_H_PROTO) && !defined(__NO_FPU)
 extern "C++" {
@@ -1250,15 +1418,30 @@ __NAMESPACE_STD_USING(bsearch)
 #endif /* !__bsearch_defined && __std_bsearch_defined */
 __NAMESPACE_STD_USING(abs)
 __NAMESPACE_STD_USING(labs)
+#endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __USE_ISOC2Y
+#ifndef __CXX_SYSTEM_HEADER
+__NAMESPACE_STD_USING(uabs)
+__NAMESPACE_STD_USING(ulabs)
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __USE_ISOC2Y */
+#ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(div)
 __NAMESPACE_STD_USING(ldiv)
 #endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __COMPILER_HAVE_LONGLONG
 #ifdef __USE_ISOC99
 #ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(llabs)
 __NAMESPACE_STD_USING(lldiv)
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __USE_ISOC99 */
+#ifdef __USE_ISOC2Y
+#ifndef __CXX_SYSTEM_HEADER
+__NAMESPACE_STD_USING(ullabs)
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __USE_ISOC2Y */
+#endif /* __COMPILER_HAVE_LONGLONG */
 #ifndef __CXX_SYSTEM_HEADER
 #include <libc/template/environ.h>
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
@@ -4397,6 +4580,12 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,qabs,(__LONGLONG 
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,qabs,(__LONGLONG __x),imaxabs,{ return __x < 0 ? -__x : __x; })
 #elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG_LONG__ == 8
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,qabs,(__LONGLONG __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,qabs,(__LONGLONG __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ulabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,qabs,(__LONGLONG __x),ulabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,qabs,(__LONGLONG __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
 #else /* ... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL qabs)(__LONGLONG __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
@@ -4855,6 +5044,12 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW,_abs64,(__INT
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW,_abs64,(__INT64_TYPE__ __x),qabs,{ return __x < 0 ? -__x : __x; })
 #elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_INTMAX_T__ == 8
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW,_abs64,(__INT64_TYPE__ __x),imaxabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_INT__ == 8
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW,_abs64,(__INT64_TYPE__ __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ullabs) && __SIZEOF_LONG_LONG__ == 8
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW,_abs64,(__INT64_TYPE__ __x),ullabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_INTMAX_T__ == 8
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW,_abs64,(__INT64_TYPE__ __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
 #else /* ... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW(__LIBCCALL _abs64)(__INT64_TYPE__ __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */

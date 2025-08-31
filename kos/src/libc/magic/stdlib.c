@@ -280,6 +280,7 @@ typedef __compar_fn_t comparison_fn_t;
 }
 
 %[define_crt_name_list(CNL_llabs       = ["llabs", "qabs"])]
+%[define_crt_name_list(CNL_ullabs      = ["ullabs"])]
 %[define_crt_name_list(CNL_lldiv       = ["lldiv", "qdiv"])]
 %[define_crt_name_list(CNL_strtol      = ["strtol"])]
 %[define_crt_name_list(CNL_strtoul     = ["strtoul"])]
@@ -429,29 +430,44 @@ void *bsearch([[in]] void const *pkey, [[in(item_count * item_size)]] void const
 
 
 [[if($extended_include_prefix("<hybrid/typecore.h>")
-     __SIZEOF_INTMAX_T__ == __SIZEOF_INT__), export_as("imaxabs")]]
+     __SIZEOF_INTMAX_T__ == __SIZEOF_INT__),
+  export_as("imaxabs", "uimaxabs")]]
+[[export_as("uabs")]]
 [[std, const, wunused, nothrow, crtbuiltin, extern_inline]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("labs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(CNL_llabs...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_INTMAX_T__), alias("imaxabs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_abs64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ulabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(CNL_ullabs...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_INTMAX_T__), alias("uimaxabs")]]
 [[section(".text.crt{|.dos}.math.utility")]]
 int abs(int x) {
 	return x < 0 ? -x : x;
 }
 
 [[if($extended_include_prefix("<hybrid/typecore.h>")
-     __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), export_as("imaxabs")]]
+     __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),
+  export_as("imaxabs", "uimaxabs")]]
+[[export_as("ulabs")]]
 [[std, const, wunused, nothrow, crtbuiltin, extern_inline]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__, abs)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_llabs...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("imaxabs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_abs64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("uabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_ullabs...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("uimaxabs")]]
 [[section(".text.crt{|.dos}.math.utility")]]
 long labs(long x) {
 	return x < 0 ? -x : x;
 }
 
+
+%(std, c, ccompat)#ifdef __USE_ISOC2Y
+[[std]] unsigned int uabs(int x) = abs;
+[[std]] unsigned long ulabs(long x) = labs;
+%(std, c, ccompat)#endif /* __USE_ISOC2Y */
 
 
 /* NOTE: `div_t', `ldiv_t' and `lldiv_t' return types need to be escaped, even if
@@ -537,17 +553,22 @@ $ldiv_t ldiv(long numer, long denom) {
 	return result;
 }
 
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 %(std, c, ccompat)#ifdef __USE_ISOC99
 [[if($extended_include_prefix("<hybrid/typecore.h>")
      __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ &&
      __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),
-  export_as("imaxabs")]]
+  export_as("imaxabs", "uimaxabs")]]
+[[export_as(CNL_ullabs...)]]
 [[std, const, wunused, nothrow, crtbuiltin, extern_inline]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_llabs...)]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, "abs")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, "labs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("imaxabs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("_abs64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("uabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("ulabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("uimaxabs")]]
 [[section(".text.crt{|.dos}.math.utility")]]
 __LONGLONG llabs(__LONGLONG x) {
 	return x < 0 ? -x : x;
@@ -570,6 +591,10 @@ $lldiv_t lldiv(__LONGLONG numer, __LONGLONG denom) {
 	return result;
 }
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
+%(std, c, ccompat)#ifdef __USE_ISOC2Y
+[[std]] __ULONGLONG ullabs(__LONGLONG x) = llabs;
+%(std, c, ccompat)#endif /* __USE_ISOC2Y */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 
 %(std)#ifdef __cplusplus
 %(std)#ifdef __CORRECT_ISO_CPP_STDLIB_H_PROTO
@@ -579,6 +604,13 @@ $lldiv_t lldiv(__LONGLONG numer, __LONGLONG denom) {
 %[insert:std_function_nousing(abs = llabs, externLinkageOverride: "C++")]
 %[insert:std_function_nousing(div = lldiv, externLinkageOverride: "C++")]
 %(std)#endif /* __USE_ISOC99 && __COMPILER_HAVE_LONGLONG */
+%(std)#ifdef __USE_ISOC2Y
+%[insert:std_function_nousing(uabs = ulabs, externLinkageOverride: "C++")]
+%(std)#ifdef __COMPILER_HAVE_LONGLONG
+%[insert:std_function_nousing(uabs = ullabs, externLinkageOverride: "C++")]
+%(std)#endif /* __COMPILER_HAVE_LONGLONG */
+%(std)#endif /* __USE_ISOC2Y */
+
 %(std)#endif /* __CORRECT_ISO_CPP_STDLIB_H_PROTO */
 %(std)#if defined(__CORRECT_ISO_CPP_MATH_H_PROTO) && !defined(__NO_FPU)
 %[insert:std_function_nousing(abs = fabsf, externLinkageOverride: "C++")]
@@ -4814,6 +4846,9 @@ extern __ATTR_CONST __INT64_TYPE__ (__LIBDCALL _abs64)(__INT64_TYPE__ __x);
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       alias("abs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_llabs...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias("imaxabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       alias("uabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_ullabs...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias("uimaxabs")]]
 /* -- local functions don't exist for `abs(3)' & friends because of extern_inline -- */
 /*[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       bind_local_function(abs)]]*/
 /*[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(llabs)]]*/

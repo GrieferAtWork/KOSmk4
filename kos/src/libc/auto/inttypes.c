@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc5c942b */
+/* HASH CRC-32:0x9017103 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -365,6 +365,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou_l)(char const *__restrict nptr,
 DECL_END
 
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8
+DEFINE_PUBLIC_ALIAS_P(uimaxabs,libc_imaxabs,ATTR_CONST,intmax_t,NOTHROW,LIBCCALL,(intmax_t x),(x));
 DEFINE_PUBLIC_ALIAS_P(imaxabs,libc_imaxabs,ATTR_CONST,intmax_t,NOTHROW,LIBCCALL,(intmax_t x),(x));
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__

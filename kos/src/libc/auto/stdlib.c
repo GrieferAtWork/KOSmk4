@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c326950 */
+/* HASH CRC-32:0xf35fb2c9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5809,11 +5809,15 @@ DEFINE_PUBLIC_ALIAS_P(DOS$bsearch,libd_bsearch,WUNUSED ATTR_IN(1) ATTR_IN_OPT(2)
 DEFINE_PUBLIC_ALIAS_P(bsearch,libc_bsearch,WUNUSED ATTR_IN(1) ATTR_IN_OPT(2) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *pkey, void const *pbase, size_t item_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)),(pkey,pbase,item_count,item_size,compar));
 #if __SIZEOF_INTMAX_T__ == __SIZEOF_INT__
 DEFINE_PUBLIC_ALIAS_P(imaxabs,libc_abs,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int x),(x));
+DEFINE_PUBLIC_ALIAS_P(uimaxabs,libc_abs,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int x),(x));
 #endif /* __SIZEOF_INTMAX_T__ == __SIZEOF_INT__ */
+DEFINE_PUBLIC_ALIAS_P(uabs,libc_abs,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int x),(x));
 DEFINE_PUBLIC_ALIAS_P(abs,libc_abs,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int x),(x));
 #if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
 DEFINE_PUBLIC_ALIAS_P(imaxabs,libc_labs,ATTR_CONST WUNUSED,long,NOTHROW,LIBCCALL,(long x),(x));
+DEFINE_PUBLIC_ALIAS_P(uimaxabs,libc_labs,ATTR_CONST WUNUSED,long,NOTHROW,LIBCCALL,(long x),(x));
 #endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
+DEFINE_PUBLIC_ALIAS_P(ulabs,libc_labs,ATTR_CONST WUNUSED,long,NOTHROW,LIBCCALL,(long x),(x));
 DEFINE_PUBLIC_ALIAS_P(labs,libc_labs,ATTR_CONST WUNUSED,long,NOTHROW,LIBCCALL,(long x),(x));
 #if __SIZEOF_INTMAX_T__ == __SIZEOF_INT__
 DEFINE_PUBLIC_ALIAS_P(imaxdiv,libc_div,WUNUSED __ATTR_CONST,struct __div_struct,NOTHROW_NCX,LIBCCALL,(int numer, int denom),(numer,denom));
@@ -5825,7 +5829,9 @@ DEFINE_PUBLIC_ALIAS_P(imaxdiv,libc_ldiv,WUNUSED __ATTR_CONST,ldiv_t,NOTHROW_NCX,
 DEFINE_PUBLIC_ALIAS_P(ldiv,libc_ldiv,WUNUSED __ATTR_CONST,ldiv_t,NOTHROW_NCX,LIBCCALL,(long numer, long denom),(numer,denom));
 #if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
 DEFINE_PUBLIC_ALIAS_P(imaxabs,libc_llabs,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGLONG x),(x));
+DEFINE_PUBLIC_ALIAS_P(uimaxabs,libc_llabs,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGLONG x),(x));
 #endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
+DEFINE_PUBLIC_ALIAS_P(ullabs,libc_llabs,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGLONG x),(x));
 DEFINE_PUBLIC_ALIAS_P(llabs,libc_llabs,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGLONG x),(x));
 DEFINE_PUBLIC_ALIAS_P(qabs,libc_llabs,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGLONG x),(x));
 #if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcdff000 */
+/* HASH CRC-32:0xaf7f8f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,6 +66,12 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),qabs,{ r
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),imaxabs,{ return __x < 0 ? -__x : __x; })
 #elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG__ == 8
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ullabs) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),ullabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
 #else /* ... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED long __NOTHROW(__LIBCCALL abs)(long __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
@@ -94,6 +100,12 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG _
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),imaxabs,{ return __x < 0 ? -__x : __x; })
 #elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG_LONG__ == 8
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),_abs64,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),uabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_ulabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),ulabs,{ return __x < 0 ? -__x : __x; })
+#elif defined(__CRT_HAVE_uimaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),uimaxabs,{ return __x < 0 ? -__x : __x; })
 #else /* ... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL abs)(__LONGLONG __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */

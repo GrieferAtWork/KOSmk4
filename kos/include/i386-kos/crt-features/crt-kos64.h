@@ -6185,6 +6185,7 @@
 #define __CRT_HAVE_twalk_r
 #define __CRT_HAVE_tzname
 #define __CRT_HAVE_tzset
+#define __CRT_HAVE_uabs
 #define __CRT_HAVE_ualarm
 #define __CRT_HAVE_ufromfp
 #define __CRT_HAVE_ufromfpf
@@ -6193,8 +6194,11 @@
 #define __CRT_HAVE_ufromfpxf
 #define __CRT_HAVE_ufromfpxl
 #define __CRT_HAVE_uid_from_user
+#define __CRT_HAVE_uimaxabs
+#define __CRT_HAVE_ulabs
 #define __CRT_HAVE_ulckpwdf
 #define __CRT_HAVE_ulimit
+#define __CRT_HAVE_ullabs
 #define __CRT_HAVE_ulltostr
 #define __CRT_HAVE_ultoa
 #define __CRT_HAVE_umask
@@ -11221,6 +11225,7 @@
 #define __CRT_HAVE_KOS$ttyname_r
 #define __CRT_HAVE_KOS$twalk
 #define __CRT_HAVE_KOS$twalk_r
+#define __CRT_HAVE_KOS$uabs
 #define __CRT_HAVE_KOS$ualarm
 #define __CRT_HAVE_KOS$ufromfp
 #define __CRT_HAVE_KOS$ufromfpf
@@ -11229,7 +11234,10 @@
 #define __CRT_HAVE_KOS$ufromfpxf
 #define __CRT_HAVE_KOS$ufromfpxl
 #define __CRT_HAVE_KOS$uid_from_user
+#define __CRT_HAVE_KOS$uimaxabs
+#define __CRT_HAVE_KOS$ulabs
 #define __CRT_HAVE_KOS$ulimit
+#define __CRT_HAVE_KOS$ullabs
 #define __CRT_HAVE_KOS$ulltostr
 #define __CRT_HAVE_KOS$ultoa
 #define __CRT_HAVE_KOS$umask
@@ -16174,6 +16182,7 @@
 #define __CRT_HAVE_DOS$ttyname_r
 #define __CRT_HAVE_DOS$twalk
 #define __CRT_HAVE_DOS$twalk_r
+#define __CRT_HAVE_DOS$uabs
 #define __CRT_HAVE_DOS$ualarm
 #define __CRT_HAVE_DOS$ufromfp
 #define __CRT_HAVE_DOS$ufromfpf
@@ -16182,7 +16191,10 @@
 #define __CRT_HAVE_DOS$ufromfpxf
 #define __CRT_HAVE_DOS$ufromfpxl
 #define __CRT_HAVE_DOS$uid_from_user
+#define __CRT_HAVE_DOS$uimaxabs
+#define __CRT_HAVE_DOS$ulabs
 #define __CRT_HAVE_DOS$ulimit
+#define __CRT_HAVE_DOS$ullabs
 #define __CRT_HAVE_DOS$ulltostr
 #define __CRT_HAVE_DOS$ultoa
 #define __CRT_HAVE_DOS$umask

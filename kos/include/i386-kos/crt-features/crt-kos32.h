@@ -6740,6 +6740,7 @@
 #define __CRT_HAVE_twalk_r
 #define __CRT_HAVE_tzname
 #define __CRT_HAVE_tzset
+#define __CRT_HAVE_uabs
 #define __CRT_HAVE_ualarm
 #define __CRT_HAVE_ufromfp
 #define __CRT_HAVE_ufromfpf
@@ -6748,8 +6749,11 @@
 #define __CRT_HAVE_ufromfpxf
 #define __CRT_HAVE_ufromfpxl
 #define __CRT_HAVE_uid_from_user
+#define __CRT_HAVE_uimaxabs
+#define __CRT_HAVE_ulabs
 #define __CRT_HAVE_ulckpwdf
 #define __CRT_HAVE_ulimit
+#define __CRT_HAVE_ullabs
 #define __CRT_HAVE_ulltostr
 #define __CRT_HAVE_ultoa
 #define __CRT_HAVE_umask

@@ -342,6 +342,13 @@
 #define _DEFAULT_SOURCE 1
 #endif /* (_BSD_SOURCE || _SVID_SOURCE) && !_DEFAULT_SOURCE */
 
+/* Map "_ISOC2X_SOURCE" to "_ISOC23_SOURCE" */
+#ifdef _ISOC2X_SOURCE
+#undef _ISOC2X_SOURCE
+#undef _ISOC23_SOURCE
+#define _ISOC23_SOURCE 1
+#endif /* _ISOC2X_SOURCE */
+
 #ifdef _GNU_SOURCE
 #undef _ISOC95_SOURCE
 #define _ISOC95_SOURCE 1
@@ -349,6 +356,10 @@
 #define _ISOC99_SOURCE 1
 #undef _ISOC11_SOURCE
 #define _ISOC11_SOURCE 1
+#undef _ISOC23_SOURCE
+#define _ISOC23_SOURCE 1
+#undef _ISOC2Y_SOURCE
+#define _ISOC2Y_SOURCE 1
 #undef _POSIX_SOURCE
 #define _POSIX_SOURCE 1
 #if !defined(_POSIX_C_SOURCE) || (_POSIX_C_SOURCE + 0 < 200809L)
@@ -367,19 +378,31 @@
 #define _DEFAULT_SOURCE 1
 #undef _ATFILE_SOURCE
 #define _ATFILE_SOURCE 1
+#undef _DYNAMIC_STACK_SIZE_SOURCE
+#define _DYNAMIC_STACK_SIZE_SOURCE 1 /* XXX: What is this about? */
 #endif /* _GNU_SOURCE */
 
-#if (!defined(_DEFAULT_SOURCE) && !defined(__USE_ISOC_PURE) && \
-     (!defined(__STRICT_ANSI__) && !defined(_ISOC99_SOURCE) && \
-      !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)))
+#if (!defined(_DEFAULT_SOURCE) && !defined(__USE_ISOC_PURE) &&                             \
+     (!defined(__STRICT_ANSI__) && !defined(_ISOC99_SOURCE) && !defined(_ISOC11_SOURCE) && \
+      !defined(_ISOC23_SOURCE) && !defined(_ISOC2Y_SOURCE) && !defined(_POSIX_SOURCE) &&   \
+      !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)))
 #define _DEFAULT_SOURCE 1
 #endif /* ... */
 
-#if (defined(_ISOC23_SOURCE) /* || \
+#if (defined(_ISOC2Y_SOURCE) /* || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= TBA)*/)
+#define __GLIBC_USE_ISOC2Y 1 /* API alias (don't use in headers!) */
+#define __USE_ISOC2Y 1
+#endif /* _ISOC2Y_SOURCE || __STDC_VERSION__ >= TBA */
+
+#if (defined(_ISOC23_SOURCE) || defined(__USE_ISOC2Y) || \
+     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L))
+#ifndef __ISO_C_VISIBLE
 #define __ISO_C_VISIBLE 2023 /* API alias (don't use in headers!) */
+#endif /* !__ISO_C_VISIBLE */
+#define __GLIBC_USE_ISOC23 1 /* API alias (don't use in headers!) */
 #define __USE_ISOC23 1
-#endif /* _ISOC23_SOURCE || __STDC_VERSION__ >= 201112L */
+#endif /* _ISOC23_SOURCE || __USE_ISOC2Y || __STDC_VERSION__ >= 201112L */
 
 #if (defined(_ISOC17_SOURCE) || defined(__USE_ISOC23) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201710L))
@@ -387,7 +410,7 @@
 #define __ISO_C_VISIBLE 2017 /* API alias (don't use in headers!) */
 #endif /* !__ISO_C_VISIBLE */
 #define __USE_ISOC17 1
-#endif /* _ISOC17_SOURCE || __STDC_VERSION__ >= 201710L */
+#endif /* _ISOC17_SOURCE || __USE_ISOC23 || __STDC_VERSION__ >= 201710L */
 
 #if (defined(_ISOC11_SOURCE) || defined(__USE_ISOC17) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
@@ -750,6 +773,8 @@
 #undef __USE_ISOC99
 #undef __USE_ISOC11
 #undef __USE_ISOC17
+#undef __USE_ISOC23
+#undef __USE_ISOC2Y
 #undef __USE_ISOCXX11
 #undef __USE_ISOCXX14
 #undef __USE_ISOCXX17
@@ -795,6 +820,8 @@
 #define __USE_ISOC99 1
 #define __USE_ISOC11 1
 #define __USE_ISOC17 1
+#define __USE_ISOC23 1
+#define __USE_ISOC2Y 1
 #define __USE_ISOCXX11 1
 #define __USE_ISOCXX14 1
 #define __USE_ISOCXX17 1

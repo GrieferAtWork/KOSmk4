@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5947b8b */
+/* HASH CRC-32:0xd1d07824 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -570,6 +570,7 @@ DEFINE_PUBLIC_ALIAS(DOS$freeifaddrs, libd_freeifaddrs);
 /* inttypes */
 #include <hybrid/typecore.h>
 #if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8
+DEFINE_PUBLIC_ALIAS(DOS$uimaxabs, libd_imaxabs);
 DEFINE_PUBLIC_ALIAS(DOS$imaxabs, libd_imaxabs);
 #endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
 #if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
@@ -2734,11 +2735,15 @@ DEFINE_PUBLIC_ALIAS(DOS$__freadptrinc, libd___freadptrinc);
 /* stdlib */
 #if __SIZEOF_INTMAX_T__ == __SIZEOF_INT__
 DEFINE_PUBLIC_ALIAS(DOS$imaxabs, libd_abs);
+DEFINE_PUBLIC_ALIAS(DOS$uimaxabs, libd_abs);
 #endif /* __SIZEOF_INTMAX_T__ == __SIZEOF_INT__ */
+DEFINE_PUBLIC_ALIAS(DOS$uabs, libd_abs);
 DEFINE_PUBLIC_ALIAS(DOS$abs, libd_abs);
 #if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
 DEFINE_PUBLIC_ALIAS(DOS$imaxabs, libd_labs);
+DEFINE_PUBLIC_ALIAS(DOS$uimaxabs, libd_labs);
 #endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
+DEFINE_PUBLIC_ALIAS(DOS$ulabs, libd_labs);
 DEFINE_PUBLIC_ALIAS(DOS$labs, libd_labs);
 #if __SIZEOF_INTMAX_T__ == __SIZEOF_INT__
 DEFINE_PUBLIC_ALIAS(DOS$imaxdiv, libd_div);
@@ -2750,7 +2755,9 @@ DEFINE_PUBLIC_ALIAS(DOS$imaxdiv, libd_ldiv);
 DEFINE_PUBLIC_ALIAS(DOS$ldiv, libd_ldiv);
 #if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
 DEFINE_PUBLIC_ALIAS(DOS$imaxabs, libd_llabs);
+DEFINE_PUBLIC_ALIAS(DOS$uimaxabs, libd_llabs);
 #endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
+DEFINE_PUBLIC_ALIAS(DOS$ullabs, libd_llabs);
 DEFINE_PUBLIC_ALIAS(DOS$llabs, libd_llabs);
 DEFINE_PUBLIC_ALIAS(DOS$qabs, libd_llabs);
 #if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
