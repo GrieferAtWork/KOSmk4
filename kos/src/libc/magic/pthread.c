@@ -3431,7 +3431,7 @@ int pthread_main_np() {
 $errno_t pthread_attr_setstartsuspended_np([[inout]] pthread_attr_t *__restrict self,
                                            int start_suspended);
 
-@@>> pthread_attr_getpidfdallocated_np(3)
+@@>> pthread_attr_getstartsuspended_np(3)
 @@Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
 @@starting  newly spawned thread  in a suspended  state (requiring the creator
 @@to resume the thread at least once before execution actually starts)

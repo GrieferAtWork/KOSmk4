@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x825f2384 */
+/* HASH CRC-32:0x353e868f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3690,7 +3690,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL 
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `start_suspended' */
 __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setstartsuspended_np,(pthread_attr_t *__restrict __self, int __start_suspended),(__self,__start_suspended))
-/* >> pthread_attr_getpidfdallocated_np(3)
+/* >> pthread_attr_getstartsuspended_np(3)
  * Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
  * starting  newly spawned thread  in a suspended  state (requiring the creator
  * to resume the thread at least once before execution actually starts)

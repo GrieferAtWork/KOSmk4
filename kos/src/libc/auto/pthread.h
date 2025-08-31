@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6a8daab */
+/* HASH CRC-32:0xaced1570 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -978,7 +978,7 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_pthread_main_np)(void);
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `start_suspended' */
 INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setstartsuspended_np)(pthread_attr_t *__restrict self, int start_suspended);
-/* >> pthread_attr_getpidfdallocated_np(3)
+/* >> pthread_attr_getstartsuspended_np(3)
  * Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
  * starting  newly spawned thread  in a suspended  state (requiring the creator
  * to resume the thread at least once before execution actually starts)

@@ -2302,8 +2302,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstartsuspended_np)(pthread_attr_t *__r
 }
 /*[[[end:libc_pthread_attr_setstartsuspended_np]]]*/
 
-/*[[[head:libc_pthread_attr_getstartsuspended_np,hash:CRC-32=0x8e393509]]]*/
-/* >> pthread_attr_getpidfdallocated_np(3)
+/*[[[head:libc_pthread_attr_getstartsuspended_np,hash:CRC-32=0xab69b8d8]]]*/
+/* >> pthread_attr_getstartsuspended_np(3)
  * Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
  * starting  newly spawned thread  in a suspended  state (requiring the creator
  * to resume the thread at least once before execution actually starts)
