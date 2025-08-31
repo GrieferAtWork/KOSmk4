@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbef8e31 */
+/* HASH CRC-32:0x33b9c38a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -826,9 +826,15 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_child))(unsigned int __ex
 		(__NAMESPACE_LOCAL_SYM __localdep_fexecve)((__fd_t)(__UINTPTR_TYPE__)__exec_arg, ___argv, ___envp);
 		break;
 #endif /* __CRT_HAVE_fexecve || (__OS_HAVE_PROCFS_SELF_FD && (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve)) */
-	case 3:
-		(*(void (__LIBCCALL *)(char **, char **))__exec_arg)((char **)___argv, (char **)___envp);
-		break;
+	case 3: {
+		__errno_t __error;
+		__error = (*(__errno_t (__LIBCCALL *)(void *))__exec_arg)((void *)___argv);
+#ifdef __POSIX_SPAWN_NOEXECERR
+		if (__attrp && __attrp->__flags & __POSIX_SPAWN_NOEXECERR)
+			__error = 0; /* Suppress the exec error. */
+#endif /* __POSIX_SPAWN_NOEXECERR */
+		return __error;
+	}	break;
 	default: __builtin_unreachable();
 	}
 

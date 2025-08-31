@@ -178,7 +178,7 @@ typedef struct __posix_spawn_file_actions posix_spawn_file_actions_t;
 %[define(POSIX_SPAWN_TYPE_EXECVE = 0)]  /* execve((char const *)exec_arg, ___argv, ___envp) */
 %[define(POSIX_SPAWN_TYPE_EXECVPE = 1)] /* execvpe((char const *)exec_arg, ___argv, ___envp) */
 %[define(POSIX_SPAWN_TYPE_FEXECVE = 2)] /* fexecve((fd_t)(uintptr_t)exec_arg, ___argv, ___envp) */
-%[define(POSIX_SPAWN_TYPE_CUSTOM = 3)]  /* (*(void (LIBCCALL *)(char **, char **))exec_arg)(___argv, ___envp) */
+%[define(POSIX_SPAWN_TYPE_CUSTOM = 3)]  /* (*(errno_t (LIBCCALL *)(void *))exec_arg)((void *)___argv) */
 
 [[static]]
 [[argument_names(exec_type, exec_arg, file_actions, attrp, ___argv, ___envp)]]
@@ -445,9 +445,15 @@ $errno_t posix_spawn_child(unsigned int exec_type, void *exec_arg,
 		fexecve((fd_t)(uintptr_t)exec_arg, ___argv, ___envp);
 		break;
 @@pp_endif@@
-	case POSIX_SPAWN_TYPE_CUSTOM:
-		(*(void (__LIBCCALL *)(char **, char **))exec_arg)((char **)___argv, (char **)___envp);
-		break;
+	case POSIX_SPAWN_TYPE_CUSTOM: {
+		errno_t error;
+		error = (*(errno_t (__LIBCCALL *)(void *))exec_arg)((void *)___argv);
+@@pp_ifdef __POSIX_SPAWN_NOEXECERR@@
+		if (attrp && attrp->@__flags@ & __POSIX_SPAWN_NOEXECERR)
+			error = 0; /* Suppress the exec error. */
+@@pp_endif@@
+		return error;
+	}	break;
 	default: __builtin_unreachable();
 	}
 
@@ -469,11 +475,10 @@ err_errno:
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
-[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>", "<asm/os/features.h>")]]
+[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) &&
            ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
-            ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
-             $has_function(read) && $has_function(write) && $has_function(close))) &&
+            ($has_function(fork, read, write, close) && ($has_function(pipe2) && defined(O_CLOEXEC)))) &&
            $has_function(posix_spawn_child) && $has_function(waitpid))]]
 $errno_t posix_spawn_impl([[out]] pid_t *__restrict pid, unsigned int exec_type, void *exec_arg,
                           [[in_opt]] posix_spawn_file_actions_t const *file_actions,
@@ -610,9 +615,7 @@ $errno_t crt_posix_spawn([[out]] pid_t *__restrict pid,
 @@@return: * :          Error (errno-code describing the reason of failure)
 [[argument_names(pid, execfd, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
-[[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
-[[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
-[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>", "<asm/os/features.h>")]]
+[[requires_include("<asm/os/features.h>")]]
 [[requires($has_function(posix_spawn_impl, fexecve) ||
            (defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(crt_posix_spawn)))]]
 $errno_t posix_fspawn_np([[out]] pid_t *__restrict pid, [[fdread]] $fd_t execfd,
@@ -633,6 +636,31 @@ $errno_t posix_fspawn_np([[out]] pid_t *__restrict pid, [[fdread]] $fd_t execfd,
 @@pp_endif@@
 	sprintf(buf, "/proc/self/fd/%d", execfd);
 	return crt_posix_spawn(pid, buf, file_actions, attrp, ___argv, ___envp);
+@@pp_endif@@
+}
+
+@@>> posix_xspawn_np(3)
+@@Wholly non-portable spawn function which, rather than doing  `execve(2)',
+@@`fexecve(2)' or `execvpe(2)' within the newly spawned child process, will
+@@instead invoke `(*exec_fn)(exec_arg)'  and (if  non-zero) propagate  that
+@@function's return value as an error then-returned by `posix_xspawn_np(3)'
+@@When `exec_fn' returns `0', the child process will `_Exit(127)'.
+@@
+@@@param: exec_fn:  Exec function for the child process
+@@@param: exec_arg: Cookie argument passed to `exec_fn'
+@@@return: 0 : Success. (The child process's PID has been stored in `*pid')
+@@@return: * : Error (errno-code describing the reason of failure)
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>")]]
+[[requires_function(posix_spawn_impl)]]
+$errno_t posix_xspawn_np([[out]] pid_t *__restrict pid,
+                         [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                         [[in_opt]] posix_spawnattr_t const *attrp,
+                         [[nonnull]] $errno_t (LIBCCALL *exec_fn)(void *),
+                         [[in_opt]] void *exec_arg) {
+@@pp_ifdef __USE_DOS_ALTERATIONS@@
+	return posix_spawn_impl(pid, POSIX_SPAWN_TYPE_CUSTOM, (void *)exec_fn, file_actions, attrp, (char const *const *)exec_arg, NULL);
+@@pp_else@@
+	return posix_spawn_impl(pid, POSIX_SPAWN_TYPE_CUSTOM, (void *)exec_fn, file_actions, attrp, (char *const *)exec_arg, NULL);
 @@pp_endif@@
 }
 
@@ -1380,6 +1408,7 @@ $errno_t pidfd_spawnp([[out]] $fd_t *__restrict pidfd,
 	return pidfd_spawn_impl(pidfd, POSIX_SPAWN_TYPE_EXECVPE, (void *)file, file_actions, attrp, ___argv, ___envp);
 }
 
+%#ifdef __USE_KOS
 
 @@>> pidfd_fspawn_np(3)
 @@Same as `posix_fspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)'
@@ -1393,6 +1422,23 @@ $errno_t pidfd_fspawn_np([[out]] $fd_t *__restrict pidfd, [[fdread]] $fd_t execf
 	return pidfd_spawn_impl(pidfd, POSIX_SPAWN_TYPE_FEXECVE, (void *)(uintptr_t)execfd, file_actions, attrp, ___argv, ___envp);
 }
 
+@@>> pidfd_fspawn_np(3)
+@@Same as `posix_xspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)'
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>")]]
+[[no_local, requires_function(pidfd_spawn_impl)]]
+$errno_t pidfd_xspawn_np([[out]] $fd_t *__restrict pidfd,
+                         [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                         [[in_opt]] posix_spawnattr_t const *attrp,
+                         [[nonnull]] $errno_t (LIBCCALL *exec_fn)(void *),
+                         [[in_opt]] void *exec_arg) {
+@@pp_ifdef __USE_DOS_ALTERATIONS@@
+	return pidfd_spawn_impl(pidfd, POSIX_SPAWN_TYPE_CUSTOM, (void *)exec_fn, file_actions, attrp, (char const *const *)exec_arg, NULL);
+@@pp_else@@
+	return pidfd_spawn_impl(pidfd, POSIX_SPAWN_TYPE_CUSTOM, (void *)exec_fn, file_actions, attrp, (char *const *)exec_arg, NULL);
+@@pp_endif@@
+}
+
+%#endif /* __USE_KOS */
 %#endif /* __USE_MISC */
 
 

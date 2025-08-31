@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77671260 */
+/* HASH CRC-32:0x53e724c2 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2196,6 +2196,7 @@ DFUN(".text.crt.dos.libiberty", libd_sort_pointers, libc_sort_pointers, TV, 3, T
 
 /* spawn */
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_fspawn_np, libc_posix_fspawn_np, TIn(__SIZEOF_ERRNO_T__), 6, TP, TIn(__SIZEOF_FD_T__), TP, TP, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_xspawn_np, libc_posix_xspawn_np, TIn(__SIZEOF_ERRNO_T__), 5, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn, libc_posix_spawn, TIn(__SIZEOF_ERRNO_T__), 6, TP, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnp, libc_posix_spawnp, TIn(__SIZEOF_ERRNO_T__), 6, TP, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_init, libc_posix_spawnattr_init, TIn(__SIZEOF_ERRNO_T__), 1, TP)
@@ -2224,6 +2225,7 @@ DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_addfchdi
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_pidfd_spawn, libc_pidfd_spawn, TIn(__SIZEOF_ERRNO_T__), 6, TP, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_pidfd_spawnp, libc_pidfd_spawnp, TIn(__SIZEOF_ERRNO_T__), 6, TP, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_pidfd_fspawn_np, libc_pidfd_fspawn_np, TIn(__SIZEOF_ERRNO_T__), 6, TP, TIn(__SIZEOF_FD_T__), TP, TP, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_pidfd_xspawn_np, libc_pidfd_xspawn_np, TIn(__SIZEOF_ERRNO_T__), 5, TP, TP, TP, TP, TP)
 
 /* ssp.string */
 DFUN(".text.crt.dos.ssp.string.memory", libd___memcpy_chk, libc___memcpy_chk, TP, 4, TP, TP, TI, TI)

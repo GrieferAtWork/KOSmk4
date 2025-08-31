@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9685d86 */
+/* HASH CRC-32:0x4de62e42 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -302,9 +302,15 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawn_child)(unsigned int exec_type,
 		libc_fexecve((fd_t)(uintptr_t)exec_arg, ___argv, ___envp);
 		break;
 
-	case 3:
-		(*(void (__LIBCCALL *)(char **, char **))exec_arg)((char **)___argv, (char **)___envp);
-		break;
+	case 3: {
+		errno_t error;
+		error = (*(errno_t (__LIBCCALL *)(void *))exec_arg)((void *)___argv);
+
+		if (attrp && attrp->__flags & __POSIX_SPAWN_NOEXECERR)
+			error = 0; /* Suppress the exec error. */
+
+		return error;
+	}	break;
 	default: __builtin_unreachable();
 	}
 
@@ -427,12 +433,6 @@ do_exec:
 	}
 	libc__Exit(127);
 }
-#include <bits/os/sigaction.h>
-#include <libc/errno.h>
-#include <hybrid/typecore.h>
-#include <asm/os/vfork.h>
-#include <asm/os/oflags.h>
-#include <asm/os/signal.h>
 /* >> posix_fspawn_np(3)
  * Implementation for the fastest possible  method of (safely) doing  fork(2)+fexecve(2)
  * in  order  to  spawn  a  new  process  from  the  given  `execfd'  file   descriptor.
@@ -478,6 +478,29 @@ NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
 
 
 
+}
+/* >> posix_xspawn_np(3)
+ * Wholly non-portable spawn function which, rather than doing  `execve(2)',
+ * `fexecve(2)' or `execvpe(2)' within the newly spawned child process, will
+ * instead invoke `(*exec_fn)(exec_arg)'  and (if  non-zero) propagate  that
+ * function's return value as an error then-returned by `posix_xspawn_np(3)'
+ * When `exec_fn' returns `0', the child process will `_Exit(127)'.
+ *
+ * @param: exec_fn:  Exec function for the child process
+ * @param: exec_arg: Cookie argument passed to `exec_fn'
+ * @return: 0 : Success. (The child process's PID has been stored in `*pid')
+ * @return: * : Error (errno-code describing the reason of failure) */
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5) ATTR_OUT(1) NONNULL((4)) errno_t
+NOTHROW_RPC(LIBCCALL libc_posix_xspawn_np)(pid_t *__restrict pid,
+                                           posix_spawn_file_actions_t const *file_actions,
+                                           posix_spawnattr_t const *attrp,
+                                           errno_t (LIBCCALL *exec_fn)(void *),
+                                           void *exec_arg) {
+#ifdef __USE_DOS_ALTERATIONS
+	return libc_posix_spawn_impl(pid, 3, (void *)exec_fn, file_actions, attrp, (char const *const *)exec_arg, NULL);
+#else /* __USE_DOS_ALTERATIONS */
+	return libc_posix_spawn_impl(pid, 3, (void *)exec_fn, file_actions, attrp, (char *const *)exec_arg, NULL);
+#endif /* !__USE_DOS_ALTERATIONS */
 }
 #include <asm/os/oflags.h>
 /* >> posix_spawn(3)
@@ -535,7 +558,7 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
 }
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
-#if ((!defined(__ARCH_HAVE_SHARED_VM_VFORK) || (!defined(__CRT_HAVE_vfork) && !defined(__CRT_HAVE___vfork) && !defined(__CRT_HAVE___libc_vfork))) && ((!defined(__CRT_HAVE_fork) && !defined(__CRT_HAVE___fork) && !defined(__CRT_HAVE___libc_fork)) || (!defined(__CRT_HAVE_pipe2) && !defined(__CRT_HAVE_pipe) && !defined(__CRT_HAVE___pipe) && !defined(__CRT_HAVE___libc_pipe) && !defined(__CRT_HAVE__pipe)) || !defined(__O_CLOEXEC) || (!defined(__CRT_HAVE_read) && !defined(__CRT_HAVE__read) && !defined(__CRT_HAVE___read) && !defined(__CRT_HAVE___libc_read)) || (!defined(__CRT_HAVE_write) && !defined(__CRT_HAVE__write) && !defined(__CRT_HAVE___write) && !defined(__CRT_HAVE___libc_write)) || (!defined(__CRT_HAVE_close) && !defined(__CRT_HAVE__close) && !defined(__CRT_HAVE___close) && !defined(__CRT_HAVE___libc_close)))) || !defined(__POSIX_SPAWN_USE_KOS) || (!defined(__CRT_HAVE_fexecve) && !defined(__CRT_HAVE_execve) && !defined(__CRT_HAVE__execve) && !defined(__CRT_HAVE___execve) && !defined(__CRT_HAVE___libc_execve) && !defined(__CRT_HAVE_execvpe) && !defined(__CRT_HAVE__execvpe)) || (!defined(__CRT_HAVE_waitpid) && !defined(__CRT_HAVE___waitpid)) || (!defined(__CRT_HAVE_execvpe) && !defined(__CRT_HAVE__execvpe) && ((!defined(__CRT_HAVE_getenv) && !defined(__LOCAL_environ)) || (!defined(__CRT_HAVE_execve) && !defined(__CRT_HAVE__execve) && !defined(__CRT_HAVE___execve) && !defined(__CRT_HAVE___libc_execve)) || !defined(__hybrid_alloca)))
+#if ((!defined(__ARCH_HAVE_SHARED_VM_VFORK) || (!defined(__CRT_HAVE_vfork) && !defined(__CRT_HAVE___vfork) && !defined(__CRT_HAVE___libc_vfork))) && ((!defined(__CRT_HAVE_fork) && !defined(__CRT_HAVE___fork) && !defined(__CRT_HAVE___libc_fork)) || (!defined(__CRT_HAVE_read) && !defined(__CRT_HAVE__read) && !defined(__CRT_HAVE___read) && !defined(__CRT_HAVE___libc_read)) || (!defined(__CRT_HAVE_write) && !defined(__CRT_HAVE__write) && !defined(__CRT_HAVE___write) && !defined(__CRT_HAVE___libc_write)) || (!defined(__CRT_HAVE_close) && !defined(__CRT_HAVE__close) && !defined(__CRT_HAVE___close) && !defined(__CRT_HAVE___libc_close)) || (!defined(__CRT_HAVE_pipe2) && !defined(__CRT_HAVE_pipe) && !defined(__CRT_HAVE___pipe) && !defined(__CRT_HAVE___libc_pipe) && !defined(__CRT_HAVE__pipe)) || !defined(__O_CLOEXEC))) || !defined(__POSIX_SPAWN_USE_KOS) || (!defined(__CRT_HAVE_fexecve) && !defined(__CRT_HAVE_execve) && !defined(__CRT_HAVE__execve) && !defined(__CRT_HAVE___execve) && !defined(__CRT_HAVE___libc_execve) && !defined(__CRT_HAVE_execvpe) && !defined(__CRT_HAVE__execvpe)) || (!defined(__CRT_HAVE_waitpid) && !defined(__CRT_HAVE___waitpid)) || (!defined(__CRT_HAVE_execvpe) && !defined(__CRT_HAVE__execvpe) && ((!defined(__CRT_HAVE_getenv) && !defined(__LOCAL_environ)) || (!defined(__CRT_HAVE_execve) && !defined(__CRT_HAVE__execve) && !defined(__CRT_HAVE___execve) && !defined(__CRT_HAVE___libc_execve)) || !defined(__hybrid_alloca)))
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__posix_spawnp_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 2, 4, 8, 9)) errno_t
 (__LIBCCALL __posix_spawnp_impl)(pid_t *__restrict pid,
@@ -562,7 +585,7 @@ __LOCAL_LIBC(__posix_spawnp_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 2, 4, 8, 9)
 	return libc_posix_spawn(pid, fullpath, file_actions, attrp, ___argv, ___envp);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork && !__CRT_HAVE___libc_fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE___libc_pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write && !__CRT_HAVE___libc_write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close && !__CRT_HAVE___libc_close))) || !__POSIX_SPAWN_USE_KOS || (!__CRT_HAVE_fexecve && !__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve && !__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe) || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid) || (!__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) || !__hybrid_alloca)) */
+#endif /* ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork && !__CRT_HAVE___libc_fork) || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write && !__CRT_HAVE___libc_write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close && !__CRT_HAVE___libc_close) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE___libc_pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC)) || !__POSIX_SPAWN_USE_KOS || (!__CRT_HAVE_fexecve && !__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve && !__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe) || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid) || (!__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) || !__hybrid_alloca)) */
 /* >> posix_spawnp(3)
  * Same  as  `posix_spawn(3)',  but  search  `getenv("PATH")'  for  `file',  rather  than
  * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
@@ -1115,12 +1138,27 @@ NOTHROW_RPC(LIBCCALL libc_pidfd_fspawn_np)(fd_t *__restrict pidfd,
                                            __TENVP) {
 	return libc_pidfd_spawn_impl(pidfd, 2, (void *)(uintptr_t)execfd, file_actions, attrp, ___argv, ___envp);
 }
+/* >> pidfd_fspawn_np(3)
+ * Same as `posix_xspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5) ATTR_OUT(1) NONNULL((4)) errno_t
+NOTHROW_RPC(LIBCCALL libc_pidfd_xspawn_np)(fd_t *__restrict pidfd,
+                                           posix_spawn_file_actions_t const *file_actions,
+                                           posix_spawnattr_t const *attrp,
+                                           errno_t (LIBCCALL *exec_fn)(void *),
+                                           void *exec_arg) {
+#ifdef __USE_DOS_ALTERATIONS
+	return libc_pidfd_spawn_impl(pidfd, 3, (void *)exec_fn, file_actions, attrp, (char const *const *)exec_arg, NULL);
+#else /* __USE_DOS_ALTERATIONS */
+	return libc_pidfd_spawn_impl(pidfd, 3, (void *)exec_fn, file_actions, attrp, (char *const *)exec_arg, NULL);
+#endif /* !__USE_DOS_ALTERATIONS */
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS_P(posix_fspawn_np,libc_posix_fspawn_np,ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pid,execfd,file_actions,attrp,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(posix_xspawn_np,libc_posix_xspawn_np,ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5) ATTR_OUT(1) NONNULL((4)),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, errno_t (LIBCCALL *exec_fn)(void *), void *exec_arg),(pid,file_actions,attrp,exec_fn,exec_arg));
 DEFINE_PUBLIC_ALIAS_P(posix_spawn,libc_posix_spawn,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pid,path,file_actions,attrp,___argv,___envp));
 DEFINE_PUBLIC_ALIAS_P(posix_spawnp,libc_posix_spawnp,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, char const *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pid,file,file_actions,attrp,___argv,___envp));
 DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_init,libc_posix_spawnattr_init,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr),(attr));
@@ -1149,6 +1187,7 @@ DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addfchdir_np,libc_posix_spawn_fil
 DEFINE_PUBLIC_ALIAS_P(pidfd_spawn,libc_pidfd_spawn,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t *__restrict pidfd, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pidfd,path,file_actions,attrp,___argv,___envp));
 DEFINE_PUBLIC_ALIAS_P(pidfd_spawnp,libc_pidfd_spawnp,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t *__restrict pidfd, char const *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pidfd,file,file_actions,attrp,___argv,___envp));
 DEFINE_PUBLIC_ALIAS_P(pidfd_fspawn_np,libc_pidfd_fspawn_np,ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t *__restrict pidfd, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pidfd,execfd,file_actions,attrp,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(pidfd_xspawn_np,libc_pidfd_xspawn_np,ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5) ATTR_OUT(1) NONNULL((4)),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t *__restrict pidfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, errno_t (LIBCCALL *exec_fn)(void *), void *exec_arg),(pidfd,file_actions,attrp,exec_fn,exec_arg));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SPAWN_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d2615e */
+/* HASH CRC-32:0xdef8ce33 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,6 +84,34 @@ INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_O
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
 INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> posix_xspawn_np(3)
+ * Wholly non-portable spawn function which, rather than doing  `execve(2)',
+ * `fexecve(2)' or `execvpe(2)' within the newly spawned child process, will
+ * instead invoke `(*exec_fn)(exec_arg)'  and (if  non-zero) propagate  that
+ * function's return value as an error then-returned by `posix_xspawn_np(3)'
+ * When `exec_fn' returns `0', the child process will `_Exit(127)'.
+ *
+ * @param: exec_fn:  Exec function for the child process
+ * @param: exec_arg: Cookie argument passed to `exec_fn'
+ * @return: 0 : Success. (The child process's PID has been stored in `*pid')
+ * @return: * : Error (errno-code describing the reason of failure) */
+INTDEF ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5) ATTR_OUT(1) NONNULL((4)) errno_t NOTHROW_RPC(LIBDCALL libd_posix_xspawn_np)(pid_t *__restrict pid, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, errno_t (LIBDCALL *exec_fn)(void *), void *exec_arg);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> posix_xspawn_np(3)
+ * Wholly non-portable spawn function which, rather than doing  `execve(2)',
+ * `fexecve(2)' or `execvpe(2)' within the newly spawned child process, will
+ * instead invoke `(*exec_fn)(exec_arg)'  and (if  non-zero) propagate  that
+ * function's return value as an error then-returned by `posix_xspawn_np(3)'
+ * When `exec_fn' returns `0', the child process will `_Exit(127)'.
+ *
+ * @param: exec_fn:  Exec function for the child process
+ * @param: exec_arg: Cookie argument passed to `exec_fn'
+ * @return: 0 : Success. (The child process's PID has been stored in `*pid')
+ * @return: * : Error (errno-code describing the reason of failure) */
+INTDEF ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5) ATTR_OUT(1) NONNULL((4)) errno_t NOTHROW_RPC(LIBCCALL libc_posix_xspawn_np)(pid_t *__restrict pid, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, errno_t (LIBCCALL *exec_fn)(void *), void *exec_arg);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn(3)
@@ -538,6 +566,16 @@ INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_O
 /* >> pidfd_fspawn_np(3)
  * Same as `posix_fspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
 INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pidfd_fspawn_np)(fd_t *__restrict pidfd, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> pidfd_fspawn_np(3)
+ * Same as `posix_xspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+INTDEF ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5) ATTR_OUT(1) NONNULL((4)) errno_t NOTHROW_RPC(LIBDCALL libd_pidfd_xspawn_np)(fd_t *__restrict pidfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, errno_t (LIBDCALL *exec_fn)(void *), void *exec_arg);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pidfd_fspawn_np(3)
+ * Same as `posix_xspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+INTDEF ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5) ATTR_OUT(1) NONNULL((4)) errno_t NOTHROW_RPC(LIBCCALL libc_pidfd_xspawn_np)(fd_t *__restrict pidfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, errno_t (LIBCCALL *exec_fn)(void *), void *exec_arg);
 #endif /* !__KERNEL__ */
 
 DECL_END

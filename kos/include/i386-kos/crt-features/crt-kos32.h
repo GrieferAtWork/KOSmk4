@@ -4549,6 +4549,7 @@
 #define __CRT_HAVE_pidfd_fspawn_np
 #define __CRT_HAVE_pidfd_spawn
 #define __CRT_HAVE_pidfd_spawnp
+#define __CRT_HAVE_pidfd_xspawn_np
 #define __CRT_HAVE_pipe
 #define __CRT_HAVE_pipe2
 #define __CRT_HAVE_pkey_alloc
@@ -4597,6 +4598,7 @@
 #define __CRT_HAVE_posix_spawnattr_setsigdefault
 #define __CRT_HAVE_posix_spawnattr_setsigmask
 #define __CRT_HAVE_posix_spawnp
+#define __CRT_HAVE_posix_xspawn_np
 #define __CRT_HAVE_pow
 #define __CRT_HAVE_pow10
 #define __CRT_HAVE_pow10f

@@ -4232,6 +4232,7 @@
 #define __CRT_HAVE_pidfd_fspawn_np
 #define __CRT_HAVE_pidfd_spawn
 #define __CRT_HAVE_pidfd_spawnp
+#define __CRT_HAVE_pidfd_xspawn_np
 #define __CRT_HAVE_pipe
 #define __CRT_HAVE_pipe2
 #define __CRT_HAVE_pkey_alloc
@@ -4280,6 +4281,7 @@
 #define __CRT_HAVE_posix_spawnattr_setsigdefault
 #define __CRT_HAVE_posix_spawnattr_setsigmask
 #define __CRT_HAVE_posix_spawnp
+#define __CRT_HAVE_posix_xspawn_np
 #define __CRT_HAVE_pow
 #define __CRT_HAVE_pow10
 #define __CRT_HAVE_pow10f
@@ -10221,6 +10223,7 @@
 #define __CRT_HAVE_KOS$pidfd_fspawn_np
 #define __CRT_HAVE_KOS$pidfd_spawn
 #define __CRT_HAVE_KOS$pidfd_spawnp
+#define __CRT_HAVE_KOS$pidfd_xspawn_np
 #define __CRT_HAVE_KOS$pipe
 #define __CRT_HAVE_KOS$pipe2
 #define __CRT_HAVE_KOS$pkey_alloc
@@ -10269,6 +10272,7 @@
 #define __CRT_HAVE_KOS$posix_spawnattr_setsigdefault
 #define __CRT_HAVE_KOS$posix_spawnattr_setsigmask
 #define __CRT_HAVE_KOS$posix_spawnp
+#define __CRT_HAVE_KOS$posix_xspawn_np
 #define __CRT_HAVE_KOS$pow
 #define __CRT_HAVE_KOS$pow10
 #define __CRT_HAVE_KOS$pow10f
@@ -15181,6 +15185,7 @@
 #define __CRT_HAVE_DOS$pidfd_fspawn_np
 #define __CRT_HAVE_DOS$pidfd_spawn
 #define __CRT_HAVE_DOS$pidfd_spawnp
+#define __CRT_HAVE_DOS$pidfd_xspawn_np
 #define __CRT_HAVE_DOS$pipe
 #define __CRT_HAVE_DOS$pipe2
 #define __CRT_HAVE_DOS$pkey_alloc
@@ -15229,6 +15234,7 @@
 #define __CRT_HAVE_DOS$posix_spawnattr_setsigdefault
 #define __CRT_HAVE_DOS$posix_spawnattr_setsigmask
 #define __CRT_HAVE_DOS$posix_spawnp
+#define __CRT_HAVE_DOS$posix_xspawn_np
 #define __CRT_HAVE_DOS$pow
 #define __CRT_HAVE_DOS$pow10
 #define __CRT_HAVE_DOS$pow10f

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x736e4348 */
+/* HASH CRC-32:0xc248b080 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2705,6 +2705,7 @@
 #define __CRT_HAVE_DOS$pidfd_fspawn_np
 #define __CRT_HAVE_DOS$pidfd_spawn
 #define __CRT_HAVE_DOS$pidfd_spawnp
+#define __CRT_HAVE_DOS$pidfd_xspawn_np
 #define __CRT_HAVE_DOS$pipe
 #define __CRT_HAVE_DOS$pipe2
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -2758,6 +2759,7 @@
 #define __CRT_HAVE_DOS$posix_spawnattr_setsigdefault
 #define __CRT_HAVE_DOS$posix_spawnattr_setsigmask
 #define __CRT_HAVE_DOS$posix_spawnp
+#define __CRT_HAVE_DOS$posix_xspawn_np
 #define __CRT_HAVE_DOS$pow
 #define __CRT_HAVE_DOS$pow10
 #define __CRT_HAVE_DOS$pow10f
@@ -7302,6 +7304,7 @@
 #define __CRT_HAVE_pidfd_spawn
 #define __CRT_HAVE_pidfd_spawn_impl
 #define __CRT_HAVE_pidfd_spawnp
+#define __CRT_HAVE_pidfd_xspawn_np
 #define __CRT_HAVE_pipe
 #define __CRT_HAVE_pipe2
 #endif /* !__KERNEL__ */
@@ -7357,6 +7360,7 @@
 #define __CRT_HAVE_posix_spawnattr_setsigdefault
 #define __CRT_HAVE_posix_spawnattr_setsigmask
 #define __CRT_HAVE_posix_spawnp
+#define __CRT_HAVE_posix_xspawn_np
 #define __CRT_HAVE_pow
 #define __CRT_HAVE_pow10
 #define __CRT_HAVE_pow10f
