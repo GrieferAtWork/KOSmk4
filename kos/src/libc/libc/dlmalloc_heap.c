@@ -1,3 +1,8 @@
+/*[[[magic
+// dlmalloc() has been heavily tested. - no need to turn on stack-smash protection!
+local opt = options.setdefault("GCC.options", []);
+opt.removeif(e -> e.startswith("-fstack-protector"));
+]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
