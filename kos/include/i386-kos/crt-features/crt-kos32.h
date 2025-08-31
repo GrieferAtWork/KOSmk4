@@ -500,6 +500,7 @@
 #define __CRT_HAVE___clone
 #define __CRT_HAVE___close
 #define __CRT_HAVE___close_nocancel
+#define __CRT_HAVE___close_nocancel_nostatus
 #define __CRT_HAVE___closedir
 #define __CRT_HAVE___cmsg_nxthdr
 #define __CRT_HAVE___cnd_timedwait64

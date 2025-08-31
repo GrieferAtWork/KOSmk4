@@ -28,6 +28,20 @@
 
 #include <syscall.h>
 
+
+/* >> void __close_nocancel_nostatus(fd_t fd);
+ *
+ * `__close_nocancel_nostatus' is an alias for `close(2)' that
+ * `__close_nocancel_nostatus' is an alias for `close(2)' that
+ * never updates `errno', and also isn't a cancellation point.
+ *
+ * Since KOS's `sys_close(2)' isn't marked as `[cp]', and since
+ * the raw `sys_foo' syscall wrappers don't do errno  handling,
+ * we can  simply alias  `__close_nocancel_nostatus=sys_close',
+ * as the two  are literally the  same thing (differing  return
+ * types can also just be ignored here) */
+DEFINE_PUBLIC_ALIAS(__close_nocancel_nostatus, libc_sys_close);
+
 #define DEFINE_XSYSCALL_EXPORT(name, sys_Xname)        \
 	DEFINE_INTERN_ALIAS(libc_##name, libc_##sys_Xname) \
 	DEFINE_PUBLIC_ALIAS(name, libc_##sys_Xname)

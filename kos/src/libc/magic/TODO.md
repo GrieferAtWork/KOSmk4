@@ -129,7 +129,9 @@
 	- <stdlib.h>
 		- #ifdef __USE_BSD: `char *fdevname($fd_t fd);` (partner to "devname")
 		- #ifdef __USE_BSD: `char *fdevname_r($fd_t fd, char *buf, __STDC_INT_AS_SIZE_T bufsize);` (partner to "devname_r")
-
+	- <spawn.h>
+		- #ifdef __USE_MISC: `posix_spawnattr_getcgroup_np`
+		- #ifdef __USE_MISC: `posix_spawnattr_setcgroup_np`
 
 
 
