@@ -8064,7 +8064,7 @@ $size_t strnlen_s([[in_opt(strnlen(., maxlen))]] char const *str, $size_t maxlen
 [[section(".text.crt.dos.string.memory")]]
 [[impl_include("<hybrid/typecore.h>", "<libc/errno.h>", "<libc/string.h>")]]
 /*dos*/ $errno_t strncat_s([[inout_opt]] char *dst, rsize_t dstsize,
-                           [[in_opt]] const char *src, rsize_t maxlen) {
+                           [[in_opt]] char const *src, rsize_t maxlen) {
 	char *iter;
 	size_t remaining;
 	if (!maxlen && !dst && !dstsize)
@@ -8903,7 +8903,7 @@ int timingsafe_memcmp([[in(n_bytes)]] void const *s1,
 [[decl_include("<bits/types.h>")]]
 [[requires_function(signalnumber, isupper)]]
 [[impl_include("<hybrid/typecore.h>", "<asm/os/signal.h>")]]
-$signo_t strtosigno([[in]] const char *name) {
+$signo_t strtosigno([[in]] char const *name) {
 	size_t i;
 	if (name[0] != 'S' || name[1] != 'I' || name[2] != 'G')
 		return 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62511dba */
+/* HASH CRC-32:0x9824ba45 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __CSDECLARE(,unsigned int,error_message_count)
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 0) void
 NOTHROW_CB_NCX(LIBCCALL libc_verror)(int status,
                                      errno_t errnum,
-                                     const char *format,
+                                     char const *format,
                                      va_list args) {
 
 	if (__LOCAL_error_print_progname) {
@@ -191,7 +191,7 @@ NOTHROW_CB_NCX(LIBCCALL libc_verror_at_line)(int status,
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(3, 4) void
 NOTHROW_CB_NCX(VLIBDCALL libd_error)(int status,
                                      errno_t errnum,
-                                     const char *format,
+                                     char const *format,
                                      ...) {
 	va_list args;
 	va_start(args, format);
@@ -208,7 +208,7 @@ NOTHROW_CB_NCX(VLIBDCALL libd_error)(int status,
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 4) void
 NOTHROW_CB_NCX(VLIBCCALL libc_error)(int status,
                                      errno_t errnum,
-                                     const char *format,
+                                     char const *format,
                                      ...) {
 	va_list args;
 	va_start(args, format);
@@ -258,12 +258,12 @@ NOTHROW_CB_NCX(VLIBCCALL libc_error_at_line)(int status,
 DECL_END
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS_P_VOID(DOS$__error,libd_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBDCALL,(int status, errno_t errnum, const char *format, ...),(status,errnum,format,));
-DEFINE_PUBLIC_ALIAS_P_VOID(DOS$error,libd_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBDCALL,(int status, errno_t errnum, const char *format, ...),(status,errnum,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$__error,libd_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBDCALL,(int status, errno_t errnum, char const *format, ...),(status,errnum,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$error,libd_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBDCALL,(int status, errno_t errnum, char const *format, ...),(status,errnum,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS_P_VOID(__error,libc_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBCCALL,(int status, errno_t errnum, const char *format, ...),(status,errnum,format,));
-DEFINE_PUBLIC_ALIAS_P_VOID(error,libc_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBCCALL,(int status, errno_t errnum, const char *format, ...),(status,errnum,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(__error,libc_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBCCALL,(int status, errno_t errnum, char const *format, ...),(status,errnum,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(error,libc_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBCCALL,(int status, errno_t errnum, char const *format, ...),(status,errnum,format,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS_P_VOID(DOS$__error_at_line,libd_error_at_line,ATTR_LIBC_PRINTF(5, 6),NOTHROW_CB_NCX,VLIBDCALL,(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, ...),(status,errnum,filename,line,format,));

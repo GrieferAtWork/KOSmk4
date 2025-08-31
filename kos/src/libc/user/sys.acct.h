@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45ae1851 */
+/* HASH CRC-32:0x5df944fa */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Switch process accounting on and off */
-INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBCCALL libc_acct)(const char *filename);
+INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBCCALL libc_acct)(char const *filename);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3001b19f */
+/* HASH CRC-32:0xd0355b94 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_signalnumber_defined
 #define __local___localdep_signalnumber_defined
 #ifdef __CRT_HAVE_signalnumber
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__signo_t,__NOTHROW_NCX,__localdep_signalnumber,(const char *__name),signalnumber,(__name))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__signo_t,__NOTHROW_NCX,__localdep_signalnumber,(char const *__name),signalnumber,(__name))
 #else /* __CRT_HAVE_signalnumber */
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/signalnumber.h>
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_signalnumber */
 #endif /* !__local___localdep_signalnumber_defined */
 __LOCAL_LIBC(str2sig) __ATTR_IN(1) __ATTR_OUT(2) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(str2sig))(const char *__name, __signo_t *__p_signo) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(str2sig))(char const *__name, __signo_t *__p_signo) {
 	__signo_t __result;
 	__SIZE_TYPE__ __i;
 	if (__name[0] == 'S' && __name[1] == 'I' && __name[2] == 'G')

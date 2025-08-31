@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec37381c */
+/* HASH CRC-32:0x4b08545d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob);
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
-INTDEF ATTR_IN(1) ATTR_OUT(4) int NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern, __STDC_INT_AS_UINT_T flags, int (LIBKCALL *errfunc)(char const *path, int flags), struct __glob64_struct *__restrict pglob);
+INTDEF ATTR_IN(1) ATTR_OUT(4) int NOTHROW_NCX(LIBCCALL libc_glob64)(char const *__restrict pattern, __STDC_INT_AS_UINT_T flags, int (LIBKCALL *errfunc)(char const *path, int flags), struct __glob64_struct *__restrict pglob);
 /* >> globfree(3), globfree64(3) */
 INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob);
 #endif /* !__KERNEL__ */

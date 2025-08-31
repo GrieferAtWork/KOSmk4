@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd92d7d64 */
+/* HASH CRC-32:0x1e398905 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -880,7 +880,7 @@ NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(char const *prefix,
                                                       char const *suffix) {
 	fd_t tempfd;
 	char *result, *p;
-	const char *tmpdir = libc_choose_tmpdir();
+	char const *tmpdir = libc_choose_tmpdir();
 	size_t tmpdir_len, prefix_len, suffix_len;
 	if (prefix == NULL)
 		prefix = "cc";

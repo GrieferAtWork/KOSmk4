@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe21ccef */
+/* HASH CRC-32:0xdca670a4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_RPC,__localdep_flock,(__fd_t __fd, __S
 #ifndef __local___localdep_flopenat_defined
 #define __local___localdep_flopenat_defined
 #ifdef __CRT_HAVE_flopenat
-__CVREDIRECT(,__fd_t,__NOTHROW_RPC,__localdep_flopenat,(__fd_t __dirfd, const char *__path, __oflag_t __flags),flopenat,(__dirfd,__path,__flags),__flags,1,(__mode_t))
+__CVREDIRECT(,__fd_t,__NOTHROW_RPC,__localdep_flopenat,(__fd_t __dirfd, char const *__path, __oflag_t __flags),flopenat,(__dirfd,__path,__flags),__flags,1,(__mode_t))
 #elif defined(__LOCK_EX) && (defined(__LOCK_NB) || !defined(__O_NONBLOCK)) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_flock) || defined(__CRT_HAVE___flock)) && ((defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)) || defined(__CRT_HAVE_fstat) || defined(__CRT_HAVE_fstat64) || defined(__CRT_HAVE___fstat64_time64) || defined(__CRT_HAVE__fstat) || defined(__CRT_HAVE__fstat32) || defined(__CRT_HAVE__fstati64) || defined(__CRT_HAVE__fstat32i64) || defined(__CRT_HAVE__fstat64) || defined(__CRT_HAVE__fstat64i32)) && ((defined(__CRT_HAVE_kfstatat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kfstatat64) && defined(__CRT_KOS_PRIMARY)) || defined(__CRT_HAVE_fstatat) || defined(__CRT_HAVE_fstatat64) || defined(__CRT_HAVE___fstatat64_time64)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize) || !defined(__O_TRUNC))
 __NAMESPACE_LOCAL_END
 #include <libc/local/bsd.libutil/flopenat.h>
@@ -260,7 +260,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(flopen) __fd_t
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(flopen))(const char *__path, __oflag_t __flags, ...) {
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(flopen))(char const *__path, __oflag_t __flags, ...) {
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_flopenat) || (defined(__LOCK_EX) && (defined(__LOCK_NB) || !defined(__O_NONBLOCK)) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_flock) || defined(__CRT_HAVE___flock)) && ((defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)) || defined(__CRT_HAVE_fstat) || defined(__CRT_HAVE_fstat64) || defined(__CRT_HAVE___fstat64_time64) || defined(__CRT_HAVE__fstat) || defined(__CRT_HAVE__fstat32) || defined(__CRT_HAVE__fstati64) || defined(__CRT_HAVE__fstat32i64) || defined(__CRT_HAVE__fstat64) || defined(__CRT_HAVE__fstat64i32)) && ((defined(__CRT_HAVE_kfstatat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kfstatat64) && defined(__CRT_KOS_PRIMARY)) || defined(__CRT_HAVE_fstatat) || defined(__CRT_HAVE_fstatat64) || defined(__CRT_HAVE___fstatat64_time64)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize) || !defined(__O_TRUNC))))
 	__mode_t __mode;
 	__builtin_va_list __args;

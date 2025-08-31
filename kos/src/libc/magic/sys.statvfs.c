@@ -122,7 +122,7 @@ int fstatvfs([[fdarg]] $fd_t filedes, [[out]] struct statvfs *buf);
 %#ifndef statvfs64
 [[decl_include("<bits/os/statvfs.h>")]]
 [[preferred_off64_variant_of(statvfs), doc_alias("statvfs")]]
-int statvfs64([[in]] const char *file, [[out]] struct statvfs64 *buf);
+int statvfs64([[in]] char const *file, [[out]] struct statvfs64 *buf);
 %#endif /* !statvfs64 */
 
 [[decl_include("<bits/os/statvfs.h>")]]

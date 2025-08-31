@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x202a7774 */
+/* HASH CRC-32:0x8590bca7 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_sem_close)(sem_t *self);
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `name' contains no characters after the initial `/'
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_IN(1) int NOTHROW_RPC_KOS(LIBDCALL libd_sem_unlink)(const char *name);
+INTDEF ATTR_IN(1) int NOTHROW_RPC_KOS(LIBDCALL libd_sem_unlink)(char const *name);
 /* >> sem_wait(3)
  * Wait for a ticket to become  available to the given semaphore  `self'
  * Once a ticket has become available, consume it and return. Until that

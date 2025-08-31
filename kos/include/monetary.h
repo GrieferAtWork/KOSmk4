@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3b72d2a */
+/* HASH CRC-32:0x5c16a28b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,9 +73,9 @@ __LIBC __ATTR_IN(3) __ATTR_LIBC_STRFMON(3, 4) __ATTR_OUTS(1, 2) ssize_t __NOTHRO
 #endif /* __CRT_HAVE_strfmon */
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_strfmon_l
-__LIBC __ATTR_IN(4) __ATTR_LIBC_STRFMON(4, 5) __ATTR_OUTS(1, 2) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, const char *__restrict __format, ...) __CASMNAME_SAME("strfmon_l");
+__LIBC __ATTR_IN(4) __ATTR_LIBC_STRFMON(4, 5) __ATTR_OUTS(1, 2) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, char const *__restrict __format, ...) __CASMNAME_SAME("strfmon_l");
 #elif defined(__CRT_HAVE___strfmon_l)
-__LIBC __ATTR_IN(4) __ATTR_LIBC_STRFMON(4, 5) __ATTR_OUTS(1, 2) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, const char *__restrict __format, ...) __CASMNAME("__strfmon_l");
+__LIBC __ATTR_IN(4) __ATTR_LIBC_STRFMON(4, 5) __ATTR_OUTS(1, 2) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, char const *__restrict __format, ...) __CASMNAME("__strfmon_l");
 #endif /* ... */
 #endif /* __USE_XOPEN2K8 */
 

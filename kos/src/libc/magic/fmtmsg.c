@@ -137,7 +137,7 @@ __SYSDECL_BEGIN
 @@@return: MM_NOMSG: Failed to print message to `stderr(3)'
 [[decl_include("<features.h>")]]
 int fmtmsg(long classification,
-           [[nullable]] const char *label,
+           [[nullable]] char const *label,
            __STDC_INT_AS_UINT_T severity,
            [[nullable]] char const *text,
            [[nullable]] char const *action,
@@ -169,7 +169,7 @@ int fmtmsg(long classification,
 @@@return: MM_NOTOK: Out of memory (errno was set to `ENOMEM')
 @@@return: MM_NOTOK: No such `severity' and `s == NULL' (errno was not modified)
 [[decl_include("<features.h>")]]
-int addseverity(__STDC_INT_AS_UINT_T severity, [[nullable]] const char *s);
+int addseverity(__STDC_INT_AS_UINT_T severity, [[nullable]] char const *s);
 %#endif /* __USE_MISC */
 
 

@@ -118,7 +118,7 @@ int __spin_lock_locked([[in]] __spin_lock_t __KOS_FIXED_CONST *lock) {
 struct mutex {
 	__spin_lock_t __held;   /* The actually used lock */
 	__spin_lock_t __lock;   /* unused */
-	const char   *__name;   /* unused */
+	char const   *__name;   /* unused */
 	void         *__head;   /* unused */
 	void         *__tail;   /* unused */
 	void         *__holder; /* unused */

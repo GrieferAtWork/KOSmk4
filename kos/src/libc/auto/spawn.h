@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1745f2e7 */
+/* HASH CRC-32:0x5d2615e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,10 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+INTDEF ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawn_child)(unsigned int exec_type, void *exec_arg, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(6) ATTR_IN(7) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawn_impl)(pid_t *__restrict pid, unsigned int exec_type, void *exec_arg, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_fspawn_np(3)
  * Implementation for the fastest possible  method of (safely) doing  fork(2)+fexecve(2)
@@ -80,8 +84,6 @@ INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_O
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
 INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
-INTDEF ATTR_IN(6) ATTR_IN(7) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawn_impl)(pid_t *__restrict pid, unsigned int exec_type, void *exec_arg, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
-INTDEF ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawn_child)(unsigned int exec_type, void *exec_arg, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn(3)
@@ -141,7 +143,7 @@ INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1
  * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
  * Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
  * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
-INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_posix_spawnp)(pid_t *__restrict pid, const char *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_posix_spawnp)(pid_t *__restrict pid, char const *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnp(3)
@@ -149,7 +151,7 @@ INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1
  * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
  * Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
  * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
-INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid, const char *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid, char const *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_init(3)
@@ -460,14 +462,14 @@ INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_
  * Enqueue a call `chdir(path)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, const char *__restrict path);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, char const *__restrict path);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addchdir_np(3)
  * Enqueue a call `chdir(path)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, const char *__restrict path);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, char const *__restrict path);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addfchdir_np(3)
@@ -482,6 +484,60 @@ INTDEF ATTR_FDARG(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 INTDEF ATTR_FDARG(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> pidfd_spawn(3)
+ * Same as `posix_spawn(3)', except that the linux/kos-specific "PIDfd" mechanism is
+ * used  to return a reference to the child process in the form of a file descriptor
+ * stored in `*pidfd'.
+ * @param: pidfd:        Store the PIDfd of the newly spawned child process here
+ * @param: path:         The pathname of the program that should be executed
+ * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+ *                              handle operations. Can be used to (e.g.) re-direct  stdout
+ *                              for the new process
+ * @param: attrp:        [0..1] Additional process attributes to set for the child process
+ * @param: argv:         Same as the `argv' accepted by `execve(2)'
+ * @param: envp:         Same as the `envp' accepted by `execve(2)'
+ * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
+ * @return: * :          Error (errno-code describing the reason of failure) */
+INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_pidfd_spawn)(fd_t *__restrict pidfd, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pidfd_spawn(3)
+ * Same as `posix_spawn(3)', except that the linux/kos-specific "PIDfd" mechanism is
+ * used  to return a reference to the child process in the form of a file descriptor
+ * stored in `*pidfd'.
+ * @param: pidfd:        Store the PIDfd of the newly spawned child process here
+ * @param: path:         The pathname of the program that should be executed
+ * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+ *                              handle operations. Can be used to (e.g.) re-direct  stdout
+ *                              for the new process
+ * @param: attrp:        [0..1] Additional process attributes to set for the child process
+ * @param: argv:         Same as the `argv' accepted by `execve(2)'
+ * @param: envp:         Same as the `envp' accepted by `execve(2)'
+ * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
+ * @return: * :          Error (errno-code describing the reason of failure) */
+INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pidfd_spawn)(fd_t *__restrict pidfd, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> pidfd_spawnp(3)
+ * Same as `posix_spawnp(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_pidfd_spawnp)(fd_t *__restrict pidfd, char const *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pidfd_spawnp(3)
+ * Same as `posix_spawnp(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pidfd_spawnp)(fd_t *__restrict pidfd, char const *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> pidfd_fspawn_np(3)
+ * Same as `posix_fspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_pidfd_fspawn_np)(fd_t *__restrict pidfd, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pidfd_fspawn_np(3)
+ * Same as `posix_fspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pidfd_fspawn_np)(fd_t *__restrict pidfd, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 
 DECL_END

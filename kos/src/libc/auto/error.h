@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cabc100 */
+/* HASH CRC-32:0x7c113388 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 0) void NOTHROW_CB_NCX(LIBCCALL libc_verror)(int status, errno_t errnum, const char *format, va_list args);
+INTDEF ATTR_LIBC_PRINTF(3, 0) void NOTHROW_CB_NCX(LIBCCALL libc_verror)(int status, errno_t errnum, char const *format, va_list args);
 INTDEF ATTR_LIBC_PRINTF(5, 0) void NOTHROW_CB_NCX(LIBCCALL libc_verror_at_line)(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -39,7 +39,7 @@ INTDEF ATTR_LIBC_PRINTF(5, 0) void NOTHROW_CB_NCX(LIBCCALL libc_verror_at_line)(
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `status' is non-zero, follow up with a call to `exit(status)' */
-INTDEF ATTR_LIBC_PRINTF(3, 4) void NOTHROW_CB_NCX(VLIBDCALL libd_error)(int status, errno_t errnum, const char *format, ...);
+INTDEF ATTR_LIBC_PRINTF(3, 4) void NOTHROW_CB_NCX(VLIBDCALL libd_error)(int status, errno_t errnum, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> error(3)
@@ -47,7 +47,7 @@ INTDEF ATTR_LIBC_PRINTF(3, 4) void NOTHROW_CB_NCX(VLIBDCALL libd_error)(int stat
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `status' is non-zero, follow up with a call to `exit(status)' */
-INTDEF ATTR_LIBC_PRINTF(3, 4) void NOTHROW_CB_NCX(VLIBCCALL libc_error)(int status, errno_t errnum, const char *format, ...);
+INTDEF ATTR_LIBC_PRINTF(3, 4) void NOTHROW_CB_NCX(VLIBCCALL libc_error)(int status, errno_t errnum, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> error_at_line(3)

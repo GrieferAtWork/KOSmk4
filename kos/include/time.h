@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b049906 */
+/* HASH CRC-32:0xedf741c6 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1895,7 +1895,7 @@ __CSDECLARE(,int,getdate_err)
  * representing the value. The templates from the file identified by
  * the environment variable `$DATEMSK' are used. In case of an error
  * `getdate_err' is set */
-__CDECLARE(__ATTR_IN(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,getdate,(const char *__string),(__string))
+__CDECLARE(__ATTR_IN(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,getdate,(char const *__string),(__string))
 #else /* __CRT_HAVE_getdate */
 #include <libc/template/getdate_err.h>
 #ifdef __LOCAL_getdate_err
@@ -1905,7 +1905,7 @@ __CDECLARE(__ATTR_IN(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,getdate,(c
  * representing the value. The templates from the file identified by
  * the environment variable `$DATEMSK' are used. In case of an error
  * `getdate_err' is set */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getdate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) struct __NAMESPACE_STD_SYM tm *__NOTHROW_NCX(__LIBCCALL getdate)(const char *__string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdate))(__string); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getdate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) struct __NAMESPACE_STD_SYM tm *__NOTHROW_NCX(__LIBCCALL getdate)(char const *__string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdate))(__string); })
 #endif /* __LOCAL_getdate_err */
 #endif /* !__CRT_HAVE_getdate */
 #endif /* __USE_XOPEN_EXTENDED */

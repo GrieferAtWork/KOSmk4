@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57806a66 */
+/* HASH CRC-32:0xfcfb9154 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -285,7 +285,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(globfree, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(4),int,__NOTHROW_NCX,glob64,(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob),glob,(__pattern,__flags,__errfunc,__pglob))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(4),int,__NOTHROW_NCX,glob64,(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob),glob,(__pattern,__flags,__errfunc,__pglob))
 #elif defined(__CRT_HAVE_glob64)
 /* >> glob(3), glob64(3)
  * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
@@ -296,7 +296,7 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(4),int,__NOTHROW_NCX,glob64,(const char *__r
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
-__CDECLARE(__ATTR_IN(1) __ATTR_OUT(4),int,__NOTHROW_NCX,glob64,(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob),(__pattern,__flags,__errfunc,__pglob))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(4),int,__NOTHROW_NCX,glob64,(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob),(__pattern,__flags,__errfunc,__pglob))
 #else /* ... */
 #include <libc/local/glob/glob64.h>
 /* >> glob(3), glob64(3)
@@ -308,7 +308,7 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT(4),int,__NOTHROW_NCX,glob64,(const char *__re
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
-__NAMESPACE_LOCAL_USING_OR_IMPL(glob64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(4) int __NOTHROW_NCX(__LIBCCALL glob64)(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob64))(__pattern, __flags, __errfunc, __pglob); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(glob64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(4) int __NOTHROW_NCX(__LIBCCALL glob64)(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob64))(__pattern, __flags, __errfunc, __pglob); })
 #endif /* !... */
 #if defined(__CRT_HAVE_globfree) && defined(__GLOB32_MATCHES_GLOB64)
 /* >> globfree(3), globfree64(3) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd637d28e */
+/* HASH CRC-32:0xe9685d86 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "spawn.h"
+#include "../user/spawn.h"
 #include "../user/fcntl.h"
 #include "../user/sched.h"
 #include "../user/signal.h"
@@ -37,165 +37,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-#include <bits/os/sigaction.h>
-#include <libc/errno.h>
-#include <hybrid/typecore.h>
-#include <asm/os/vfork.h>
-#include <asm/os/oflags.h>
-#include <asm/os/signal.h>
-/* >> posix_fspawn_np(3)
- * Implementation for the fastest possible  method of (safely) doing  fork(2)+fexecve(2)
- * in  order  to  spawn  a  new  process  from  the  given  `execfd'  file   descriptor.
- * For this purpose, any error that may happen during either the fork(3), the fexecve(2)
- * or  any of the numerous additional system calls that may be performed in-between will
- * be returned by this function to the  parent process, while the function itself  never
- * actually returns in the child process.
- * For this  purpose,  this  function tries  to  make  use of  `vfork(2)'  in  combination
- * with  `__ARCH_HAVE_SHARED_VM_VFORK',  and if  that  isn't available,  a  temporary pipe
- * is  used to communicate process initialization errors, as well as to await a successful
- * exec call by using the  fact that a successful exec  will close all `O_CLOEXEC'  files,
- * with the pipe having been given that flag, and that a pipe without both ends still open
- * will always  have its  read immediately  return  (which is  used to  indicate  success)
- * @param: pid:          Store the PID of the newly spawned child process here
- * @param: execfd:       The file descriptor pointing to the file that should be executed
- * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
- *                              handle operations. Can be used to (e.g.) re-direct  stdout
- *                              for the new process
- * @param: attrp:        [0..1] Additional process attributes to set for the child process
- * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
- * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
- * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error (errno-code describing the reason of failure) */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
-NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
-                                           fd_t execfd,
-                                           posix_spawn_file_actions_t const *file_actions,
-                                           posix_spawnattr_t const *attrp,
-                                           __TARGV,
-                                           __TENVP) {
-
-	return libc_posix_spawn_impl(pid, 2, (void *)(uintptr_t)execfd, file_actions, attrp, ___argv, ___envp);
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-#include <bits/os/sigaction.h>
-#include <libc/errno.h>
-#include <hybrid/typecore.h>
-#include <asm/os/vfork.h>
-#include <asm/os/oflags.h>
-#include <asm/os/signal.h>
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(6) ATTR_IN(7) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) errno_t
-NOTHROW_RPC(LIBCCALL libc_posix_spawn_impl)(pid_t *__restrict pid,
-                                            unsigned int exec_type,
-                                            void *exec_arg,
-                                            posix_spawn_file_actions_t const *file_actions,
-                                            posix_spawnattr_t const *attrp,
-                                            __TARGV,
-                                            __TENVP) {
-	int status;
-
-
-
-
-	errno_t result, error, old_errno;
-	pid_t child;
-	old_errno = __libc_geterrno_or(0);
-
-	(void)libc_seterrno(0);
-	child = libc_vfork();
-	if (child == 0)
-		goto do_exec;
-	/* Check if the vfork() from  the child returned success, but  left
-	 * our (vm-shared) errno as non-zero (which would indicate that the
-	 * child encountered an error at  some point after vfork()  already
-	 * succeeded) */
-	result = __libc_geterrno_or(0);
-	if (result != 0) {
-		if (child < 0) {
-			/* The vfork() itself failed. */
-			(void)libc_seterrno(old_errno);
-			return result;
-		}
-		/* Something within the child failed after vfork(). */
-		goto err_join_zombie_child;
-	}
-	/* Restore the old errno */
-	(void)libc_seterrno(old_errno);
-	/* Write back the child's PID */
-	*pid = child;
-	return result;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-err_join_zombie_child:
-	/* Unless the child was already spawned as detached,
-	 * we still have to re-join  it, or else it will  be
-	 * left dangling as a zombie process! */
-	if (libc_waitpid(child, &status, 0) < 0) {
-
-		if (__libc_geterrno() == EINTR)
-			goto err_join_zombie_child;
-
-	}
-	(void)libc_seterrno(old_errno);
-	return result;
-do_exec:
-	/* Perform additional actions within the child.
-	 *
-	 * NOTE: When the exec succeeds, the pipe is auto-
-	 *       closed because it's marked as  O_CLOEXEC! */
-	error = libc_posix_spawn_child(exec_type, exec_arg, file_actions, attrp, ___argv, ___envp);
-	if (error != 0) {
-
-		/* If the exec fails, it will have modified `errno' to indicate this fact.
-		 * And since we're sharing VMs with  our parent process, the error  reason
-		 * will have already  been written  back to  our parent's  VM, so  there's
-		 * actually nothing left for us to do, but to simply exit! */
-		__libc_seterrno(error);
-
-
-
-
-
-	}
-	libc__Exit(127);
-}
 #include <bits/os/sigaction.h>
 #include <libc/errno.h>
 #include <hybrid/typecore.h>
@@ -479,6 +320,165 @@ err_errno:
 
 
 }
+#include <bits/os/sigaction.h>
+#include <libc/errno.h>
+#include <hybrid/typecore.h>
+#include <asm/os/vfork.h>
+#include <asm/os/oflags.h>
+#include <asm/os/signal.h>
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(6) ATTR_IN(7) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_posix_spawn_impl)(pid_t *__restrict pid,
+                                            unsigned int exec_type,
+                                            void *exec_arg,
+                                            posix_spawn_file_actions_t const *file_actions,
+                                            posix_spawnattr_t const *attrp,
+                                            __TARGV,
+                                            __TENVP) {
+	int status;
+
+
+
+
+	errno_t result, error, old_errno;
+	pid_t child;
+	old_errno = __libc_geterrno_or(0);
+
+	(void)libc_seterrno(0);
+	child = libc_vfork();
+	if (child == 0)
+		goto do_exec;
+	/* Check if the vfork() from  the child returned success, but  left
+	 * our (vm-shared) errno as non-zero (which would indicate that the
+	 * child encountered an error at  some point after vfork()  already
+	 * succeeded) */
+	result = __libc_geterrno_or(0);
+	if (result != 0) {
+		if (child < 0) {
+			/* The vfork() itself failed. */
+			(void)libc_seterrno(old_errno);
+			return result;
+		}
+		/* Something within the child failed after vfork(). */
+		goto err_join_zombie_child;
+	}
+	/* Restore the old errno */
+	(void)libc_seterrno(old_errno);
+	/* Write back the child's PID */
+	*pid = child;
+	return result;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+err_join_zombie_child:
+	/* Unless the child was already spawned as detached,
+	 * we still have to re-join  it, or else it will  be
+	 * left dangling as a zombie process! */
+	if (libc_waitpid(child, &status, 0) < 0) {
+
+		if (__libc_geterrno() == EINTR)
+			goto err_join_zombie_child;
+
+	}
+	(void)libc_seterrno(old_errno);
+	return result;
+do_exec:
+	/* Perform additional actions within the child.
+	 *
+	 * NOTE: When the exec succeeds, the pipe is auto-
+	 *       closed because it's marked as  O_CLOEXEC! */
+	error = libc_posix_spawn_child(exec_type, exec_arg, file_actions, attrp, ___argv, ___envp);
+	if (error != 0) {
+
+		/* If the exec fails, it will have modified `errno' to indicate this fact.
+		 * And since we're sharing VMs with  our parent process, the error  reason
+		 * will have already  been written  back to  our parent's  VM, so  there's
+		 * actually nothing left for us to do, but to simply exit! */
+		__libc_seterrno(error);
+
+
+
+
+
+	}
+	libc__Exit(127);
+}
+#include <bits/os/sigaction.h>
+#include <libc/errno.h>
+#include <hybrid/typecore.h>
+#include <asm/os/vfork.h>
+#include <asm/os/oflags.h>
+#include <asm/os/signal.h>
+/* >> posix_fspawn_np(3)
+ * Implementation for the fastest possible  method of (safely) doing  fork(2)+fexecve(2)
+ * in  order  to  spawn  a  new  process  from  the  given  `execfd'  file   descriptor.
+ * For this purpose, any error that may happen during either the fork(3), the fexecve(2)
+ * or  any of the numerous additional system calls that may be performed in-between will
+ * be returned by this function to the  parent process, while the function itself  never
+ * actually returns in the child process.
+ * For this  purpose,  this  function tries  to  make  use of  `vfork(2)'  in  combination
+ * with  `__ARCH_HAVE_SHARED_VM_VFORK',  and if  that  isn't available,  a  temporary pipe
+ * is  used to communicate process initialization errors, as well as to await a successful
+ * exec call by using the  fact that a successful exec  will close all `O_CLOEXEC'  files,
+ * with the pipe having been given that flag, and that a pipe without both ends still open
+ * will always  have its  read immediately  return  (which is  used to  indicate  success)
+ * @param: pid:          Store the PID of the newly spawned child process here
+ * @param: execfd:       The file descriptor pointing to the file that should be executed
+ * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+ *                              handle operations. Can be used to (e.g.) re-direct  stdout
+ *                              for the new process
+ * @param: attrp:        [0..1] Additional process attributes to set for the child process
+ * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
+ * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
+ * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
+ * @return: * :          Error (errno-code describing the reason of failure) */
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
+                                           fd_t execfd,
+                                           posix_spawn_file_actions_t const *file_actions,
+                                           posix_spawnattr_t const *attrp,
+                                           __TARGV,
+                                           __TENVP) {
+
+	return libc_posix_spawn_impl(pid, 2, (void *)(uintptr_t)execfd, file_actions, attrp, ___argv, ___envp);
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
 #include <asm/os/oflags.h>
 /* >> posix_spawn(3)
  * Implementation for the fastest possible method of (safely) doing fork(2)+execve(2)
@@ -570,7 +570,7 @@ __NAMESPACE_LOCAL_END
  * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
-                                        const char *__restrict file,
+                                        char const *__restrict file,
                                         posix_spawn_file_actions_t const *file_actions,
                                         posix_spawnattr_t const *attrp,
                                         __TARGV,
@@ -1026,7 +1026,7 @@ err:
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions,
-                                                                const char *__restrict path) {
+                                                                char const *__restrict path) {
 	struct __spawn_action *action;
 	if unlikely((path = libc_strdup(path)) == NULL)
 		goto err;
@@ -1070,6 +1070,51 @@ err:
 
 
 }
+/* >> pidfd_spawn(3)
+ * Same as `posix_spawn(3)', except that the linux/kos-specific "PIDfd" mechanism is
+ * used  to return a reference to the child process in the form of a file descriptor
+ * stored in `*pidfd'.
+ * @param: pidfd:        Store the PIDfd of the newly spawned child process here
+ * @param: path:         The pathname of the program that should be executed
+ * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+ *                              handle operations. Can be used to (e.g.) re-direct  stdout
+ *                              for the new process
+ * @param: attrp:        [0..1] Additional process attributes to set for the child process
+ * @param: argv:         Same as the `argv' accepted by `execve(2)'
+ * @param: envp:         Same as the `envp' accepted by `execve(2)'
+ * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
+ * @return: * :          Error (errno-code describing the reason of failure) */
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_pidfd_spawn)(fd_t *__restrict pidfd,
+                                       char const *__restrict path,
+                                       posix_spawn_file_actions_t const *file_actions,
+                                       posix_spawnattr_t const *attrp,
+                                       __TARGV,
+                                       __TENVP) {
+	return libc_pidfd_spawn_impl(pidfd, 0, (void *)path, file_actions, attrp, ___argv, ___envp);
+}
+/* >> pidfd_spawnp(3)
+ * Same as `posix_spawnp(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_pidfd_spawnp)(fd_t *__restrict pidfd,
+                                        char const *__restrict file,
+                                        posix_spawn_file_actions_t const *file_actions,
+                                        posix_spawnattr_t const *attrp,
+                                        __TARGV,
+                                        __TENVP) {
+	return libc_pidfd_spawn_impl(pidfd, 1, (void *)file, file_actions, attrp, ___argv, ___envp);
+}
+/* >> pidfd_fspawn_np(3)
+ * Same as `posix_fspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_pidfd_fspawn_np)(fd_t *__restrict pidfd,
+                                           fd_t execfd,
+                                           posix_spawn_file_actions_t const *file_actions,
+                                           posix_spawnattr_t const *attrp,
+                                           __TARGV,
+                                           __TENVP) {
+	return libc_pidfd_spawn_impl(pidfd, 2, (void *)(uintptr_t)execfd, file_actions, attrp, ___argv, ___envp);
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -1077,7 +1122,7 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS_P(posix_fspawn_np,libc_posix_fspawn_np,ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pid,execfd,file_actions,attrp,___argv,___envp));
 DEFINE_PUBLIC_ALIAS_P(posix_spawn,libc_posix_spawn,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pid,path,file_actions,attrp,___argv,___envp));
-DEFINE_PUBLIC_ALIAS_P(posix_spawnp,libc_posix_spawnp,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, const char *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pid,file,file_actions,attrp,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnp,libc_posix_spawnp,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, char const *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pid,file,file_actions,attrp,___argv,___envp));
 DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_init,libc_posix_spawnattr_init,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr),(attr));
 DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_destroy,libc_posix_spawnattr_destroy,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr),(attr));
 DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_getflags,libc_posix_spawnattr_getflags,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t const *__restrict attr, short int *__restrict pflags),(attr,pflags));
@@ -1099,8 +1144,11 @@ DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addclose,libc_posix_spawn_file_ac
 DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_adddup2,libc_posix_spawn_file_actions_adddup2,ATTR_FDARG(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, fd_t oldfd, fd_t newfd),(file_actions,oldfd,newfd));
 DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addtcsetpgrp_np,libc_posix_spawn_file_actions_addtcsetpgrp_np,ATTR_FDARG(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd),(file_actions,fd));
 DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addclosefrom_np,libc_posix_spawn_file_actions_addclosefrom_np,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, fd_t lowfd),(file_actions,lowfd));
-DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addchdir_np,libc_posix_spawn_file_actions_addchdir_np,ATTR_IN(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, const char *__restrict path),(file_actions,path));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addchdir_np,libc_posix_spawn_file_actions_addchdir_np,ATTR_IN(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, char const *__restrict path),(file_actions,path));
 DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addfchdir_np,libc_posix_spawn_file_actions_addfchdir_np,ATTR_FDARG(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd),(file_actions,dfd));
+DEFINE_PUBLIC_ALIAS_P(pidfd_spawn,libc_pidfd_spawn,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t *__restrict pidfd, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pidfd,path,file_actions,attrp,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(pidfd_spawnp,libc_pidfd_spawnp,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t *__restrict pidfd, char const *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pidfd,file,file_actions,attrp,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(pidfd_fspawn_np,libc_pidfd_fspawn_np,ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t *__restrict pidfd, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pidfd,execfd,file_actions,attrp,___argv,___envp));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SPAWN_C */

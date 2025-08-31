@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90622937 */
+/* HASH CRC-32:0xf740266a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -759,14 +759,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(clearkeybuf, __FORCELOCAL __ATTR_ARTIFICIAL void
 #ifdef __CRT_HAVE__conio_getpass
 /* >> _conio_getpass(3)
  * CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>' */
-__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),char *,__NOTHROW_RPC,getpass,(const char *__prompt, char *__str),_conio_getpass,(__prompt,__str))
+__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),char *,__NOTHROW_RPC,getpass,(char const *__prompt, char *__str),_conio_getpass,(__prompt,__str))
 #else /* __CRT_HAVE__conio_getpass */
 #include <asm/os/stdio.h>
 #if defined(__CRT_HAVE_getpass_r) || defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read) || defined(__CRT_HAVE_readpassphrase)
 #include <libc/local/conio/_conio_getpass.h>
 /* >> _conio_getpass(3)
  * CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_INOUT(2) char *__NOTHROW_RPC(__LIBCCALL getpass)(const char *__prompt, char *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_conio_getpass))(__prompt, __str); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_INOUT(2) char *__NOTHROW_RPC(__LIBCCALL getpass)(char const *__prompt, char *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_conio_getpass))(__prompt, __str); }
 #else /* __CRT_HAVE_getpass_r || __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read || __CRT_HAVE_readpassphrase */
 #undef __getpass_defined
 #endif /* !__CRT_HAVE_getpass_r && !__CRT_HAVE_getpassfd && !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read && !__CRT_HAVE_readpassphrase */

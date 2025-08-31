@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b10b31a */
+/* HASH CRC-32:0x7504e4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ DECL_BEGIN
 #include <bits/types.h>
 #include <bits/os/stat.h>
 INTERN ATTR_SECTION(".text.crt.unsorted") fd_t
-NOTHROW_RPC(VLIBCCALL libc_flopen)(const char *path,
+NOTHROW_RPC(VLIBCCALL libc_flopen)(char const *path,
                                    oflag_t flags,
                                    ...) {
 
@@ -110,7 +110,7 @@ NOTHROW_RPC(VLIBCCALL libc_flopen)(const char *path,
 #include <bits/os/stat.h>
 INTERN ATTR_SECTION(".text.crt.unsorted") fd_t
 NOTHROW_RPC(VLIBCCALL libc_flopenat)(fd_t dirfd,
-                                     const char *path,
+                                     char const *path,
                                      oflag_t flags,
                                      ...) {
 
@@ -173,8 +173,8 @@ restart:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS_P(flopen,libc_flopen,,fd_t,NOTHROW_RPC,VLIBCCALL,(const char *path, oflag_t flags, ...),(path,flags,));
-DEFINE_PUBLIC_ALIAS_P(flopenat,libc_flopenat,,fd_t,NOTHROW_RPC,VLIBCCALL,(fd_t dirfd, const char *path, oflag_t flags, ...),(dirfd,path,flags,));
+DEFINE_PUBLIC_ALIAS_P(flopen,libc_flopen,,fd_t,NOTHROW_RPC,VLIBCCALL,(char const *path, oflag_t flags, ...),(path,flags,));
+DEFINE_PUBLIC_ALIAS_P(flopenat,libc_flopenat,,fd_t,NOTHROW_RPC,VLIBCCALL,(fd_t dirfd, char const *path, oflag_t flags, ...),(dirfd,path,flags,));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_BSD_LIBUTIL_C */

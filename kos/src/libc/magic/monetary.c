@@ -70,7 +70,7 @@ ssize_t strfmon([[out(return <= maxsize)]] char *__restrict s, size_t maxsize,
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__strfmon_l")]]
 ssize_t strfmon_l([[out(return <= maxsize)]] char *__restrict s, size_t maxsize, $locale_t loc,
-                  [[in, format("strfmon")]] const char *__restrict format, ...);
+                  [[in, format("strfmon")]] char const *__restrict format, ...);
 %#endif /* __USE_XOPEN2K8 */
 
 

@@ -54,12 +54,12 @@ NOTHROW_NCX(LIBCCALL libc_fstatfs)(fd_t filedes,
 /*[[[end:libc_fstatfs]]]*/
 
 
-/*[[[head:libc_statfs64,hash:CRC-32=0xa979a712]]]*/
+/*[[[head:libc_statfs64,hash:CRC-32=0x4ee2c968]]]*/
 #ifdef _STATFS_MATCHES_STATFS64
 DEFINE_INTERN_ALIAS(libc_statfs64, libc_statfs);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_IN(1) ATTR_OUT(2) int
-NOTHROW_NCX(LIBCCALL libc_statfs64)(const char *file,
+NOTHROW_NCX(LIBCCALL libc_statfs64)(char const *file,
                                     struct statfs64 *buf)
 /*[[[body:libc_statfs64]]]*/
 {
@@ -93,14 +93,14 @@ NOTHROW_NCX(LIBCCALL libc_fstatfs64)(fd_t filedes,
 #undef statfs
 #undef statfs64
 
-/*[[[start:exports,hash:CRC-32=0x66db0d94]]]*/
+/*[[[start:exports,hash:CRC-32=0x97f0ba2a]]]*/
 DEFINE_PUBLIC_ALIAS_P(__statfs,libc_statfs,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct statfs *buf),(file,buf));
 DEFINE_PUBLIC_ALIAS_P(__libc_statfs,libc_statfs,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct statfs *buf),(file,buf));
 DEFINE_PUBLIC_ALIAS_P(statfs,libc_statfs,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct statfs *buf),(file,buf));
 DEFINE_PUBLIC_ALIAS_P(__fstatfs,libc_fstatfs,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t filedes, struct statfs *buf),(filedes,buf));
 DEFINE_PUBLIC_ALIAS_P(__libc_fstatfs,libc_fstatfs,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t filedes, struct statfs *buf),(filedes,buf));
 DEFINE_PUBLIC_ALIAS_P(fstatfs,libc_fstatfs,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t filedes, struct statfs *buf),(filedes,buf));
-DEFINE_PUBLIC_ALIAS_P(statfs64,libc_statfs64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(const char *file, struct statfs64 *buf),(file,buf));
+DEFINE_PUBLIC_ALIAS_P(statfs64,libc_statfs64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct statfs64 *buf),(file,buf));
 DEFINE_PUBLIC_ALIAS_P(fstatfs64,libc_fstatfs64,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t filedes, struct statfs64 *buf),(filedes,buf));
 /*[[[end:exports]]]*/
 

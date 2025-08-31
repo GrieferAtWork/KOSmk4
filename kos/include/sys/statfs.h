@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd196017c */
+/* HASH CRC-32:0xa3da6171 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,15 +70,15 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs,(__fd_t __fi
 #ifdef __USE_LARGEFILE64
 #ifndef statfs64
 #if defined(__CRT_HAVE_statfs) && defined(_STATFS_MATCHES_STATFS64)
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(const char *__file, struct statfs64 *__buf),statfs,(__file,__buf))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(char const *__file, struct statfs64 *__buf),statfs,(__file,__buf))
 #elif defined(__CRT_HAVE_statfs) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(const char *__file, struct statfs64 *__buf),statfs,(__file,__buf))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(char const *__file, struct statfs64 *__buf),statfs,(__file,__buf))
 #elif defined(__CRT_HAVE___statfs) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(const char *__file, struct statfs64 *__buf),__statfs,(__file,__buf))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(char const *__file, struct statfs64 *__buf),__statfs,(__file,__buf))
 #elif defined(__CRT_HAVE___libc_statfs) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(const char *__file, struct statfs64 *__buf),__libc_statfs,(__file,__buf))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(char const *__file, struct statfs64 *__buf),__libc_statfs,(__file,__buf))
 #elif defined(__CRT_HAVE_statfs64)
-__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(const char *__file, struct statfs64 *__buf),(__file,__buf))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(char const *__file, struct statfs64 *__buf),(__file,__buf))
 #endif /* ... */
 #endif /* !statfs64 */
 #if defined(__CRT_HAVE_fstatfs) && defined(_STATFS_MATCHES_STATFS64)

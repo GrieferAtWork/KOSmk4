@@ -130,7 +130,7 @@ __CSDECLARE(,int,@error_one_per_line@)
            defined(__LOCAL_program_invocation_short_name) &&
            $has_function(strerror))]]
 void verror(int status, $errno_t errnum,
-            [[nullable, format("printf")]] const char *format, va_list args) {
+            [[nullable, format("printf")]] char const *format, va_list args) {
 @@pp_ifdef __LOCAL_error_print_progname@@
 	if (__LOCAL_error_print_progname) {
 		(*__LOCAL_error_print_progname)();
@@ -219,7 +219,7 @@ void verror_at_line(int status, $errno_t errnum, char const *filename,
 @@If `status' is non-zero, follow up with a call to `exit(status)'
 [[fast, libc, stdio_throws, decl_include("<bits/types.h>"), requires_function(verror)]]
 [[export_as("__error")]] /* From Glibc 2.0.4 */
-void error(int status, $errno_t errnum, [[nullable, format("printf")]] const char *format, ...) {
+void error(int status, $errno_t errnum, [[nullable, format("printf")]] char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	verror(status, errnum, format, args);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dd2ae27 */
+/* HASH CRC-32:0x76b2819b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +18,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_SYS_ACCT_H
-#define GUARD_LIBC_AUTO_SYS_ACCT_H 1
+#ifndef GUARD_LIBC_USER_SPAWN_H
+#define GUARD_LIBC_USER_SPAWN_H 1
 
 #include "../api.h"
+#include "../auto/spawn.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include <sys/acct.h>
+#include <spawn.h>
 
 DECL_BEGIN
 
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Switch process accounting on and off */
-INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBDCALL libd_acct)(char const *filename);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_IN(6) ATTR_IN(7) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_pidfd_spawn_impl)(fd_t *__restrict pidfd, unsigned int exec_type, void *exec_arg, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+#endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_AUTO_SYS_ACCT_H */
+#endif /* !GUARD_LIBC_USER_SPAWN_H */

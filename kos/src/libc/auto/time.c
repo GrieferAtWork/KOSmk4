@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e573519 */
+/* HASH CRC-32:0x86ff0da4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -577,7 +577,7 @@ DEFINE_PUBLIC_ALIAS(getdate_err, libc_getdate_err);
  * the environment variable `$DATEMSK' are used. In case of an error
  * `getdate_err' is set */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(1) struct tm *
-NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string) {
+NOTHROW_NCX(LIBCCALL libc_getdate)(char const *string) {
 	struct tm *const _p_tmbuf = &libc_get_tlsglobals()->ltg_tmbuf;
 #define tmbuf (*_p_tmbuf)
 	int error = libc_getdate_r(string, &tmbuf);
@@ -1390,7 +1390,7 @@ DEFINE_PUBLIC_ALIAS_P(_timespec64_get,libc_timespec_getres64,ATTR_OUT(1),int,NOT
 DEFINE_PUBLIC_ALIAS_P(__timespec_getres64,libc_timespec_getres64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 *ts, int base),(ts,base));
 DEFINE_PUBLIC_ALIAS_P(timespec_getres64,libc_timespec_getres64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 *ts, int base),(ts,base));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS_P(getdate,libc_getdate,ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(const char *string),(string));
+DEFINE_PUBLIC_ALIAS_P(getdate,libc_getdate,ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(char const *string),(string));
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(_strftime_l,libc_strftime_l,ATTR_IN(3) ATTR_IN(4) ATTR_LIBC_STRFTIME(3, 0) ATTR_OUTS(1, 2),size_t,NOTHROW_NCX,LIBCCALL,(char *__restrict buf, size_t bufsize, char const *__restrict format, struct tm const *__restrict tp, locale_t locale),(buf,bufsize,format,tp,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */

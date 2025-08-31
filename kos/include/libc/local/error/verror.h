@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd85be69a */
+/* HASH CRC-32:0xb10f0b4c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,7 +191,7 @@ __CSDECLARE(,unsigned int,error_message_count)
 #endif /* !__LOCAL_error_message_count */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(verror) __ATTR_LIBC_PRINTF(3, 0) void
-__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(verror))(int __status, __errno_t __errnum, const char *__format, __builtin_va_list __args) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(verror))(int __status, __errno_t __errnum, char const *__format, __builtin_va_list __args) {
 #ifdef __LOCAL_error_print_progname
 	if (__LOCAL_error_print_progname) {
 		(*__LOCAL_error_print_progname)();

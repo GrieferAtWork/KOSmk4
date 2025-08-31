@@ -71,7 +71,7 @@ int fstatfs([[fdarg]] $fd_t filedes, [[out]] struct statfs *buf);
 [[decl_include("<bits/os/statfs.h>")]]
 [[preferred_statfs64_variant_of(statfs), doc_alias("statfs")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("statfs", "__statfs", "__libc_statfs")]]
-int statfs64([[in]] const char *file, [[out]] struct statfs64 *buf);
+int statfs64([[in]] char const *file, [[out]] struct statfs64 *buf);
 %#endif /* !statfs64 */
 
 [[decl_include("<bits/os/statfs.h>")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x699ab06f */
+/* HASH CRC-32:0x65e4ed9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_statfs)(char const *file, struct statfs *buf);
 INTDEF ATTR_FDARG(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_fstatfs)(fd_t filedes, struct statfs *buf);
-INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_statfs64)(const char *file, struct statfs64 *buf);
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_statfs64)(char const *file, struct statfs64 *buf);
 INTDEF ATTR_FDARG(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_fstatfs64)(fd_t filedes, struct statfs64 *buf);
 #endif /* !__KERNEL__ */
 

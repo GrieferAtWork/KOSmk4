@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b1d15f7 */
+/* HASH CRC-32:0x95af39cb */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
  * @return: * :   Pointer to a statically allocated fstab entry for `special_file'
  * @return: NULL: [errno = <unchanged>] No entry exists matching `special_file'
  * @return: NULL: [errno = *] Error */
-INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBDCALL libd_getfsspec)(const char *special_file);
+INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBDCALL libd_getfsspec)(char const *special_file);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getfsspec(3)
@@ -43,7 +43,7 @@ INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBDCALL libd_getfsspec)(con
  * @return: * :   Pointer to a statically allocated fstab entry for `special_file'
  * @return: NULL: [errno = <unchanged>] No entry exists matching `special_file'
  * @return: NULL: [errno = *] Error */
-INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBCCALL libc_getfsspec)(const char *special_file);
+INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBCCALL libc_getfsspec)(char const *special_file);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getfsfile(3)
@@ -51,7 +51,7 @@ INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBCCALL libc_getfsspec)(con
  * @return: * :   Pointer to a statically allocated fstab entry for `mount_point'
  * @return: NULL: [errno = <unchanged>] No entry exists matching `mount_point'
  * @return: NULL: [errno = *] Error */
-INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBDCALL libd_getfsfile)(const char *mount_point);
+INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBDCALL libd_getfsfile)(char const *mount_point);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getfsfile(3)
@@ -59,7 +59,7 @@ INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBDCALL libd_getfsfile)(con
  * @return: * :   Pointer to a statically allocated fstab entry for `mount_point'
  * @return: NULL: [errno = <unchanged>] No entry exists matching `mount_point'
  * @return: NULL: [errno = *] Error */
-INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBCCALL libc_getfsfile)(const char *mount_point);
+INTDEF WUNUSED ATTR_IN(1) struct fstab *NOTHROW_NCX(LIBCCALL libc_getfsfile)(char const *mount_point);
 #endif /* !__KERNEL__ */
 
 DECL_END

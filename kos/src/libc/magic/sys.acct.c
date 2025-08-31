@@ -57,7 +57,7 @@ typedef __time_t time_t;
 @@Switch process accounting on and off
 [[cp, section(".text.crt{|.dos}.fs.modify")]]
 [[export_alias("__acct", "__libc_acct")]]
-int acct([[in_opt]] const char *filename);
+int acct([[in_opt]] char const *filename);
 
 %{
 

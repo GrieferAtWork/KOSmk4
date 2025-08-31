@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f8648dd */
+/* HASH CRC-32:0xd458150d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ DECL_BEGIN
  * @return: NULL: [errno = <unchanged>] No entry exists matching `special_file'
  * @return: NULL: [errno = *] Error */
 INTERN ATTR_SECTION(".text.crt.database.fstab") WUNUSED ATTR_IN(1) struct fstab *
-NOTHROW_NCX(LIBCCALL libc_getfsspec)(const char *special_file) {
+NOTHROW_NCX(LIBCCALL libc_getfsspec)(char const *special_file) {
 	struct fstab *result;
 	if (!libc_setfsent())
 		return NULL;
@@ -54,7 +54,7 @@ NOTHROW_NCX(LIBCCALL libc_getfsspec)(const char *special_file) {
  * @return: NULL: [errno = <unchanged>] No entry exists matching `mount_point'
  * @return: NULL: [errno = *] Error */
 INTERN ATTR_SECTION(".text.crt.database.fstab") WUNUSED ATTR_IN(1) struct fstab *
-NOTHROW_NCX(LIBCCALL libc_getfsfile)(const char *mount_point) {
+NOTHROW_NCX(LIBCCALL libc_getfsfile)(char const *mount_point) {
 	struct fstab *result;
 	if (!libc_setfsent())
 		return NULL;
@@ -69,8 +69,8 @@ NOTHROW_NCX(LIBCCALL libc_getfsfile)(const char *mount_point) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS_P(getfsspec,libc_getfsspec,WUNUSED ATTR_IN(1),struct fstab *,NOTHROW_NCX,LIBCCALL,(const char *special_file),(special_file));
-DEFINE_PUBLIC_ALIAS_P(getfsfile,libc_getfsfile,WUNUSED ATTR_IN(1),struct fstab *,NOTHROW_NCX,LIBCCALL,(const char *mount_point),(mount_point));
+DEFINE_PUBLIC_ALIAS_P(getfsspec,libc_getfsspec,WUNUSED ATTR_IN(1),struct fstab *,NOTHROW_NCX,LIBCCALL,(char const *special_file),(special_file));
+DEFINE_PUBLIC_ALIAS_P(getfsfile,libc_getfsfile,WUNUSED ATTR_IN(1),struct fstab *,NOTHROW_NCX,LIBCCALL,(char const *mount_point),(mount_point));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FSTAB_C */

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x8dd2ae27 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +17,42 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_SYS_ACCT_H
-#define GUARD_LIBC_AUTO_SYS_ACCT_H 1
+#ifndef GUARD_LIBC_USER_SPAWN_C
+#define GUARD_LIBC_USER_SPAWN_C 1
 
 #include "../api.h"
+/**/
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <sys/acct.h>
+#include "spawn.h"
 
 DECL_BEGIN
 
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Switch process accounting on and off */
-INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBDCALL libd_acct)(char const *filename);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/*[[[head:libc_pidfd_spawn_impl,hash:CRC-32=0xceef6ea0]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(6) ATTR_IN(7) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_pidfd_spawn_impl)(fd_t *__restrict pidfd,
+                                            unsigned int exec_type,
+                                            void *exec_arg,
+                                            posix_spawn_file_actions_t const *file_actions,
+                                            posix_spawnattr_t const *attrp,
+                                            __TARGV,
+                                            __TENVP)
+/*[[[body:libc_pidfd_spawn_impl]]]*/
+/*AUTO*/{
+	(void)pidfd;
+	(void)exec_type;
+	(void)exec_arg;
+	(void)file_actions;
+	(void)attrp;
+	(void)___argv;
+	(void)___envp;
+	CRT_UNIMPLEMENTEDF("pidfd_spawn_impl(pidfd: %p, exec_type: %x, exec_arg: %p, file_actions: %p, attrp: %p, ___argv: %p, ___envp: %p)", pidfd, exec_type, exec_arg, file_actions, attrp, ___argv, ___envp); /* TODO */
+	return ENOSYS;
+}
+/*[[[end:libc_pidfd_spawn_impl]]]*/
+
+/*[[[start:exports,hash:CRC-32=0x0]]]*/
+/*[[[end:exports]]]*/
 
 DECL_END
 
-#endif /* !GUARD_LIBC_AUTO_SYS_ACCT_H */
+#endif /* !GUARD_LIBC_USER_SPAWN_C */

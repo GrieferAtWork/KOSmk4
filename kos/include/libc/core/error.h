@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6de02eab */
+/* HASH CRC-32:0xac6ba4ba */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __SYSDECL_BEGIN
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `status' is non-zero, follow up with a call to `exit(status)' */
-__LIBC __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB_NCX(__VLIBCCALL __libc_core_error)(int __status, __errno_t __errnum, const char *__format, ...) __CASMNAME("error");
+__LIBC __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB_NCX(__VLIBCCALL __libc_core_error)(int __status, __errno_t __errnum, char const *__format, ...) __CASMNAME("error");
 #else /* __CRT_HAVE_error */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>

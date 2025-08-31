@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25566859 */
+/* HASH CRC-32:0x38dea782 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsncat_s) __ATTR_INOUT_OPT(1) __ATTR_IN_OPT(3) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncat_s))(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __dstsize, const __WCHAR_TYPE__ *__src, __SIZE_TYPE__ __maxlen) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncat_s))(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __dstsize, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __maxlen) {
 	__WCHAR_TYPE__ *__iter;
 	__SIZE_TYPE__ __remaining;
 	if (!__maxlen && !__dst && !__dstsize)

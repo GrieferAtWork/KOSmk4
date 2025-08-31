@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ffda641 */
+/* HASH CRC-32:0xcc92518 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_verror __LIBC_LOCAL_NAME(verror)
 #endif /* !__local___localdep_verror_defined */
 __LOCAL_LIBC(error) __ATTR_LIBC_PRINTF(3, 4) void
-__NOTHROW_CB_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(error))(int __status, __errno_t __errnum, const char *__format, ...) {
+__NOTHROW_CB_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(error))(int __status, __errno_t __errnum, char const *__format, ...) {
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
 	(__NAMESPACE_LOCAL_SYM __localdep_verror)(__status, __errnum, __format, __args);

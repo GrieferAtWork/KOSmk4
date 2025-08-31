@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27874d4d */
+/* HASH CRC-32:0x7ac8f3b9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -969,11 +969,11 @@ __NAMESPACE_LOCAL_END
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsnlen_s)(wchar_t const *__str, __SIZE_TYPE__ __maxlen) { return __str ? (__NAMESPACE_LOCAL_SYM __localdep_wcsnlen)(__str, __maxlen) : 0; }
 #ifdef __CRT_HAVE_wcsncat_s
 /* >> wcsncat_s(3) */
-__CDECLARE(__ATTR_INOUT_OPT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,wcsncat_s,(wchar_t *__dst, rsize_t __dstsize, const wchar_t *__src, rsize_t __maxlen),(__dst,__dstsize,__src,__maxlen))
+__CDECLARE(__ATTR_INOUT_OPT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,wcsncat_s,(wchar_t *__dst, rsize_t __dstsize, wchar_t const *__src, rsize_t __maxlen),(__dst,__dstsize,__src,__maxlen))
 #else /* __CRT_HAVE_wcsncat_s */
 #include <libc/local/corecrt_wstring/wcsncat_s.h>
 /* >> wcsncat_s(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcsncat_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(1) __ATTR_IN_OPT(3) __errno_t __NOTHROW_NCX(__LIBCCALL wcsncat_s)(wchar_t *__dst, rsize_t __dstsize, const wchar_t *__src, rsize_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncat_s))(__dst, __dstsize, __src, __maxlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcsncat_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(1) __ATTR_IN_OPT(3) __errno_t __NOTHROW_NCX(__LIBCCALL wcsncat_s)(wchar_t *__dst, rsize_t __dstsize, wchar_t const *__src, rsize_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncat_s))(__dst, __dstsize, __src, __maxlen); })
 #endif /* !__CRT_HAVE_wcsncat_s */
 #ifdef __CRT_HAVE_wcsncpy_s
 /* >> wcsncpy_s(3) */

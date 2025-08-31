@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42017bd8 */
+/* HASH CRC-32:0x88d18d57 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,9 +114,9 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatvfs,(__fd_t __f
 #ifdef __USE_LARGEFILE64
 #ifndef statvfs64
 #if defined(__CRT_HAVE_statvfs) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statvfs64,(const char *__file, struct statvfs64 *__buf),statvfs,(__file,__buf))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statvfs64,(char const *__file, struct statvfs64 *__buf),statvfs,(__file,__buf))
 #elif defined(__CRT_HAVE_statvfs64)
-__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statvfs64,(const char *__file, struct statvfs64 *__buf),(__file,__buf))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statvfs64,(char const *__file, struct statvfs64 *__buf),(__file,__buf))
 #endif /* ... */
 #endif /* !statvfs64 */
 #if defined(__CRT_HAVE_fstatvfs) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__

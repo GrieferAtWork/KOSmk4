@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2798886e */
+/* HASH CRC-32:0x15a93be1 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,7 +227,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(flopenat) __fd_t
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(flopenat))(__fd_t __dirfd, const char *__path, __oflag_t __flags, ...) {
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(flopenat))(__fd_t __dirfd, char const *__path, __oflag_t __flags, ...) {
 #ifdef __O_TRUNC
 	int __should_trunc;
 #endif /* __O_TRUNC */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc4222a3 */
+/* HASH CRC-32:0x736e4348 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2702,6 +2702,9 @@
 #define __CRT_HAVE_DOS$pex_run
 #define __CRT_HAVE_DOS$pex_run_in_environment
 #define __CRT_HAVE_DOS$pexecute
+#define __CRT_HAVE_DOS$pidfd_fspawn_np
+#define __CRT_HAVE_DOS$pidfd_spawn
+#define __CRT_HAVE_DOS$pidfd_spawnp
 #define __CRT_HAVE_DOS$pipe
 #define __CRT_HAVE_DOS$pipe2
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -7295,6 +7298,10 @@
 #define __CRT_HAVE_pexecute
 #define __CRT_HAVE_physmem_available
 #define __CRT_HAVE_physmem_total
+#define __CRT_HAVE_pidfd_fspawn_np
+#define __CRT_HAVE_pidfd_spawn
+#define __CRT_HAVE_pidfd_spawn_impl
+#define __CRT_HAVE_pidfd_spawnp
 #define __CRT_HAVE_pipe
 #define __CRT_HAVE_pipe2
 #endif /* !__KERNEL__ */

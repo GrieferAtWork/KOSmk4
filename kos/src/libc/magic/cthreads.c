@@ -154,10 +154,10 @@ typedef struct mutex *mutex_t;
 struct mutex {
 	spin_lock_t          held;   /* Underlying lock */
 	spin_lock_t          lock;   /* Unused */
-	const char          *name;   /* [0..1] Name (for debugging) */
+	char const          *name;   /* [0..1] Name (for debugging) */
 	struct cthread_queue queue;  /* Unused */
 #ifdef WAIT_FUNC_DEBUG
-	const char          *fname;  /* Debugging? */
+	char const          *fname;  /* Debugging? */
 #else /* WAIT_FUNC_DEBUG */
 	struct cthread      *holder; /* Debugging? */
 #endif /* WAIT_FUNC_DEBUG */

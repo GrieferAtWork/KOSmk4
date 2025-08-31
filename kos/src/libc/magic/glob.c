@@ -275,7 +275,7 @@ void globfree([[inout]] glob_t *pglob) {
 [[decl_include("<features.h>", "<bits/crt/glob.h>")]]
 [[preferred_glob64_variant_of(glob), doc_alias("glob")]]
 [[userimpl, impl_include("<asm/crt/glob.h>")]]
-int glob64([[in]] const char *__restrict pattern, __STDC_INT_AS_UINT_T flags,
+int glob64([[in]] char const *__restrict pattern, __STDC_INT_AS_UINT_T flags,
            [[nullable]] int (LIBKCALL *errfunc)(char const *path, int flags),
            [[out]] struct __glob64_struct *__restrict pglob) {
 	(void)pattern;

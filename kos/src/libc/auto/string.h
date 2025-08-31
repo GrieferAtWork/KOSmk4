@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88e5e228 */
+/* HASH CRC-32:0xaf506337 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2475,10 +2475,10 @@ INTDEF ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBDCALL libd_strcat
 INTDEF ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBCCALL libc_strcat_s)(char *dst, size_t dstsize, char const *src);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBDCALL libd_strncat_s)(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen);
+INTDEF ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBDCALL libd_strncat_s)(char *dst, rsize_t dstsize, char const *src, rsize_t maxlen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBCCALL libc_strncat_s)(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen);
+INTDEF ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBCCALL libc_strncat_s)(char *dst, rsize_t dstsize, char const *src, rsize_t maxlen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_IN_OPT(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd_strncpy_s)(char *dst, size_t dstsize, char const *src, size_t maxlen);
@@ -2613,14 +2613,14 @@ INTDEF WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) int NOTHROW_NCX(LIBCCALL libc_timin
  * Return the signal number for a given name.
  * e.g.: `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
-INTDEF ATTR_PURE WUNUSED ATTR_IN(1) signo_t NOTHROW_NCX(LIBDCALL libd_strtosigno)(const char *name);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) signo_t NOTHROW_NCX(LIBDCALL libd_strtosigno)(char const *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strtosigno(3)
  * Return the signal number for a given name.
  * e.g.: `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
-INTDEF ATTR_PURE WUNUSED ATTR_IN(1) signo_t NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) signo_t NOTHROW_NCX(LIBCCALL libc_strtosigno)(char const *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> stresep(3)

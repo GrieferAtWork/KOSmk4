@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53b909de */
+/* HASH CRC-32:0xb98c483c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __LOCAL_LIBC(_conio_getpass) __ATTR_IN(1) __ATTR_INOUT(2) char *
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_conio_getpass))(const char *__prompt, char *__str) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_conio_getpass))(char const *__prompt, char *__str) {
 	unsigned char __buflen = (unsigned char)__str[0];
 	char *__result = (__NAMESPACE_LOCAL_SYM __localdep_getpass_r)(__prompt, &__str[2], __buflen);
 	if (__result != __NULLPTR) {

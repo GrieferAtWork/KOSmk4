@@ -376,7 +376,7 @@ fmtmsg_printer(void *arg, /*utf-8*/ char const *__restrict data, size_t datalen)
 }
 
 
-/*[[[head:libc_fmtmsg,hash:CRC-32=0xc583ab33]]]*/
+/*[[[head:libc_fmtmsg,hash:CRC-32=0x9b4d3d84]]]*/
 /* >> fmtmsg(3)
  * Print a message to `stderr(3)' and/or `syslog(3)'. The exact  format
  * in which the mssage is printed, alongside additional severity levels
@@ -399,7 +399,7 @@ fmtmsg_printer(void *arg, /*utf-8*/ char const *__restrict data, size_t datalen)
  * @return: MM_NOMSG: Failed to print message to `stderr(3)' */
 INTERN ATTR_SECTION(".text.crt.fmtmsg") int
 NOTHROW_NCX(LIBCCALL libc_fmtmsg)(long classification,
-                                  const char *label,
+                                  char const *label,
                                   __STDC_INT_AS_UINT_T severity,
                                   char const *text,
                                   char const *action,
@@ -491,7 +491,7 @@ done_nolock:
 }
 /*[[[end:libc_fmtmsg]]]*/
 
-/*[[[head:libc_addseverity,hash:CRC-32=0x2ec9d073]]]*/
+/*[[[head:libc_addseverity,hash:CRC-32=0x4c786585]]]*/
 /* >> addseverity(3)
  * Add  (`s != NULL') or remove  (`s == NULL') custom severity levels.
  * By default (and these cannot be overwritten or removed), levels 0-4
@@ -516,7 +516,7 @@ done_nolock:
  * @return: MM_NOTOK: No such `severity' and `s == NULL' (errno was not modified) */
 INTERN ATTR_SECTION(".text.crt.fmtmsg") int
 NOTHROW_NCX(LIBCCALL libc_addseverity)(__STDC_INT_AS_UINT_T severity,
-                                       const char *s)
+                                       char const *s)
 /*[[[body:libc_addseverity]]]*/
 {
 	int result;
@@ -535,9 +535,9 @@ NOTHROW_NCX(LIBCCALL libc_addseverity)(__STDC_INT_AS_UINT_T severity,
 }
 /*[[[end:libc_addseverity]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xdbc0e2c0]]]*/
-DEFINE_PUBLIC_ALIAS_P(fmtmsg,libc_fmtmsg,,int,NOTHROW_NCX,LIBCCALL,(long classification, const char *label, __STDC_INT_AS_UINT_T severity, char const *text, char const *action, char const *tag),(classification,label,severity,text,action,tag));
-DEFINE_PUBLIC_ALIAS_P(addseverity,libc_addseverity,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T severity, const char *s),(severity,s));
+/*[[[start:exports,hash:CRC-32=0x83da8b39]]]*/
+DEFINE_PUBLIC_ALIAS_P(fmtmsg,libc_fmtmsg,,int,NOTHROW_NCX,LIBCCALL,(long classification, char const *label, __STDC_INT_AS_UINT_T severity, char const *text, char const *action, char const *tag),(classification,label,severity,text,action,tag));
+DEFINE_PUBLIC_ALIAS_P(addseverity,libc_addseverity,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T severity, char const *s),(severity,s));
 /*[[[end:exports]]]*/
 
 DECL_END

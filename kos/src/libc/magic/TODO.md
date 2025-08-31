@@ -108,9 +108,9 @@
 	- `walkcontext()`
 	- `int ungetchar(int ch)`     (same as `ungetc(ch, stdin)`)
 	- <dl.h>  (http://3kranger.com/HP3000/mpeix/en-hpux/B2355-90683/shl_load.3X.html)
-		- `shl_t shl_load(const char *path, int flags, long address);`
-		- `int shl_findsym(shl_t *handle, const char *sym, short type, void *value);`
-		- `int shl_definesym(const char *sym, short type, long value, int flags);`
+		- `shl_t shl_load(char const *path, int flags, long address);`
+		- `int shl_findsym(shl_t *handle, char const *sym, short type, void *value);`
+		- `int shl_definesym(char const *sym, short type, long value, int flags);`
 		- `int shl_getsymbols(shl_t handle, short type, int flags, void *(*memory) (), struct shl_symbol **symbols);`
 		- `int shl_unload(shl_t handle);`
 		- `int shl_get(int index, struct shl_descriptor **desc);`

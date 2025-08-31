@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2584983 */
+/* HASH CRC-32:0xb2a806f6 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8031,10 +8031,10 @@ __NAMESPACE_LOCAL_END
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strnlen_s)(char const *__str, __SIZE_TYPE__ __maxlen) { return __str ? (__NAMESPACE_LOCAL_SYM __localdep_strnlen)(__str, __maxlen) : 0; }
 #endif /* !__strnlen_s_defined */
 #ifdef __CRT_HAVE_strncat_s
-__CDECLARE(__ATTR_INOUT_OPT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,strncat_s,(char *__dst, rsize_t __dstsize, const char *__src, rsize_t __maxlen),(__dst,__dstsize,__src,__maxlen))
+__CDECLARE(__ATTR_INOUT_OPT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,strncat_s,(char *__dst, rsize_t __dstsize, char const *__src, rsize_t __maxlen),(__dst,__dstsize,__src,__maxlen))
 #else /* __CRT_HAVE_strncat_s */
 #include <libc/local/string/strncat_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strncat_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(1) __ATTR_IN_OPT(3) __errno_t __NOTHROW_NCX(__LIBCCALL strncat_s)(char *__dst, rsize_t __dstsize, const char *__src, rsize_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncat_s))(__dst, __dstsize, __src, __maxlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strncat_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(1) __ATTR_IN_OPT(3) __errno_t __NOTHROW_NCX(__LIBCCALL strncat_s)(char *__dst, rsize_t __dstsize, char const *__src, rsize_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncat_s))(__dst, __dstsize, __src, __maxlen); })
 #endif /* !__CRT_HAVE_strncat_s */
 #ifdef __CRT_HAVE_strncpy_s
 __CDECLARE(__ATTR_IN_OPT(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,strncpy_s,(char *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __maxlen),(__dst,__dstsize,__src,__maxlen))
@@ -8799,14 +8799,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timingsafe_memcmp, __FORCELOCAL __ATTR_ARTIFICIA
  * Return the signal number for a given name.
  * e.g.: `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__signo_t,__NOTHROW_NCX,strtosigno,(const char *__name),(__name))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__signo_t,__NOTHROW_NCX,strtosigno,(char const *__name),(__name))
 #else /* __CRT_HAVE_strtosigno */
 #include <libc/local/string/strtosigno.h>
 /* >> strtosigno(3)
  * Return the signal number for a given name.
  * e.g.: `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtosigno, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __signo_t __NOTHROW_NCX(__LIBCCALL strtosigno)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtosigno))(__name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtosigno, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __signo_t __NOTHROW_NCX(__LIBCCALL strtosigno)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtosigno))(__name); })
 #endif /* !__CRT_HAVE_strtosigno */
 #endif /* !__strtosigno_defined */
 #endif /* __USE_CYGWIN */

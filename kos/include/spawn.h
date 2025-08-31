@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc99aca */
+/* HASH CRC-32:0x1807f9b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -245,7 +245,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
  * Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
  * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
-__CDECLARE(__ATTR_IN(2) __ATTR_IN(5) __ATTR_IN(6) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1),__errno_t,__NOTHROW_RPC,posix_spawnp,(pid_t *__restrict __pid, const char *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__file,__file_actions,__attrp,___argv,___envp))
+__CDECLARE(__ATTR_IN(2) __ATTR_IN(5) __ATTR_IN(6) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1),__errno_t,__NOTHROW_RPC,posix_spawnp,(pid_t *__restrict __pid, char const *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__file,__file_actions,__attrp,___argv,___envp))
 #else /* __CRT_HAVE_posix_spawnp */
 #include <hybrid/__alloca.h>
 #include <asm/os/vfork.h>
@@ -260,7 +260,7 @@ __CDECLARE(__ATTR_IN(2) __ATTR_IN(5) __ATTR_IN(6) __ATTR_IN_OPT(3) __ATTR_IN_OPT
  * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
  * Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
  * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_IN(5) __ATTR_IN(6) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL posix_spawnp)(pid_t *__restrict __pid, const char *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnp))(__pid, __file, __file_actions, __attrp, ___argv, ___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_IN(5) __ATTR_IN(6) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL posix_spawnp)(pid_t *__restrict __pid, char const *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnp))(__pid, __file, __file_actions, __attrp, ___argv, ___envp); })
 #endif /* (((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork || __CRT_HAVE___libc_fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE___libc_pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close))) && __POSIX_SPAWN_USE_KOS && (__CRT_HAVE_fexecve || __CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve || __CRT_HAVE_execvpe || __CRT_HAVE__execvpe) && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) && (__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) && __hybrid_alloca))) || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_posix_spawn || (((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork || __CRT_HAVE___libc_fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE___libc_pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close))) && __POSIX_SPAWN_USE_KOS && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) && (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve)) || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_posix_fspawn_np || (((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork || __CRT_HAVE___libc_fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE___libc_pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close))) && __POSIX_SPAWN_USE_KOS && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) && (__CRT_HAVE_fexecve || (__OS_HAVE_PROCFS_SELF_FD && (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve))))))) && __hybrid_alloca) */
 #endif /* !__CRT_HAVE_posix_spawnp */
 #ifdef __CRT_HAVE_posix_spawnattr_init
@@ -578,14 +578,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addclosefrom_np, __FORC
  * Enqueue a call `chdir(path)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_addchdir_np,(posix_spawn_file_actions_t *__restrict __file_actions, const char *__restrict __path),(__file_actions,__path))
+__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_addchdir_np,(posix_spawn_file_actions_t *__restrict __file_actions, char const *__restrict __path),(__file_actions,__path))
 #elif defined(__POSIX_SPAWN_USE_KOS) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/spawn/posix_spawn_file_actions_addchdir_np.h>
 /* >> posix_spawn_file_actions_addchdir_np(3)
  * Enqueue a call `chdir(path)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addchdir_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict __file_actions, const char *__restrict __path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addchdir_np))(__file_actions, __path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addchdir_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict __file_actions, char const *__restrict __path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addchdir_np))(__file_actions, __path); })
 #endif /* ... */
 #ifdef __CRT_HAVE_posix_spawn_file_actions_addfchdir_np
 /* >> posix_spawn_file_actions_addfchdir_np(3)
@@ -602,6 +602,30 @@ __CDECLARE(__ATTR_FDARG(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawn_f
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addfchdir_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(2) __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __dfd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addfchdir_np))(__file_actions, __dfd); })
 #endif /* ... */
 #endif /* __USE_MISC || __USE_GNU */
+
+#ifdef __USE_MISC
+/* >> pidfd_spawn(3)
+ * Same as `posix_spawn(3)', except that the linux/kos-specific "PIDfd" mechanism is
+ * used  to return a reference to the child process in the form of a file descriptor
+ * stored in `*pidfd'.
+ * @param: pidfd:        Store the PIDfd of the newly spawned child process here
+ * @param: path:         The pathname of the program that should be executed
+ * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+ *                              handle operations. Can be used to (e.g.) re-direct  stdout
+ *                              for the new process
+ * @param: attrp:        [0..1] Additional process attributes to set for the child process
+ * @param: argv:         Same as the `argv' accepted by `execve(2)'
+ * @param: envp:         Same as the `envp' accepted by `execve(2)'
+ * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
+ * @return: * :          Error (errno-code describing the reason of failure) */
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_IN(5) __ATTR_IN(6) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1),__errno_t,__NOTHROW_RPC,pidfd_spawn,(__fd_t *__restrict __pidfd, char const *__restrict __path, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pidfd,__path,__file_actions,__attrp,___argv,___envp))
+/* >> pidfd_spawnp(3)
+ * Same as `posix_spawnp(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_IN(5) __ATTR_IN(6) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1),__errno_t,__NOTHROW_RPC,pidfd_spawnp,(__fd_t *__restrict __pidfd, char const *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pidfd,__file,__file_actions,__attrp,___argv,___envp))
+/* >> pidfd_fspawn_np(3)
+ * Same as `posix_fspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)' */
+__CDECLARE_OPT(__ATTR_FDREAD(2) __ATTR_IN(5) __ATTR_IN(6) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1),__errno_t,__NOTHROW_RPC,pidfd_fspawn_np,(__fd_t *__restrict __pidfd, __fd_t __execfd, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pidfd,__execfd,__file_actions,__attrp,___argv,___envp))
+#endif /* __USE_MISC */
 
 #endif /* __CC__ */
 

@@ -108,12 +108,12 @@ NOTHROW_NCX(LIBCCALL libc_fstatvfs)(fd_t filedes,
 }
 /*[[[end:libc_fstatvfs]]]*/
 
-/*[[[head:libc_statvfs64,hash:CRC-32=0x79fc557b]]]*/
+/*[[[head:libc_statvfs64,hash:CRC-32=0x6266fc3]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_statvfs64, libc_statvfs);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statvfs") ATTR_IN(1) ATTR_OUT(2) int
-NOTHROW_NCX(LIBCCALL libc_statvfs64)(const char *file,
+NOTHROW_NCX(LIBCCALL libc_statvfs64)(char const *file,
                                      struct statvfs64 *buf)
 /*[[[body:libc_statvfs64]]]*/
 {
@@ -150,10 +150,10 @@ NOTHROW_NCX(LIBCCALL libc_fstatvfs64)(fd_t filedes,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe8edb8c9]]]*/
+/*[[[start:exports,hash:CRC-32=0x699b5616]]]*/
 DEFINE_PUBLIC_ALIAS_P(statvfs,libc_statvfs,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct statvfs *buf),(file,buf));
 DEFINE_PUBLIC_ALIAS_P(fstatvfs,libc_fstatvfs,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t filedes, struct statvfs *buf),(filedes,buf));
-DEFINE_PUBLIC_ALIAS_P(statvfs64,libc_statvfs64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(const char *file, struct statvfs64 *buf),(file,buf));
+DEFINE_PUBLIC_ALIAS_P(statvfs64,libc_statvfs64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct statvfs64 *buf),(file,buf));
 DEFINE_PUBLIC_ALIAS_P(fstatvfs64,libc_fstatvfs64,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t filedes, struct statvfs64 *buf),(filedes,buf));
 /*[[[end:exports]]]*/
 

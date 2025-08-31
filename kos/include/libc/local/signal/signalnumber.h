@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f30dd19 */
+/* HASH CRC-32:0x420d6da6 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,7 +134,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/signal.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(signalnumber) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __signo_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(signalnumber))(const char *__name) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(signalnumber))(char const *__name) {
 	__signo_t __result;
 
 	/* Skip "SIG" prefix. */

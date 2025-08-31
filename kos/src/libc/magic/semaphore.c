@@ -130,7 +130,7 @@ int sem_close([[inout]] sem_t *self);
 @@@return: -1: [errno=EINVAL] The given `name' contains no characters after the initial `/'
 @@@return: -1: Error (s.a. `errno')
 [[cp_kos]]
-int sem_unlink([[in]] const char *name);
+int sem_unlink([[in]] char const *name);
 
 
 @@>> sem_wait(3)

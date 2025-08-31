@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31968c94 */
+/* HASH CRC-32:0x5c54f45 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,13 +55,13 @@ typedef __time_t time_t;
 
 #ifdef __CRT_HAVE_acct
 /* Switch process accounting on and off */
-__CDECLARE(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),(__filename))
+__CDECLARE(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(char const *__filename),(__filename))
 #elif defined(__CRT_HAVE___acct)
 /* Switch process accounting on and off */
-__CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),__acct,(__filename))
+__CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(char const *__filename),__acct,(__filename))
 #elif defined(__CRT_HAVE___libc_acct)
 /* Switch process accounting on and off */
-__CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),__libc_acct,(__filename))
+__CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(char const *__filename),__libc_acct,(__filename))
 #endif /* ... */
 
 __SYSDECL_END

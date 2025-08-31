@@ -26,10 +26,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_acct,hash:CRC-32=0xb9190a0a]]]*/
+/*[[[head:libc_acct,hash:CRC-32=0x48389903]]]*/
 /* Switch process accounting on and off */
 INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN_OPT(1) int
-NOTHROW_RPC(LIBCCALL libc_acct)(const char *filename)
+NOTHROW_RPC(LIBCCALL libc_acct)(char const *filename)
 /*[[[body:libc_acct]]]*/
 {
 	errno_t error;
@@ -42,10 +42,10 @@ NOTHROW_RPC(LIBCCALL libc_acct)(const char *filename)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1c2e4bd]]]*/
-DEFINE_PUBLIC_ALIAS_P(__acct,libc_acct,ATTR_IN_OPT(1),int,NOTHROW_RPC,LIBCCALL,(const char *filename),(filename));
-DEFINE_PUBLIC_ALIAS_P(__libc_acct,libc_acct,ATTR_IN_OPT(1),int,NOTHROW_RPC,LIBCCALL,(const char *filename),(filename));
-DEFINE_PUBLIC_ALIAS_P(acct,libc_acct,ATTR_IN_OPT(1),int,NOTHROW_RPC,LIBCCALL,(const char *filename),(filename));
+/*[[[start:exports,hash:CRC-32=0x4aafae73]]]*/
+DEFINE_PUBLIC_ALIAS_P(__acct,libc_acct,ATTR_IN_OPT(1),int,NOTHROW_RPC,LIBCCALL,(char const *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(__libc_acct,libc_acct,ATTR_IN_OPT(1),int,NOTHROW_RPC,LIBCCALL,(char const *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(acct,libc_acct,ATTR_IN_OPT(1),int,NOTHROW_RPC,LIBCCALL,(char const *filename),(filename));
 /*[[[end:exports]]]*/
 
 DECL_END

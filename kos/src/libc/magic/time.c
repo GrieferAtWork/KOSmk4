@@ -1869,7 +1869,7 @@ DEFINE_PUBLIC_ALIAS(getdate_err, libc_getdate_err);
 [[requires_include("<libc/template/getdate_err.h>")]]
 [[requires($has_function(getdate_r) && defined(__LOCAL_getdate_err))]]
 [[impl_include("<bits/crt/tm.h>")]]
-struct $tm *getdate([[in]] const char *string) {
+struct $tm *getdate([[in]] char const *string) {
 	@@static struct tm tmbuf = {0}@@
 	int error = getdate_r(string, &tmbuf);
 	if (error == 0)

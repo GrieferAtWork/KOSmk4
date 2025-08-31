@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40038bc */
+/* HASH CRC-32:0xaac9eb18 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -115,7 +115,7 @@ __CDECLARE_OPT(__ATTR_INOUT(1),int,__NOTHROW_NCX,sem_close,(sem_t *__self),(__se
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `name' contains no characters after the initial `/'
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_IN(1),int,__NOTHROW_RPC_KOS,sem_unlink,(const char *__name),(__name))
+__CDECLARE_OPT(__ATTR_IN(1),int,__NOTHROW_RPC_KOS,sem_unlink,(char const *__name),(__name))
 /* >> sem_wait(3)
  * Wait for a ticket to become  available to the given semaphore  `self'
  * Once a ticket has become available, consume it and return. Until that

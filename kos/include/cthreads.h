@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc41ced9f */
+/* HASH CRC-32:0x4878fcb3 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -140,10 +140,10 @@ typedef struct mutex *mutex_t;
 struct mutex {
 	spin_lock_t          held;   /* Underlying lock */
 	spin_lock_t          lock;   /* Unused */
-	const char          *name;   /* [0..1] Name (for debugging) */
+	char const          *name;   /* [0..1] Name (for debugging) */
 	struct cthread_queue queue;  /* Unused */
 #ifdef WAIT_FUNC_DEBUG
-	const char          *fname;  /* Debugging? */
+	char const          *fname;  /* Debugging? */
 #else /* WAIT_FUNC_DEBUG */
 	struct cthread      *holder; /* Debugging? */
 #endif /* WAIT_FUNC_DEBUG */

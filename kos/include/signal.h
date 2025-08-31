@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b41b87f */
+/* HASH CRC-32:0xcd43004d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2780,7 +2780,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW
  * the given `name', and the  signal's actual name. When  `name'
  * isn't recognized, return `0' instead.
  * This function also handles stuff like "SIGRTMIN+1" or "9" */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__signo_t,__NOTHROW_NCX,signalnumber,(const char *__name),(__name))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__signo_t,__NOTHROW_NCX,signalnumber,(char const *__name),(__name))
 #else /* __CRT_HAVE_signalnumber */
 #include <libc/local/signal/signalnumber.h>
 /* >> signalnumber(3)
@@ -2789,7 +2789,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__signo_t,__NOTHROW_NCX,signa
  * the given `name', and the  signal's actual name. When  `name'
  * isn't recognized, return `0' instead.
  * This function also handles stuff like "SIGRTMIN+1" or "9" */
-__NAMESPACE_LOCAL_USING_OR_IMPL(signalnumber, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __signo_t __NOTHROW_NCX(__LIBCCALL signalnumber)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(signalnumber))(__name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(signalnumber, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __signo_t __NOTHROW_NCX(__LIBCCALL signalnumber)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(signalnumber))(__name); })
 #endif /* !__CRT_HAVE_signalnumber */
 #ifdef __CRT_HAVE_signalnext
 /* >> signalnext(3)
@@ -2830,7 +2830,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sig2str, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_O
  *  - Doesn't automatically remove any "SIG" prefix.
  * @return: 0 : Success; `*p_signo' was filled
  * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
-__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,str2sig,(const char *__name, __signo_t *__p_signo),(__name,__p_signo))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,str2sig,(char const *__name, __signo_t *__p_signo),(__name,__p_signo))
 #else /* __CRT_HAVE_str2sig */
 #include <libc/local/signal/str2sig.h>
 /* >> str2sig(3)
@@ -2839,7 +2839,7 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,str2sig,(const char *__n
  *  - Doesn't automatically remove any "SIG" prefix.
  * @return: 0 : Success; `*p_signo' was filled
  * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(str2sig, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL str2sig)(const char *__name, __signo_t *__p_signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(str2sig))(__name, __p_signo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(str2sig, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL str2sig)(char const *__name, __signo_t *__p_signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(str2sig))(__name, __p_signo); })
 #endif /* !__CRT_HAVE_str2sig */
 #endif /* __USE_SOLARIS */
 

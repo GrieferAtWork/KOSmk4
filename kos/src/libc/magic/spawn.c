@@ -175,186 +175,10 @@ typedef struct __posix_spawn_file_actions posix_spawn_file_actions_t;
 )]
 
 
-[[ignore, nocrt, alias("posix_spawn")]]
-[[argument_names(pid, path, file_actions, attrp, ___argv, ___envp)]]
-[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
-$errno_t crt_posix_spawn([[out]] pid_t *__restrict pid,
-                         [[in]] char const *__restrict path,
-                         [[in_opt]] posix_spawn_file_actions_t const *file_actions,
-                         [[in_opt]] posix_spawnattr_t const *attrp,
-                         [[in]] __TARGV, [[in]] __TENVP);
-
-
-%#ifdef __USE_KOS
-
 %[define(POSIX_SPAWN_TYPE_EXECVE = 0)]  /* execve((char const *)exec_arg, ___argv, ___envp) */
 %[define(POSIX_SPAWN_TYPE_EXECVPE = 1)] /* execvpe((char const *)exec_arg, ___argv, ___envp) */
 %[define(POSIX_SPAWN_TYPE_FEXECVE = 2)] /* fexecve((fd_t)(uintptr_t)exec_arg, ___argv, ___envp) */
 %[define(POSIX_SPAWN_TYPE_CUSTOM = 3)]  /* (*(void (LIBCCALL *)(char **, char **))exec_arg)(___argv, ___envp) */
-
-
-
-@@>> posix_fspawn_np(3)
-@@Implementation for the fastest possible  method of (safely) doing  fork(2)+fexecve(2)
-@@in  order  to  spawn  a  new  process  from  the  given  `execfd'  file   descriptor.
-@@For this purpose, any error that may happen during either the fork(3), the fexecve(2)
-@@or  any of the numerous additional system calls that may be performed in-between will
-@@be returned by this function to the  parent process, while the function itself  never
-@@actually returns in the child process.
-@@For this  purpose,  this  function tries  to  make  use of  `vfork(2)'  in  combination
-@@with  `__ARCH_HAVE_SHARED_VM_VFORK',  and if  that  isn't available,  a  temporary pipe
-@@is  used to communicate process initialization errors, as well as to await a successful
-@@exec call by using the  fact that a successful exec  will close all `O_CLOEXEC'  files,
-@@with the pipe having been given that flag, and that a pipe without both ends still open
-@@will always  have its  read immediately  return  (which is  used to  indicate  success)
-@@@param: pid:          Store the PID of the newly spawned child process here
-@@@param: execfd:       The file descriptor pointing to the file that should be executed
-@@@param: file_actions: [0..1] A set of additional actions to perform in regards to file-
-@@                             handle operations. Can be used to (e.g.) re-direct  stdout
-@@                             for the new process
-@@@param: attrp:        [0..1] Additional process attributes to set for the child process
-@@@param: argv:         Same as the `argv' accepted by `fexecve(2)'
-@@@param: envp:         Same as the `envp' accepted by `fexecve(2)'
-@@@return: 0 :          Success. (The child process's PID has been stored in `*pid')
-@@@return: * :          Error (errno-code describing the reason of failure)
-[[argument_names(pid, execfd, file_actions, attrp, ___argv, ___envp)]]
-[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
-[[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
-[[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
-[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>", "<asm/os/features.h>")]]
-[[requires($has_function(posix_spawn_impl, fexecve) ||
-           (defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(crt_posix_spawn)))]]
-$errno_t posix_fspawn_np([[out]] pid_t *__restrict pid, [[fdread]] $fd_t execfd,
-                         [[in_opt]] posix_spawn_file_actions_t const *file_actions,
-                         [[in_opt]] posix_spawnattr_t const *attrp,
-                         [[in]] __TARGV, [[in]] __TENVP) {
-@@pp_if $has_function(posix_spawn_impl, fexecve)@@
-	return posix_spawn_impl(pid, POSIX_SPAWN_TYPE_FEXECVE, (void *)(uintptr_t)execfd, file_actions, attrp, ___argv, ___envp);
-@@pp_else@@
-@@pp_if __SIZEOF_INT__ == 4@@
-	char buf[COMPILER_LNEOF("/proc/self/fd/-2147483648")];
-@@pp_elif __SIZEOF_INT__ == 8@@
-	char buf[COMPILER_LNEOF("/proc/self/fd/-9223372036854775808")];
-@@pp_elif __SIZEOF_INT__ == 2@@
-	char buf[COMPILER_LNEOF("/proc/self/fd/-32768")];
-@@pp_else@@
-	char buf[COMPILER_LNEOF("/proc/self/fd/-128")];
-@@pp_endif@@
-	sprintf(buf, "/proc/self/fd/%d", execfd);
-	return crt_posix_spawn(pid, buf, file_actions, attrp, ___argv, ___envp);
-@@pp_endif@@
-}
-
-
-
-[[static]]
-[[argument_names(pid, exec_type, exec_arg, file_actions, attrp, ___argv, ___envp)]]
-[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
-[[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
-[[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
-[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>", "<asm/os/features.h>")]]
-[[requires(defined(__POSIX_SPAWN_USE_KOS) &&
-           ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
-            ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
-             $has_function(read) && $has_function(write) && $has_function(close))) &&
-           $has_function(posix_spawn_child) && $has_function(waitpid))]]
-$errno_t posix_spawn_impl([[out]] pid_t *__restrict pid, unsigned int exec_type, void *exec_arg,
-                          [[in_opt]] posix_spawn_file_actions_t const *file_actions,
-                          [[in_opt]] posix_spawnattr_t const *attrp,
-                          [[in]] __TARGV, [[in]] __TENVP) {
-	int status;
-@@pp_if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || !$has_function(vfork)@@
-	fd_t pipes[2];
-	ssize_t temp;
-@@pp_endif@@
-	errno_t result, error, old_errno;
-	pid_t child;
-	old_errno = __libc_geterrno_or(0);
-@@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
-	(void)libc_seterrno(0);
-	child = vfork();
-	if (child == 0)
-		goto do_exec;
-	/* Check if the vfork() from  the child returned success, but  left
-	 * our (vm-shared) errno as non-zero (which would indicate that the
-	 * child encountered an error at  some point after vfork()  already
-	 * succeeded) */
-	result = __libc_geterrno_or(0);
-	if (result != 0) {
-		if (child < 0) {
-			/* The vfork() itself failed. */
-			(void)libc_seterrno(old_errno);
-			return result;
-		}
-		/* Something within the child failed after vfork(). */
-		goto err_join_zombie_child;
-	}
-	/* Restore the old errno */
-	(void)libc_seterrno(old_errno);
-	/* Write back the child's PID */
-	*pid = child;
-	return result;
-@@pp_else@@
-	/* Create a pair of pipes for temporary communication. */
-	if (pipe2(pipes, O_CLOEXEC)) {
-err_without_child:
-		result = __libc_geterrno_or(0);
-		(void)libc_seterrno(old_errno);
-		return result;
-	}
-	child = fork();
-	if (child == 0)
-		goto do_exec;
-	if (child < 0)
-		goto err_without_child; /* The fork() itself failed. */
-	/* Read from the communication pipe
-	 * (NOTE: If exec() succeeds, the pipe will be
-	 *        closed and  read() returns  ZERO(0)) */
-	close(pipes[1]); /* Close the writer. */
-	temp = read(pipes[0], &result, sizeof(result));
-	close(pipes[0]); /* Close the reader. */
-	if (temp < 0)
-		goto err_join_zombie_child;
-	/* This means that `fexecve()' below closed the pipe during a successful exec(). */
-	if (temp != sizeof(result)) {
-		*pid = child;
-		(void)libc_seterrno(old_errno);
-		return 0;
-	}
-@@pp_endif@@
-err_join_zombie_child:
-	/* Unless the child was already spawned as detached,
-	 * we still have to re-join  it, or else it will  be
-	 * left dangling as a zombie process! */
-	if (waitpid(child, &status, 0) < 0) {
-@@pp_ifdef EINTR@@
-		if (__libc_geterrno() == EINTR)
-			goto err_join_zombie_child;
-@@pp_endif@@
-	}
-	(void)libc_seterrno(old_errno);
-	return result;
-do_exec:
-	/* Perform additional actions within the child.
-	 *
-	 * NOTE: When the exec succeeds, the pipe is auto-
-	 *       closed because it's marked as  O_CLOEXEC! */
-	error = posix_spawn_child(exec_type, exec_arg, file_actions, attrp, ___argv, ___envp);
-	if (error != 0) {
-@@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
-		/* If the exec fails, it will have modified `errno' to indicate this fact.
-		 * And since we're sharing VMs with  our parent process, the error  reason
-		 * will have already  been written  back to  our parent's  VM, so  there's
-		 * actually nothing left for us to do, but to simply exit! */
-		__libc_seterrno(error);
-@@pp_else@@
-		/* Write the exec-error back to our parent. */
-		write(pipes[1], &error, sizeof(error));
-		/* No need to close the pipe, it's auto-closed by the kernel! */
-@@pp_endif@@
-	}
-	_Exit(127);
-}
 
 [[static]]
 [[argument_names(exec_type, exec_arg, file_actions, attrp, ___argv, ___envp)]]
@@ -640,6 +464,178 @@ err_errno:
 @@pp_endif@@
 }
 
+[[static]]
+[[argument_names(pid, exec_type, exec_arg, file_actions, attrp, ___argv, ___envp)]]
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
+[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>", "<asm/os/features.h>")]]
+[[requires(defined(__POSIX_SPAWN_USE_KOS) &&
+           ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
+            ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
+             $has_function(read) && $has_function(write) && $has_function(close))) &&
+           $has_function(posix_spawn_child) && $has_function(waitpid))]]
+$errno_t posix_spawn_impl([[out]] pid_t *__restrict pid, unsigned int exec_type, void *exec_arg,
+                          [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                          [[in_opt]] posix_spawnattr_t const *attrp,
+                          [[in]] __TARGV, [[in]] __TENVP) {
+	int status;
+@@pp_if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || !$has_function(vfork)@@
+	fd_t pipes[2];
+	ssize_t temp;
+@@pp_endif@@
+	errno_t result, error, old_errno;
+	pid_t child;
+	old_errno = __libc_geterrno_or(0);
+@@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
+	(void)libc_seterrno(0);
+	child = vfork();
+	if (child == 0)
+		goto do_exec;
+	/* Check if the vfork() from  the child returned success, but  left
+	 * our (vm-shared) errno as non-zero (which would indicate that the
+	 * child encountered an error at  some point after vfork()  already
+	 * succeeded) */
+	result = __libc_geterrno_or(0);
+	if (result != 0) {
+		if (child < 0) {
+			/* The vfork() itself failed. */
+			(void)libc_seterrno(old_errno);
+			return result;
+		}
+		/* Something within the child failed after vfork(). */
+		goto err_join_zombie_child;
+	}
+	/* Restore the old errno */
+	(void)libc_seterrno(old_errno);
+	/* Write back the child's PID */
+	*pid = child;
+	return result;
+@@pp_else@@
+	/* Create a pair of pipes for temporary communication. */
+	if (pipe2(pipes, O_CLOEXEC)) {
+err_without_child:
+		result = __libc_geterrno_or(0);
+		(void)libc_seterrno(old_errno);
+		return result;
+	}
+	child = fork();
+	if (child == 0)
+		goto do_exec;
+	if (child < 0)
+		goto err_without_child; /* The fork() itself failed. */
+	/* Read from the communication pipe
+	 * (NOTE: If exec() succeeds, the pipe will be
+	 *        closed and  read() returns  ZERO(0)) */
+	close(pipes[1]); /* Close the writer. */
+	temp = read(pipes[0], &result, sizeof(result));
+	close(pipes[0]); /* Close the reader. */
+	if (temp < 0)
+		goto err_join_zombie_child;
+	/* This means that `fexecve()' below closed the pipe during a successful exec(). */
+	if (temp != sizeof(result)) {
+		*pid = child;
+		(void)libc_seterrno(old_errno);
+		return 0;
+	}
+@@pp_endif@@
+err_join_zombie_child:
+	/* Unless the child was already spawned as detached,
+	 * we still have to re-join  it, or else it will  be
+	 * left dangling as a zombie process! */
+	if (waitpid(child, &status, 0) < 0) {
+@@pp_ifdef EINTR@@
+		if (__libc_geterrno() == EINTR)
+			goto err_join_zombie_child;
+@@pp_endif@@
+	}
+	(void)libc_seterrno(old_errno);
+	return result;
+do_exec:
+	/* Perform additional actions within the child.
+	 *
+	 * NOTE: When the exec succeeds, the pipe is auto-
+	 *       closed because it's marked as  O_CLOEXEC! */
+	error = posix_spawn_child(exec_type, exec_arg, file_actions, attrp, ___argv, ___envp);
+	if (error != 0) {
+@@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
+		/* If the exec fails, it will have modified `errno' to indicate this fact.
+		 * And since we're sharing VMs with  our parent process, the error  reason
+		 * will have already  been written  back to  our parent's  VM, so  there's
+		 * actually nothing left for us to do, but to simply exit! */
+		__libc_seterrno(error);
+@@pp_else@@
+		/* Write the exec-error back to our parent. */
+		write(pipes[1], &error, sizeof(error));
+		/* No need to close the pipe, it's auto-closed by the kernel! */
+@@pp_endif@@
+	}
+	_Exit(127);
+}
+
+
+
+%#ifdef __USE_KOS
+[[ignore, nocrt, alias("posix_spawn")]]
+[[argument_names(pid, path, file_actions, attrp, ___argv, ___envp)]]
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
+$errno_t crt_posix_spawn([[out]] pid_t *__restrict pid,
+                         [[in]] char const *__restrict path,
+                         [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                         [[in_opt]] posix_spawnattr_t const *attrp,
+                         [[in]] __TARGV, [[in]] __TENVP);
+
+@@>> posix_fspawn_np(3)
+@@Implementation for the fastest possible  method of (safely) doing  fork(2)+fexecve(2)
+@@in  order  to  spawn  a  new  process  from  the  given  `execfd'  file   descriptor.
+@@For this purpose, any error that may happen during either the fork(3), the fexecve(2)
+@@or  any of the numerous additional system calls that may be performed in-between will
+@@be returned by this function to the  parent process, while the function itself  never
+@@actually returns in the child process.
+@@For this  purpose,  this  function tries  to  make  use of  `vfork(2)'  in  combination
+@@with  `__ARCH_HAVE_SHARED_VM_VFORK',  and if  that  isn't available,  a  temporary pipe
+@@is  used to communicate process initialization errors, as well as to await a successful
+@@exec call by using the  fact that a successful exec  will close all `O_CLOEXEC'  files,
+@@with the pipe having been given that flag, and that a pipe without both ends still open
+@@will always  have its  read immediately  return  (which is  used to  indicate  success)
+@@@param: pid:          Store the PID of the newly spawned child process here
+@@@param: execfd:       The file descriptor pointing to the file that should be executed
+@@@param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+@@                             handle operations. Can be used to (e.g.) re-direct  stdout
+@@                             for the new process
+@@@param: attrp:        [0..1] Additional process attributes to set for the child process
+@@@param: argv:         Same as the `argv' accepted by `fexecve(2)'
+@@@param: envp:         Same as the `envp' accepted by `fexecve(2)'
+@@@return: 0 :          Success. (The child process's PID has been stored in `*pid')
+@@@return: * :          Error (errno-code describing the reason of failure)
+[[argument_names(pid, execfd, file_actions, attrp, ___argv, ___envp)]]
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
+[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>", "<asm/os/features.h>")]]
+[[requires($has_function(posix_spawn_impl, fexecve) ||
+           (defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(crt_posix_spawn)))]]
+$errno_t posix_fspawn_np([[out]] pid_t *__restrict pid, [[fdread]] $fd_t execfd,
+                         [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                         [[in_opt]] posix_spawnattr_t const *attrp,
+                         [[in]] __TARGV, [[in]] __TENVP) {
+@@pp_if $has_function(posix_spawn_impl, fexecve)@@
+	return posix_spawn_impl(pid, POSIX_SPAWN_TYPE_FEXECVE, (void *)(uintptr_t)execfd, file_actions, attrp, ___argv, ___envp);
+@@pp_else@@
+@@pp_if __SIZEOF_INT__ == 4@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-2147483648")];
+@@pp_elif __SIZEOF_INT__ == 8@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-9223372036854775808")];
+@@pp_elif __SIZEOF_INT__ == 2@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-32768")];
+@@pp_else@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-128")];
+@@pp_endif@@
+	sprintf(buf, "/proc/self/fd/%d", execfd);
+	return crt_posix_spawn(pid, buf, file_actions, attrp, ___argv, ___envp);
+@@pp_endif@@
+}
+
 %#endif /* __USE_KOS */
 
 
@@ -745,7 +741,7 @@ __LOCAL_LIBC(__posix_spawnp_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 2, 4, 8, 9)
 @@pp_endif@@
 )]]
 $errno_t posix_spawnp([[out]] pid_t *__restrict pid,
-                      [[in]] const char *__restrict file,
+                      [[in]] char const *__restrict file,
                       [[in_opt]] posix_spawn_file_actions_t const *file_actions,
                       [[in_opt]] posix_spawnattr_t const *attrp,
                       [[in]] __TARGV, [[in]] __TENVP) {
@@ -1283,7 +1279,7 @@ err:
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(posix_spawn_file_actions_alloc))]]
 $errno_t posix_spawn_file_actions_addchdir_np([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
-                                              [[in]] const char *__restrict path) {
+                                              [[in]] char const *__restrict path) {
 	struct __spawn_action *action;
 	if unlikely((path = strdup(path)) == NULL)
 		goto err;
@@ -1331,6 +1327,73 @@ err:
 @@pp_endif@@
 }
 %#endif /* __USE_MISC || __USE_GNU */
+
+
+
+%
+%#ifdef __USE_MISC
+
+[[static]] /* Not implemented in magic -- only implemented in "userimpl" */
+[[argument_names(pidfd, exec_type, exec_arg, file_actions, attrp, ___argv, ___envp)]]
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
+$errno_t pidfd_spawn_impl([[out]] $fd_t *__restrict pidfd, unsigned int exec_type, void *exec_arg,
+                          [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                          [[in_opt]] posix_spawnattr_t const *attrp,
+                          [[in]] __TARGV, [[in]] __TENVP);
+
+
+@@>> pidfd_spawn(3)
+@@Same as `posix_spawn(3)', except that the linux/kos-specific "PIDfd" mechanism is
+@@used  to return a reference to the child process in the form of a file descriptor
+@@stored in `*pidfd'.
+@@@param: pidfd:        Store the PIDfd of the newly spawned child process here
+@@@param: path:         The pathname of the program that should be executed
+@@@param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+@@                             handle operations. Can be used to (e.g.) re-direct  stdout
+@@                             for the new process
+@@@param: attrp:        [0..1] Additional process attributes to set for the child process
+@@@param: argv:         Same as the `argv' accepted by `execve(2)'
+@@@param: envp:         Same as the `envp' accepted by `execve(2)'
+@@@return: 0 :          Success. (The child process's PID has been stored in `*pid')
+@@@return: * :          Error (errno-code describing the reason of failure)
+[[argument_names(pidfd, path, file_actions, attrp, ___argv, ___envp)]]
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[no_local, requires_function(pidfd_spawn_impl)]]
+$errno_t pidfd_spawn([[out]] $fd_t *__restrict pidfd,
+                     [[in]] char const *__restrict path,
+                     [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                     [[in_opt]] posix_spawnattr_t const *attrp,
+                     [[in]] __TARGV, [[in]] __TENVP) {
+	return pidfd_spawn_impl(pidfd, POSIX_SPAWN_TYPE_EXECVE, (void *)path, file_actions, attrp, ___argv, ___envp);
+}
+
+@@>> pidfd_spawnp(3)
+@@Same as `posix_spawnp(3)', but use a "PIDfd" like `pidfd_spawn(3)'
+[[argument_names(pidfd, file, file_actions, attrp, ___argv, ___envp)]]
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[no_local, requires_function(pidfd_spawn_impl)]]
+$errno_t pidfd_spawnp([[out]] $fd_t *__restrict pidfd,
+                      [[in]] char const *__restrict file,
+                      [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                      [[in_opt]] posix_spawnattr_t const *attrp,
+                      [[in]] __TARGV, [[in]] __TENVP) {
+	return pidfd_spawn_impl(pidfd, POSIX_SPAWN_TYPE_EXECVPE, (void *)file, file_actions, attrp, ___argv, ___envp);
+}
+
+
+@@>> pidfd_fspawn_np(3)
+@@Same as `posix_fspawn_np(3)', but use a "PIDfd" like `pidfd_spawn(3)'
+[[argument_names(pidfd, execfd, file_actions, attrp, ___argv, ___envp)]]
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[no_local, requires_function(pidfd_spawn_impl)]]
+$errno_t pidfd_fspawn_np([[out]] $fd_t *__restrict pidfd, [[fdread]] $fd_t execfd,
+                         [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                         [[in_opt]] posix_spawnattr_t const *attrp,
+                         [[in]] __TARGV, [[in]] __TENVP) {
+	return pidfd_spawn_impl(pidfd, POSIX_SPAWN_TYPE_FEXECVE, (void *)(uintptr_t)execfd, file_actions, attrp, ___argv, ___envp);
+}
+
+%#endif /* __USE_MISC */
 
 
 /* XXX:

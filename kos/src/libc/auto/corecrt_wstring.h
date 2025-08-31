@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x235a952f */
+/* HASH CRC-32:0xe23eb94f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,9 +63,9 @@ INTDEF ATTR_IN_OPT(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd_wcscpy_s
 /* >> wcscpy_s(3) */
 INTDEF ATTR_IN_OPT(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc_wcscpy_s)(char32_t *dst, size_t dstsize, char32_t const *src);
 /* >> wcsncat_s(3) */
-INTDEF ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBDCALL libd_wcsncat_s)(char16_t *dst, rsize_t dstsize, const char16_t *src, rsize_t maxlen);
+INTDEF ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBDCALL libd_wcsncat_s)(char16_t *dst, rsize_t dstsize, char16_t const *src, rsize_t maxlen);
 /* >> wcsncat_s(3) */
-INTDEF ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBKCALL libc_wcsncat_s)(char32_t *dst, rsize_t dstsize, const char32_t *src, rsize_t maxlen);
+INTDEF ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBKCALL libc_wcsncat_s)(char32_t *dst, rsize_t dstsize, char32_t const *src, rsize_t maxlen);
 /* >> wcsncpy_s(3) */
 INTDEF ATTR_IN_OPT(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd_wcsncpy_s)(char16_t *dst, size_t dstsize, char16_t const *src, size_t maxlen);
 /* >> wcsncpy_s(3) */

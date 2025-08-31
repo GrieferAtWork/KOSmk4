@@ -75,7 +75,7 @@ __SYSDECL_BEGIN
 
 %[insert:extern(humanize_number)]
 
-//TODO:int expand_number(const char *buf, uint64_t *num);
+//TODO:int expand_number(char const *buf, uint64_t *num);
 
 [[cp, vartypes($mode_t)]]
 [[decl_include("<bits/types.h>")]]
@@ -85,7 +85,7 @@ __SYSDECL_BEGIN
             $has_function(openat, flock, fstat, stat) &&
             ($has_function(ftruncate) || !defined(__O_TRUNC))))]]
 [[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>", "<bits/types.h>", "<bits/os/stat.h>")]]
-$fd_t flopen(const char *path, $oflag_t flags, ...) {
+$fd_t flopen(char const *path, $oflag_t flags, ...) {
 @@pp_if defined(__AT_FDCWD) && $has_function(flopenat)@@
 	mode_t mode;
 	va_list args;
@@ -159,7 +159,7 @@ restart:
            $has_function(openat, flock, fstat, fstatat) &&
            ($has_function(ftruncate) || !defined(__O_TRUNC)))]]
 [[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>", "<bits/types.h>", "<bits/os/stat.h>")]]
-$fd_t flopenat([[dirfd]] $fd_t dirfd, const char *path, $oflag_t flags, ...) {
+$fd_t flopenat([[dirfd]] $fd_t dirfd, char const *path, $oflag_t flags, ...) {
 @@pp_ifdef __O_TRUNC@@
 	int should_trunc;
 @@pp_endif@@
@@ -216,8 +216,8 @@ restart:
 	goto again;
 }
 
-//TODO:struct pidfh *pidfile_open(const char *path, mode_t mode, pid_t *pidptr);
-//TODO:$fd_t pidfile_fileno(const struct pidfh *pfh);
+//TODO:struct pidfh *pidfile_open(char const *path, mode_t mode, pid_t *pidptr);
+//TODO:$fd_t pidfile_fileno(struct pidfh const *pfh);
 //TODO:int pidfile_write(struct pidfh *pfh);
 //TODO:int pidfile_close(struct pidfh *pfh);
 //TODO:int pidfile_remove(struct pidfh *pfh);

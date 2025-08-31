@@ -3208,7 +3208,7 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 [[pure, wunused]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<asm/os/signal.h>")]]
-$signo_t signalnumber([[in]] const char *name) {
+$signo_t signalnumber([[in]] char const *name) {
 	$signo_t result;
 
 	/* Skip "SIG" prefix. */
@@ -3316,7 +3316,7 @@ int sig2str($signo_t signo, [[out]] char buf[SIG2STR_MAX]) {
 [[decl_include("<bits/types.h>")]]
 [[requires_function(signalnumber)]]
 [[section(".text.crt{|.dos}.solaris")]]
-int str2sig([[in]] const char *name, [[out]] $signo_t *p_signo) {
+int str2sig([[in]] char const *name, [[out]] $signo_t *p_signo) {
 	$signo_t result;
 	size_t i;
 	if (name[0] == 'S' && name[1] == 'I' && name[2] == 'G')

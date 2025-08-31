@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0bf6b73 */
+/* HASH CRC-32:0x7ea7847b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,16 +30,16 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF fd_t NOTHROW_RPC(VLIBDCALL libd_flopen)(const char *path, oflag_t flags, ...);
+INTDEF fd_t NOTHROW_RPC(VLIBDCALL libd_flopen)(char const *path, oflag_t flags, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF fd_t NOTHROW_RPC(VLIBCCALL libc_flopen)(const char *path, oflag_t flags, ...);
+INTDEF fd_t NOTHROW_RPC(VLIBCCALL libc_flopen)(char const *path, oflag_t flags, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF fd_t NOTHROW_RPC(VLIBDCALL libd_flopenat)(fd_t dirfd, const char *path, oflag_t flags, ...);
+INTDEF fd_t NOTHROW_RPC(VLIBDCALL libd_flopenat)(fd_t dirfd, char const *path, oflag_t flags, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF fd_t NOTHROW_RPC(VLIBCCALL libc_flopenat)(fd_t dirfd, const char *path, oflag_t flags, ...);
+INTDEF fd_t NOTHROW_RPC(VLIBCCALL libc_flopenat)(fd_t dirfd, char const *path, oflag_t flags, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1096,7 +1096,7 @@ char *make_temp_file_with_prefix([[in_opt]] char const *prefix,
                                  [[in_opt]] char const *suffix) {
 	fd_t tempfd;
 	char *result, *p;
-	const char *tmpdir = choose_tmpdir();
+	char const *tmpdir = choose_tmpdir();
 	size_t tmpdir_len, prefix_len, suffix_len;
 	if (prefix == NULL)
 		prefix = "cc";

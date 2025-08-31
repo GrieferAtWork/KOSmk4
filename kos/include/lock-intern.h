@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf627fc9a */
+/* HASH CRC-32:0xf1de1790 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,7 +117,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__spin_lock_locked, __FORCELOCAL __ATTR_ARTIFICI
 struct mutex {
 	__spin_lock_t __held;   /* The actually used lock */
 	__spin_lock_t __lock;   /* unused */
-	const char   *__name;   /* unused */
+	char const   *__name;   /* unused */
 	void         *__head;   /* unused */
 	void         *__tail;   /* unused */
 	void         *__holder; /* unused */

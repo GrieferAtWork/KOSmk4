@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb16c6454 */
+/* HASH CRC-32:0x6c654235 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <asm/os/paths.h>
 /* Weird function that just returns "/dev/shm/" */
-INTERN ATTR_SECTION(".text.crt.compat.glibc") const char *
+INTERN ATTR_SECTION(".text.crt.compat.glibc") char const *
 NOTHROW_NCX(LIBCCALL libc___shm_directory)(size_t *len) {
 	*len = COMPILER_STRLEN(__PATH_SHM "/");
 	return __PATH_SHM "/";
@@ -1130,7 +1130,7 @@ NOTHROW_NCX(LIBCCALL libc_unmapfile)(struct mapfile *__restrict mapping) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS_P(__shm_directory,libc___shm_directory,,const char *,NOTHROW_NCX,LIBCCALL,(size_t *len),(len));
+DEFINE_PUBLIC_ALIAS_P(__shm_directory,libc___shm_directory,,char const *,NOTHROW_NCX,LIBCCALL,(size_t *len),(len));
 DEFINE_PUBLIC_ALIAS_P(shm_open,libc_shm_open,ATTR_IN(1),fd_t,NOTHROW_RPC,LIBCCALL,(char const *name, oflag_t oflags, mode_t mode),(name,oflags,mode));
 DEFINE_PUBLIC_ALIAS_P(shm_unlink,libc_shm_unlink,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *name),(name));
 DEFINE_PUBLIC_ALIAS_P(posix_madvise,libc_posix_madvise,ATTR_ACCESS_NONE(1),errno_t,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T advice),(addr,len,advice));

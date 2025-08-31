@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29bc929d */
+/* HASH CRC-32:0xc5810ca6 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6217,7 +6217,7 @@ NOTHROW_NCX(LIBCCALL libc_strcat_s)(char *dst,
 INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_INOUT_OPT(1) ATTR_IN_OPT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_strncat_s)(char *dst,
                                      rsize_t dstsize,
-                                     const char *src,
+                                     char const *src,
                                      rsize_t maxlen) {
 	char *iter;
 	size_t remaining;
@@ -6722,7 +6722,7 @@ NOTHROW_NCX(LIBCCALL libc_timingsafe_memcmp)(void const *s1,
  * e.g.: `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) signo_t
-NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name) {
+NOTHROW_NCX(LIBCCALL libc_strtosigno)(char const *name) {
 	size_t i;
 	if (name[0] != 'S' || name[1] != 'I' || name[2] != 'G')
 		return 0;
@@ -7929,7 +7929,7 @@ DEFINE_PUBLIC_ALIAS_P(memcpy_s,libc_memcpy_s,ATTR_INS(3, 4) ATTR_OUTS(1, 2),errn
 DEFINE_PUBLIC_ALIAS_P(memmove_s,libc_memmove_s,ATTR_INS(3, 4) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBCCALL,(void *dst, rsize_t dstlength, void const *src, rsize_t srclength),(dst,dstlength,src,srclength));
 DEFINE_PUBLIC_ALIAS_P(strcpy_s,libc_strcpy_s,ATTR_IN_OPT(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src),(dst,dstsize,src));
 DEFINE_PUBLIC_ALIAS_P(strcat_s,libc_strcat_s,ATTR_INOUT_OPT(1) ATTR_IN_OPT(3),errno_t,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src),(dst,dstsize,src));
-DEFINE_PUBLIC_ALIAS_P(strncat_s,libc_strncat_s,ATTR_INOUT_OPT(1) ATTR_IN_OPT(3),errno_t,NOTHROW_NCX,LIBCCALL,(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen),(dst,dstsize,src,maxlen));
+DEFINE_PUBLIC_ALIAS_P(strncat_s,libc_strncat_s,ATTR_INOUT_OPT(1) ATTR_IN_OPT(3),errno_t,NOTHROW_NCX,LIBCCALL,(char *dst, rsize_t dstsize, char const *src, rsize_t maxlen),(dst,dstsize,src,maxlen));
 DEFINE_PUBLIC_ALIAS_P(strncpy_s,libc_strncpy_s,ATTR_IN_OPT(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src, size_t maxlen),(dst,dstsize,src,maxlen));
 DEFINE_PUBLIC_ALIAS_P(_strerror,libc__strerror,WUNUSED ATTR_IN_OPT(1),char *,NOTHROW_RPC,LIBCCALL,(char const *message),(message));
 DEFINE_PUBLIC_ALIAS_P(_strerror_s,libc__strerror_s,ATTR_IN_OPT(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_RPC,LIBCCALL,(char *__restrict buf, size_t buflen, char const *message),(buf,buflen,message));
@@ -7942,7 +7942,7 @@ DEFINE_PUBLIC_ALIAS_P(strnstr,libc_strnstr,ATTR_PURE WUNUSED ATTR_IN(2) ATTR_INS
 DEFINE_PUBLIC_ALIAS_P_VOID(strmode,libc_strmode,ATTR_OUT(2),NOTHROW_NCX,LIBCCALL,(mode_t mode, char p[12]),(mode,p));
 DEFINE_PUBLIC_ALIAS_P(timingsafe_bcmp,libc_timingsafe_memcmp,WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3),int,NOTHROW_NCX,LIBCCALL,(void const *s1, void const *s2, size_t n_bytes),(s1,s2,n_bytes));
 DEFINE_PUBLIC_ALIAS_P(timingsafe_memcmp,libc_timingsafe_memcmp,WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3),int,NOTHROW_NCX,LIBCCALL,(void const *s1, void const *s2, size_t n_bytes),(s1,s2,n_bytes));
-DEFINE_PUBLIC_ALIAS_P(strtosigno,libc_strtosigno,ATTR_PURE WUNUSED ATTR_IN(1),signo_t,NOTHROW_NCX,LIBCCALL,(const char *name),(name));
+DEFINE_PUBLIC_ALIAS_P(strtosigno,libc_strtosigno,ATTR_PURE WUNUSED ATTR_IN(1),signo_t,NOTHROW_NCX,LIBCCALL,(char const *name),(name));
 DEFINE_PUBLIC_ALIAS_P(stresep,libc_stresep,ATTR_LEAF ATTR_IN(2) ATTR_INOUT(1),char *,NOTHROW_NCX,LIBCCALL,(char **__restrict stringp, char const *__restrict delim, int escape),(stringp,delim,escape));
 DEFINE_PUBLIC_ALIAS_P(consttime_memequal,libc_consttime_memequal,WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3),int,NOTHROW_NCX,LIBCCALL,(void const *s1, void const *s2, size_t n_bytes),(s1,s2,n_bytes));
 DEFINE_PUBLIC_ALIAS_P(uucopy,libc_uucopy,ATTR_INS(1, 3) ATTR_OUTS(2, 3),int,NOTHROW_NCX,LIBCCALL,(void const *__restrict src, void *__restrict dst, size_t num_bytes),(src,dst,num_bytes));

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef844e10 */
+/* HASH CRC-32:0xd254ea82 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3283,13 +3283,13 @@ __CDECLARE_OPT(__ATTR_IN(1),int,__NOTHROW_RPC,revoke,(char const *__file),(__fil
 #define __acct_defined
 #ifdef __CRT_HAVE_acct
 /* Switch process accounting on and off */
-__CDECLARE(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),(__filename))
+__CDECLARE(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(char const *__filename),(__filename))
 #elif defined(__CRT_HAVE___acct)
 /* Switch process accounting on and off */
-__CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),__acct,(__filename))
+__CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(char const *__filename),__acct,(__filename))
 #elif defined(__CRT_HAVE___libc_acct)
 /* Switch process accounting on and off */
-__CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),__libc_acct,(__filename))
+__CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(char const *__filename),__libc_acct,(__filename))
 #else /* ... */
 #undef __acct_defined
 #endif /* !... */

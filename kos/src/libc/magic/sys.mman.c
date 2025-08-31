@@ -784,7 +784,7 @@ int munlockall();
 [[hidden, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<asm/os/paths.h>")]]
 [[section(".text.crt{|.dos}.compat.glibc")]]
-const char *__shm_directory($size_t *len) {
+char const *__shm_directory($size_t *len) {
 	*len = COMPILER_STRLEN(__PATH_SHM "/");
 	return __PATH_SHM "/";
 }

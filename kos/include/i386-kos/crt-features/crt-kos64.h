@@ -4229,6 +4229,9 @@
 #define __CRT_HAVE_pexecute
 #define __CRT_HAVE_physmem_available
 #define __CRT_HAVE_physmem_total
+#define __CRT_HAVE_pidfd_fspawn_np
+#define __CRT_HAVE_pidfd_spawn
+#define __CRT_HAVE_pidfd_spawnp
 #define __CRT_HAVE_pipe
 #define __CRT_HAVE_pipe2
 #define __CRT_HAVE_pkey_alloc
@@ -10215,6 +10218,9 @@
 #define __CRT_HAVE_KOS$pex_run
 #define __CRT_HAVE_KOS$pex_run_in_environment
 #define __CRT_HAVE_KOS$pexecute
+#define __CRT_HAVE_KOS$pidfd_fspawn_np
+#define __CRT_HAVE_KOS$pidfd_spawn
+#define __CRT_HAVE_KOS$pidfd_spawnp
 #define __CRT_HAVE_KOS$pipe
 #define __CRT_HAVE_KOS$pipe2
 #define __CRT_HAVE_KOS$pkey_alloc
@@ -15172,6 +15178,9 @@
 #define __CRT_HAVE_DOS$pex_run
 #define __CRT_HAVE_DOS$pex_run_in_environment
 #define __CRT_HAVE_DOS$pexecute
+#define __CRT_HAVE_DOS$pidfd_fspawn_np
+#define __CRT_HAVE_DOS$pidfd_spawn
+#define __CRT_HAVE_DOS$pidfd_spawnp
 #define __CRT_HAVE_DOS$pipe
 #define __CRT_HAVE_DOS$pipe2
 #define __CRT_HAVE_DOS$pkey_alloc

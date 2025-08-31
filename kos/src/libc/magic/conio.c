@@ -604,7 +604,7 @@ void clearkeybuf(void) {
 @@>> _conio_getpass(3)
 @@CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>'
 [[cp, guard, requires_function(getpass_r), exposed_name("getpass")]]
-char *_conio_getpass([[in]] const char *prompt, [[inout]] char *str) {
+char *_conio_getpass([[in]] char const *prompt, [[inout]] char *str) {
 	unsigned char buflen = (unsigned char)str[0];
 	char *result = getpass_r(prompt, &str[2], buflen);
 	if (result != NULL) {

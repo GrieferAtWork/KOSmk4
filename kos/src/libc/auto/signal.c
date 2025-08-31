@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb91a2b04 */
+/* HASH CRC-32:0xfe9f6d52 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1055,7 +1055,7 @@ err:
  * isn't recognized, return `0' instead.
  * This function also handles stuff like "SIGRTMIN+1" or "9" */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED ATTR_IN(1) signo_t
-NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name) {
+NOTHROW_NCX(LIBCCALL libc_signalnumber)(char const *name) {
 	signo_t result;
 
 	/* Skip "SIG" prefix. */
@@ -1147,7 +1147,7 @@ NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo,
  * @return: 0 : Success; `*p_signo' was filled
  * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
 INTERN ATTR_SECTION(".text.crt.solaris") ATTR_IN(1) ATTR_OUT(2) int
-NOTHROW_NCX(LIBCCALL libc_str2sig)(const char *name,
+NOTHROW_NCX(LIBCCALL libc_str2sig)(char const *name,
                                    signo_t *p_signo) {
 	signo_t result;
 	size_t i;
@@ -1211,10 +1211,10 @@ DEFINE_PUBLIC_ALIAS_P(sighold,libc_sighold,,int,NOTHROW_NCX,LIBCCALL,(signo_t si
 DEFINE_PUBLIC_ALIAS_P(sigrelse,libc_sigrelse,,int,NOTHROW_NCX,LIBCCALL,(signo_t signo),(signo));
 DEFINE_PUBLIC_ALIAS_P(sigignore,libc_sigignore,,int,NOTHROW_NCX,LIBCCALL,(signo_t signo),(signo));
 DEFINE_PUBLIC_ALIAS_P(sigset,libc_sigset,,sighandler_t,NOTHROW_NCX,LIBCCALL,(signo_t signo, sighandler_t disp),(signo,disp));
-DEFINE_PUBLIC_ALIAS_P(signalnumber,libc_signalnumber,ATTR_PURE WUNUSED ATTR_IN(1),signo_t,NOTHROW_NCX,LIBCCALL,(const char *name),(name));
+DEFINE_PUBLIC_ALIAS_P(signalnumber,libc_signalnumber,ATTR_PURE WUNUSED ATTR_IN(1),signo_t,NOTHROW_NCX,LIBCCALL,(char const *name),(name));
 DEFINE_PUBLIC_ALIAS_P(signalnext,libc_signalnext,ATTR_CONST WUNUSED,signo_t,NOTHROW,LIBCCALL,(signo_t signo),(signo));
 DEFINE_PUBLIC_ALIAS_P(sig2str,libc_sig2str,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(signo_t signo, char buf[32]),(signo,buf));
-DEFINE_PUBLIC_ALIAS_P(str2sig,libc_str2sig,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(const char *name, signo_t *p_signo),(name,p_signo));
+DEFINE_PUBLIC_ALIAS_P(str2sig,libc_str2sig,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *name, signo_t *p_signo),(name,p_signo));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SIGNAL_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x115924b */
+/* HASH CRC-32:0x71367bf */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -204,7 +204,7 @@ __LOCAL_LIBC(make_temp_file_with_prefix) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGN
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(make_temp_file_with_prefix))(char const *__prefix, char const *__suffix) {
 	__fd_t __tempfd;
 	char *__result, *__p;
-	const char *__tmpdir = (__NAMESPACE_LOCAL_SYM __localdep_choose_tmpdir)();
+	char const *__tmpdir = (__NAMESPACE_LOCAL_SYM __localdep_choose_tmpdir)();
 	__SIZE_TYPE__ __tmpdir_len, __prefix_len, __suffix_len;
 	if (__prefix == __NULLPTR)
 		__prefix = "cc";

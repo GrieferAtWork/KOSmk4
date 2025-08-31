@@ -59,13 +59,13 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
 }
 /*[[[end:libc_strfmon]]]*/
 
-/*[[[head:libd_strfmon_l,hash:CRC-32=0x6906d5b4]]]*/
+/*[[[head:libd_strfmon_l,hash:CRC-32=0xf31c6443]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2) ssize_t
 NOTHROW_NCX(VLIBDCALL libd_strfmon_l)(char *__restrict s,
                                       size_t maxsize,
                                       locale_t loc,
-                                      const char *__restrict format,
+                                      char const *__restrict format,
                                       ...)
 /*[[[body:libd_strfmon_l]]]*/
 /*AUTO*/{
@@ -79,12 +79,12 @@ NOTHROW_NCX(VLIBDCALL libd_strfmon_l)(char *__restrict s,
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_strfmon_l]]]*/
 
-/*[[[head:libc_strfmon_l,hash:CRC-32=0xbaf847b1]]]*/
+/*[[[head:libc_strfmon_l,hash:CRC-32=0x20e2f646]]]*/
 INTERN ATTR_SECTION(".text.crt.utility.monetary") ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2) ssize_t
 NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s,
                                       size_t maxsize,
                                       locale_t loc,
-                                      const char *__restrict format,
+                                      char const *__restrict format,
                                       ...)
 /*[[[body:libc_strfmon_l]]]*/
 /*AUTO*/{
@@ -101,17 +101,17 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xdd4c8b24]]]*/
+/*[[[start:exports,hash:CRC-32=0xeef83e5]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$strfmon,libd_strfmon,ATTR_IN(3) ATTR_LIBC_STRFMON(3, 4) ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,VLIBDCALL,(char *__restrict s, size_t maxsize, char const *__restrict format, ...),(s,maxsize,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS_P(strfmon,libc_strfmon,ATTR_IN(3) ATTR_LIBC_STRFMON(3, 4) ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,VLIBCCALL,(char *__restrict s, size_t maxsize, char const *__restrict format, ...),(s,maxsize,format,));
 #ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS_P(DOS$__strfmon_l,libd_strfmon_l,ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,VLIBDCALL,(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...),(s,maxsize,loc,format,));
-DEFINE_PUBLIC_ALIAS_P(DOS$strfmon_l,libd_strfmon_l,ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,VLIBDCALL,(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...),(s,maxsize,loc,format,));
+DEFINE_PUBLIC_ALIAS_P(DOS$__strfmon_l,libd_strfmon_l,ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,VLIBDCALL,(char *__restrict s, size_t maxsize, locale_t loc, char const *__restrict format, ...),(s,maxsize,loc,format,));
+DEFINE_PUBLIC_ALIAS_P(DOS$strfmon_l,libd_strfmon_l,ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,VLIBDCALL,(char *__restrict s, size_t maxsize, locale_t loc, char const *__restrict format, ...),(s,maxsize,loc,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS_P(__strfmon_l,libc_strfmon_l,ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,VLIBCCALL,(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...),(s,maxsize,loc,format,));
-DEFINE_PUBLIC_ALIAS_P(strfmon_l,libc_strfmon_l,ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,VLIBCCALL,(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...),(s,maxsize,loc,format,));
+DEFINE_PUBLIC_ALIAS_P(__strfmon_l,libc_strfmon_l,ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,VLIBCCALL,(char *__restrict s, size_t maxsize, locale_t loc, char const *__restrict format, ...),(s,maxsize,loc,format,));
+DEFINE_PUBLIC_ALIAS_P(strfmon_l,libc_strfmon_l,ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,VLIBCCALL,(char *__restrict s, size_t maxsize, locale_t loc, char const *__restrict format, ...),(s,maxsize,loc,format,));
 /*[[[end:exports]]]*/
 
 DECL_END

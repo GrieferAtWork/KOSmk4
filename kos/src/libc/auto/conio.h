@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8ec060d */
+/* HASH CRC-32:0x8c35db2a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -307,12 +307,12 @@ INTDEF void NOTHROW(LIBCCALL libc_clearkeybuf)(void);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> _conio_getpass(3)
  * CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>' */
-INTDEF ATTR_IN(1) ATTR_INOUT(2) char *NOTHROW_RPC(LIBDCALL libd__conio_getpass)(const char *prompt, char *str);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) char *NOTHROW_RPC(LIBDCALL libd__conio_getpass)(char const *prompt, char *str);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> _conio_getpass(3)
  * CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>' */
-INTDEF ATTR_IN(1) ATTR_INOUT(2) char *NOTHROW_RPC(LIBCCALL libc__conio_getpass)(const char *prompt, char *str);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) char *NOTHROW_RPC(LIBCCALL libc__conio_getpass)(char const *prompt, char *str);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cputsxy(3)

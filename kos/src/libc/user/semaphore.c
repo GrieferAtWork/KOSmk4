@@ -330,7 +330,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *self)
 }
 /*[[[end:libc_sem_close]]]*/
 
-/*[[[head:libc_sem_unlink,hash:CRC-32=0xef00f0e5]]]*/
+/*[[[head:libc_sem_unlink,hash:CRC-32=0x7b9d2602]]]*/
 /* >> sem_unlink(3)
  * Unlink (delete) a named semaphore `name' that was
  * previously  created  by `sem_open(name, O_CREAT)'
@@ -338,7 +338,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *self)
  * @return: -1: [errno=EINVAL] The given `name' contains no characters after the initial `/'
  * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_IN(1) int
-NOTHROW_RPC_KOS(LIBCCALL libc_sem_unlink)(const char *name)
+NOTHROW_RPC_KOS(LIBCCALL libc_sem_unlink)(char const *name)
 /*[[[body:libc_sem_unlink]]]*/
 {
 	int result;
@@ -598,12 +598,12 @@ NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict self,
 /*[[[end:libc_sem_getvalue]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x4ecb39f6]]]*/
+/*[[[start:exports,hash:CRC-32=0xd972d10f]]]*/
 DEFINE_PUBLIC_ALIAS_P(sem_init,libc_sem_init,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sem_t *self, int pshared, unsigned int value),(self,pshared,value));
 DEFINE_PUBLIC_ALIAS_P(sem_destroy,libc_sem_destroy,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sem_t *self),(self));
 DEFINE_PUBLIC_ALIAS_P(sem_open,libc_sem_open,ATTR_IN(1),sem_t *,NOTHROW_RPC_KOS,VLIBCCALL,(char const *name, oflag_t oflags, ...),(name,oflags,));
 DEFINE_PUBLIC_ALIAS_P(sem_close,libc_sem_close,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sem_t *self),(self));
-DEFINE_PUBLIC_ALIAS_P(sem_unlink,libc_sem_unlink,ATTR_IN(1),int,NOTHROW_RPC_KOS,LIBCCALL,(const char *name),(name));
+DEFINE_PUBLIC_ALIAS_P(sem_unlink,libc_sem_unlink,ATTR_IN(1),int,NOTHROW_RPC_KOS,LIBCCALL,(char const *name),(name));
 DEFINE_PUBLIC_ALIAS_P(sem_wait,libc_sem_wait,ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(sem_t *self),(self));
 DEFINE_PUBLIC_ALIAS_P(sem_timedwait,libc_sem_timedwait,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(sem_t *__restrict self, struct timespec const *__restrict abstime),(self,abstime));
 #include <bits/types.h>

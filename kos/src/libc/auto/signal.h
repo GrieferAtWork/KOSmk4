@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87b5178f */
+/* HASH CRC-32:0xc1bb850f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -559,7 +559,7 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t pthread, si
  * the given `name', and the  signal's actual name. When  `name'
  * isn't recognized, return `0' instead.
  * This function also handles stuff like "SIGRTMIN+1" or "9" */
-INTDEF ATTR_PURE WUNUSED ATTR_IN(1) signo_t NOTHROW_NCX(LIBDCALL libd_signalnumber)(const char *name);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) signo_t NOTHROW_NCX(LIBDCALL libd_signalnumber)(char const *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> signalnumber(3)
@@ -568,7 +568,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) signo_t NOTHROW_NCX(LIBDCALL libd_signalnumb
  * the given `name', and the  signal's actual name. When  `name'
  * isn't recognized, return `0' instead.
  * This function also handles stuff like "SIGRTMIN+1" or "9" */
-INTDEF ATTR_PURE WUNUSED ATTR_IN(1) signo_t NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) signo_t NOTHROW_NCX(LIBCCALL libc_signalnumber)(char const *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> signalnext(3)
@@ -605,7 +605,7 @@ INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo, char bu
  *  - Doesn't automatically remove any "SIG" prefix.
  * @return: 0 : Success; `*p_signo' was filled
  * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
-INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_str2sig)(const char *name, signo_t *p_signo);
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_str2sig)(char const *name, signo_t *p_signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> str2sig(3)
@@ -614,7 +614,7 @@ INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_str2sig)(const char 
  *  - Doesn't automatically remove any "SIG" prefix.
  * @return: 0 : Success; `*p_signo' was filled
  * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
-INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_str2sig)(const char *name, signo_t *p_signo);
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_str2sig)(char const *name, signo_t *p_signo);
 #endif /* !__KERNEL__ */
 
 DECL_END

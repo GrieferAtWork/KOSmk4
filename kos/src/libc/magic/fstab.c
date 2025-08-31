@@ -89,7 +89,7 @@ struct fstab *getfsent(void);
 [[wunused, nullable, requires_function(getfsent, setfsent)]]
 [[decl_include("<bits/crt/db/fstab.h>")]]
 [[impl_include("<bits/crt/db/fstab.h>")]]
-struct fstab *getfsspec([[in]] const char *special_file) {
+struct fstab *getfsspec([[in]] char const *special_file) {
 	struct fstab *result;
 	if (!setfsent())
 		return NULL;
@@ -108,7 +108,7 @@ struct fstab *getfsspec([[in]] const char *special_file) {
 [[wunused, nullable, requires_function(getfsent, setfsent)]]
 [[decl_include("<bits/crt/db/fstab.h>")]]
 [[impl_include("<bits/crt/db/fstab.h>")]]
-struct fstab *getfsfile([[in]] const char *mount_point) {
+struct fstab *getfsfile([[in]] char const *mount_point) {
 	struct fstab *result;
 	if (!setfsent())
 		return NULL;

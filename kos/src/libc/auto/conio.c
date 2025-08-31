@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e100a05 */
+/* HASH CRC-32:0x4ff2c804 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -625,7 +625,7 @@ NOTHROW(LIBCCALL libc_clearkeybuf)(void) {
 /* >> _conio_getpass(3)
  * CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>' */
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_INOUT(2) char *
-NOTHROW_RPC(LIBCCALL libc__conio_getpass)(const char *prompt,
+NOTHROW_RPC(LIBCCALL libc__conio_getpass)(char const *prompt,
                                           char *str) {
 	unsigned char buflen = (unsigned char)str[0];
 	char *result = libc_getpass_r(prompt, &str[2], buflen);
@@ -879,7 +879,7 @@ DEFINE_PUBLIC_ALIAS_P_VOID(textcolor,libc_textcolor,,NOTHROW_RPC,LIBCCALL,(int c
 DEFINE_PUBLIC_ALIAS_P_VOID(textbackground,libc_textbackground,,NOTHROW_RPC,LIBCCALL,(int color),(color));
 DEFINE_PUBLIC_ALIAS_P_VOID(textattr,libc_textattr,,NOTHROW_RPC,LIBCCALL,(int attr),(attr));
 DEFINE_PUBLIC_ALIAS_P_VOID(clearkeybuf,libc_clearkeybuf,,NOTHROW,LIBCCALL,(void),());
-DEFINE_PUBLIC_ALIAS_P(_conio_getpass,libc__conio_getpass,ATTR_IN(1) ATTR_INOUT(2),char *,NOTHROW_RPC,LIBCCALL,(const char *prompt, char *str),(prompt,str));
+DEFINE_PUBLIC_ALIAS_P(_conio_getpass,libc__conio_getpass,ATTR_IN(1) ATTR_INOUT(2),char *,NOTHROW_RPC,LIBCCALL,(char const *prompt, char *str),(prompt,str));
 DEFINE_PUBLIC_ALIAS_P_VOID(cputsxy,libc_cputsxy,ATTR_IN(3),NOTHROW_RPC,LIBCCALL,(int x, int y, char __KOS_FIXED_CONST *str),(x,y,str));
 DEFINE_PUBLIC_ALIAS_P_VOID(putchxy,libc_putchxy,,NOTHROW_RPC,LIBCCALL,(int x, int y, char ch),(x,y,ch));
 DEFINE_PUBLIC_ALIAS_P(wherex,libc_wherex,,int,NOTHROW_RPC,LIBCCALL,(void),());
