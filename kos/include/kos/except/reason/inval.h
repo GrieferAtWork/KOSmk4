@@ -151,6 +151,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM,          /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_SIGHAND` was given without 'CLONE_VM'. */
 	E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_FLAGS,              /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unrecognized `struct clone_args::ca_flags' passed to `clone3(2)' */
 	E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIZE,               /* E_INVALID_ARGUMENT_BAD_VALUE: Unrecognized `size' argument passed to `clone3(2)' */
+	E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIGNO,              /* E_INVALID_ARGUMENT_BAD_VALUE: Bad signal number passed in `struct clone_args::ca_exit_signal' */
 	E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT,                      /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The `what' argument passed to `unshare(2)' isn't a subset of:
 	                                                               * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
 	                                                               *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
@@ -457,6 +458,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM         E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM         /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_SIGHAND` was given without 'CLONE_VM'. */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_FLAGS             E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_FLAGS             /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unrecognized `struct clone_args::ca_flags' passed to `clone3(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIZE              E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIZE              /* E_INVALID_ARGUMENT_BAD_VALUE: Unrecognized `size' argument passed to `clone3(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIGNO             E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIGNO             /* E_INVALID_ARGUMENT_BAD_VALUE: Bad signal number passed in `struct clone_args::ca_exit_signal' */
 #define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                     E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The `what' argument passed to `unshare(2)' isn't a subset of:
                                                                                                                                  * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
                                                                                                                                  *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
@@ -734,7 +736,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM         899   /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_SIGHAND` was given without 'CLONE_VM'. */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_FLAGS             900   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unrecognized `struct clone_args::ca_flags' passed to `clone3(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIZE              901   /* E_INVALID_ARGUMENT_BAD_VALUE: Unrecognized `size' argument passed to `clone3(2)' */
-#define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                     902   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The `what' argument passed to `unshare(2)' isn't a subset of:
+#define E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIGNO             902   /* E_INVALID_ARGUMENT_BAD_VALUE: Bad signal number passed in `struct clone_args::ca_exit_signal' */
+#define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                     903   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The `what' argument passed to `unshare(2)' isn't a subset of:
                                                                            * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
                                                                            *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
 /* System calls: PIDFD */

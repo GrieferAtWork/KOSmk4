@@ -23,6 +23,16 @@
 #include "../api.h"
 /**/
 
+#include <kos/syscalls.h>
+#include <sys/wait.h>
+
+#include <errno.h>
+#include <sched.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "spawn.h"
 
 DECL_BEGIN
@@ -37,16 +47,60 @@ NOTHROW_RPC(LIBCCALL libc_pidfd_spawn_impl)(fd_t *__restrict pidfd,
                                             __TARGV,
                                             __TENVP)
 /*[[[body:libc_pidfd_spawn_impl]]]*/
-/*AUTO*/{
-	(void)pidfd;
-	(void)exec_type;
-	(void)exec_arg;
-	(void)file_actions;
-	(void)attrp;
-	(void)___argv;
-	(void)___envp;
-	CRT_UNIMPLEMENTEDF("pidfd_spawn_impl(pidfd: %p, exec_type: %x, exec_arg: %p, file_actions: %p, attrp: %p, ___argv: %p, ___envp: %p)", pidfd, exec_type, exec_arg, file_actions, attrp, ___argv, ___envp); /* TODO */
-	return ENOSYS;
+{
+	int status;
+	errno_t result, error, old_errno;
+	pid_t child;
+	struct clone_args cargs;
+	old_errno = libc_geterrno();
+	(void)libc_seterrno(0);
+
+	/* This is the magic right here: do a VFORK+PIDFD clone(2) system call. */
+	bzero(&cargs, sizeof(cargs));
+	cargs.ca_flags       = CLONE_VM | CLONE_VFORK | CLONE_PIDFD;
+	cargs.ca_exit_signal = SIGCHLD;
+	cargs.ca_pidfd       = pidfd;
+	child = sys_clone3(&cargs, sizeof(cargs));
+	if (child == 0)
+		goto do_exec;
+	if (E_ISERR(child)) {
+		/* The vfork() itself failed. */
+		(void)libc_seterrno(old_errno);
+		return -child;
+	}
+
+	/* Check if something within the child failed after vfork(). */
+	result = libc_geterrno();
+	if (result != 0)
+		goto err_join_zombie_child;
+
+	/* Restore the old errno */
+	(void)libc_seterrno(old_errno);
+	return result;
+err_join_zombie_child:
+	/* Unless the child was already spawned as detached,
+	 * we still have to re-join  it, or else it will  be
+	 * left dangling as a zombie process! */
+	if (waitpid(child, &status, 0) < 0) {
+		if (libc_geterrno() == EINTR)
+			goto err_join_zombie_child;
+	}
+	/* Must close the (already-opened) PIDfd file descriptor. Even though
+	 * we *did* manage to  spawn a new process,  the exec part that  came
+	 * after failed, meaning we can't let our caller inherit the FD. */
+	(void)close(*pidfd);
+	(void)libc_seterrno(old_errno);
+	return result;
+do_exec:
+	error = libc_posix_spawn_child(exec_type, exec_arg, file_actions, attrp, ___argv, ___envp);
+	if (error != 0) {
+		/* If the exec fails, it will have modified `errno' to indicate this fact.
+		 * And since we're sharing VMs with  our parent process, the error  reason
+		 * will have already  been written  back to  our parent's  VM, so  there's
+		 * actually nothing left for us to do, but to simply exit! */
+		libc_seterrno(error);
+	}
+	_Exit(127);
 }
 /*[[[end:libc_pidfd_spawn_impl]]]*/
 

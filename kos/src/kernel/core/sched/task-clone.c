@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_SCHED_TASK_CLONE_C
 #define GUARD_KERNEL_SRC_SCHED_TASK_CLONE_C 1
 #define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -1043,6 +1044,17 @@ sys_clone3_impl(struct icpustate const *__restrict state,
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
 		      E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_FLAGS, cargs.tca_flags,
 		      ~(CLONE_CLEAR_SIGHAND | CLONE_INTO_CGROUP | CLONE_NEWTIME | CLONE_CRED));
+	}
+
+	/* Verify the user-given `exit_signal' argument. */
+	if (!sigvalid(cargs.tca_exit_signal)) {
+		if (cargs.tca_exit_signal == 0) {
+			cargs.tca_exit_signal = SIGCHLD;
+		} else {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIGNO,
+			      cargs.tca_exit_signal);
+		}
 	}
 
 	/* Spawn a new child thread/process */
