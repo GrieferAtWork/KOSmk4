@@ -65,6 +65,10 @@
  *     23600: /lib/libc-2.36.so
  *     23700: /lib/libc-2.37.so
  *     23800: /lib/libc-2.38.so
+ *     23900: /lib/libc-2.39.so
+ *     24000: /lib/libc-2.40.so
+ *     24100: /lib/libc-2.41.so
+ *     24200: /lib/libc-2.42.so
  */
 #ifndef __GNU_LIBRARY__
 #define __GNU_LIBRARY__ 6
@@ -74,7 +78,7 @@
 #endif /* __GNU_LIBRARY__ < 6 */
 #ifndef __GLIBC__
 #define __GLIBC__       2
-#define __GLIBC_MINOR__ 38
+#define __GLIBC_MINOR__ 42
 #define __GLIBC_PATCH__ 0
 #else /* !__GLIBC__ */
 #ifndef __GLIBC_MINOR__
@@ -2040,6 +2044,9 @@
 #if __GLIBC_VERSION__ >= 23300 && __GLIBC_VERSION__ <= 23600
 #define __CRT_HAVE___libc_scratch_buffer_dupfree
 #endif /* __GLIBC_VERSION__ >= 23300 && __GLIBC_VERSION__ <= 23600 */
+#if __GLIBC_VERSION__ >= 23400 && __GLIBC_VERSION__ <= 24000
+#define __CRT_HAVE___nptl_change_stack_perm
+#endif /* __GLIBC_VERSION__ >= 23400 && __GLIBC_VERSION__ <= 24000 */
 #if defined(_REENTRANT) && __GLIBC_VERSION__ >= 20302 && __GLIBC_VERSION__ <= 23300
 #define __CRT_HAVE___pthread_initialize_minimal
 #endif /* _REENTRANT && __GLIBC_VERSION__ >= 20302 && __GLIBC_VERSION__ <= 23300 */
@@ -2843,6 +2850,9 @@
 #if __GLIBC_VERSION__ <= 20004 || (__GLIBC_VERSION__ >= 21290 && __GLIBC_VERSION__ <= 21800) || __GLIBC_VERSION__ >= 22000
 #define __CRT_HAVE___getrlimit
 #endif /* __GLIBC_VERSION__ <= 20004 || (__GLIBC_VERSION__ >= 21290 && __GLIBC_VERSION__ <= 21800) || __GLIBC_VERSION__ >= 22000 */
+#if __GLIBC_VERSION__ <= 20004 || (__GLIBC_VERSION__ >= 22600 && __GLIBC_VERSION__ <= 23800)
+#define __CRT_HAVE___snprintf
+#endif /* __GLIBC_VERSION__ <= 20004 || (__GLIBC_VERSION__ >= 22600 && __GLIBC_VERSION__ <= 23800) */
 #if __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ == 20205
 #define __CRT_HAVE__dl_pagesize
 #endif /* __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ == 20205 */
@@ -2880,7 +2890,6 @@
 #define __CRT_HAVE___mmap
 #define __CRT_HAVE___mprotect
 #define __CRT_HAVE___munmap
-#define __CRT_HAVE___snprintf
 #endif /* __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 22600 */
 #if __GLIBC_VERSION__ <= 20103
 #define __CRT_HAVE___collate_element_hash
@@ -5048,7 +5057,6 @@
 #define __CRT_HAVE___libutil_version_placeholder
 #define __CRT_HAVE___lll_lock_wait_private
 #define __CRT_HAVE___lll_lock_wake_private
-#define __CRT_HAVE___nptl_change_stack_perm
 #define __CRT_HAVE___nptl_create_event
 #define __CRT_HAVE___nptl_death_event
 #define __CRT_HAVE___nptl_initial_report_events
@@ -5413,6 +5421,241 @@
 #define __CRT_HAVE_wcslcat
 #define __CRT_HAVE_wcslcpy
 #endif /* __GLIBC_VERSION__ >= 23800 */
+#if __GLIBC_VERSION__ >= 23900
+#define __CRT_HAVE___tunable_is_initialized
+#define __CRT_HAVE_pidfd_getpid
+#define __CRT_HAVE_pidfd_spawn
+#define __CRT_HAVE_pidfd_spawnp
+#define __CRT_HAVE_posix_spawnattr_getcgroup_np
+#define __CRT_HAVE_posix_spawnattr_setcgroup_np
+#define __CRT_HAVE_stdc_bit_ceil_uc
+#define __CRT_HAVE_stdc_bit_ceil_ui
+#define __CRT_HAVE_stdc_bit_ceil_ul
+#define __CRT_HAVE_stdc_bit_ceil_ull
+#define __CRT_HAVE_stdc_bit_ceil_us
+#define __CRT_HAVE_stdc_bit_floor_uc
+#define __CRT_HAVE_stdc_bit_floor_ui
+#define __CRT_HAVE_stdc_bit_floor_ul
+#define __CRT_HAVE_stdc_bit_floor_ull
+#define __CRT_HAVE_stdc_bit_floor_us
+#define __CRT_HAVE_stdc_bit_width_uc
+#define __CRT_HAVE_stdc_bit_width_ui
+#define __CRT_HAVE_stdc_bit_width_ul
+#define __CRT_HAVE_stdc_bit_width_ull
+#define __CRT_HAVE_stdc_bit_width_us
+#define __CRT_HAVE_stdc_count_ones_uc
+#define __CRT_HAVE_stdc_count_ones_ui
+#define __CRT_HAVE_stdc_count_ones_ul
+#define __CRT_HAVE_stdc_count_ones_ull
+#define __CRT_HAVE_stdc_count_ones_us
+#define __CRT_HAVE_stdc_count_zeros_uc
+#define __CRT_HAVE_stdc_count_zeros_ui
+#define __CRT_HAVE_stdc_count_zeros_ul
+#define __CRT_HAVE_stdc_count_zeros_ull
+#define __CRT_HAVE_stdc_count_zeros_us
+#define __CRT_HAVE_stdc_first_leading_one_uc
+#define __CRT_HAVE_stdc_first_leading_one_ui
+#define __CRT_HAVE_stdc_first_leading_one_ul
+#define __CRT_HAVE_stdc_first_leading_one_ull
+#define __CRT_HAVE_stdc_first_leading_one_us
+#define __CRT_HAVE_stdc_first_leading_zero_uc
+#define __CRT_HAVE_stdc_first_leading_zero_ui
+#define __CRT_HAVE_stdc_first_leading_zero_ul
+#define __CRT_HAVE_stdc_first_leading_zero_ull
+#define __CRT_HAVE_stdc_first_leading_zero_us
+#define __CRT_HAVE_stdc_first_trailing_one_uc
+#define __CRT_HAVE_stdc_first_trailing_one_ui
+#define __CRT_HAVE_stdc_first_trailing_one_ul
+#define __CRT_HAVE_stdc_first_trailing_one_ull
+#define __CRT_HAVE_stdc_first_trailing_one_us
+#define __CRT_HAVE_stdc_first_trailing_zero_uc
+#define __CRT_HAVE_stdc_first_trailing_zero_ui
+#define __CRT_HAVE_stdc_first_trailing_zero_ul
+#define __CRT_HAVE_stdc_first_trailing_zero_ull
+#define __CRT_HAVE_stdc_first_trailing_zero_us
+#define __CRT_HAVE_stdc_has_single_bit_uc
+#define __CRT_HAVE_stdc_has_single_bit_ui
+#define __CRT_HAVE_stdc_has_single_bit_ul
+#define __CRT_HAVE_stdc_has_single_bit_ull
+#define __CRT_HAVE_stdc_has_single_bit_us
+#define __CRT_HAVE_stdc_leading_ones_uc
+#define __CRT_HAVE_stdc_leading_ones_ui
+#define __CRT_HAVE_stdc_leading_ones_ul
+#define __CRT_HAVE_stdc_leading_ones_ull
+#define __CRT_HAVE_stdc_leading_ones_us
+#define __CRT_HAVE_stdc_leading_zeros_uc
+#define __CRT_HAVE_stdc_leading_zeros_ui
+#define __CRT_HAVE_stdc_leading_zeros_ul
+#define __CRT_HAVE_stdc_leading_zeros_ull
+#define __CRT_HAVE_stdc_leading_zeros_us
+#define __CRT_HAVE_stdc_trailing_ones_uc
+#define __CRT_HAVE_stdc_trailing_ones_ui
+#define __CRT_HAVE_stdc_trailing_ones_ul
+#define __CRT_HAVE_stdc_trailing_ones_ull
+#define __CRT_HAVE_stdc_trailing_ones_us
+#define __CRT_HAVE_stdc_trailing_zeros_uc
+#define __CRT_HAVE_stdc_trailing_zeros_ui
+#define __CRT_HAVE_stdc_trailing_zeros_ul
+#define __CRT_HAVE_stdc_trailing_zeros_ull
+#define __CRT_HAVE_stdc_trailing_zeros_us
+#endif /* __GLIBC_VERSION__ >= 23900 */
+#if __GLIBC_VERSION__ >= 24000
+#define __CRT_HAVE_exp10m1
+#define __CRT_HAVE_exp10m1f
+#define __CRT_HAVE_exp10m1f128
+#define __CRT_HAVE_exp10m1f32
+#define __CRT_HAVE_exp10m1f32x
+#define __CRT_HAVE_exp10m1f64
+#define __CRT_HAVE_exp10m1f64x
+#define __CRT_HAVE_exp10m1l
+#define __CRT_HAVE_exp2m1
+#define __CRT_HAVE_exp2m1f
+#define __CRT_HAVE_exp2m1f128
+#define __CRT_HAVE_exp2m1f32
+#define __CRT_HAVE_exp2m1f32x
+#define __CRT_HAVE_exp2m1f64
+#define __CRT_HAVE_exp2m1f64x
+#define __CRT_HAVE_exp2m1l
+#define __CRT_HAVE_log10p1
+#define __CRT_HAVE_log10p1f
+#define __CRT_HAVE_log10p1f128
+#define __CRT_HAVE_log10p1f32
+#define __CRT_HAVE_log10p1f32x
+#define __CRT_HAVE_log10p1f64
+#define __CRT_HAVE_log10p1f64x
+#define __CRT_HAVE_log10p1l
+#define __CRT_HAVE_log2p1
+#define __CRT_HAVE_log2p1f
+#define __CRT_HAVE_log2p1f128
+#define __CRT_HAVE_log2p1f32
+#define __CRT_HAVE_log2p1f32x
+#define __CRT_HAVE_log2p1f64
+#define __CRT_HAVE_log2p1f64x
+#define __CRT_HAVE_log2p1l
+#define __CRT_HAVE_logp1
+#define __CRT_HAVE_logp1f
+#define __CRT_HAVE_logp1f128
+#define __CRT_HAVE_logp1f32
+#define __CRT_HAVE_logp1f32x
+#define __CRT_HAVE_logp1f64
+#define __CRT_HAVE_logp1f64x
+#define __CRT_HAVE_logp1l
+#endif /* __GLIBC_VERSION__ >= 24000 */
+#if __GLIBC_VERSION__ >= 24100
+#define __CRT_HAVE_acospi
+#define __CRT_HAVE_acospif
+#define __CRT_HAVE_acospif128
+#define __CRT_HAVE_acospif32
+#define __CRT_HAVE_acospif32x
+#define __CRT_HAVE_acospif64
+#define __CRT_HAVE_acospif64x
+#define __CRT_HAVE_acospil
+#define __CRT_HAVE_asinpi
+#define __CRT_HAVE_asinpif
+#define __CRT_HAVE_asinpif128
+#define __CRT_HAVE_asinpif32
+#define __CRT_HAVE_asinpif32x
+#define __CRT_HAVE_asinpif64
+#define __CRT_HAVE_asinpif64x
+#define __CRT_HAVE_asinpil
+#define __CRT_HAVE_atan2pi
+#define __CRT_HAVE_atan2pif
+#define __CRT_HAVE_atan2pif128
+#define __CRT_HAVE_atan2pif32
+#define __CRT_HAVE_atan2pif32x
+#define __CRT_HAVE_atan2pif64
+#define __CRT_HAVE_atan2pif64x
+#define __CRT_HAVE_atan2pil
+#define __CRT_HAVE_atanpi
+#define __CRT_HAVE_atanpif
+#define __CRT_HAVE_atanpif128
+#define __CRT_HAVE_atanpif32
+#define __CRT_HAVE_atanpif32x
+#define __CRT_HAVE_atanpif64
+#define __CRT_HAVE_atanpif64x
+#define __CRT_HAVE_atanpil
+#define __CRT_HAVE_cospi
+#define __CRT_HAVE_cospif
+#define __CRT_HAVE_cospif128
+#define __CRT_HAVE_cospif32
+#define __CRT_HAVE_cospif32x
+#define __CRT_HAVE_cospif64
+#define __CRT_HAVE_cospif64x
+#define __CRT_HAVE_cospil
+#define __CRT_HAVE_sched_getattr
+#define __CRT_HAVE_sched_setattr
+#define __CRT_HAVE_sinpi
+#define __CRT_HAVE_sinpif
+#define __CRT_HAVE_sinpif128
+#define __CRT_HAVE_sinpif32
+#define __CRT_HAVE_sinpif32x
+#define __CRT_HAVE_sinpif64
+#define __CRT_HAVE_sinpif64x
+#define __CRT_HAVE_sinpil
+#define __CRT_HAVE_tanpi
+#define __CRT_HAVE_tanpif
+#define __CRT_HAVE_tanpif128
+#define __CRT_HAVE_tanpif32
+#define __CRT_HAVE_tanpif32x
+#define __CRT_HAVE_tanpif64
+#define __CRT_HAVE_tanpif64x
+#define __CRT_HAVE_tanpil
+#endif /* __GLIBC_VERSION__ >= 24100 */
+#if __GLIBC_VERSION__ >= 24200
+#define __CRT_HAVE___close_nocancel_nostatus
+#define __CRT_HAVE___inet_ntop_chk
+#define __CRT_HAVE___inet_pton_chk
+#define __CRT_HAVE_cfgetibaud
+#define __CRT_HAVE_cfgetobaud
+#define __CRT_HAVE_cfsetbaud
+#define __CRT_HAVE_cfsetibaud
+#define __CRT_HAVE_cfsetobaud
+#define __CRT_HAVE_compoundn
+#define __CRT_HAVE_compoundnf
+#define __CRT_HAVE_compoundnf128
+#define __CRT_HAVE_compoundnf32
+#define __CRT_HAVE_compoundnf32x
+#define __CRT_HAVE_compoundnf64
+#define __CRT_HAVE_compoundnf64x
+#define __CRT_HAVE_compoundnl
+#define __CRT_HAVE_pown
+#define __CRT_HAVE_pownf
+#define __CRT_HAVE_pownf128
+#define __CRT_HAVE_pownf32
+#define __CRT_HAVE_pownf32x
+#define __CRT_HAVE_pownf64
+#define __CRT_HAVE_pownf64x
+#define __CRT_HAVE_pownl
+#define __CRT_HAVE_powr
+#define __CRT_HAVE_powrf
+#define __CRT_HAVE_powrf128
+#define __CRT_HAVE_powrf32
+#define __CRT_HAVE_powrf32x
+#define __CRT_HAVE_powrf64
+#define __CRT_HAVE_powrf64x
+#define __CRT_HAVE_powrl
+#define __CRT_HAVE_pthread_gettid_np
+#define __CRT_HAVE_rootn
+#define __CRT_HAVE_rootnf
+#define __CRT_HAVE_rootnf128
+#define __CRT_HAVE_rootnf32
+#define __CRT_HAVE_rootnf32x
+#define __CRT_HAVE_rootnf64
+#define __CRT_HAVE_rootnf64x
+#define __CRT_HAVE_rootnl
+#define __CRT_HAVE_rsqrt
+#define __CRT_HAVE_rsqrtf
+#define __CRT_HAVE_rsqrtf128
+#define __CRT_HAVE_rsqrtf32
+#define __CRT_HAVE_rsqrtf32x
+#define __CRT_HAVE_rsqrtf64
+#define __CRT_HAVE_rsqrtf64x
+#define __CRT_HAVE_rsqrtl
+#define __CRT_HAVE_uabs
+#define __CRT_HAVE_uimaxabs
+#define __CRT_HAVE_ulabs
+#define __CRT_HAVE_ullabs
+#endif /* __GLIBC_VERSION__ >= 24200 */
 #ifdef __x86_64__
 #define __CRT_HAVE___arch_prctl
 #define __CRT_HAVE_arch_prctl
