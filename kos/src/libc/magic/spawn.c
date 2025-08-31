@@ -186,8 +186,7 @@ typedef struct __posix_spawn_file_actions posix_spawn_file_actions_t;
 [[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<asm/os/oflags.h>", "<asm/os/signal.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
-[[requires(defined(__POSIX_SPAWN_USE_KOS) &&
-           ($has_function(fexecve) || $has_function(execve) || $has_function(execvpe)))]]
+[[requires(defined(__POSIX_SPAWN_USE_KOS))]]
 $errno_t posix_spawn_child(unsigned int exec_type, void *exec_arg,
                            [[in_opt]] posix_spawn_file_actions_t const *file_actions,
                            [[in_opt]] posix_spawnattr_t const *attrp,

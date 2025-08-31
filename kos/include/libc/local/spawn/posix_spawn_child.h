@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33b9c38a */
+/* HASH CRC-32:0x1d3379c1 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,10 +22,7 @@
 #define __local_posix_spawn_child_defined
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
-#include <asm/os/features.h>
-#include <hybrid/__alloca.h>
-#include <libc/template/environ.h>
-#if defined(__POSIX_SPAWN_USE_KOS) && (defined(__CRT_HAVE_fexecve) || defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve) || defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe))
+#ifdef __POSIX_SPAWN_USE_KOS
 #include <bits/crt/posix_spawn.h>
 #include <bits/types.h>
 #ifndef __TARGV
@@ -151,13 +148,19 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,__localdep_execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
-#elif (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca)
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__alloca.h>
+#include <libc/template/environ.h>
+__NAMESPACE_LOCAL_BEGIN
+#if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/execvpe.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_execvpe __LIBC_LOCAL_NAME(execvpe)
-#else /* ... */
+#else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) && __hybrid_alloca */
 #undef __local___localdep_execvpe_defined
+#endif /* (!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) || !__hybrid_alloca */
 #endif /* !... */
 #endif /* !__local___localdep_execvpe_defined */
 #ifndef __local___localdep_fchdir_defined
@@ -179,14 +182,19 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_FDREAD(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,__localdep_fexecve,(__fd_t __execfd, __TARGV, __TENVP),fexecve,(__execfd,___argv,___envp))
-#elif defined(__OS_HAVE_PROCFS_SELF_FD) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve))
+#else /* __CRT_HAVE_fexecve */
+__NAMESPACE_LOCAL_END
+#include <asm/os/features.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__OS_HAVE_PROCFS_SELF_FD) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/fexecve.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_fexecve __LIBC_LOCAL_NAME(fexecve)
-#else /* ... */
+#else /* __OS_HAVE_PROCFS_SELF_FD && (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) */
 #undef __local___localdep_fexecve_defined
-#endif /* !... */
+#endif /* !__OS_HAVE_PROCFS_SELF_FD || (!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) */
+#endif /* !__CRT_HAVE_fexecve */
 #endif /* !__local___localdep_fexecve_defined */
 #ifndef __local___localdep_getgid_defined
 #define __local___localdep_getgid_defined
@@ -855,7 +863,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_posix_spawn_child_defined
 #define __localdep_posix_spawn_child __LIBC_LOCAL_NAME(posix_spawn_child)
 #endif /* !__local___localdep_posix_spawn_child_defined */
-#else /* __POSIX_SPAWN_USE_KOS && (__CRT_HAVE_fexecve || __CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve || __CRT_HAVE_execvpe || __CRT_HAVE__execvpe) */
+#else /* __POSIX_SPAWN_USE_KOS */
 #undef __local_posix_spawn_child_defined
-#endif /* !__POSIX_SPAWN_USE_KOS || (!__CRT_HAVE_fexecve && !__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve && !__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe) */
+#endif /* !__POSIX_SPAWN_USE_KOS */
 #endif /* !__local_posix_spawn_child_defined */
