@@ -277,7 +277,7 @@ fallback_mallopt_NOOP(int param_number, int value) {
 }
 
 #ifndef _MALLINFO_MATCHES_MALLINFO2
-PRIVATE struct mallinfo2 LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") struct mallinfo2 LIBCCALL
 fallback_mallinfo2_with_mallinfo(void) {
 	struct mallinfo info = mallinfo();
 	struct mallinfo2 result;
@@ -294,14 +294,14 @@ fallback_mallinfo2_with_mallinfo(void) {
 	return result;
 }
 
-PRIVATE struct mallinfo2 LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") struct mallinfo2 LIBCCALL
 fallback_mallinfo2_NOOP(void) {
 	struct mallinfo2 result;
 	bzero(&result, sizeof(result));
 	return result;
 }
 
-PRIVATE struct mallinfo LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") struct mallinfo LIBCCALL
 fallback_mallinfo_with_mallinfo2(void) {
 	struct mallinfo2 info = mallinfo2();
 	struct mallinfo result;
@@ -319,7 +319,7 @@ fallback_mallinfo_with_mallinfo2(void) {
 }
 #endif /* !_MALLINFO_MATCHES_MALLINFO2 */
 
-PRIVATE struct mallinfo LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") struct mallinfo LIBCCALL
 fallback_mallinfo_NOOP(void) {
 	struct mallinfo result;
 	bzero(&result, sizeof(result));
@@ -327,7 +327,7 @@ fallback_mallinfo_NOOP(void) {
 }
 
 
-PRIVATE int LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") int LIBCCALL
 fallback_malloc_trim_NOOP(size_t pad) {
 	(void)pad;
 	COMPILER_IMPURE();
@@ -337,12 +337,12 @@ fallback_malloc_trim_NOOP(size_t pad) {
 PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers")
 LPMALLOC_USABLE_SIZE libc_user__msize = NULL;
 
-PRIVATE size_t LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") size_t LIBCCALL
 fallback_malloc_usable_size_with__msize(void *ptr) {
 	return ptr ? (*libc_user__msize)(ptr) : 0;
 }
 
-PRIVATE size_t LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") size_t LIBCCALL
 fallback_malloc_usable_size_NOOP(void *ptr) {
 	/* NOTE: Returning `0' here might not be ABI-compliant in
 	 *       every situation, but it's the best we can  do... */
