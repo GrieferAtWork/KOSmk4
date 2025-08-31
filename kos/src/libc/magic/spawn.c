@@ -187,6 +187,13 @@ $errno_t crt_posix_spawn([[out]] pid_t *__restrict pid,
 
 %#ifdef __USE_KOS
 
+%[define(POSIX_SPAWN_TYPE_EXECVE = 0)]  /* execve((char const *)exec_arg, ___argv, ___envp) */
+%[define(POSIX_SPAWN_TYPE_EXECVPE = 1)] /* execvpe((char const *)exec_arg, ___argv, ___envp) */
+%[define(POSIX_SPAWN_TYPE_FEXECVE = 2)] /* fexecve((fd_t)(uintptr_t)exec_arg, ___argv, ___envp) */
+%[define(POSIX_SPAWN_TYPE_CUSTOM = 3)]  /* (*(void (LIBCCALL *)(char **, char **))exec_arg)(___argv, ___envp) */
+
+
+
 @@>> posix_fspawn_np(3)
 @@Implementation for the fastest possible  method of (safely) doing  fork(2)+fexecve(2)
 @@in  order  to  spawn  a  new  process  from  the  given  `execfd'  file   descriptor.
@@ -215,27 +222,52 @@ $errno_t crt_posix_spawn([[out]] pid_t *__restrict pid,
 [[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>", "<asm/os/features.h>")]]
-[[requires((defined(__POSIX_SPAWN_USE_KOS) &&
-            ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
-             ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
-              $has_function(read) && $has_function(write) && $has_function(close))) &&
-            $has_function(crt_fexecve) && $has_function(waitpid)) ||
+[[requires($has_function(posix_spawn_impl, fexecve) ||
            (defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(crt_posix_spawn)))]]
 $errno_t posix_fspawn_np([[out]] pid_t *__restrict pid, [[fdread]] $fd_t execfd,
                          [[in_opt]] posix_spawn_file_actions_t const *file_actions,
                          [[in_opt]] posix_spawnattr_t const *attrp,
                          [[in]] __TARGV, [[in]] __TENVP) {
-@@pp_if defined(__POSIX_SPAWN_USE_KOS) &&
-        ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
-         ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
-          $has_function(read) && $has_function(write) && $has_function(close))) &&
-        $has_function(crt_fexecve) && $has_function(waitpid)@@
+@@pp_if $has_function(posix_spawn_impl, fexecve)@@
+	return posix_spawn_impl(pid, POSIX_SPAWN_TYPE_FEXECVE, (void *)(uintptr_t)execfd, file_actions, attrp, ___argv, ___envp);
+@@pp_else@@
+@@pp_if __SIZEOF_INT__ == 4@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-2147483648")];
+@@pp_elif __SIZEOF_INT__ == 8@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-9223372036854775808")];
+@@pp_elif __SIZEOF_INT__ == 2@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-32768")];
+@@pp_else@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-128")];
+@@pp_endif@@
+	sprintf(buf, "/proc/self/fd/%d", execfd);
+	return crt_posix_spawn(pid, buf, file_actions, attrp, ___argv, ___envp);
+@@pp_endif@@
+}
+
+
+
+[[static]]
+[[argument_names(pid, exec_type, exec_arg, file_actions, attrp, ___argv, ___envp)]]
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
+[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>", "<asm/os/features.h>")]]
+[[requires(defined(__POSIX_SPAWN_USE_KOS) &&
+           ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
+            ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
+             $has_function(read) && $has_function(write) && $has_function(close))) &&
+           $has_function(posix_spawn_child) && $has_function(waitpid))]]
+$errno_t posix_spawn_impl([[out]] pid_t *__restrict pid, unsigned int exec_type, void *exec_arg,
+                          [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                          [[in_opt]] posix_spawnattr_t const *attrp,
+                          [[in]] __TARGV, [[in]] __TENVP) {
 	int status;
 @@pp_if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || !$has_function(vfork)@@
 	fd_t pipes[2];
 	ssize_t temp;
 @@pp_endif@@
-	errno_t result, old_errno;
+	errno_t result, error, old_errno;
 	pid_t child;
 	old_errno = __libc_geterrno_or(0);
 @@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
@@ -303,6 +335,40 @@ err_join_zombie_child:
 	(void)libc_seterrno(old_errno);
 	return result;
 do_exec:
+	/* Perform additional actions within the child.
+	 *
+	 * NOTE: When the exec succeeds, the pipe is auto-
+	 *       closed because it's marked as  O_CLOEXEC! */
+	error = posix_spawn_child(exec_type, exec_arg, file_actions, attrp, ___argv, ___envp);
+	if (error != 0) {
+@@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
+		/* If the exec fails, it will have modified `errno' to indicate this fact.
+		 * And since we're sharing VMs with  our parent process, the error  reason
+		 * will have already  been written  back to  our parent's  VM, so  there's
+		 * actually nothing left for us to do, but to simply exit! */
+		__libc_seterrno(error);
+@@pp_else@@
+		/* Write the exec-error back to our parent. */
+		write(pipes[1], &error, sizeof(error));
+		/* No need to close the pipe, it's auto-closed by the kernel! */
+@@pp_endif@@
+	}
+	_Exit(127);
+}
+
+[[static]]
+[[argument_names(exec_type, exec_arg, file_actions, attrp, ___argv, ___envp)]]
+[[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
+[[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<asm/os/oflags.h>", "<asm/os/signal.h>")]]
+[[requires_include("<asm/crt/posix_spawn.h>")]]
+[[requires(defined(__POSIX_SPAWN_USE_KOS) &&
+           ($has_function(fexecve) || $has_function(execve) || $has_function(execvpe)))]]
+$errno_t posix_spawn_child(unsigned int exec_type, void *exec_arg,
+                           [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                           [[in_opt]] posix_spawnattr_t const *attrp,
+                           [[in]] __TARGV, [[in]] __TENVP) {
+
 	/* Perform additional actions within the child. */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("__used")
@@ -324,7 +390,7 @@ do_exec:
 			case __POSIX_SPAWN_ACTION_CLOSE:
 				/* Close a file handle */
 				if unlikely(close(act->@__sa_action@.@__sa_close_action@.@__sa_fd@))
-					goto child_error;
+					goto err_errno;
 				break;
 @@pp_endif@@
 
@@ -336,7 +402,7 @@ do_exec:
 				/* Duplicate a file handle */
 				if unlikely(dup2(act->@__sa_action@.@__sa_dup2_action@.@__sa_oldfd@,
 				                 act->@__sa_action@.@__sa_dup2_action@.@__sa_newfd@))
-					goto child_error;
+					goto err_errno;
 				break;
 @@pp_endif@@
 
@@ -351,11 +417,11 @@ do_exec:
 				              act->@__sa_action@.@__sa_open_action@.@__sa_oflag@,
 				              act->@__sa_action@.@__sa_open_action@.@__sa_mode@);
 				if unlikely(tempfd < 0)
-					goto child_error;
+					goto err_errno;
 				if likely(tempfd != act->@__sa_action@.@__sa_open_action@.@__sa_fd@) {
 					if unlikely(dup2(tempfd, act->@__sa_action@.@__sa_open_action@.@__sa_fd@))
-						goto child_error;
-					close(tempfd);
+						goto err_errno;
+					(void)close(tempfd);
 				}
 			}	break;
 @@pp_endif@@
@@ -367,10 +433,8 @@ do_exec:
 @@pp_else@@
 			case __POSIX_SPAWN_ACTION_CHDIR: {
 				/* Change direction using `chdir(2)' */
-				int error;
-				error = chdir(act->@__sa_action@.@__sa_chdir_action@.@__sa_path@);
-				if unlikely(error != 0)
-					goto child_error;
+				if unlikely(chdir(act->@__sa_action@.@__sa_chdir_action@.@__sa_path@))
+					goto err_errno;
 			}	break;
 @@pp_endif@@
 @@pp_endif@@
@@ -382,10 +446,8 @@ do_exec:
 @@pp_else@@
 			case __POSIX_SPAWN_ACTION_FCHDIR: {
 				/* Change direction using `fchdir(2)' */
-				int error;
-				error = fchdir(act->@__sa_action@.@__sa_fchdir_action@.@__sa_fd@);
-				if unlikely(error != 0)
-					goto child_error;
+				if unlikely(fchdir(act->@__sa_action@.@__sa_fchdir_action@.@__sa_fd@))
+					goto err_errno;
 			}	break;
 @@pp_endif@@
 @@pp_endif@@
@@ -398,7 +460,7 @@ do_exec:
 			case __POSIX_SPAWN_ACTION_TCSETPGRP:
 				/* NOTE: Passing `0' as second argument to `tcsetpgrp()' is the same as `getpid()' */
 				if unlikely(tcsetpgrp(act->@__sa_action@.@__sa_tcsetpgrp_action@.@__sa_fd@, 0))
-					goto child_error;
+					goto err_errno;
 				break;
 @@pp_endif@@
 @@pp_endif@@
@@ -419,13 +481,12 @@ do_exec:
 #undef __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
 			default:
 @@pp_ifdef ENOSYS@@
-				(void)libc_seterrno(ENOSYS);
+				return ENOSYS;
 @@pp_elif defined(EPERM)@@
-				(void)libc_seterrno(EPERM);
+				return EPERM;
 @@pp_else@@
-				(void)libc_seterrno(1);
+				return 1;
 @@pp_endif@@
-				goto child_error;
 @@pp_else@@
 			default:
 				__builtin_unreachable();
@@ -442,37 +503,35 @@ do_exec:
 @@pp_if ($has_function(seteuid) && $has_function(getuid)) || ($has_function(setegid) && $has_function(getgid))@@
 @@pp_if $has_function(seteuid) && $has_function(getuid)@@
 			if (seteuid(getuid()))
-				goto child_error;
+				goto err_errno;
 @@pp_endif@@
 @@pp_if $has_function(setegid) && $has_function(getgid)@@
 			if (setegid(getgid()))
-				goto child_error;
+				goto err_errno;
 @@pp_endif@@
 @@pp_else@@
 @@pp_ifdef ENOSYS@@
-			(void)libc_seterrno(ENOSYS);
+			return ENOSYS;
 @@pp_elif defined(EPERM)@@
-			(void)libc_seterrno(EPERM);
+			return EPERM;
 @@pp_else@@
-			(void)libc_seterrno(1);
+			return 1;
 @@pp_endif@@
-			goto child_error;
 @@pp_endif@@
 		}
 		if (attrp->@__flags@ & __POSIX_SPAWN_SETPGROUP) {
 @@pp_if $has_function(setpgid)@@
 			/* HINT: Passing `0' as first argument is the same as passing `getpid()'! */
 			if unlikely(setpgid(0, attrp->@__pgrp@))
-				goto child_error;
+				goto err_errno;
 @@pp_else@@
 @@pp_ifdef ENOSYS@@
-			(void)libc_seterrno(ENOSYS);
+			return ENOSYS;
 @@pp_elif defined(EPERM)@@
-			(void)libc_seterrno(EPERM);
+			return EPERM;
 @@pp_else@@
-			(void)libc_seterrno(1);
+			return 1;
 @@pp_endif@@
-			goto child_error;
 @@pp_endif@@
 		}
 		if (attrp->@__flags@ & __POSIX_SPAWN_SETSIGDEF) {
@@ -486,32 +545,30 @@ do_exec:
 				if (!sigismember(&attrp->@__sd@, i))
 					continue;
 				if unlikely(sigaction(i, &sa, NULL))
-					goto child_error;
+					goto err_errno;
 			}
 @@pp_else@@
 @@pp_ifdef ENOSYS@@
-			(void)libc_seterrno(ENOSYS);
+			return ENOSYS;
 @@pp_elif defined(EPERM)@@
-			(void)libc_seterrno(EPERM);
+			return EPERM;
 @@pp_else@@
-			(void)libc_seterrno(1);
+			return 1;
 @@pp_endif@@
-			goto child_error;
 @@pp_endif@@
 		}
 		if (attrp->@__flags@ & __POSIX_SPAWN_SETSIGMASK) {
 @@pp_if $has_function(sigprocmask) && defined(__SIG_SETMASK)@@
 			if unlikely(sigprocmask(__SIG_SETMASK, &attrp->@__ss@, NULL))
-				goto child_error;
+				goto err_errno;
 @@pp_else@@
 @@pp_ifdef ENOSYS@@
-			(void)libc_seterrno(ENOSYS);
+			return ENOSYS;
 @@pp_elif defined(EPERM)@@
-			(void)libc_seterrno(EPERM);
+			return EPERM;
 @@pp_else@@
-			(void)libc_seterrno(1);
+			return 1;
 @@pp_endif@@
-			goto child_error;
 @@pp_endif@@
 		}
 		if (attrp->@__flags@ & (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) {
@@ -529,71 +586,60 @@ do_exec:
 					error = sched_setscheduler(0, attrp->@__policy@, &param);
 			}
 			if unlikely(error)
-				goto child_error;
+				goto err_errno;
 @@pp_else@@
 @@pp_ifdef ENOSYS@@
-			(void)libc_seterrno(ENOSYS);
+			return ENOSYS;
 @@pp_elif defined(EPERM)@@
-			(void)libc_seterrno(EPERM);
+			return EPERM;
 @@pp_else@@
-			(void)libc_seterrno(1);
+			return 1;
 @@pp_endif@@
-			goto child_error;
 @@pp_endif@@
 		}
 @@pp_if defined(__POSIX_SPAWN_SETSID) && $has_function(setsid)@@
 		if (attrp->@__flags@ & __POSIX_SPAWN_SETSID) {
 			if unlikely(setsid() < 0)
-				goto child_error;
+				goto err_errno;
 		}
 @@pp_endif@@
 	}
-	/* When the exec succeeds, the pipe is auto-
-	 * closed because it's marked as  O_CLOEXEC! */
-	fexecve(execfd, ___argv, ___envp);
-@@pp_ifdef __POSIX_SPAWN_NOEXECERR@@
-	if (attrp && attrp->@__flags@ & __POSIX_SPAWN_NOEXECERR) {
-		/* Suppress the exec error. */
-@@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
-		(void)libc_seterrno(0);
+
+	switch (exec_type) {
+@@pp_if $has_function(execve)@@
+	case POSIX_SPAWN_TYPE_EXECVE:
+		execve((char const *)exec_arg, ___argv, ___envp);
+		break;
 @@pp_endif@@
-	} else
+@@pp_if $has_function(execvpe)@@
+	case POSIX_SPAWN_TYPE_EXECVPE:
+		execvpe((char const *)exec_arg, ___argv, ___envp);
+		break;
 @@pp_endif@@
-	{
-child_error:
-@@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
-		/* If the exec fails, it will have modified `errno' to indicate this fact.
-		 * And since we're sharing VMs with  our parent process, the error  reason
-		 * will have already  been written  back to  our parent's  VM, so  there's
-		 * actually nothing left for us to do, but to simply exit! */
-		;
-@@pp_else@@
-		/* Write the exec-error back to our parent. */
-@@pp_ifdef ENOENT@@
-		error = __libc_geterrno_or(ENOENT);
-@@pp_else@@
-		error = __libc_geterrno_or(1);
+@@pp_if $has_function(fexecve)@@
+	case POSIX_SPAWN_TYPE_FEXECVE:
+		fexecve((fd_t)(uintptr_t)exec_arg, ___argv, ___envp);
+		break;
 @@pp_endif@@
-		/* Communicate back why this failed. */
-		write(pipes[1], &error, sizeof(error));
-		/* No need to close the pipe, it's auto-closed by the kernel! */
-@@pp_endif@@
+	case POSIX_SPAWN_TYPE_CUSTOM:
+		(*(void (__LIBCCALL *)(char **, char **))exec_arg)((char **)___argv, (char **)___envp);
+		break;
+	default: __builtin_unreachable();
 	}
-	_Exit(127);
-@@pp_else@@
-@@pp_if __SIZEOF_INT__ == 4@@
-	char buf[COMPILER_LNEOF("/proc/self/fd/-2147483648")];
-@@pp_elif __SIZEOF_INT__ == 8@@
-	char buf[COMPILER_LNEOF("/proc/self/fd/-9223372036854775808")];
-@@pp_elif __SIZEOF_INT__ == 2@@
-	char buf[COMPILER_LNEOF("/proc/self/fd/-32768")];
-@@pp_else@@
-	char buf[COMPILER_LNEOF("/proc/self/fd/-128")];
+
+@@pp_ifdef __POSIX_SPAWN_NOEXECERR@@
+	if (attrp && attrp->@__flags@ & __POSIX_SPAWN_NOEXECERR)
+		return 0; /* Suppress the exec error. */
 @@pp_endif@@
-	sprintf(buf, "/proc/self/fd/%d", execfd);
-	return crt_posix_spawn(pid, buf, file_actions, attrp, ___argv, ___envp);
+
+err_errno:
+@@pp_ifdef ENOENT@@
+	return __libc_geterrno_or(ENOENT);
+@@pp_else@@
+	return __libc_geterrno_or(1);
 @@pp_endif@@
 }
+
 %#endif /* __USE_KOS */
 
 
@@ -621,7 +667,8 @@ child_error:
 @@@param: envp:         Same as the `envp' accepted by `execve(2)'
 @@@return: 0 :          Success. (The child process's PID has been stored in `*pid')
 @@@return: * :          Error (errno-code describing the reason of failure)
-[[requires_function(open, posix_fspawn_np), impl_include("<asm/os/oflags.h>")]]
+[[impl_include("<asm/os/oflags.h>")]]
+[[requires($has_function(posix_spawn_impl, execve) || $has_function(open, posix_fspawn_np))]]
 [[argument_names(pid, path, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
 $errno_t posix_spawn([[out]] pid_t *__restrict pid,
@@ -629,6 +676,9 @@ $errno_t posix_spawn([[out]] pid_t *__restrict pid,
                      [[in_opt]] posix_spawn_file_actions_t const *file_actions,
                      [[in_opt]] posix_spawnattr_t const *attrp,
                      [[in]] __TARGV, [[in]] __TENVP) {
+@@pp_if $has_function(posix_spawn_impl, execve)@@
+	return posix_spawn_impl(pid, POSIX_SPAWN_TYPE_EXECVE, (void *)path, file_actions, attrp, ___argv, ___envp);
+@@pp_else@@
 	fd_t fd;
 	pid_t result = -1;
 @@pp_if defined(O_RDONLY) && defined(O_CLOEXEC)@@
@@ -647,6 +697,7 @@ $errno_t posix_spawn([[out]] pid_t *__restrict pid,
 @@pp_endif@@
 	}
 	return result;
+@@pp_endif@@
 }
 
 
@@ -657,12 +708,14 @@ $errno_t posix_spawn([[out]] pid_t *__restrict pid,
 @@Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
 @@either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)')
 [[requires_include("<hybrid/__alloca.h>")]]
-[[requires($has_function(getenv) && $has_function(posix_spawn) && defined(__hybrid_alloca))]]
+[[requires($has_function(posix_spawn_impl, execvpe) ||
+           ($has_function(getenv, posix_spawn) && defined(__hybrid_alloca)))]]
 [[argument_names(pid, file, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[impl_prefix(
+@@pp_if !$has_function(posix_spawn_impl, execvpe)@@
 @@push_namespace(local)@@
 __LOCAL_LIBC(__posix_spawnp_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 2, 4, 8, 9)) $errno_t
 (__LIBCCALL __posix_spawnp_impl)($pid_t *__restrict pid,
@@ -689,12 +742,16 @@ __LOCAL_LIBC(__posix_spawnp_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 2, 4, 8, 9)
 	return posix_spawn(pid, fullpath, file_actions, attrp, ___argv, ___envp);
 }
 @@pop_namespace@@
+@@pp_endif@@
 )]]
 $errno_t posix_spawnp([[out]] pid_t *__restrict pid,
                       [[in]] const char *__restrict file,
                       [[in_opt]] posix_spawn_file_actions_t const *file_actions,
                       [[in_opt]] posix_spawnattr_t const *attrp,
                       [[in]] __TARGV, [[in]] __TENVP) {
+@@pp_if $has_function(posix_spawn_impl, execvpe)@@
+	return posix_spawn_impl(pid, POSIX_SPAWN_TYPE_EXECVPE, (void *)file, file_actions, attrp, ___argv, ___envp);
+@@pp_else@@
 	errno_t result;
 	char *env_path;
 	/* [...]
@@ -737,6 +794,7 @@ $errno_t posix_spawnp([[out]] pid_t *__restrict pid,
 		}
 	}
 	return result;
+@@pp_endif@@
 }
 
 

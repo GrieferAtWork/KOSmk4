@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2135d34d */
+/* HASH CRC-32:0xd637d28e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,16 +74,41 @@ NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
                                            __TARGV,
                                            __TENVP) {
 
+	return libc_posix_spawn_impl(pid, 2, (void *)(uintptr_t)execfd, file_actions, attrp, ___argv, ___envp);
 
 
 
 
+
+
+
+
+
+
+
+
+
+}
+#include <bits/os/sigaction.h>
+#include <libc/errno.h>
+#include <hybrid/typecore.h>
+#include <asm/os/vfork.h>
+#include <asm/os/oflags.h>
+#include <asm/os/signal.h>
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(6) ATTR_IN(7) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) errno_t
+NOTHROW_RPC(LIBCCALL libc_posix_spawn_impl)(pid_t *__restrict pid,
+                                            unsigned int exec_type,
+                                            void *exec_arg,
+                                            posix_spawn_file_actions_t const *file_actions,
+                                            posix_spawnattr_t const *attrp,
+                                            __TARGV,
+                                            __TENVP) {
 	int status;
 
 
 
 
-	errno_t result, old_errno;
+	errno_t result, error, old_errno;
 	pid_t child;
 	old_errno = __libc_geterrno_or(0);
 
@@ -151,6 +176,39 @@ err_join_zombie_child:
 	(void)libc_seterrno(old_errno);
 	return result;
 do_exec:
+	/* Perform additional actions within the child.
+	 *
+	 * NOTE: When the exec succeeds, the pipe is auto-
+	 *       closed because it's marked as  O_CLOEXEC! */
+	error = libc_posix_spawn_child(exec_type, exec_arg, file_actions, attrp, ___argv, ___envp);
+	if (error != 0) {
+
+		/* If the exec fails, it will have modified `errno' to indicate this fact.
+		 * And since we're sharing VMs with  our parent process, the error  reason
+		 * will have already  been written  back to  our parent's  VM, so  there's
+		 * actually nothing left for us to do, but to simply exit! */
+		__libc_seterrno(error);
+
+
+
+
+
+	}
+	libc__Exit(127);
+}
+#include <bits/os/sigaction.h>
+#include <libc/errno.h>
+#include <hybrid/typecore.h>
+#include <asm/os/oflags.h>
+#include <asm/os/signal.h>
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) errno_t
+NOTHROW_RPC(LIBCCALL libc_posix_spawn_child)(unsigned int exec_type,
+                                             void *exec_arg,
+                                             posix_spawn_file_actions_t const *file_actions,
+                                             posix_spawnattr_t const *attrp,
+                                             __TARGV,
+                                             __TENVP) {
+
 	/* Perform additional actions within the child. */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("__used")
@@ -172,7 +230,7 @@ do_exec:
 			case __POSIX_SPAWN_ACTION_CLOSE:
 				/* Close a file handle */
 				if unlikely(libc_close(act->__sa_action.__sa_close_action.__sa_fd))
-					goto child_error;
+					goto err_errno;
 				break;
 
 
@@ -184,7 +242,7 @@ do_exec:
 				/* Duplicate a file handle */
 				if unlikely(libc_dup2(act->__sa_action.__sa_dup2_action.__sa_oldfd,
 				                 act->__sa_action.__sa_dup2_action.__sa_newfd))
-					goto child_error;
+					goto err_errno;
 				break;
 
 
@@ -199,11 +257,11 @@ do_exec:
 				              act->__sa_action.__sa_open_action.__sa_oflag,
 				              act->__sa_action.__sa_open_action.__sa_mode);
 				if unlikely(tempfd < 0)
-					goto child_error;
+					goto err_errno;
 				if likely(tempfd != act->__sa_action.__sa_open_action.__sa_fd) {
 					if unlikely(libc_dup2(tempfd, act->__sa_action.__sa_open_action.__sa_fd))
-						goto child_error;
-					libc_close(tempfd);
+						goto err_errno;
+					(void)libc_close(tempfd);
 				}
 			}	break;
 
@@ -215,10 +273,8 @@ do_exec:
 
 			case __POSIX_SPAWN_ACTION_CHDIR: {
 				/* Change direction using `chdir(2)' */
-				int error;
-				error = libc_chdir(act->__sa_action.__sa_chdir_action.__sa_path);
-				if unlikely(error != 0)
-					goto child_error;
+				if unlikely(libc_chdir(act->__sa_action.__sa_chdir_action.__sa_path))
+					goto err_errno;
 			}	break;
 
 
@@ -230,10 +286,8 @@ do_exec:
 
 			case __POSIX_SPAWN_ACTION_FCHDIR: {
 				/* Change direction using `fchdir(2)' */
-				int error;
-				error = libc_fchdir(act->__sa_action.__sa_fchdir_action.__sa_fd);
-				if unlikely(error != 0)
-					goto child_error;
+				if unlikely(libc_fchdir(act->__sa_action.__sa_fchdir_action.__sa_fd))
+					goto err_errno;
 			}	break;
 
 
@@ -246,7 +300,7 @@ do_exec:
 			case __POSIX_SPAWN_ACTION_TCSETPGRP:
 				/* NOTE: Passing `0' as second argument to `tcsetpgrp()' is the same as `getpid()' */
 				if unlikely(libc_tcsetpgrp(act->__sa_action.__sa_tcsetpgrp_action.__sa_fd, 0))
-					goto child_error;
+					goto err_errno;
 				break;
 
 
@@ -267,13 +321,12 @@ do_exec:
 #undef __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
 			default:
 
-				(void)libc_seterrno(ENOSYS);
+				return ENOSYS;
 
 
 
 
 
-				goto child_error;
 #else /* __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION */
 			default:
 				__builtin_unreachable();
@@ -290,12 +343,11 @@ do_exec:
 
 
 			if (libc_seteuid(libc_getuid()))
-				goto child_error;
+				goto err_errno;
 
 
 			if (libc_setegid(libc_getgid()))
-				goto child_error;
-
+				goto err_errno;
 
 
 
@@ -311,8 +363,7 @@ do_exec:
 
 			/* HINT: Passing `0' as first argument is the same as passing `getpid()'! */
 			if unlikely(libc_setpgid(0, attrp->__pgrp))
-				goto child_error;
-
+				goto err_errno;
 
 
 
@@ -334,9 +385,8 @@ do_exec:
 				if (!libc_sigismember(&attrp->__sd, i))
 					continue;
 				if unlikely(libc_sigaction(i, &sa, NULL))
-					goto child_error;
+					goto err_errno;
 			}
-
 
 
 
@@ -350,8 +400,7 @@ do_exec:
 		if (attrp->__flags & __POSIX_SPAWN_SETSIGMASK) {
 
 			if unlikely(libc_sigprocmask(__SIG_SETMASK, &attrp->__ss, NULL))
-				goto child_error;
-
+				goto err_errno;
 
 
 
@@ -377,8 +426,7 @@ do_exec:
 					error = libc_sched_setscheduler(0, attrp->__policy, &param);
 			}
 			if unlikely(error)
-				goto child_error;
-
+				goto err_errno;
 
 
 
@@ -392,52 +440,41 @@ do_exec:
 
 		if (attrp->__flags & __POSIX_SPAWN_SETSID) {
 			if unlikely(libc_setsid() < 0)
-				goto child_error;
+				goto err_errno;
 		}
 
 	}
-	/* When the exec succeeds, the pipe is auto-
-	 * closed because it's marked as  O_CLOEXEC! */
-	libc_fexecve(execfd, ___argv, ___envp);
 
-	if (attrp && attrp->__flags & __POSIX_SPAWN_NOEXECERR) {
-		/* Suppress the exec error. */
+	switch (exec_type) {
 
-		(void)libc_seterrno(0);
-
-	} else
-
-	{
-child_error:
-
-		/* If the exec fails, it will have modified `errno' to indicate this fact.
-		 * And since we're sharing VMs with  our parent process, the error  reason
-		 * will have already  been written  back to  our parent's  VM, so  there's
-		 * actually nothing left for us to do, but to simply exit! */
-		;
+	case 0:
+		libc_execve((char const *)exec_arg, ___argv, ___envp);
+		break;
 
 
+	case 1:
+		libc_execvpe((char const *)exec_arg, ___argv, ___envp);
+		break;
 
 
+	case 2:
+		libc_fexecve((fd_t)(uintptr_t)exec_arg, ___argv, ___envp);
+		break;
 
-
-
-
-
-
-
+	case 3:
+		(*(void (__LIBCCALL *)(char **, char **))exec_arg)((char **)___argv, (char **)___envp);
+		break;
+	default: __builtin_unreachable();
 	}
-	libc__Exit(127);
 
 
+	if (attrp && attrp->__flags & __POSIX_SPAWN_NOEXECERR)
+		return 0; /* Suppress the exec error. */
 
 
+err_errno:
 
-
-
-
-
-
+	return __libc_geterrno_or(ENOENT);
 
 
 
@@ -473,10 +510,8 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
                                        posix_spawnattr_t const *attrp,
                                        __TARGV,
                                        __TENVP) {
-	fd_t fd;
-	pid_t result = -1;
 
-	fd = libc_open(path, O_RDONLY | O_CLOEXEC);
+	return libc_posix_spawn_impl(pid, 0, (void *)path, file_actions, attrp, ___argv, ___envp);
 
 
 
@@ -484,16 +519,23 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
 
 
 
-	if likely(fd >= 0) {
-		result = libc_posix_fspawn_np(pid, fd, file_actions, attrp, ___argv, ___envp);
 
-		libc_close(fd);
 
-	}
-	return result;
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
+#if ((!defined(__ARCH_HAVE_SHARED_VM_VFORK) || (!defined(__CRT_HAVE_vfork) && !defined(__CRT_HAVE___vfork) && !defined(__CRT_HAVE___libc_vfork))) && ((!defined(__CRT_HAVE_fork) && !defined(__CRT_HAVE___fork) && !defined(__CRT_HAVE___libc_fork)) || (!defined(__CRT_HAVE_pipe2) && !defined(__CRT_HAVE_pipe) && !defined(__CRT_HAVE___pipe) && !defined(__CRT_HAVE___libc_pipe) && !defined(__CRT_HAVE__pipe)) || !defined(__O_CLOEXEC) || (!defined(__CRT_HAVE_read) && !defined(__CRT_HAVE__read) && !defined(__CRT_HAVE___read) && !defined(__CRT_HAVE___libc_read)) || (!defined(__CRT_HAVE_write) && !defined(__CRT_HAVE__write) && !defined(__CRT_HAVE___write) && !defined(__CRT_HAVE___libc_write)) || (!defined(__CRT_HAVE_close) && !defined(__CRT_HAVE__close) && !defined(__CRT_HAVE___close) && !defined(__CRT_HAVE___libc_close)))) || !defined(__POSIX_SPAWN_USE_KOS) || (!defined(__CRT_HAVE_fexecve) && !defined(__CRT_HAVE_execve) && !defined(__CRT_HAVE__execve) && !defined(__CRT_HAVE___execve) && !defined(__CRT_HAVE___libc_execve) && !defined(__CRT_HAVE_execvpe) && !defined(__CRT_HAVE__execvpe)) || (!defined(__CRT_HAVE_waitpid) && !defined(__CRT_HAVE___waitpid)) || (!defined(__CRT_HAVE_execvpe) && !defined(__CRT_HAVE__execvpe) && ((!defined(__CRT_HAVE_getenv) && !defined(__LOCAL_environ)) || (!defined(__CRT_HAVE_execve) && !defined(__CRT_HAVE__execve) && !defined(__CRT_HAVE___execve) && !defined(__CRT_HAVE___libc_execve)) || !defined(__hybrid_alloca)))
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__posix_spawnp_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 2, 4, 8, 9)) errno_t
 (__LIBCCALL __posix_spawnp_impl)(pid_t *__restrict pid,
@@ -520,6 +562,7 @@ __LOCAL_LIBC(__posix_spawnp_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 2, 4, 8, 9)
 	return libc_posix_spawn(pid, fullpath, file_actions, attrp, ___argv, ___envp);
 }
 __NAMESPACE_LOCAL_END
+#endif /* ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork && !__CRT_HAVE___libc_fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE___libc_pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write && !__CRT_HAVE___libc_write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close && !__CRT_HAVE___libc_close))) || !__POSIX_SPAWN_USE_KOS || (!__CRT_HAVE_fexecve && !__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve && !__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe) || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid) || (!__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) || !__hybrid_alloca)) */
 /* >> posix_spawnp(3)
  * Same  as  `posix_spawn(3)',  but  search  `getenv("PATH")'  for  `file',  rather  than
  * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
@@ -532,48 +575,52 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
                                         posix_spawnattr_t const *attrp,
                                         __TARGV,
                                         __TENVP) {
-	errno_t result;
-	char *env_path;
-	/* [...]
-	 * If the specified filename includes a slash character,
-	 * then $PATH is ignored, and the file at the  specified
-	 * pathname is executed.
-	 * [...] */
+
+	return libc_posix_spawn_impl(pid, 1, (void *)file, file_actions, attrp, ___argv, ___envp);
 
 
 
-	if (libc_strchr(file, '/'))
-
-	{
-		return libc_posix_spawn(pid, file, file_actions, attrp, ___argv, ___envp);
-	}
-	env_path = libc_getenv("PATH");
-
-	result = ENOENT;
 
 
 
-	if (env_path && *env_path) {
-		size_t filelen;
-		filelen  = libc_strlen(file);
-		for (;;) {
-			char *path_end;
 
 
 
-			path_end = libc_strchrnul(env_path, ':');
 
-			result = (__NAMESPACE_LOCAL_SYM __posix_spawnp_impl)(pid, env_path, (size_t)(path_end - env_path),
-			                                                     file, filelen, file_actions, attrp,
-			                                                     ___argv, ___envp);
-			if (result == 0)
-				break;
-			if (!*path_end)
-				break;
-			env_path = path_end + 1;
-		}
-	}
-	return result;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 /* >> posix_spawnattr_init(3)
  * Initialize a given set of spawn attributes to all zero

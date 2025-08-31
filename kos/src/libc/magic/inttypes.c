@@ -798,7 +798,8 @@ $imaxdiv_t imaxdiv($intmax_t numer, $intmax_t denom) {
 }
 
 %(std, c, ccompat)#ifdef __USE_ISOC2Y
-[[std]] $uintmax_t uimaxabs($intmax_t x) = imaxabs;
+[[std, decl_include("<hybrid/typecore.h>")]]
+$uintmax_t uimaxabs($intmax_t x) = imaxabs;
 %(std, c, ccompat)#endif /* __USE_ISOC2Y */
 
 

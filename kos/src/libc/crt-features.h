@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1f36f3b */
+/* HASH CRC-32:0xbc4222a3 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7323,6 +7323,7 @@
 #define __CRT_HAVE_posix_memalign
 #define __CRT_HAVE_posix_openpt
 #define __CRT_HAVE_posix_spawn
+#define __CRT_HAVE_posix_spawn_child
 #define __CRT_HAVE_posix_spawn_file_actions_addchdir_np
 #define __CRT_HAVE_posix_spawn_file_actions_addclose
 #define __CRT_HAVE_posix_spawn_file_actions_addclosefrom_np
@@ -7333,6 +7334,7 @@
 #define __CRT_HAVE_posix_spawn_file_actions_alloc
 #define __CRT_HAVE_posix_spawn_file_actions_destroy
 #define __CRT_HAVE_posix_spawn_file_actions_init
+#define __CRT_HAVE_posix_spawn_impl
 #define __CRT_HAVE_posix_spawnattr_destroy
 #define __CRT_HAVE_posix_spawnattr_getflags
 #define __CRT_HAVE_posix_spawnattr_getpgroup

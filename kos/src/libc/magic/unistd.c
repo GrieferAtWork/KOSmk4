@@ -2377,11 +2377,6 @@ int fexecve([[fdread]] $fd_t execfd, [[in]] __TARGV, [[in]] __TENVP) {
 	sprintf(buf, "/proc/self/fd/%d", execfd);
 	return execve(buf, ___argv, ___envp);
 }
-
-[[cp, hidden, nocrt, argument_names(fd, ___argv, ___envp), alias("fexecve")]]
-[[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
-int crt_fexecve([[fdread]] $fd_t fd, [[in]] __TARGV, [[in]] __TENVP);
-
 %#endif /* __USE_XOPEN2K8 */
 
 %

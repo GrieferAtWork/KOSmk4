@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bd5b89c */
+/* HASH CRC-32:0x1745f2e7 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,6 +80,8 @@ INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_O
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
 INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(6) ATTR_IN(7) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawn_impl)(pid_t *__restrict pid, unsigned int exec_type, void *exec_arg, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawn_child)(unsigned int exec_type, void *exec_arg, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn(3)
