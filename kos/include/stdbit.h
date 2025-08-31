@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f5fac7d */
+/* HASH CRC-32:0x36606d2b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,7 @@
 #include <hybrid/typecore.h>
 #include <hybrid/byteorder.h>
 #include <bits/types.h>
+#include <features.h>
 
 #define __STDC_VERSION_STDBIT_H__ 202311L
 #define __STDC_ENDIAN_LITTLE__    __ORDER_LITTLE_ENDIAN__
@@ -381,56 +382,48 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL stdc_first
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ui,(unsigned int __i),ffs,{ return __builtin_ffs(__i); })
 #elif defined(__CRT_HAVE_ffs)
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ui,(unsigned int __i),ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #elif defined(__CRT_HAVE_ffsl) && __SIZEOF_INT__ == __SIZEOF_LONG__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ui,(unsigned int __i),ffsl,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #elif defined(__CRT_HAVE_stdc_first_leading_one_ul) && __SIZEOF_INT__ == __SIZEOF_LONG__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ui,(unsigned int __i),stdc_first_leading_one_ul,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #elif defined(__CRT_HAVE_ffsll) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ui,(unsigned int __i),ffsll,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #elif defined(__CRT_HAVE_stdc_first_leading_one_ull) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ui,(unsigned int __i),stdc_first_leading_one_ull,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #elif defined(__CRT_HAVE___ffs)
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ui,(unsigned int __i),__ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #elif defined(__CRT_HAVE_stdc_first_leading_one_ui)
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIDECLARE(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ui,(unsigned int __i),{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #else /* ... */
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
@@ -444,56 +437,48 @@ __LOCAL unsigned int __NOTHROW_NCX(__LIBCCALL stdc_first_leading_one_ui)(unsigne
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ul,(unsigned long __i),ffsl,{ return __builtin_ffsl(__i); })
 #elif defined(__CRT_HAVE_ffsl)
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ul,(unsigned long __i),ffsl,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
 #elif defined(__CRT_HAVE_ffs) && __SIZEOF_LONG__ == __SIZEOF_INT__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ul,(unsigned long __i),ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
 #elif defined(__CRT_HAVE___ffs) && __SIZEOF_LONG__ == __SIZEOF_INT__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ul,(unsigned long __i),__ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
 #elif defined(__CRT_HAVE_stdc_first_leading_one_ui) && __SIZEOF_LONG__ == __SIZEOF_INT__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ul,(unsigned long __i),stdc_first_leading_one_ui,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
 #elif defined(__CRT_HAVE_ffsll) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ul,(unsigned long __i),ffsll,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
 #elif defined(__CRT_HAVE_stdc_first_leading_one_ull) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ul,(unsigned long __i),stdc_first_leading_one_ull,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
 #elif defined(__CRT_HAVE_stdc_first_leading_one_ul)
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIDECLARE(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ul,(unsigned long __i),{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
 #else /* ... */
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
@@ -1366,56 +1351,48 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL stdc_trail
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ull,(__ULONGLONG __i),ffsll,{ return __builtin_ffsll(__i); })
 #elif defined(__CRT_HAVE_ffsll)
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ull,(__ULONGLONG __i),ffsll,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
 #elif defined(__CRT_HAVE_ffs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ull,(__ULONGLONG __i),ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
 #elif defined(__CRT_HAVE___ffs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ull,(__ULONGLONG __i),__ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
 #elif defined(__CRT_HAVE_stdc_first_leading_one_ui) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ull,(__ULONGLONG __i),stdc_first_leading_one_ui,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
 #elif defined(__CRT_HAVE_ffsl) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ull,(__ULONGLONG __i),ffsl,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
 #elif defined(__CRT_HAVE_stdc_first_leading_one_ul) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIREDIRECT(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ull,(__ULONGLONG __i),stdc_first_leading_one_ul,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
 #elif defined(__CRT_HAVE_stdc_first_leading_one_ull)
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)
  * Find first set (1-based, returning `0' when `x == 0') */
 __CEIDECLARE(,unsigned int,__NOTHROW_NCX,stdc_first_leading_one_ull,(__ULONGLONG __i),{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
 #else /* ... */
-#include <features.h>
 /* >> stdc_first_leading_one(3) (type-generic)
  * >> stdc_first_leading_one_uc(3), stdc_first_leading_one_us(3), stdc_first_leading_one_ui(3)
  * >> stdc_first_leading_one_ul(3), stdc_first_leading_one_ull(3)

@@ -35,6 +35,8 @@
 #include <hybrid/byteorder.h>
 )]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
+#include <features.h>
 )]%{
 
 #define __STDC_VERSION_STDBIT_H__ 202311L
