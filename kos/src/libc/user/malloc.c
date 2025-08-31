@@ -951,7 +951,7 @@ libc_malloc_hooks_doinit(void) {
 
 	/* Check if malloc gets defined by the main application. */
 	bzero(&abi, sizeof(abi));
-	*(void **)&abi.uma_malloc = user_malloc_abi_dlsym(nameof_free, (void *)&libc_free);
+	*(void **)&abi.uma_malloc = user_malloc_abi_dlsym(nameof_malloc, (void *)&libc_malloc);
 	if (abi.uma_malloc != NULL) {
 		user_malloc_abi_load(&abi);
 	} else {
