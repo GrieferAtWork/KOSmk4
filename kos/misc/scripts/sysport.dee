@@ -587,7 +587,7 @@ global final STD_HEADERS: {string: {string...}} = {
 
 
 function filesTxtContainsLine(line: Bytes): bool {
-	static local knownFiles = File.open("files-sorted.txt", "rb").readall();
+	static local knownFiles = File.open(r"E:\home\files-sorted.txt", "rb").readall();
 	local lo = 0, hi = #knownFiles;
 	while (lo < hi) {
 		local startOfLine = (lo + hi) / 2;

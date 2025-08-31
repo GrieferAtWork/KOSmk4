@@ -232,6 +232,7 @@
 	.bsd.* .bsd                       # Misc BSD functions
 	.solaris.* .solaris               # Misc Solaris functions
 	.mbstring.* .mbstring             # <mbstring.h>, <mbctype.h>
+	.stdbit.* .stdbit                 # <stdbit.h>
 	.conio.* .conio                   # <conio.h>, `stdtty'
 	.capability                       # <sys/capability.h>
 	.libiberty                        # <libiberty.h>
@@ -381,6 +382,7 @@
 	CB(PREFIX.crt.bsd.vis) \
 	CB(PREFIX.crt.bsd.io.access PREFIX.crt.bsd.sched.signal PREFIX.crt.bsd.strstat PREFIX.crt.bsd.user PREFIX.crt.bsd) \
 	CB(PREFIX.crt.solaris.io PREFIX.crt.solaris) \
+	CB(PREFIX.crt.stdbit) \
 	CB(PREFIX.crt.capability) \
 	CB(PREFIX.crt.libiberty) \
 	CB(PREFIX.crt.unsorted) \
@@ -569,6 +571,7 @@
 	CB(PREFIX.crt.dos.bsd.io.access PREFIX.crt.dos.bsd.strstat PREFIX.crt.dos.bsd.user PREFIX.crt.dos.bsd) \
 	CB(PREFIX.crt.dos.solaris.io PREFIX.crt.dos.solaris) \
 	CB(PREFIX.crt.dos.mbstring) \
+	CB(PREFIX.crt.dos.stdbit) \
 	CB(PREFIX.crt.dos.conio) \
 	CB(PREFIX.crt.dos.capability) \
 	CB(PREFIX.crt.dos.libiberty) \

@@ -3685,12 +3685,12 @@ int strncasecmp([[in(strnlen(., maxlen))]] char const *s1,
 
 
 [[decl_include("<features.h>")]]
-[[guard, const, wunused, nothrow, crtbuiltin]]
+[[extern_inline, guard, const, wunused, nothrow, crtbuiltin]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)),       crt_intern_kos_alias("libc_ffsl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias("libc_ffsll")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__),                                        alias("ffsl")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__),                                   alias("ffsll")]]
-[[export_alias("__ffs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__),                                        alias("ffsl", "stdc_first_leading_one_ul")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__),                                   alias("ffsll", "stdc_first_leading_one_ull")]]
+[[export_alias("__ffs", "stdc_first_leading_one_ui")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFS))]]
 [[impl_include("<features.h>", "<hybrid/__bit.h>")]]
 __STDC_INT_AS_UINT_T ffs(int i) {
@@ -3712,10 +3712,11 @@ __STDC_INT_AS_UINT_T ffs(int i) {
 
 %#ifdef __USE_GNU
 [[decl_include("<features.h>")]]
-[[const, wunused, nothrow, crtbuiltin]]
+[[extern_inline, const, wunused, nothrow, crtbuiltin]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias("libc_ffsll")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__),                                         alias("ffs")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__),                                   alias("ffsll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__),                                         alias("ffs", "__ffs", "stdc_first_leading_one_ui")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__),                                   alias("ffsll", "stdc_first_leading_one_ull")]]
+[[export_alias("stdc_first_leading_one_ul")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFSL))]]
 [[impl_include("<features.h>", "<hybrid/__bit.h>")]]
 __STDC_INT_AS_UINT_T ffsl(long i) {
@@ -3723,9 +3724,10 @@ __STDC_INT_AS_UINT_T ffsl(long i) {
 }
 
 [[decl_include("<features.h>")]]
-[[const, wunused, nothrow, crtbuiltin]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__),  alias("ffs")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("ffsl")]]
+[[extern_inline, const, wunused, nothrow, crtbuiltin]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__),  alias("ffs", "__ffs", "stdc_first_leading_one_ui")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("ffsl", "stdc_first_leading_one_ul")]]
+[[export_alias("stdc_first_leading_one_ull")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFSLL))]]
 [[impl_include("<features.h>", "<hybrid/__bit.h>")]]
 __STDC_INT_AS_UINT_T ffsll(__LONGLONG i) {

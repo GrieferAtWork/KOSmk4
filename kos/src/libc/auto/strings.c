@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58a190d8 */
+/* HASH CRC-32:0xffa0228e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,12 +95,15 @@ DECL_END
 
 #include <hybrid/typecore.h>
 #if !defined(__KERNEL__) && ((__SIZEOF_INT__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)) || (__SIZEOF_INT__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)) || !defined(LIBC_ARCH_HAVE_POPCOUNT))
+DEFINE_PUBLIC_ALIAS_P(stdc_count_ones_ui,libc_popcount,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(unsigned int i),(i));
 DEFINE_PUBLIC_ALIAS_P(popcount,libc_popcount,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(unsigned int i),(i));
 #endif /* !__KERNEL__ && ((__SIZEOF_INT__ == 4 && !LIBC_ARCH_HAVE_POPCOUNT32) || (__SIZEOF_INT__ == 8 && !LIBC_ARCH_HAVE_POPCOUNT64) || !LIBC_ARCH_HAVE_POPCOUNT) */
 #if !defined(__KERNEL__) && ((__SIZEOF_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)) || (__SIZEOF_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)) || !defined(LIBC_ARCH_HAVE_POPCOUNTL))
+DEFINE_PUBLIC_ALIAS_P(stdc_count_ones_ul,libc_popcountl,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(unsigned long i),(i));
 DEFINE_PUBLIC_ALIAS_P(popcountl,libc_popcountl,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(unsigned long i),(i));
 #endif /* !__KERNEL__ && ((__SIZEOF_LONG__ == 4 && !LIBC_ARCH_HAVE_POPCOUNT32) || (__SIZEOF_LONG__ == 8 && !LIBC_ARCH_HAVE_POPCOUNT64) || !LIBC_ARCH_HAVE_POPCOUNTL) */
 #if !defined(__KERNEL__) && ((__SIZEOF_LONG_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)) || (__SIZEOF_LONG_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)) || !defined(LIBC_ARCH_HAVE_POPCOUNTLL))
+DEFINE_PUBLIC_ALIAS_P(stdc_count_ones_ull,libc_popcountll,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(__ULONGLONG i),(i));
 DEFINE_PUBLIC_ALIAS_P(popcountll,libc_popcountll,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(__ULONGLONG i),(i));
 #endif /* !__KERNEL__ && ((__SIZEOF_LONG_LONG__ == 4 && !LIBC_ARCH_HAVE_POPCOUNT32) || (__SIZEOF_LONG_LONG__ == 8 && !LIBC_ARCH_HAVE_POPCOUNT64) || !LIBC_ARCH_HAVE_POPCOUNTLL) */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_POPCOUNT32)

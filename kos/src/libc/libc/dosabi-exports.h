@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5425232c */
+/* HASH CRC-32:0xe5947b8b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2376,6 +2376,72 @@ DEFINE_PUBLIC_ALIAS(DOS$__memmovedownq_chk, libd___memmovedownq_chk);
 DEFINE_PUBLIC_ALIAS(DOS$__mempmoveupq_chk, libd___mempmoveupq_chk);
 DEFINE_PUBLIC_ALIAS(DOS$__mempmovedownq_chk, libd___mempmovedownq_chk);
 
+/* stdbit */
+DEFINE_PUBLIC_ALIAS(DOS$stdc_leading_zeros_uc, libd_stdc_leading_zeros_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_leading_zeros_us, libd_stdc_leading_zeros_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_leading_zeros_ui, libd_stdc_leading_zeros_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_leading_zeros_ul, libd_stdc_leading_zeros_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_leading_ones_uc, libd_stdc_leading_ones_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_leading_ones_us, libd_stdc_leading_ones_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_leading_ones_ui, libd_stdc_leading_ones_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_leading_ones_ul, libd_stdc_leading_ones_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_trailing_zeros_uc, libd_stdc_trailing_zeros_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_trailing_zeros_us, libd_stdc_trailing_zeros_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_trailing_zeros_ui, libd_stdc_trailing_zeros_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_trailing_zeros_ul, libd_stdc_trailing_zeros_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_trailing_ones_uc, libd_stdc_trailing_ones_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_trailing_ones_us, libd_stdc_trailing_ones_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_trailing_ones_ui, libd_stdc_trailing_ones_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_trailing_ones_ul, libd_stdc_trailing_ones_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_leading_one_uc, libd_stdc_first_leading_one_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_leading_one_us, libd_stdc_first_leading_one_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_leading_zero_uc, libd_stdc_first_leading_zero_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_leading_zero_us, libd_stdc_first_leading_zero_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_leading_zero_ui, libd_stdc_first_leading_zero_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_leading_zero_ul, libd_stdc_first_leading_zero_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_trailing_zero_uc, libd_stdc_first_trailing_zero_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_trailing_zero_us, libd_stdc_first_trailing_zero_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_trailing_zero_ui, libd_stdc_first_trailing_zero_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_trailing_zero_ul, libd_stdc_first_trailing_zero_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_trailing_one_uc, libd_stdc_first_trailing_one_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_trailing_one_us, libd_stdc_first_trailing_one_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_trailing_one_ui, libd_stdc_first_trailing_one_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_trailing_one_ul, libd_stdc_first_trailing_one_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_count_ones_uc, libd_stdc_count_ones_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_count_ones_us, libd_stdc_count_ones_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_count_zeros_uc, libd_stdc_count_zeros_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_count_zeros_us, libd_stdc_count_zeros_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_count_zeros_ui, libd_stdc_count_zeros_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_count_zeros_ul, libd_stdc_count_zeros_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_has_single_bit_uc, libd_stdc_has_single_bit_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_has_single_bit_us, libd_stdc_has_single_bit_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_has_single_bit_ui, libd_stdc_has_single_bit_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_has_single_bit_ul, libd_stdc_has_single_bit_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_width_uc, libd_stdc_bit_width_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_width_us, libd_stdc_bit_width_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_width_ui, libd_stdc_bit_width_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_width_ul, libd_stdc_bit_width_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_floor_uc, libd_stdc_bit_floor_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_floor_us, libd_stdc_bit_floor_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_floor_ui, libd_stdc_bit_floor_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_floor_ul, libd_stdc_bit_floor_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_ceil_uc, libd_stdc_bit_ceil_uc);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_ceil_us, libd_stdc_bit_ceil_us);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_ceil_ui, libd_stdc_bit_ceil_ui);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_ceil_ul, libd_stdc_bit_ceil_ul);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_leading_zeros_ull, libd_stdc_leading_zeros_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_leading_ones_ull, libd_stdc_leading_ones_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_trailing_zeros_ull, libd_stdc_trailing_zeros_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_trailing_ones_ull, libd_stdc_trailing_ones_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_leading_zero_ull, libd_stdc_first_leading_zero_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_trailing_zero_ull, libd_stdc_first_trailing_zero_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_trailing_one_ull, libd_stdc_first_trailing_one_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_count_zeros_ull, libd_stdc_count_zeros_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_has_single_bit_ull, libd_stdc_has_single_bit_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_width_ull, libd_stdc_bit_width_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_floor_ull, libd_stdc_bit_floor_ull);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_bit_ceil_ull, libd_stdc_bit_ceil_ull);
+
 /* stdio */
 DEFINE_PUBLIC_ALIAS(DOS$_fclose_nolock, libd_fclose);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_fclose, libd_fclose);
@@ -3180,8 +3246,11 @@ DEFINE_PUBLIC_ALIAS(DOS$strncmpi, libd_strncasecmp);
 DEFINE_PUBLIC_ALIAS(DOS$__strncasecmp, libd_strncasecmp);
 DEFINE_PUBLIC_ALIAS(DOS$strncasecmp, libd_strncasecmp);
 DEFINE_PUBLIC_ALIAS(DOS$__ffs, libd_ffs);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_leading_one_ui, libd_ffs);
 DEFINE_PUBLIC_ALIAS(DOS$ffs, libd_ffs);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_leading_one_ul, libd_ffsl);
 DEFINE_PUBLIC_ALIAS(DOS$ffsl, libd_ffsl);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_first_leading_one_ull, libd_ffsll);
 DEFINE_PUBLIC_ALIAS(DOS$ffsll, libd_ffsll);
 DEFINE_PUBLIC_ALIAS(DOS$strlcat, libd_strlcat);
 DEFINE_PUBLIC_ALIAS(DOS$strlcpy, libd_strlcpy);
@@ -3448,8 +3517,11 @@ DEFINE_PUBLIC_ALIAS(DOS$sl_find, libd_sl_find);
 DEFINE_PUBLIC_ALIAS(DOS$sl_delete, libd_sl_delete);
 
 /* strings */
+DEFINE_PUBLIC_ALIAS(DOS$stdc_count_ones_ui, libd_popcount);
 DEFINE_PUBLIC_ALIAS(DOS$popcount, libd_popcount);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_count_ones_ul, libd_popcountl);
 DEFINE_PUBLIC_ALIAS(DOS$popcountl, libd_popcountl);
+DEFINE_PUBLIC_ALIAS(DOS$stdc_count_ones_ull, libd_popcountll);
 DEFINE_PUBLIC_ALIAS(DOS$popcountll, libd_popcountll);
 DEFINE_PUBLIC_ALIAS(DOS$popcount32, libd_popcount32);
 DEFINE_PUBLIC_ALIAS(DOS$popcount64, libd_popcount64);

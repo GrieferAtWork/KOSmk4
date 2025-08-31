@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e4c38e2 */
+/* HASH CRC-32:0x29bc929d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7332,12 +7332,15 @@ DEFINE_PUBLIC_ALIAS_P(__strncasecmp,libc_strncasecmp,ATTR_PURE WUNUSED ATTR_INS(
 DEFINE_PUBLIC_ALIAS_P(strncasecmp,libc_strncasecmp,ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)),int,NOTHROW_NCX,LIBCCALL,(char const *s1, char const *s2, size_t maxlen),(s1,s2,maxlen));
 #if !defined(__KERNEL__) && ((__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)) || (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)) || !defined(LIBC_ARCH_HAVE_FFS))
 DEFINE_PUBLIC_ALIAS_P(__ffs,libc_ffs,ATTR_CONST WUNUSED,__STDC_INT_AS_UINT_T,NOTHROW,LIBCCALL,(int i),(i));
+DEFINE_PUBLIC_ALIAS_P(stdc_first_leading_one_ui,libc_ffs,ATTR_CONST WUNUSED,__STDC_INT_AS_UINT_T,NOTHROW,LIBCCALL,(int i),(i));
 DEFINE_PUBLIC_ALIAS_P(ffs,libc_ffs,ATTR_CONST WUNUSED,__STDC_INT_AS_UINT_T,NOTHROW,LIBCCALL,(int i),(i));
 #endif /* !__KERNEL__ && ((__SIZEOF_INT__ == __SIZEOF_LONG__ && !LIBC_ARCH_HAVE_FFSL) || (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !LIBC_ARCH_HAVE_FFSLL) || !LIBC_ARCH_HAVE_FFS) */
 #if !defined(__KERNEL__) && ((__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)) || !defined(LIBC_ARCH_HAVE_FFSL))
+DEFINE_PUBLIC_ALIAS_P(stdc_first_leading_one_ul,libc_ffsl,ATTR_CONST WUNUSED,__STDC_INT_AS_UINT_T,NOTHROW,LIBCCALL,(long i),(i));
 DEFINE_PUBLIC_ALIAS_P(ffsl,libc_ffsl,ATTR_CONST WUNUSED,__STDC_INT_AS_UINT_T,NOTHROW,LIBCCALL,(long i),(i));
 #endif /* !__KERNEL__ && ((__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !LIBC_ARCH_HAVE_FFSLL) || !LIBC_ARCH_HAVE_FFSL) */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_FFSLL)
+DEFINE_PUBLIC_ALIAS_P(stdc_first_leading_one_ull,libc_ffsll,ATTR_CONST WUNUSED,__STDC_INT_AS_UINT_T,NOTHROW,LIBCCALL,(__LONGLONG i),(i));
 DEFINE_PUBLIC_ALIAS_P(ffsll,libc_ffsll,ATTR_CONST WUNUSED,__STDC_INT_AS_UINT_T,NOTHROW,LIBCCALL,(__LONGLONG i),(i));
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_FFSLL */
 #ifndef LIBC_ARCH_HAVE_STRLCAT

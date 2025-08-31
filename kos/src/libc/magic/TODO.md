@@ -159,7 +159,6 @@
 
 ### Missing headers
 
-- `<stdbit.h>`                  (STDC)
 - `<a.out.h>`                   (Glibc)
 - `<asm-generic/perf_regs.h>`   (linux)
 - `<asm-generic/ptrace.h>`      (linux)

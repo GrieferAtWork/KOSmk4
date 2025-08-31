@@ -204,30 +204,32 @@ __SYSDECL_BEGIN
 
 @@>> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
 @@POPulationCOUNT. Return the number of 1-bits in `i'
-[[const, wunused, nothrow, crtbuiltin]]
+[[extern_inline, const, wunused, nothrow, crtbuiltin]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 4),                                        alias("popcount32")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),                                        alias("popcount64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)), crt_intern_kos_alias("libc_popcount32")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)), crt_intern_kos_alias("libc_popcount64")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__),                          alias("popcountl")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__),                     alias("popcountll")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 4),                                        bind_local_function(popcount32)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),                                        bind_local_function(popcount64)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__),                          alias("popcountl", "stdc_count_ones_ul")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__),                     alias("popcountll", "stdc_count_ones_ull")]]
+/*[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 4),                                      bind_local_function(popcount32)]]*/
+/*[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),                                      bind_local_function(popcount64)]]*/
+[[export_alias("stdc_count_ones_ui")]]
 [[impl_include("<hybrid/__bit.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_POPCOUNT))]]
 unsigned int popcount(unsigned int i) {
 	return __hybrid_popcount(i);
 }
 
-[[const, wunused, nothrow, crtbuiltin, doc_alias("popcount")]]
+[[extern_inline, const, wunused, nothrow, crtbuiltin, doc_alias("popcount")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),                                        alias("popcount32")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),                                        alias("popcount64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)), crt_intern_kos_alias("libc_popcount32")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)), crt_intern_kos_alias("libc_popcount64")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__),                           alias("popcount")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__),                     alias("popcountll")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),                                        bind_local_function(popcount32)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),                                        bind_local_function(popcount64)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__),                           alias("popcount", "stdc_count_ones_ui")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__),                     alias("popcountll", "stdc_count_ones_ull")]]
+/*[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),                                      bind_local_function(popcount32)]]*/
+/*[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),                                      bind_local_function(popcount64)]]*/
+[[export_alias("stdc_count_ones_ul")]]
 [[impl_include("<hybrid/__bit.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_POPCOUNTL))]]
 unsigned int popcountl(unsigned long i) {
@@ -235,15 +237,16 @@ unsigned int popcountl(unsigned long i) {
 }
 
 %#ifdef __LONGLONG
-[[const, wunused, nothrow, crtbuiltin, doc_alias("popcount")]]
+[[extern_inline, const, wunused, nothrow, crtbuiltin, doc_alias("popcount")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4),                                        alias("popcount32")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8),                                        alias("popcount64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)), crt_intern_kos_alias("libc_popcount32")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)), crt_intern_kos_alias("libc_popcount64")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__),                           alias("popcount")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__),                          alias("popcountl")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4),                                        bind_local_function(popcount32)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8),                                        bind_local_function(popcount64)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__),                           alias("popcount", "stdc_count_ones_ui")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__),                          alias("popcountl", "stdc_count_ones_ul")]]
+/*[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4),                                      bind_local_function(popcount32)]]*/
+/*[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8),                                      bind_local_function(popcount64)]]*/
+[[export_alias("stdc_count_ones_ull")]]
 [[impl_include("<hybrid/__bit.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_POPCOUNTLL))]]
 unsigned int popcountll(__ULONGLONG i) {
@@ -251,11 +254,11 @@ unsigned int popcountll(__ULONGLONG i) {
 }
 %#endif /* __LONGLONG */
 
-[[decl_include("<hybrid/typecore.h>")]]
+[[extern_inline, decl_include("<hybrid/typecore.h>")]]
 [[const, wunused, nothrow, crtbuiltin, doc_alias("popcount")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 4),       alias("popcount")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias("popcountl")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("popcountll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 4),       alias("popcount", "stdc_count_ones_ui")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias("popcountl", "stdc_count_ones_ul")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("popcountll", "stdc_count_ones_ull")]]
 [[impl_include("<hybrid/__bit.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_POPCOUNT32))]]
 unsigned int popcount32($uint32_t i) {
@@ -263,11 +266,11 @@ unsigned int popcount32($uint32_t i) {
 }
 
 %#ifdef __UINT64_TYPE__
-[[decl_include("<hybrid/typecore.h>")]]
+[[extern_inline, decl_include("<hybrid/typecore.h>")]]
 [[const, wunused, nothrow, crtbuiltin, doc_alias("popcount")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       alias("popcount")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias("popcountl")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("popcountll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       alias("popcount", "stdc_count_ones_ui")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias("popcountl", "stdc_count_ones_ul")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("popcountll", "stdc_count_ones_ull")]]
 [[impl_include("<hybrid/__bit.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_POPCOUNT64))]]
 unsigned int popcount64($uint64_t i) {

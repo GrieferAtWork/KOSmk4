@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26814432 */
+/* HASH CRC-32:0xd2584983 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2515,16 +2515,29 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strncasecmp, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if __has_builtin(__builtin_ffs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ffs)
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),{ return __builtin_ffs(__i); })
 #elif defined(__CRT_HAVE_ffs)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),(__i))
+#include <hybrid/__bit.h>
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #elif defined(__CRT_HAVE_ffsl) && __SIZEOF_INT__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),ffsl,(__i))
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),ffsl,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
+#elif defined(__CRT_HAVE_stdc_first_leading_one_ul) && __SIZEOF_INT__ == __SIZEOF_LONG__
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),stdc_first_leading_one_ul,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #elif defined(__CRT_HAVE_ffsll) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),ffsll,(__i))
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),ffsll,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
+#elif defined(__CRT_HAVE_stdc_first_leading_one_ull) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),stdc_first_leading_one_ull,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #elif defined(__CRT_HAVE___ffs)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),__ffs,(__i))
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),__ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
+#elif defined(__CRT_HAVE_stdc_first_leading_one_ui)
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),stdc_first_leading_one_ui,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); })
 #else /* ... */
-#include <libc/local/string/ffs.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ffs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T __NOTHROW(__LIBCCALL ffs)(int __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffs))(__i); })
+#include <hybrid/__bit.h>
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T __NOTHROW(__LIBCCALL ffs)(int __i) { return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i); }
 #endif /* !... */
 #endif /* !__ffs_defined */
 #ifdef __USE_KOS
@@ -2541,26 +2554,56 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ffs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST
 #if __has_builtin(__builtin_ffsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ffsl)
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),{ return __builtin_ffsl(__i); })
 #elif defined(__CRT_HAVE_ffsl)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),(__i))
+#include <hybrid/__bit.h>
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
 #elif defined(__CRT_HAVE_ffs) && __SIZEOF_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),ffs,(__i))
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
+#elif defined(__CRT_HAVE___ffs) && __SIZEOF_LONG__ == __SIZEOF_INT__
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),__ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
+#elif defined(__CRT_HAVE_stdc_first_leading_one_ui) && __SIZEOF_LONG__ == __SIZEOF_INT__
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),stdc_first_leading_one_ui,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
 #elif defined(__CRT_HAVE_ffsll) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),ffsll,(__i))
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),ffsll,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
+#elif defined(__CRT_HAVE_stdc_first_leading_one_ull) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),stdc_first_leading_one_ull,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
+#elif defined(__CRT_HAVE_stdc_first_leading_one_ul)
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),stdc_first_leading_one_ul,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); })
 #else /* ... */
-#include <libc/local/string/ffsl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ffsl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T __NOTHROW(__LIBCCALL ffsl)(long __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffsl))(__i); })
+#include <hybrid/__bit.h>
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T __NOTHROW(__LIBCCALL ffsl)(long __i) { return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i); }
 #endif /* !... */
 #if __has_builtin(__builtin_ffsll) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ffsll)
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),{ return __builtin_ffsll(__i); })
 #elif defined(__CRT_HAVE_ffsll)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),(__i))
+#include <hybrid/__bit.h>
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
 #elif defined(__CRT_HAVE_ffs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),ffs,(__i))
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
+#elif defined(__CRT_HAVE___ffs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),__ffs,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
+#elif defined(__CRT_HAVE_stdc_first_leading_one_ui) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),stdc_first_leading_one_ui,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
 #elif defined(__CRT_HAVE_ffsl) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),ffsl,(__i))
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),ffsl,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
+#elif defined(__CRT_HAVE_stdc_first_leading_one_ul) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),stdc_first_leading_one_ul,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
+#elif defined(__CRT_HAVE_stdc_first_leading_one_ull)
+#include <hybrid/__bit.h>
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),stdc_first_leading_one_ull,{ return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); })
 #else /* ... */
-#include <libc/local/string/ffsll.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ffsll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T __NOTHROW(__LIBCCALL ffsll)(__LONGLONG __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffsll))(__i); })
+#include <hybrid/__bit.h>
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T __NOTHROW(__LIBCCALL ffsll)(__LONGLONG __i) { return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)__i); }
 #endif /* !... */
 #endif /* __USE_GNU */
 #ifndef __strlcat_defined

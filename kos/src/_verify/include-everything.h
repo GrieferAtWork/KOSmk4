@@ -1472,6 +1472,7 @@ incdir("");
 #include <stdalign.h>
 #include <stdarg.h>
 #include <stdatomic.h>
+#include <stdbit.h>
 #include <stdbool.h>
 #include <stdc-predef.h>
 #include <stdckdint.h>

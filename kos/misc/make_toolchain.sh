@@ -84,6 +84,8 @@ CXX_COMPAT_HEADER_FILES=(
 CXX_KOS_SPECIFIC_HEADER_FILES=(
 	"atomic"
 	"stdatomic.h"
+	"stdbit.h"
+	"stdckdint.h"
 )
 
 BINUTILS_VERSION="binutils-${BINUTILS_VERSION_NUMBER}"
