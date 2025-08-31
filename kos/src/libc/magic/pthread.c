@@ -1290,12 +1290,13 @@ $errno_t pthread_setname_np(pthread_t self,
 %#endif /* __USE_GNU */
 
 
-%#ifdef __USE_KOS
+%#if defined(__USE_KOS) || defined(__USE_GNU)
 @@>> pthread_gettid_np(3)
 @@Return the TID of the given `self'.
 @@If `self' has already terminated, 0 is returned
 @@@return: * : The TID of the given thread
-@@@return: 0 : The given `self' has already terminated
+@@@return: 0 : The given `self' has already terminated (KOS)
+@@@return: -1: The given `self' has already terminated (GLibc)
 [[userimpl, guard, pure, wunused]]
 [[section(".text.crt{|.dos}.sched.pthread.ext.kos.tid")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -1307,7 +1308,10 @@ $pid_t pthread_gettid_np(pthread_t self) {
 		result = 0;
 	return result;
 }
+%#endif /* __USE_KOS || __USE_GNU */
 
+
+%#ifdef __USE_KOS
 @@>> pthread_getpidfd_np(3)
 @@Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
 @@To  guaranty that a PIDfd is available for a given thread, you can make use of

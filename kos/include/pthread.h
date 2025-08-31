@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ecc7c65 */
+/* HASH CRC-32:0x825f2384 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1258,7 +1258,7 @@ __CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t _
 #endif /* !... */
 #endif /* !__pthread_setname_np_defined */
 #endif /* __USE_GNU */
-#ifdef __USE_KOS
+#if defined(__USE_KOS) || defined(__USE_GNU)
 #ifndef __pthread_gettid_np_defined
 #define __pthread_gettid_np_defined
 #ifdef __CRT_HAVE_pthread_gettid_np
@@ -1266,7 +1266,8 @@ __CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t _
  * Return the TID of the given `self'.
  * If `self' has already terminated, 0 is returned
  * @return: * : The TID of the given thread
- * @return: 0 : The given `self' has already terminated */
+ * @return: 0 : The given `self' has already terminated (KOS)
+ * @return: -1: The given `self' has already terminated (GLibc) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __self),(__self))
 #elif defined(__CRT_HAVE_pthread_getunique_np) || defined(__CRT_HAVE_pthread_threadid_np)
 #include <libc/local/pthread/pthread_gettid_np.h>
@@ -1274,12 +1275,15 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(p
  * Return the TID of the given `self'.
  * If `self' has already terminated, 0 is returned
  * @return: * : The TID of the given thread
- * @return: 0 : The given `self' has already terminated */
+ * @return: 0 : The given `self' has already terminated (KOS)
+ * @return: -1: The given `self' has already terminated (GLibc) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_gettid_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __pid_t __NOTHROW_NCX(__LIBCCALL pthread_gettid_np)(pthread_t __self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_gettid_np))(__self); })
 #else /* ... */
 #undef __pthread_gettid_np_defined
 #endif /* !... */
 #endif /* !__pthread_gettid_np_defined */
+#endif /* __USE_KOS || __USE_GNU */
+#ifdef __USE_KOS
 #if !defined(__pthread_getpidfd_np_defined) && defined(__CRT_HAVE_pthread_getpidfd_np)
 #define __pthread_getpidfd_np_defined
 /* >> pthread_getpidfd_np(3)

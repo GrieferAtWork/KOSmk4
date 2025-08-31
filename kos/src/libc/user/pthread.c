@@ -977,18 +977,19 @@ NOTHROW(LIBCCALL libc_pthread_self)(void)
 }
 /*[[[end:libc_pthread_self]]]*/
 
-/*[[[head:libc_pthread_gettid_np,hash:CRC-32=0x8b5628fb]]]*/
+/*[[[head:libc_pthread_gettid_np,hash:CRC-32=0xa9aa40ae]]]*/
 /* >> pthread_gettid_np(3)
  * Return the TID of the given `self'.
  * If `self' has already terminated, 0 is returned
  * @return: * : The TID of the given thread
- * @return: 0 : The given `self' has already terminated */
+ * @return: 0 : The given `self' has already terminated (KOS)
+ * @return: -1: The given `self' has already terminated (GLibc) */
 INTERN ATTR_SECTION(".text.crt.sched.pthread.ext.kos.tid") ATTR_PURE WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
 /*[[[body:libc_pthread_gettid_np]]]*/
 {
 	pid_t result;
-	result = self->pt_tid;
+	result = atomic_read(&self->pt_tid);
 	return result;
 }
 /*[[[end:libc_pthread_gettid_np]]]*/

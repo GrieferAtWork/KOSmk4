@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc0f4352 */
+/* HASH CRC-32:0xb6a8daab */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -267,7 +267,8 @@ INTDEF ATTR_IN(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_setname_np)(pthread_
  * Return the TID of the given `self'.
  * If `self' has already terminated, 0 is returned
  * @return: * : The TID of the given thread
- * @return: 0 : The given `self' has already terminated */
+ * @return: 0 : The given `self' has already terminated (KOS)
+ * @return: -1: The given `self' has already terminated (GLibc) */
 INTDEF ATTR_PURE WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_pthread_gettid_np)(pthread_t self);
 /* >> pthread_getpidfd_np(3)
  * Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
