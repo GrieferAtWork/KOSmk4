@@ -278,7 +278,7 @@ NOTHROW(libc_sys_sigreturn)(struct ucpustate const *restore_cpu,
 #define libc_handle libc_handle
 LOCAL ATTR_CONST ATTR_RETNONNULL WUNUSED void *
 NOTHROW(libc_handle)(void) {
-	/* The  `current@tlsgd' symbol points to a `tls_index' structure,
+	/* The  `current@tlsld' symbol points to a `tls_index' structure,
 	 * which consists of 16 bytes total, where the first 8 are filled
 	 * with a module handle pointer by libdl.
 	 * Note that this is a KOS-specific implementation detail. As far
@@ -290,11 +290,11 @@ NOTHROW(libc_handle)(void) {
 #if 1 /* https://sourceware.org/pipermail/binutils-cvs/2024-September/065790.html
        * TODO: Figure out a way to work around this! */
 	__register_var(void *, result, "%rdi");
-	__asm__("leaq current@tlsgd(%%rip), %0" : "=r" (result));
+	__asm__("leaq current@tlsld(%%rip), %0" : "=r" (result));
 	result = *(void **)result;
 #else
 	void *result;
-	__asm__("movq current@tlsgd(%%rip), %0" : "=r" (result));
+	__asm__("movq current@tlsld(%%rip), %0" : "=r" (result));
 #endif
 	return result;
 }

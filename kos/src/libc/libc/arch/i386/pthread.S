@@ -58,7 +58,7 @@ INTERN_FUNCTION(libc_handle)
 1:	popP_cfi %Pax
 	addP   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %Pax
 
-	/* The `current@tlsgd' symbol points to a `tls_index' structure,
+	/* The `current@tlsldm' symbol points to a `tls_index' structure,
 	 * which consists of 8 bytes total, where the first 4 are filled
 	 * with a module handle pointer by libdl.
 
@@ -72,10 +72,10 @@ INTERN_FUNCTION(libc_handle)
 #if 1 /* https://sourceware.org/pipermail/binutils-cvs/2024-September/065790.html
        * TODO: Figure out a way to work around this! */
 	movP   %Pax, %Pcx
-	leaP   current@tlsgd(%Pcx), %Pax
+	leaP   current@tlsldm(%Pcx), %Pax
 	movP   (%Pax), %Pax
 #else
-	movP   current@tlsgd(,%Pax,1), %Pax
+	movP   current@tlsldm(,%Pax,1), %Pax
 #endif
 	ret
 	.cfi_endproc
