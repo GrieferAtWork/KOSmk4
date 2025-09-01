@@ -442,7 +442,8 @@ user_malloc_abi_load(struct user_malloc_abi *__restrict self) {
 			self->uma_mallinfo2 = &fallback_mallinfo2_with_mallinfo;
 		} else {
 			self->uma_mallinfo2 = &fallback_mallinfo2_NOOP;
-			self->uma_mallinfo  = &fallback_mallinfo_NOOP;
+			COMPILER_IMPURE(); /* Prevent GCC from emitting ".data.rel.ro.local", which would require extra relocations... */
+			self->uma_mallinfo = &fallback_mallinfo_NOOP;
 		}
 	}
 	if (self->uma_mallinfo == NULL) {
@@ -968,8 +969,11 @@ libc_malloc_hooks_doinit(void) {
 
 	/* Remember abi-pointers and inject wrappers that
 	 * will  invoke  user-defined hooks  (if defined) */
-#define INJECT_HOOK(name) \
-	(libc_hookcore_##name = abi.uma_##name, abi.uma_##name = &libc_hooked_##name)
+#define INJECT_HOOK(name)                                                                          \
+	libc_hookcore_##name = abi.uma_##name;                                                         \
+	abi.uma_##name       = &libc_hooked_##name;                                                    \
+	/* Prevent GCC from emitting ".data.rel.ro.local", which would require extra relocations... */ \
+	COMPILER_IMPURE()
 	INJECT_HOOK(malloc);
 	INJECT_HOOK(free);
 	INJECT_HOOK(calloc);

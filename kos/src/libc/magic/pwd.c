@@ -464,9 +464,11 @@ eof:
 		char *field_starts[7];
 		char *iter = dbline;
 		unsigned int i;
-		field_starts[4] =             /* pw_gecos */
-		field_starts[5] =             /* pw_dir */
-		field_starts[6] = (char *)""; /* pw_shell */
+		field_starts[4] = (char *)"";      /* pw_gecos */
+		COMPILER_IMPURE(); /* Prevent GCC from emitting ".data.rel.ro.local", which would require extra relocations... */
+		field_starts[5] = field_starts[4]; /* pw_dir */
+		COMPILER_IMPURE(); /* Prevent GCC from emitting ".data.rel.ro.local", which would require extra relocations... */
+		field_starts[6] = field_starts[4]; /* pw_shell */
 		for (i = 0; i < 4; ++i) {
 			field_starts[i] = iter;
 			iter = strchrnul(iter, ':');

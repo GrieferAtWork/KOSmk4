@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77232b3b */
+/* HASH CRC-32:0xeedefc62 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -297,9 +297,11 @@ __eof:
 		char *__field_starts[7];
 		char *__iter = __dbline;
 		unsigned int __i;
-		__field_starts[4] =             /* pw_gecos */
-		__field_starts[5] =             /* pw_dir */
-		__field_starts[6] = (char *)""; /* pw_shell */
+		__field_starts[4] = (char *)"";      /* pw_gecos */
+		__COMPILER_IMPURE(); /* Prevent GCC from emitting ".data.rel.ro.local", which would require extra relocations... */
+		__field_starts[5] = __field_starts[4]; /* pw_dir */
+		__COMPILER_IMPURE(); /* Prevent GCC from emitting ".data.rel.ro.local", which would require extra relocations... */
+		__field_starts[6] = __field_starts[4]; /* pw_shell */
 		for (__i = 0; __i < 4; ++__i) {
 			__field_starts[__i] = __iter;
 			__iter = (__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__iter, ':');
