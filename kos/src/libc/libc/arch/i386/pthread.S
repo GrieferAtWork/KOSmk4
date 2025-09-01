@@ -69,13 +69,13 @@ INTERN_FUNCTION(libc_handle)
 	 * meaning that we can simply (ab-)use that fact to quickly get a
 	 * handle for libc itself. */
 	INTERN(current)
-#if 1 /* https://sourceware.org/pipermail/binutils-cvs/2024-September/065790.html
+#if 0 /* https://sourceware.org/pipermail/binutils-cvs/2024-September/065790.html
        * TODO: Figure out a way to work around this! */
 	movP   %Pax, %Pcx
 	leaP   current@tlsldm(%Pcx), %Pax
 	movP   (%Pax), %Pax
 #else
-	movP   current@tlsldm(,%Pax,1), %Pax
+	movP   current@tlsldm(%Pax), %Pax
 #endif
 	ret
 	.cfi_endproc

@@ -63,6 +63,12 @@ BEGIN
 		"-e", "libc_exec_main",
 	})
 
+	/* Prevent tls "checks" on x86; we need to  use
+	 * custom relocations for best efficiency here! */
+	if (TARGET_ARCH in ["i386", "x86_64"]) {
+		AS_FLAGS({ "-mtls-check=no" })
+	}
+
 	DEFINE({ "__BUILDING_LIBC" : "1" })
 
 

@@ -287,8 +287,8 @@ NOTHROW(libc_handle)(void) {
 	 * simply re-uses  the regular  module handle  for this  purpose,
 	 * meaning that we can simply (ab-)use that fact to quickly get a
 	 * handle for libc itself. */
-#if 1 /* https://sourceware.org/pipermail/binutils-cvs/2024-September/065790.html
-       * TODO: Figure out a way to work around this! */
+#if 0 /* https://sourceware.org/pipermail/binutils-cvs/2024-September/065790.html
+       * Not needed because  libc is passing  `-mtls-check=no' to the  assembler! */
 	__register_var(void *, result, "%rdi");
 	__asm__("leaq current@tlsld(%%rip), %0" : "=r" (result));
 	result = *(void **)result;
