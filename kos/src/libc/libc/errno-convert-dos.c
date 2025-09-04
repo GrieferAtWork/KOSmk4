@@ -457,7 +457,6 @@ NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2nt)(/*kos*/ er
 }
 
 DEFINE_PUBLIC_ALIAS(errno_nt2dos, libd_errno_nt2dos);
-DEFINE_INTERN_ALIAS(libd__dosmaperr, libd_errno_nt2dos);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
 NOBLOCK ATTR_CONST /*dos*/ errno_t
 NOTHROW(LIBDCALL libd_errno_nt2dos)(/*nt*/ errno_t value) {
