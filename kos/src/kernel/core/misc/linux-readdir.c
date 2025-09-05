@@ -137,7 +137,7 @@ DECL_BEGIN
 PRIVATE uintptr_t readdir_lockbits[CONFIG_KERNEL_LINUX_READDIR_LOCKCNT / BITSOF(uintptr_t)] = { 0, };
 
 /* Signal broadcast whenever one of `readdir_lockbits' is cleared. */
-PRIVATE struct sig readdir_locksig = SIG_INIT;
+PRIVATE DEFINE_SIG(readdir_locksig);
 
 #define readdir_lockbits_word(i) ((i) / BITSOF(uintptr_t))
 #define readdir_lockbits_mask(i) ((uintptr_t)1 << ((i) % BITSOF(uintptr_t)))

@@ -690,7 +690,7 @@ do_flush_fp:
 
 
 PRIVATE ATTR_SECTION(".bss.crt.application.exit")
-struct shared_recursive_rwlock flushall_lock = SHARED_RECURSIVE_RWLOCK_INIT;
+DEFINE_SHARED_RECURSIVE_RWLOCK(flushall_lock);
 PRIVATE ATTR_SECTION(".bss.crt.application.exit") uintptr_t flushall_version = 0;
 PRIVATE ATTR_SECTION(".bss.crt.application.exit") bool flushall_must_restart = false;
 

@@ -1000,10 +1000,10 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	result->mf_mtime = result->mf_atime;
 	result->mf_ctime = result->mf_atime;
 	result->mf_btime = result->mf_atime;
-	sig_init(&result->uv_reqmore);
-	sig_init(&result->uv_reqdlvr);
-	sig_init(&result->uv_reqdone);
-	sig_init(&result->uv_reqfree);
+	sig_init_named(&result->uv_reqmore, "<uvio>.uv_reqmore");
+	sig_init_named(&result->uv_reqdlvr, "<uvio>.uv_reqdlvr");
+	sig_init_named(&result->uv_reqdone, "<uvio>.uv_reqdone");
+	sig_init_named(&result->uv_reqfree, "<uvio>.uv_reqfree");
 	{
 		unsigned int reqid;
 		for (reqid = 0; reqid < CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {

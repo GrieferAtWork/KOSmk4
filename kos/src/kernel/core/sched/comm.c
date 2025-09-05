@@ -134,7 +134,7 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 	rpc->prh_func    = &task_setcomm_rpcfun;
 	rpc->tscr_refcnt = 2; /* +1: `rpc', +1: `task_setcomm_rpcfun' */
 	rpc->tscr_state  = TASK_SETCOMM_RPC_ST_PENDING;
-	sig_init(&rpc->tscr_done);
+	sig_init_named(&rpc->tscr_done, "<task_setcomm_rpc>.tscr_done");
 	namelen = strnlen(name, TASK_COMM_LEN - 1);
 	bzero(mempcpy(rpc->tscr_name, name, namelen, sizeof(char)),
 	      TASK_COMM_LEN - namelen, sizeof(char));

@@ -91,16 +91,15 @@ struct mfutex {
 #endif /* !__WANT_MFUTEX__mfu_dead */
 #ifdef __WANT_MFUTEX__mfu_lop
 	union {
-		struct {
-			struct sig        mfu_signal; /* [valid_if(mfu_refcnt != 0)] The signal used to implement the mem-futex. */
-			void            *_mfu_pad;    /* ... */
-		};
+		struct sig            mfu_signal; /* [valid_if(mfu_refcnt != 0)] The signal used to implement the mem-futex. */
 		Toblockop(mpart)     _mfu_lop;    /* [valid_if(mfu_refcnt == 0)] Used internally. */
 		Tobpostlockop(mpart) _mfu_plop;   /* [valid_if(mfu_refcnt == 0)] Used internally. */
 	};
 #else /* __WANT_MFUTEX__mfu_lop */
 	struct sig                mfu_signal; /* [valid_if(mfu_refcnt != 0)] The signal used to implement the mem-futex. */
+#if SIZEOF_SIG < (2 * __SIZEOF_POINTER__)
 	void                    *_mfu_pad;    /* ... */
+#endif /* SIZEOF_SIG < (2 * __SIZEOF_POINTER__) */
 #endif /* !__WANT_MFUTEX__mfu_lop */
 };
 

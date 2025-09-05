@@ -51,7 +51,7 @@ INTDEF struct fdirnode_ops const devfs_disk_ops;
 #define MFILE_INIT_mf_notify_ /* nothing */
 #endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
-#define INIT_SPECIAL_DEVFS_SUBDIR(ops, ino)                                         \
+#define INIT_SPECIAL_DEVFS_SUBDIR(self, ops, ino)                                   \
 	{                                                                               \
 		.dn_node = {                                                                \
 			.fn_file = {                                                            \
@@ -59,7 +59,7 @@ INTDEF struct fdirnode_ops const devfs_disk_ops;
 				MFILE_INIT_mf_ops(&ops.dno_node.no_file),                           \
 				MFILE_INIT_mf_lock,                                                 \
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                         \
-				MFILE_INIT_mf_initdone,                                             \
+				MFILE_INIT_mf_initdone(self.dn_node.fn_file),                       \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                       \
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                     \
 				MFILE_INIT_mf_notify_                                               \
@@ -87,10 +87,10 @@ INTDEF struct fdirnode_ops const devfs_disk_ops;
 	}
 
 /* Special sub-directories of /dev/ */
-INTERN struct fdirnode devfs_block = INIT_SPECIAL_DEVFS_SUBDIR(devfs_block_ops, DEVFS_INO_BLOCK);
-INTERN struct fdirnode devfs_char  = INIT_SPECIAL_DEVFS_SUBDIR(devfs_char_ops, DEVFS_INO_CHAR);
-INTERN struct fdirnode devfs_cpu   = INIT_SPECIAL_DEVFS_SUBDIR(devfs_cpu_ops, DEVFS_INO_CPU);
-INTERN struct fdirnode devfs_disk  = INIT_SPECIAL_DEVFS_SUBDIR(devfs_disk_ops, DEVFS_INO_DISK);
+INTERN struct fdirnode devfs_block = INIT_SPECIAL_DEVFS_SUBDIR(devfs_block, devfs_block_ops, DEVFS_INO_BLOCK);
+INTERN struct fdirnode devfs_char  = INIT_SPECIAL_DEVFS_SUBDIR(devfs_char, devfs_char_ops, DEVFS_INO_CHAR);
+INTERN struct fdirnode devfs_cpu   = INIT_SPECIAL_DEVFS_SUBDIR(devfs_cpu, devfs_cpu_ops, DEVFS_INO_CPU);
+INTERN struct fdirnode devfs_disk  = INIT_SPECIAL_DEVFS_SUBDIR(devfs_disk, devfs_disk_ops, DEVFS_INO_DISK);
 #undef INIT_SPECIAL_DEVFS_SUBDIR
 
 
@@ -113,7 +113,7 @@ INTDEF struct fdirnode_ops const _devdiskruledir_default_ops;
 					MFILE_INIT_mf_ops(&_devdiskruledir_default_ops.dno_node.no_file),    \
 					MFILE_INIT_mf_lock,                                                  \
 					MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                          \
-					MFILE_INIT_mf_initdone,                                              \
+					MFILE_INIT_mf_initdone(_dir_##devdiskrule_name.ddrd_dir.dn_node.fn_file), \
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                        \
 					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                      \
 					MFILE_INIT_mf_notify_                                                \
@@ -180,7 +180,7 @@ INTERN_CONST struct flnknode const devicelink_template = {
 			MFILE_INIT_mf_ops(&devicelink_ops.lno_node.no_file),
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-			MFILE_INIT_mf_initdone,
+			MFILE_INIT_mf_initdone(devicelink_template.ln_node.fn_file),
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 			MFILE_INIT_mf_notify_
@@ -251,7 +251,7 @@ PUBLIC struct ramfs_super devfs = {
 					MFILE_INIT_mf_ops(&devfs_super_ops.so_fdir.dno_node.no_file),
 					MFILE_INIT_mf_lock,
 					MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-					MFILE_INIT_mf_initdone,
+					MFILE_INIT_mf_initdone(devfs.rs_sup.fs_root.dn_node.fn_file),
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 					MFILE_INIT_mf_notify_
@@ -280,7 +280,7 @@ PUBLIC struct ramfs_super devfs = {
 		},
 	},
 	.rs_dat = {
-		.rdd_lock = SHARED_RWLOCK_INIT,
+		.rdd_lock = SHARED_RWLOCK_INIT(devfs.rs_dat.rdd_lock),
 		.rdd_lops = SLIST_HEAD_INITIALIZER(devfs.rs_dat.rdd_lops),
 		.rdd_tree = NULL,
 	},

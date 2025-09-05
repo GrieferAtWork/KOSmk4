@@ -135,7 +135,11 @@ PUBLIC_CONST ATTR_COLDRODATA struct desctab const x86_dbgaltcoreidt_ptr = {
 #endif /* !CONFIG_NO_KERNEL_DEBUGGER */
 
 /* Lock used to guard against multiple threads modifying the IDT */
-PRIVATE ATTR_COLDBSS struct shared_lock x86_idt_modify_lock = SHARED_LOCK_INIT;
+#ifdef SIG_INIT_IS_ZERO
+PRIVATE ATTR_COLDBSS DEFINE_SHARED_LOCK(x86_idt_modify_lock);
+#else /* SIG_INIT_IS_ZERO */
+PRIVATE ATTR_COLDDATA DEFINE_SHARED_LOCK(x86_idt_modify_lock);
+#endif /* !SIG_INIT_IS_ZERO */
 
 /* [0..1][lock(x86_idt_modify_lock)]
  * The temporary IDT copy that is in-use while the original IDT is getting modified. */

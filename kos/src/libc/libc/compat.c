@@ -114,9 +114,9 @@ DECL_BEGIN
 /************************************************************************/
 /* KOS/DOS Default STDIO streams                                        */
 /************************************************************************/
-PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stdin_data  = IOFILE_DATA_NOVTAB_INIT();
-PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stdout_data = IOFILE_DATA_NOVTAB_INIT();
-PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stderr_data = IOFILE_DATA_NOVTAB_INIT();
+PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stdin_data  = IOFILE_DATA_NOVTAB_INIT(default_stdin_data);
+PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stdout_data = IOFILE_DATA_NOVTAB_INIT(default_stdout_data);
+PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stderr_data = IOFILE_DATA_NOVTAB_INIT(default_stderr_data);
 INTERN ATTR_SECTION(".data.crt.FILE.std_files") FILE libc_iob[3] = {
 	[0] = __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdin_data),             /* !Relocation: &default_stdin_io */
 	[1] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdout_data), /* !Relocation: &default_stdout_io */
@@ -154,7 +154,7 @@ FILE *NOTHROW(LIBDCALL libd___iob_func)(void) {
 /* stdtty (for <conio.h>)                                               */
 /************************************************************************/
 PRIVATE ATTR_SECTION(".data.crt.dos.conio")
-struct iofile_data_novtab libc_stdttyfile_data = IOFILE_DATA_NOVTAB_INIT();
+struct iofile_data_novtab libc_stdttyfile_data = IOFILE_DATA_NOVTAB_INIT(libc_stdttyfile_data);
 #ifdef AT_FDCTTY
 PRIVATE ATTR_SECTION(".data.crt.dos.conio")
 FILE libc_stdttyfile = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNBUF | IO_ISATTY, AT_FDCTTY, { 0 }, 0, NULL /*(struct iofile_data *)&libc_stdttyfile_data*/);

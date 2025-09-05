@@ -82,7 +82,7 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct pending_rpc_slist) this_rpcs = SLIST_HEAD_
  * This signal is _only_ used  to implement `signalfd(2)', as you're  not
  * normally supposed to "wait" for signals to arrive; you just always get
  * a sporadic interrupt once they do arrive. */
-PUBLIC ATTR_PERTASK ATTR_ALIGN(struct sig) this_rpcs_sig = SIG_INIT;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct sig) this_rpcs_sig = SIG_INIT_NAMED(this_rpcs_sig, NULL);
 
 /* [lock(SET(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
  * Bitset of pending info-less POSIX signals (1-31). Bit#0 becomes set

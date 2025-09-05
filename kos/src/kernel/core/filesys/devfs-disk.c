@@ -512,7 +512,7 @@ PUBLIC REF struct devdiskrule **devdiskrules_list = (REF struct devdiskrule **)d
 PUBLIC size_t /*             */ devdiskrules_size = devdiskrules_default_size;
 
 /* Lock for `devdiskrules_list' and `devdiskrules_size' */
-PUBLIC struct shared_rwlock devdiskrules_lock = SHARED_RWLOCK_INIT;
+PUBLIC DEFINE_SHARED_RWLOCK(devdiskrules_lock);
 
 /* Lock operators for `devdiskrules_lock' */
 PUBLIC struct lockop_slist devdiskrules_lops = SLIST_HEAD_INITIALIZER(devdiskrules_lops);

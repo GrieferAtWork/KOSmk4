@@ -465,10 +465,9 @@ struct pb_buffer {
 #define PB_BUFFER_DEFAULT_LIMIT 8192
 
 /* Initialize a given packet-buffer. */
-#define PB_BUFFER_INIT PB_BUFFER_INIT_EX(PB_BUFFER_DEFAULT_LIMIT)
-#define PB_BUFFER_INIT_EX(limit)                \
-	{ ATOMIC_RWLOCK_INIT, __NULLPTR, __NULLPTR, \
-	  __NULLPTR, __NULLPTR, 0, limit, SCHED_SIGNAL_INIT }
+#define PB_BUFFER_INIT_EX(self, limit) \
+	{ ATOMIC_RWLOCK_INIT, __NULLPTR, __NULLPTR, __NULLPTR, __NULLPTR, 0, limit, SCHED_SIGNAL_INIT(self.pb_psta) }
+#define PB_BUFFER_INIT(self) PB_BUFFER_INIT_EX(self, PB_BUFFER_DEFAULT_LIMIT)
 
 /* Initialize a given packet-buffer. */
 #ifdef __INTELLISENSE__
@@ -498,6 +497,27 @@ __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffe
 	 (self)->pb_limt = (limit),                     \
 	 sched_signal_cinit(&(self)->pb_psta))
 #endif /* !__INTELLISENSE__ */
+
+#define pb_buffer_init_named(self, name)  pb_buffer_init_named_ex(self, name, PB_BUFFER_DEFAULT_LIMIT)
+#define pb_buffer_cinit_named(self, name) pb_buffer_cinit_named_ex(self, name, PB_BUFFER_DEFAULT_LIMIT)
+#define pb_buffer_init_named_ex(self, name, limit) \
+	(atomic_rwlock_init(&(self)->pb_lock),         \
+	 (self)->pb_bbas = __NULLPTR,                  \
+	 (self)->pb_bend = __NULLPTR,                  \
+	 (self)->pb_rptr = __NULLPTR,                  \
+	 (self)->pb_wptr = __NULLPTR,                  \
+	 (self)->pb_used = 0,                          \
+	 (self)->pb_limt = (limit),                    \
+	 sched_signal_init_named(&(self)->pb_psta, name ".pb_psta"))
+#define pb_buffer_cinit_named_ex(self, name, limit) \
+	(atomic_rwlock_cinit(&(self)->pb_lock),         \
+	 __hybrid_assert((self)->pb_bbas == __NULLPTR), \
+	 __hybrid_assert((self)->pb_bend == __NULLPTR), \
+	 __hybrid_assert((self)->pb_rptr == __NULLPTR), \
+	 __hybrid_assert((self)->pb_wptr == __NULLPTR), \
+	 __hybrid_assert((self)->pb_used == 0),         \
+	 (self)->pb_limt = (limit),                     \
+	 sched_signal_cinit_named(&(self)->pb_psta, name ".pb_psta"))
 
 #if defined(NDEBUG) || defined(NDEBUG_FINI)
 #define __pb_buffer_fini_debug(self) (void)0

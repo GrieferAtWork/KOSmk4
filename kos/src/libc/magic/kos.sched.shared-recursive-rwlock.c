@@ -78,21 +78,34 @@ __SYSDECL_BEGIN
  * able to do recursive write-locks.
  */
 
-#define SHARED_RECURSIVE_RWLOCK_INIT              { SHARED_RWLOCK_INIT, __SHARED_RECURSIVE_RWLOCK_BADTID, 0 }
-#define SHARED_RECURSIVE_RWLOCK_INIT_READ         { SHARED_RWLOCK_INIT_READ, __SHARED_RECURSIVE_RWLOCK_BADTID, 0 }
-#define shared_recursive_rwlock_init(self)        (void)(shared_rwlock_init(&(self)->srr_lock), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, (self)->srr_wrcnt = 0)
-#define shared_recursive_rwlock_init_read(self)   (void)(shared_rwlock_init_read(&(self)->srr_lock), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, (self)->srr_wrcnt = 0)
-#define shared_recursive_rwlock_init_write(self)  (void)(shared_rwlock_init_write(&(self)->srr_lock), __shared_recursive_rwlock_setown(self))
+#define SHARED_RECURSIVE_RWLOCK_INIT(self)                    { SHARED_RWLOCK_INIT(self.srr_lock), __SHARED_RECURSIVE_RWLOCK_BADTID, 0 }
+#define SHARED_RECURSIVE_RWLOCK_INIT_READ(self)               { SHARED_RWLOCK_INIT_READ(self.srr_lock), __SHARED_RECURSIVE_RWLOCK_BADTID, 0 }
+#define SHARED_RECURSIVE_RWLOCK_INIT_NAMED(self, name)        { SHARED_RWLOCK_INIT_NAMED(self.srr_lock, name ".srr_lock"), __SHARED_RECURSIVE_RWLOCK_BADTID, 0 }
+#define SHARED_RECURSIVE_RWLOCK_INIT_READ_NAMED(self, name)   { SHARED_RWLOCK_INIT_READ_NAMED(self.srr_lock, name ".srr_lock"), __SHARED_RECURSIVE_RWLOCK_BADTID, 0 }
+#define shared_recursive_rwlock_init(self)                    (void)(shared_rwlock_init(&(self)->srr_lock), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, (self)->srr_wrcnt = 0)
+#define shared_recursive_rwlock_init_read(self)               (void)(shared_rwlock_init_read(&(self)->srr_lock), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, (self)->srr_wrcnt = 0)
+#define shared_recursive_rwlock_init_write(self)              (void)(shared_rwlock_init_write(&(self)->srr_lock), __shared_recursive_rwlock_setown(self))
+#define shared_recursive_rwlock_init_named(self, name)        (void)(shared_rwlock_init_named(&(self)->srr_lock, name ".srr_lock"), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, (self)->srr_wrcnt = 0)
+#define shared_recursive_rwlock_init_read_named(self, name)   (void)(shared_rwlock_init_read_named(&(self)->srr_lock, name ".srr_lock"), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, (self)->srr_wrcnt = 0)
+#define shared_recursive_rwlock_init_write_named(self, name)  (void)(shared_rwlock_init_write_named(&(self)->srr_lock, name ".srr_lock"), __shared_recursive_rwlock_setown(self))
 #ifdef __SHARED_RECURSIVE_RWLOCK_BADTID_ISZERO
-#define shared_recursive_rwlock_cinit(self)       (shared_rwlock_cinit(&(self)->srr_lock), __hybrid_assert((self)->srr_writer == __SHARED_RECURSIVE_RWLOCK_BADTID), __hybrid_assert((self)->srr_wrcnt == 0))
-#define shared_recursive_rwlock_cinit_read(self)  (shared_rwlock_cinit_read(&(self)->srr_lock), __hybrid_assert((self)->srr_writer == __SHARED_RECURSIVE_RWLOCK_BADTID), __hybrid_assert((self)->srr_wrcnt == 0))
+#define shared_recursive_rwlock_cinit(self)                   (shared_rwlock_cinit(&(self)->srr_lock), __hybrid_assert((self)->srr_writer == __SHARED_RECURSIVE_RWLOCK_BADTID), __hybrid_assert((self)->srr_wrcnt == 0))
+#define shared_recursive_rwlock_cinit_read(self)              (shared_rwlock_cinit_read(&(self)->srr_lock), __hybrid_assert((self)->srr_writer == __SHARED_RECURSIVE_RWLOCK_BADTID), __hybrid_assert((self)->srr_wrcnt == 0))
+#define shared_recursive_rwlock_cinit_named(self, name)       (shared_rwlock_cinit_named(&(self)->srr_lock, name ".srr_lock"), __hybrid_assert((self)->srr_writer == __SHARED_RECURSIVE_RWLOCK_BADTID), __hybrid_assert((self)->srr_wrcnt == 0))
+#define shared_recursive_rwlock_cinit_read_named(self, name)  (shared_rwlock_cinit_read_named(&(self)->srr_lock, name ".srr_lock"), __hybrid_assert((self)->srr_writer == __SHARED_RECURSIVE_RWLOCK_BADTID), __hybrid_assert((self)->srr_wrcnt == 0))
 #else /* __SHARED_RECURSIVE_RWLOCK_BADTID_ISZERO */
-#define shared_recursive_rwlock_cinit(self)       (shared_rwlock_cinit(&(self)->srr_lock), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, __hybrid_assert((self)->srr_wrcnt == 0))
-#define shared_recursive_rwlock_cinit_read(self)  (shared_rwlock_cinit_read(&(self)->srr_lock), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, __hybrid_assert((self)->srr_wrcnt == 0))
+#define shared_recursive_rwlock_cinit(self)                   (shared_rwlock_cinit(&(self)->srr_lock), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, __hybrid_assert((self)->srr_wrcnt == 0))
+#define shared_recursive_rwlock_cinit_read(self)              (shared_rwlock_cinit_read(&(self)->srr_lock), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, __hybrid_assert((self)->srr_wrcnt == 0))
+#define shared_recursive_rwlock_cinit_named(self, name)       (shared_rwlock_cinit_named(&(self)->srr_lock, name ".srr_lock"), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, __hybrid_assert((self)->srr_wrcnt == 0))
+#define shared_recursive_rwlock_cinit_read_named(self, name)  (shared_rwlock_cinit_read_named(&(self)->srr_lock, name ".srr_lock"), (self)->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID, __hybrid_assert((self)->srr_wrcnt == 0))
 #endif /* !__SHARED_RECURSIVE_RWLOCK_BADTID_ISZERO */
-#define shared_recursive_rwlock_cinit_write(self) (void)(shared_rwlock_cinit_write(&(self)->srr_lock), __shared_recursive_rwlock_setown(self))
-#define shared_recursive_rwlock_broadcast_for_fini(self) \
-	shared_rwlock_broadcast_for_fini(&(self)->srr_lock)
+#define shared_recursive_rwlock_cinit_write(self)             (void)(shared_rwlock_cinit_write(&(self)->srr_lock), __shared_recursive_rwlock_setown(self))
+#define shared_recursive_rwlock_cinit_write_named(self, name) (void)(shared_rwlock_cinit_write_named(&(self)->srr_lock, name ".srr_lock"), __shared_recursive_rwlock_setown(self))
+#define shared_recursive_rwlock_broadcast_for_fini(self)      shared_rwlock_broadcast_for_fini(&(self)->srr_lock)
+#define DEFINE_SHARED_RECURSIVE_RWLOCK(self)                  struct shared_recursive_rwlock self = SHARED_RECURSIVE_RWLOCK_INIT(self)
+#define DEFINE_SHARED_RECURSIVE_RWLOCK_READ(self)             struct shared_recursive_rwlock self = SHARED_RECURSIVE_RWLOCK_INIT_READ(self)
+#define DEFINE_SHARED_RECURSIVE_RWLOCK_NAMED(self, name)      struct shared_recursive_rwlock self = SHARED_RECURSIVE_RWLOCK_INIT_NAMED(self, name)
+#define DEFINE_SHARED_RECURSIVE_RWLOCK_READ_NAMED(self, name) struct shared_recursive_rwlock self = SHARED_RECURSIVE_RWLOCK_INIT_READ_NAMED(self, name)
 
 /* Check if reading/writing is possible, or a read/write lock is being held. */
 #define shared_recursive_rwlock_canread(self)  (shared_rwlock_canread(&(self)->srr_lock) || __shared_recursive_rwlock_isown(self))

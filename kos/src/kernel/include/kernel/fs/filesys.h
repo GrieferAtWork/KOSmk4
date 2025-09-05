@@ -87,7 +87,7 @@ struct ffilesys {
 		 * The following fields will be initialized by the caller:
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_refcnt     = 1;
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_lock       = ATOMIC_RWLOCK_INIT;
-		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_initdone   = SIG_INIT;
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_initdone   = SIG_INIT(...);
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_lockops    = SLIST_HEAD_INITIALIZER(~);
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask = MAX(PAGESIZE, 1 << return->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift) - 1;
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_meta       = NULL;

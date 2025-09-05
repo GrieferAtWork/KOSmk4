@@ -865,7 +865,7 @@ struct mfile {
 #define MFILE_INIT_mf_lock                ATOMIC_RWLOCK_INIT, SLIST_HEAD_INITIALIZER(~)
 #endif /* !CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 #define MFILE_INIT_mf_parts(mf_parts)     mf_parts
-#define MFILE_INIT_mf_initdone            SIG_INIT
+#define MFILE_INIT_mf_initdone(mfile)     SIG_INIT(mfile.mf_initdone)
 #define MFILE_INIT_mf_changed(mf_changed) { mf_changed }
 #if ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) != 0
 #define MFILE_INIT_mf_blockshift(mf_blockshift, mf_iobashift) \

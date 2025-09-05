@@ -98,8 +98,8 @@ struct linebuffer {
 
 /* Static initialization */
 #define LINEBUFFER_DEFAULT_LIMIT  _POSIX_MAX_INPUT
-#define LINEBUFFER_INIT_EX(limit) { ATOMIC_LOCK_INIT, { __NULLPTR, 0, 0 }, limit, SCHED_SIGNAL_INIT }
-#define LINEBUFFER_INIT           LINEBUFFER_INIT_EX(LINEBUFFER_DEFAULT_LIMIT)
+#define LINEBUFFER_INIT_EX(self, limit) { ATOMIC_LOCK_INIT, { __NULLPTR, 0, 0 }, limit, SCHED_SIGNAL_INIT(self.lb_nful) }
+#define LINEBUFFER_INIT(self)           LINEBUFFER_INIT_EX(self, LINEBUFFER_DEFAULT_LIMIT)
 
 /* Initialization / finalization */
 #define linebuffer_init_ex(self, limit)                      \
@@ -113,8 +113,21 @@ struct linebuffer {
 	 __hybrid_assert((self)->lb_line.lc_alloc == 0),        \
 	 (self)->lb_limt = (limit),                             \
 	 sched_signal_cinit(&(self)->lb_nful))
-#define linebuffer_init(self)   linebuffer_init_ex(self, LINEBUFFER_DEFAULT_LIMIT)
-#define linebuffer_cinit(self)  linebuffer_cinit_ex(self, LINEBUFFER_DEFAULT_LIMIT)
+#define linebuffer_init_named_ex(self, name, limit)          \
+	(atomic_lock_init(&(self)->lb_lock),                     \
+	 (self)->lb_line.lc_size = (self)->lb_line.lc_alloc = 0, \
+	 (self)->lb_limt = (limit), sched_signal_init_named(&(self)->lb_nful, name ".lb_nful"))
+#define linebuffer_cinit_named_ex(self, name, limit)        \
+	(atomic_lock_cinit(&(self)->lb_lock),                   \
+	 __hybrid_assert((self)->lb_line.lc_base == __NULLPTR), \
+	 __hybrid_assert((self)->lb_line.lc_size == 0),         \
+	 __hybrid_assert((self)->lb_line.lc_alloc == 0),        \
+	 (self)->lb_limt = (limit),                             \
+	 sched_signal_cinit_named(&(self)->lb_nful, name ".lb_nful"))
+#define linebuffer_init(self)              linebuffer_init_ex(self, LINEBUFFER_DEFAULT_LIMIT)
+#define linebuffer_cinit(self)             linebuffer_cinit_ex(self, LINEBUFFER_DEFAULT_LIMIT)
+#define linebuffer_init_named(self, name)  linebuffer_init_named_ex(self, name, LINEBUFFER_DEFAULT_LIMIT)
+#define linebuffer_cinit_named(self, name) linebuffer_cinit_named_ex(self, name, LINEBUFFER_DEFAULT_LIMIT)
 #define linebuffer_fini(self)                           \
 	(sched_signal_broadcast_for_fini(&(self)->lb_nful), \
 	 linecapture_fini(&(self)->lb_line))

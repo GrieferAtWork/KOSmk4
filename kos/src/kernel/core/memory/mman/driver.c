@@ -2650,7 +2650,7 @@ NOTHROW_NCX(KCALL libuw_unwind_fde_find)(VIRT void const *absolute_pc,
 /************************************************************************/
 
 /* Signal broadcast whenever the `d_state' of any loaded driver changes. */
-PUBLIC struct sig driver_state_changed = SIG_INIT;
+PUBLIC DEFINE_SIG(driver_state_changed);
 
 /* Perform the necessary actions after the state of
  * `self' has been set to `DRIVER_STATE_FINI_DEPS'. */

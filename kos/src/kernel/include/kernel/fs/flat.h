@@ -231,7 +231,7 @@ struct flatdirnode_xops {
 	 *  - return->_fnode_file_ mf_flags     |= MFILE_FN_GLOBAL_REF;
 	 *  - return->_fnode_file_ mf_flags     |= self->_fdirnode_node_ _fnode_file_ mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 	 *  - return->_fnode_file_ mf_lock       = ATOMIC_RWLOCK_INIT;
-	 *  - return->_fnode_file_ mf_initdone   = SIG_INIT;
+	 *  - return->_fnode_file_ mf_initdone   = SIG_INIT(...);
 	 *  - return->_fnode_file_ mf_lockops    = SLIST_HEAD_INITIALIZER(~);
 	 *  - return->_fnode_file_ mf_changed    = SLIST_HEAD_INITIALIZER(~);
 	 *  - return->_fnode_file_ mf_part_amask = self->_fdirnode_node_ _fnode_file_ mf_part_amask;
@@ -712,7 +712,7 @@ struct flatsuper_ops {
 	 *  - return->_fnode_file_ mf_flags     |= MFILE_FN_GLOBAL_REF;
 	 *  - return->_fnode_file_ mf_flags     |= dir->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 	 *  - return->_fnode_file_ mf_lock       = ATOMIC_RWLOCK_INIT;
-	 *  - return->_fnode_file_ mf_initdone   = SIG_INIT;
+	 *  - return->_fnode_file_ mf_initdone   = SIG_INIT(...);
 	 *  - return->_fnode_file_ mf_lockops    = SLIST_HEAD_INITIALIZER(~);
 	 *  - return->_fnode_file_ mf_changed    = SLIST_HEAD_INITIALIZER(~);
 	 *  - return->_fnode_file_ mf_part_amask = self->ffs_super.fs_root._fdirnode_node_ _fnode_file_ mf_part_amask;

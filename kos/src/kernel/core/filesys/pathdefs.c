@@ -123,7 +123,7 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 					MFILE_INIT_mf_ops(&fsuper_unmounted_ops.so_fdir.dno_node.no_file),
 					MFILE_INIT_mf_lock,
 					MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-					MFILE_INIT_mf_initdone,
+					MFILE_INIT_mf_initdone(fsuper_unmounted.rs_sup.fs_root.dn_node.fn_file),
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 					MFILE_INIT_mf_meta,
@@ -156,8 +156,8 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 		},
 	},
 	.rs_dat = {
-		.rdd_lock = SHARED_RWLOCK_INIT,
-		.rdd_tree     = NULL,
+		.rdd_lock = SHARED_RWLOCK_INIT(fsuper_unmounted.rs_dat.rdd_lock),
+		.rdd_tree = NULL,
 	},
 };
 

@@ -67,7 +67,7 @@ INTERN GDBThreadStopEvent *GDBThread_Stopped = NULL;
 INTERN GDBThreadStopEvent *GDBThread_AsyncNotifStopEvents = NULL;
 
 /* Signal broadcast when `GDBThread_AsyncNotifStopEvents' becomes non-empty. */
-INTERN struct sig GDBThread_AsyncNotifStopEventsAdded = SIG_INIT;
+INTERN DEFINE_SIG(GDBThread_AsyncNotifStopEventsAdded);
 
 /* [1..1][lock(PRIVATE(<GDB_HOST_THREAD>))]
  * The thread that is hosting the GDB server (== THIS_TASK). */
@@ -80,7 +80,7 @@ INTERN struct task *GDBServer_Host = NULL;
  * to `GDBServer_FallbackHostOnByte', which would slow down
  * remote data processing when each byte would re-awake the
  * fallback host thread. */
-INTERN struct sig GDBServer_HostUnlocked = SIG_INIT;
+INTERN DEFINE_SIG(GDBServer_HostUnlocked);
 
 
 

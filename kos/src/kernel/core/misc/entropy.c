@@ -102,8 +102,8 @@ PUBLIC size_t entropy_overflow = 0;
  * broadcasting `entropy_request_sig'.
  * If you wish to wait for entropy to arrive, you should
  * make use of `entropy_connect()' */
-PUBLIC size_t entropy_request_bits    = (size_t)-1;
-PUBLIC struct sig entropy_request_sig = SIG_INIT;
+PUBLIC size_t entropy_request_bits = (size_t)-1;
+PUBLIC DEFINE_SIG(entropy_request_sig);
 
 
 /* Check if at least `num_bits' of entropy are current available.

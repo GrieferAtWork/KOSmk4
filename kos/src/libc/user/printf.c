@@ -138,7 +138,7 @@ NOTHROW_NCX(LIBCCALL inject_hooks)(void) {
 
 /* Printf lock used to sync custom printf specifiers, and their use */
 PRIVATE ATTR_SECTION(".bss.crt.compat.glibc.printf")
-struct shared_rwlock specsup_printf = SHARED_RWLOCK_INIT;
+DEFINE_SHARED_RWLOCK(specsup_printf);
 
 /* Helpers for accessing `specsup_printf' */
 #define /*        */ _specsup_printf_reap()        (void)0

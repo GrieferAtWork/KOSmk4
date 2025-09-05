@@ -90,9 +90,9 @@ unaligned_v_saveblocks(struct mfile *__restrict self, pos_t addr,
 
 
 /* Set of files for which mounting is currently in progress. */
-PRIVATE size_t /*       */ mount_in_progress_count = 0;        /* [lock(mount_in_progress_lock)] # of files with in-progress mounts */
-PRIVATE REF struct mfile **mount_in_progress_list  = NULL;     /* [1..1][0..mount_in_progress_count][owned][lock(mount_in_progress_lock)] List of files with in-progress mounts */
-PRIVATE struct sig /*   */ mount_in_progress_rmsig = SIG_INIT; /* Broadcast when a file is removed from `mount_in_progress_list' */
+PRIVATE size_t /*       */ mount_in_progress_count = 0;    /* [lock(mount_in_progress_lock)] # of files with in-progress mounts */
+PRIVATE REF struct mfile **mount_in_progress_list  = NULL; /* [1..1][0..mount_in_progress_count][owned][lock(mount_in_progress_lock)] List of files with in-progress mounts */
+PRIVATE DEFINE_SIG(mount_in_progress_rmsig);               /* Broadcast when a file is removed from `mount_in_progress_list' */
 #ifndef CONFIG_NO_SMP
 PRIVATE struct atomic_lock mount_in_progress_lock = ATOMIC_LOCK_INIT; /* SMP-lock for `mount_in_progress_list' */
 #endif /* !CONFIG_NO_SMP */

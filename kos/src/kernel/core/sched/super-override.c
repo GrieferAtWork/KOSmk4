@@ -49,7 +49,11 @@ PRIVATE ATTR_COLDBSS struct cpu *super_override_cpu = NULL;
 /* Signal  broadcast  when  the super  override  is released.
  * This signal will cause IPIs to be sent to every other CPU,
  * informing them that they may resume normal execution. */
-PRIVATE ATTR_COLDBSS struct sig super_override_release = SIG_INIT;
+#ifdef SIG_INIT_IS_ZERO
+PRIVATE ATTR_COLDBSS DEFINE_SIG(super_override_release);
+#else /* SIG_INIT_IS_ZERO */
+PRIVATE ATTR_COLDDATA DEFINE_SIG(super_override_release);
+#endif /* !SIG_INIT_IS_ZERO */
 
 /* [lock(SUPER_OVERRIDE)] Set to true while a super-override is active.
  * Only set to true once everyone has acknowledged the override itself. */

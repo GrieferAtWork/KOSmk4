@@ -169,7 +169,7 @@ PRIVATE struct fnode const procfs_perproc_reg_template = {
 		MFILE_INIT_mf_ops(NULL), /* Will be overwritten */
 		MFILE_INIT_mf_lock,
 		MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-		MFILE_INIT_mf_initdone,
+		MFILE_INIT_mf_initdone(procfs_perproc_reg_template.fn_file),
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 		MFILE_INIT_mf_meta,
@@ -200,7 +200,7 @@ PRIVATE struct fnode const procfs_perproc_nomap_template = {
 		MFILE_INIT_mf_ops(NULL), /* Will be overwritten */
 		MFILE_INIT_mf_lock,
 		MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-		MFILE_INIT_mf_initdone,
+		MFILE_INIT_mf_initdone(procfs_perproc_nomap_template.fn_file),
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 		MFILE_INIT_mf_meta,
@@ -236,7 +236,7 @@ INTERN_CONST struct flnknode const procfs_pp_fdlnk_template = {
 			MFILE_INIT_mf_ops(&procfs_pp_fdlnk_ops.lno_node.no_file),
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-			MFILE_INIT_mf_initdone,
+			MFILE_INIT_mf_initdone(procfs_pp_fdlnk_template.ln_node.fn_file),
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 			MFILE_INIT_mf_meta,
@@ -267,37 +267,39 @@ INTERN_CONST struct flnknode const procfs_pp_fdlnk_template = {
 /* Template for files from  "/proc/[PID]/fdinfo/[NO]" */
 INTDEF struct printnode_ops const procfs_pp_fdinfo_ops;
 INTERN_CONST struct printnode const procfs_pp_fdinfo_template = {
-	.pn_node = {{
-		.fn_file = {
-			MFILE_INIT_mf_refcnt(1), /* Return value of creator */
-			MFILE_INIT_mf_ops(&procfs_pp_fdinfo_ops.pno_reg.rno_node.no_file),
-			MFILE_INIT_mf_lock,
-			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-			MFILE_INIT_mf_initdone,
-			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-			MFILE_INIT_mf_meta,
-			MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
-			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
-			                    MFILE_FN_FLEETING),
-			MFILE_INIT_mf_trunclock,
-			MFILE_INIT_mf_filesize((uint64_t)-1),
-			MFILE_INIT_mf_atime(0, 0),
-			MFILE_INIT_mf_mtime(0, 0),
-			MFILE_INIT_mf_ctime(0, 0),
-			MFILE_INIT_mf_btime(0, 0),
-			MFILE_INIT_mf_msalign(NULL),
+	.pn_node = {
+		.rn_node{
+			.fn_file = {
+				MFILE_INIT_mf_refcnt(1), /* Return value of creator */
+				MFILE_INIT_mf_ops(&procfs_pp_fdinfo_ops.pno_reg.rno_node.no_file),
+				MFILE_INIT_mf_lock,
+				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
+				MFILE_INIT_mf_initdone(procfs_pp_fdinfo_template.pn_node.rn_node.fn_file),
+				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
+				MFILE_INIT_mf_meta,
+				MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FN_FLEETING),
+				MFILE_INIT_mf_trunclock,
+				MFILE_INIT_mf_filesize((uint64_t)-1),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0),
+				MFILE_INIT_mf_msalign(NULL),
+			},
+			FNODE_INIT_fn_nlink(1),
+			FNODE_INIT_fn_mode(S_IFREG | 0400),
+			FNODE_INIT_fn_uid(0),  /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
+			FNODE_INIT_fn_gid(0),  /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
+			FNODE_INIT_fn_ino(0),
+			FNODE_INIT_fn_super(&procfs_super),
+			FNODE_INIT_fn_changed,
+			FNODE_INIT_fn_supent,
+			FNODE_INIT_fn_allnodes,
 		},
-		FNODE_INIT_fn_nlink(1),
-		FNODE_INIT_fn_mode(S_IFREG | 0400),
-		FNODE_INIT_fn_uid(0),  /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
-		FNODE_INIT_fn_gid(0),  /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
-		FNODE_INIT_fn_ino(0),
-		FNODE_INIT_fn_super(&procfs_super),
-		FNODE_INIT_fn_changed,
-		FNODE_INIT_fn_supent,
-		FNODE_INIT_fn_allnodes,
-	}},
+	},
 };
 
 /* Template for files from "/proc/[PID]/kos/dcwd/[id]" */
@@ -309,7 +311,7 @@ INTERN_CONST struct flnknode const procfs_perproc_dcwdlink_template = {
 			MFILE_INIT_mf_ops(&procfs_perproc_dcwdlink_ops.lno_node.no_file),
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-			MFILE_INIT_mf_initdone,
+			MFILE_INIT_mf_initdone(procfs_perproc_dcwdlink_template.ln_node.fn_file),
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 			MFILE_INIT_mf_meta,
@@ -346,7 +348,7 @@ INTERN_CONST struct flnknode const procfs_perproc_drivelink_template = {
 			MFILE_INIT_mf_ops(&procfs_perproc_drivelink_ops.lno_node.no_file),
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-			MFILE_INIT_mf_initdone,
+			MFILE_INIT_mf_initdone(procfs_perproc_drivelink_template.ln_node.fn_file),
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 			MFILE_INIT_mf_meta,
@@ -384,7 +386,7 @@ INTERN_CONST struct flnknode const perproc_mapfile_lnknode_template = {
 			MFILE_INIT_mf_ops(&perproc_mapfile_lnknode_ops.lno_node.no_file),
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-			MFILE_INIT_mf_initdone,
+			MFILE_INIT_mf_initdone(perproc_mapfile_lnknode_template.ln_node.fn_file),
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 			MFILE_INIT_mf_meta,

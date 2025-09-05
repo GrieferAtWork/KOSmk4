@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x448cc501 */
+/* HASH CRC-32:0x9b1335a1 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,33 +56,62 @@ __SYSDECL_BEGIN
  * one can do blocking waits for the lock to become available. */
 
 #ifdef __KERNEL__
-#define SHARED_RWLOCK_INIT              { 0, SIG_INIT, SIG_INIT }
-#define SHARED_RWLOCK_INIT_READ         { 1, SIG_INIT, SIG_INIT }
-#define SHARED_RWLOCK_INIT_WRITE        { (__uintptr_t)-1, SIG_INIT, SIG_INIT }
-#define shared_rwlock_init(self)        ((self)->sl_lock = 0, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
-#define shared_rwlock_init_read(self)   (void)((self)->sl_lock = 1, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
-#define shared_rwlock_init_write(self)  (void)((self)->sl_lock = (__uintptr_t)-1, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
-#define shared_rwlock_cinit(self)       (__hybrid_assert((self)->sl_lock == 0), sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
-#define shared_rwlock_cinit_read(self)  (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
-#define shared_rwlock_cinit_write(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = (__uintptr_t)-1, sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
+#define SHARED_RWLOCK_INIT(self)                    { 0, SIG_INIT(self.sl_rdwait), SIG_INIT(self.sl_wrwait) }
+#define SHARED_RWLOCK_INIT_READ(self)               { 1, SIG_INIT(self.sl_rdwait), SIG_INIT(self.sl_wrwait) }
+#define SHARED_RWLOCK_INIT_WRITE(self)              { (__uintptr_t)-1, SIG_INIT(self.sl_rdwait), SIG_INIT(self.sl_wrwait) }
+#define SHARED_RWLOCK_INIT_NAMED(self, name)        { 0, SIG_INIT_NAMED(self.sl_rdwait, name ".sl_rdwait"), SIG_INIT_NAMED(self.sl_wrwait, name ".sl_wrwait") }
+#define SHARED_RWLOCK_INIT_READ_NAMED(self, name)   { 1, SIG_INIT_NAMED(self.sl_rdwait, name ".sl_rdwait"), SIG_INIT_NAMED(self.sl_wrwait, name ".sl_wrwait") }
+#define SHARED_RWLOCK_INIT_WRITE_NAMED(self, name)  { (__uintptr_t)-1, SIG_INIT_NAMED(self.sl_rdwait, name ".sl_rdwait"), SIG_INIT_NAMED(self.sl_wrwait, name ".sl_wrwait") }
+#define shared_rwlock_init(self)                    ((self)->sl_lock = 0, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
+#define shared_rwlock_init_read(self)               (void)((self)->sl_lock = 1, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
+#define shared_rwlock_init_write(self)              (void)((self)->sl_lock = (__uintptr_t)-1, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
+#define shared_rwlock_cinit(self)                   (__hybrid_assert((self)->sl_lock == 0), sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
+#define shared_rwlock_cinit_read(self)              (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
+#define shared_rwlock_cinit_write(self)             (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = (__uintptr_t)-1, sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
+#define shared_rwlock_init_named(self, name)        ((self)->sl_lock = 0, sig_init_named(&(self)->sl_rdwait, name ".sl_rdwait"), sig_init_named(&(self)->sl_wrwait, name ".sl_wrwait"))
+#define shared_rwlock_init_read_named(self, name)   (void)((self)->sl_lock = 1, sig_init_named(&(self)->sl_rdwait, name ".sl_rdwait"), sig_init_named(&(self)->sl_wrwait, name ".sl_wrwait"))
+#define shared_rwlock_init_write_named(self, name)  (void)((self)->sl_lock = (__uintptr_t)-1, sig_init_named(&(self)->sl_rdwait, name ".sl_rdwait"), sig_init_named(&(self)->sl_wrwait, name ".sl_wrwait"))
+#define shared_rwlock_cinit_named(self, name)       (__hybrid_assert((self)->sl_lock == 0), sig_cinit_named(&(self)->sl_rdwait, name ".sl_rdwait"), sig_cinit_named(&(self)->sl_wrwait, name ".sl_wrwait"))
+#define shared_rwlock_cinit_read_named(self, name)  (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, sig_cinit_named(&(self)->sl_rdwait, name ".sl_rdwait"), sig_cinit_named(&(self)->sl_wrwait, name ".sl_wrwait"))
+#define shared_rwlock_cinit_write_named(self, name) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = (__uintptr_t)-1, sig_cinit_named(&(self)->sl_rdwait, name ".sl_rdwait"), sig_cinit_named(&(self)->sl_wrwait, name ".sl_wrwait"))
 #define shared_rwlock_broadcast_for_fini(self)   \
 	(sig_broadcast_for_fini(&(self)->sl_rdwait), \
 	 sig_broadcast_for_fini(&(self)->sl_wrwait))
 #else /* __KERNEL__ */
-#define SHARED_RWLOCK_INIT              { 0, 0, 0 }
-#define SHARED_RWLOCK_INIT_READ         { 1, 0, 0 }
-#define SHARED_RWLOCK_INIT_WRITE        { (__uintptr_t)-1, 0, 0 }
-#define shared_rwlock_init(self)        (void)((self)->sl_lock = 0, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
-#define shared_rwlock_init_read(self)   (void)((self)->sl_lock = 1, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
-#define shared_rwlock_init_write(self)  (void)((self)->sl_lock = (__uintptr_t)-1, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
-#define shared_rwlock_cinit(self)       (__hybrid_assert((self)->sl_lock == 0), __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
-#define shared_rwlock_cinit_read(self)  (__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
-#define shared_rwlock_cinit_write(self) (__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = (__uintptr_t)-1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
+#define SHARED_RWLOCK_INIT(self)                    { 0, 0, 0 }
+#define SHARED_RWLOCK_INIT_READ(self)               { 1, 0, 0 }
+#define SHARED_RWLOCK_INIT_WRITE(self)              { (__uintptr_t)-1, 0, 0 }
+#define SHARED_RWLOCK_INIT_NAMED(self, name)        SHARED_RWLOCK_INIT(self)
+#define SHARED_RWLOCK_INIT_READ_NAMED(self, name)   SHARED_RWLOCK_INIT_READ(self)
+#define SHARED_RWLOCK_INIT_WRITE_NAMED(self, name)  SHARED_RWLOCK_INIT_WRITE(self)
+#define shared_rwlock_init(self)                    (void)((self)->sl_lock = 0, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
+#define shared_rwlock_init_read(self)               (void)((self)->sl_lock = 1, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
+#define shared_rwlock_init_write(self)              (void)((self)->sl_lock = (__uintptr_t) - 1, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
+#define shared_rwlock_cinit(self)                   (__hybrid_assert((self)->sl_lock == 0), __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
+#define shared_rwlock_cinit_read(self)              (__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
+#define shared_rwlock_cinit_write(self)             (__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = (__uintptr_t) - 1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
+#define shared_rwlock_init_named(self, name)        shared_rwlock_init(self)
+#define shared_rwlock_init_read_named(self, name)   shared_rwlock_init_read(self)
+#define shared_rwlock_init_write_named(self, name)  shared_rwlock_init_write(self)
+#define shared_rwlock_cinit_named(self, name)       shared_rwlock_cinit(self)
+#define shared_rwlock_cinit_read_named(self, name)  shared_rwlock_cinit_read(self)
+#define shared_rwlock_cinit_write_named(self, name) shared_rwlock_cinit_write(self)
 /* NOTE: we use `sys_Xlfutex()', because the only possible exception is E_SEGFAULT */
+#if __CRT_HAVE_XSC(lfutex)
 #define shared_rwlock_broadcast_for_fini(self)                                                                        \
 	((self)->sl_rdwait ? (void)sys_Xlfutex(&(self)->sl_rdwait, LFUTEX_WAKE, (__uintptr_t)-1, __NULLPTR, 0) : (void)0, \
 	 (self)->sl_rdwait ? (void)sys_Xlfutex(&(self)->sl_wrwait, LFUTEX_WAKE, (__uintptr_t)-1, __NULLPTR, 0) : (void)0)
+#else /* __CRT_HAVE_XSC(lfutex) */
+#define shared_rwlock_broadcast_for_fini(self) (void)0
+#endif /* !__CRT_HAVE_XSC(lfutex) */
 #endif /* !__KERNEL__ */
+#define DEFINE_SHARED_RWLOCK(self)                   struct shared_rwlock self = SHARED_RWLOCK_INIT(self)
+#define DEFINE_SHARED_RWLOCK_READ(self)              struct shared_rwlock self = SHARED_RWLOCK_INIT_READ(self)
+#define DEFINE_SHARED_RWLOCK_WRITE(self)             struct shared_rwlock self = SHARED_RWLOCK_INIT_WRITE(self)
+#define DEFINE_SHARED_RWLOCK_NAMED(self, name)       struct shared_rwlock self = SHARED_RWLOCK_INIT_NAMED(self, name)
+#define DEFINE_SHARED_RWLOCK_READ_NAMED(self, name)  struct shared_rwlock self = SHARED_RWLOCK_INIT_READ_NAMED(self, name)
+#define DEFINE_SHARED_RWLOCK_WRITE_NAMED(self, name) struct shared_rwlock self = SHARED_RWLOCK_INIT_WRITE_NAMED(self, name)
+
 
 /* Check if reading/writing is possible, or a read/write lock is being held. */
 #ifdef __COMPILER_WORKAROUND_GCC_105689_MAC

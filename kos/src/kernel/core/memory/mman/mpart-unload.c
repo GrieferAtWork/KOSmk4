@@ -180,7 +180,8 @@ INTDEF struct mpart_ajob mpart_ajob_fallback_worker;
 
 /* Signal broadcast when something gets added to `mpart_ajob_fallback_list' */
 PRIVATE struct sig mpart_ajob_fallback_sig =
-SIG_INIT_EX(&mpart_ajob_fallback_worker.mpaj_async.a_comp.smc_cons[0].mr_com.scc_con);
+SIG_INIT_EX(mpart_ajob_fallback_sig,
+            &mpart_ajob_fallback_worker.mpaj_async.a_comp.smc_cons[0].mr_com.scc_con);
 
 
 /* [0..n][lock(ATOMIC)] Fallback list of mem-parts with pending async jobs. */

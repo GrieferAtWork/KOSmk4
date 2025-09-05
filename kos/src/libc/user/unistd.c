@@ -1819,7 +1819,7 @@ NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd,
 
 /* Lock for `brk_curr' */
 PRIVATE ATTR_SECTION(".bss.crt.heap.utility")
-struct shared_lock brk_lock = SHARED_LOCK_INIT;
+DEFINE_SHARED_LOCK(brk_lock);
 
 /* [0..1][lock(brk_lock)] */
 PRIVATE ATTR_SECTION(".bss.crt.heap.utility")

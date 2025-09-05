@@ -108,7 +108,7 @@ err:
 
 /* Lock for accessing the dynamic parts of `<fmtmsg.h>' */
 PRIVATE ATTR_SECTION(".bss.crt.fmtmsg")
-struct shared_rwlock fmtmsg_lock = SHARED_RWLOCK_INIT;
+DEFINE_SHARED_RWLOCK(fmtmsg_lock);
 
 /* Helpers for accessing `fmtmsg_lock' */
 #define /*        */ _fmtmsg_lock_reap()        (void)0

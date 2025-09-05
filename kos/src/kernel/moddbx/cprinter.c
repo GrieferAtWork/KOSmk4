@@ -1655,18 +1655,15 @@ NOTHROW_CB_NCX(KCALL print_special_struct)(struct ctyperef const *__restrict sel
 	if unlikely(!CTYPE_KIND_ISSTRUCT(typ->ct_kind))
 		return DBX_ENOENT;
 
-	switch (typ->ct_struct.ct_sizeof) {
-
-	case 16: {
-		/* Special handling for `int128_t' and `uint128_t'. For
-		 * this purpose, we (at least) want to match the types:
-		 * - `int128_t'                 (from `<int128.h>')
-		 * - `uint128_t'                (from `<int128.h>')
-		 * - `__hybrid_int128_struct'   (from `<hybrid/int128.h>')
-		 * - `__hybrid_uint128_struct'  (from `<hybrid/int128.h>')
-		 * - `__hybrid_int128_t'        (from `<hybrid/int128.h>')
-		 * - `__hybrid_uint128_t'       (from `<hybrid/int128.h>')
-		 */
+	/* Special handling for `int128_t' and `uint128_t'. For
+	 * this purpose, we (at least) want to match the types:
+	 * - `int128_t'                 (from `<int128.h>')
+	 * - `uint128_t'                (from `<int128.h>')
+	 * - `__hybrid_int128_struct'   (from `<hybrid/int128.h>')
+	 * - `__hybrid_uint128_struct'  (from `<hybrid/int128.h>')
+	 * - `__hybrid_int128_t'        (from `<hybrid/int128.h>')
+	 * - `__hybrid_uint128_t'       (from `<hybrid/int128.h>') */
+	if (typ->ct_struct.ct_sizeof == 16) {
 		NCX char const *name;
 		name = ctype_struct_getname(typ);
 		if (name == NULL)
@@ -1693,9 +1690,10 @@ NOTHROW_CB_NCX(KCALL print_special_struct)(struct ctyperef const *__restrict sel
 			if (strcmp(name, "int128_struct") == 0 || strcmp(name, "int128_t") == 0)
 				return do_print_int128(printer, ptr, is_unsigned, flags, p_result);
 		}
-	}	break;
+	}
 
-	case sizeof(void *): {
+	/* Special handling to prevent duplicated information for "struct sig" */
+	if (typ->ct_struct.ct_sizeof == SIZEOF_SIG) {
 		NCX char const *name;
 		struct cmodule *mod = typ->ct_struct.ct_info.cd_mod;
 		if (cmodule_iskern(mod)) {
@@ -1708,16 +1706,12 @@ NOTHROW_CB_NCX(KCALL print_special_struct)(struct ctyperef const *__restrict sel
 					 * available by the obnote of "sig". Note that we only do this  when
 					 * the signal is being printed in a nested context (as the member of
 					 * some larger struct, or an  array element). When printing the  sig
-					 * directly, we don't do this special handling.
-					 */
+					 * directly, we don't do this special handling. */
 					*p_omit_struct_fields = true;
 					return DBX_ENOENT;
 				}
 			}
 		}
-	}	break;
-
-	default: break;
 	}
 
 	/* Support for other special struct-types would go here. */

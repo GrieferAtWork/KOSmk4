@@ -1384,7 +1384,7 @@ NOTHROW(FCALL device_getdevfsfilename)(struct device *__restrict self) {
 
 
 /* By-name lookup of devices in /dev/ */
-PUBLIC struct shared_rwlock devfs_byname_lock = SHARED_RWLOCK_INIT;
+PUBLIC DEFINE_SHARED_RWLOCK(devfs_byname_lock);
 PUBLIC struct lockop_slist devfs_byname_lops  = SLIST_HEAD_INITIALIZER(devfs_byname_lops);
 extern struct device _devfs_byname_tree__INIT[];
 PUBLIC RBTREE_ROOT(device) devfs_byname_tree = _devfs_byname_tree__INIT;

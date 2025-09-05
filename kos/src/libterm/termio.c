@@ -84,10 +84,10 @@ NOTHROW_NCX(CC libterminal_init)(struct terminal *__restrict self,
 	self->t_oprint      = oprinter;
 	self->t_raise       = raisefunc;
 	self->t_chk_sigttou = chk_sigttou;
-	ringbuffer_init_ex(&self->t_ibuf, _POSIX_MAX_INPUT * 4);
-	linebuffer_init_ex(&self->t_canon, _POSIX_MAX_CANON * 4);
-	linebuffer_init_ex(&self->t_opend, MAX_C(_POSIX_MAX_INPUT / 2, 64));
-	linebuffer_init_ex(&self->t_ipend, MAX_C(_POSIX_MAX_INPUT / 2, 64));
+	ringbuffer_init_named_ex(&self->t_ibuf, "<terminal>.t_ibuf", _POSIX_MAX_INPUT * 4);
+	linebuffer_init_named_ex(&self->t_canon, "<terminal>.t_canon", _POSIX_MAX_CANON * 4);
+	linebuffer_init_named_ex(&self->t_opend, "<terminal>.t_opend", MAX_C(_POSIX_MAX_INPUT / 2, 64));
+	linebuffer_init_named_ex(&self->t_ipend, "<terminal>.t_ipend", MAX_C(_POSIX_MAX_INPUT / 2, 64));
 	sched_signal_init(&self->t_ioschange);
 	/* Initialize the IOS to default values. */
 	cfmakesane(&self->t_ios);

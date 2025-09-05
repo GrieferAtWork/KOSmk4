@@ -340,7 +340,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	                        RPC_PRIORITY_F_HIGH);
 	rpc->pr_user.pur_refcnt = 1;
 	rpc->pr_user.pur_status = PENDING_USER_RPC_STATUS_PENDING;
-	sig_init(&rpc->pr_user.pur_stchng);
+	sig_init_named(&rpc->pr_user.pur_stchng, "<pending_rpc>.pr_user.pur_stchng");
 	rpc->pr_user.pur_mman = incref(THIS_MMAN);
 	rpc->pr_user.pur_prog = program;
 	rpc->pr_user.pur_argc = max_param_count;

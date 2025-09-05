@@ -75,7 +75,7 @@ pipe_create(size_t limit) THROWS(E_BADALLOC) {
 	result->p_refcnt = 1;
 	result->p_rdcnt  = 0;
 	result->p_wrcnt  = 0;
-	ringbuffer_init_ex(&result->p_buffer, limit);
+	ringbuffer_init_named_ex(&result->p_buffer, "<pipe>.p_buffer", limit);
 	return result;
 }
 

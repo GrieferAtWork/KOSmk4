@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18d149c7 */
+/* HASH CRC-32:0xdaf3f771 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,24 +53,43 @@ __SYSDECL_BEGIN
 
 #ifdef __KERNEL__
 #if __SIZEOF_INT__ < __SIZEOF_POINTER__
-#define SHARED_LOCK_INIT               { 0, {}, SIG_INIT }
-#define SHARED_LOCK_INIT_LOCKED        { 1, {}, SIG_INIT }
+#define SHARED_LOCK_INIT(self)                     { 0, {}, SIG_INIT(self.sl_sig) }
+#define SHARED_LOCK_INIT_LOCKED(self)              { 1, {}, SIG_INIT(self.sl_sig) }
+#define SHARED_LOCK_INIT_NAMED(self, name)         { 0, {}, SIG_INIT_NAMED(self, name ".sl_sig") }
+#define SHARED_LOCK_INIT_LOCKED_NAMED(self, name)  { 1, {}, SIG_INIT_NAMED(self, name ".sl_sig") }
 #else /* __SIZEOF_INT__ < __SIZEOF_POINTER__ */
-#define SHARED_LOCK_INIT               { 0, SIG_INIT }
-#define SHARED_LOCK_INIT_LOCKED        { 1, SIG_INIT }
+#define SHARED_LOCK_INIT(self)                     { 0, SIG_INIT(self.sl_sig) }
+#define SHARED_LOCK_INIT_LOCKED(self)              { 1, SIG_INIT(self.sl_sig) }
+#define SHARED_LOCK_INIT_NAMED(self, name)         { 0, SIG_INIT_NAMED(name ".sl_sig") }
+#define SHARED_LOCK_INIT_LOCKED_NAMED(self, name)  { 1, SIG_INIT_NAMED(name ".sl_sig") }
 #endif /* __SIZEOF_INT__ >= __SIZEOF_POINTER__ */
-#define shared_lock_init(self)         (void)(sig_init(&(self)->sl_sig), (self)->sl_lock = 0)
-#define shared_lock_init_locked(self)  (void)(sig_init(&(self)->sl_sig), (self)->sl_lock = 1)
-#define shared_lock_cinit(self)        (void)(sig_cinit(&(self)->sl_sig), __hybrid_assert((self)->sl_lock == 0))
-#define shared_lock_cinit_locked(self) (void)(sig_cinit(&(self)->sl_sig), (self)->sl_lock = 1)
+#define shared_lock_init(self)                     (void)(sig_init(&(self)->sl_sig), (self)->sl_lock = 0)
+#define shared_lock_init_locked(self)              (void)(sig_init(&(self)->sl_sig), (self)->sl_lock = 1)
+#define shared_lock_cinit(self)                    (void)(sig_cinit(&(self)->sl_sig), __hybrid_assert((self)->sl_lock == 0))
+#define shared_lock_cinit_locked(self)             (void)(sig_cinit(&(self)->sl_sig), (self)->sl_lock = 1)
+#define shared_lock_init_named(self, name)         (void)(sig_init_named(&(self)->sl_sig, name ".sl_sig"), (self)->sl_lock = 0)
+#define shared_lock_init_locked_named(self, name)  (void)(sig_init_named(&(self)->sl_sig, name ".sl_sig"), (self)->sl_lock = 1)
+#define shared_lock_cinit_named(self, name)        (void)(sig_cinit_named(&(self)->sl_sig, name ".sl_sig"), __hybrid_assert((self)->sl_lock == 0))
+#define shared_lock_cinit_locked_named(self, name) (void)(sig_cinit_named(&(self)->sl_sig, name ".sl_sig"), (self)->sl_lock = 1)
 #else /* __KERNEL__ */
-#define SHARED_LOCK_INIT               { 0 }
-#define SHARED_LOCK_INIT_LOCKED        { 1 }
-#define shared_lock_init(self)         (void)((self)->sl_lock = 0)
-#define shared_lock_init_locked(self)  (void)((self)->sl_lock = 1)
-#define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_lock == 0))
-#define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1)
+#define SHARED_LOCK_INIT(self)                     { 0 }
+#define SHARED_LOCK_INIT_LOCKED(self)              { 1 }
+#define SHARED_LOCK_INIT_NAMED(self, name)         SHARED_LOCK_INIT(self)
+#define SHARED_LOCK_INIT_LOCKED_NAMED(self, name)  SHARED_LOCK_INIT_LOCKED(self)
+#define shared_lock_init(self)                     (void)((self)->sl_lock = 0)
+#define shared_lock_init_locked(self)              (void)((self)->sl_lock = 1)
+#define shared_lock_cinit(self)                    (void)(__hybrid_assert((self)->sl_lock == 0))
+#define shared_lock_cinit_locked(self)             (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1)
+#define shared_lock_init_named(self, name)         shared_lock_init(self)
+#define shared_lock_init_locked_named(self, name)  shared_lock_init_locked(self)
+#define shared_lock_cinit_named(self, name)        shared_lock_cinit(self)
+#define shared_lock_cinit_locked_named(self, name) shared_lock_cinit_locked(self)
 #endif /* !__KERNEL__ */
+#define DEFINE_SHARED_LOCK(self)                    struct shared_lock self = SHARED_LOCK_INIT(self)
+#define DEFINE_SHARED_LOCK_LOCKED(self)             struct shared_lock self = SHARED_LOCK_INIT_LOCKED(self)
+#define DEFINE_SHARED_LOCK_NAMED(self, name)        struct shared_lock self = SHARED_LOCK_INIT_NAMED(self, name)
+#define DEFINE_SHARED_LOCK_LOCKED_NAMED(self, name) struct shared_lock self = SHARED_LOCK_INIT_LOCKED_NAMED(self, name)
+
 #define shared_lock_acquired(self)  (!__shared_lock_available(self))
 #define shared_lock_available(self) __shared_lock_available(self)
 #ifdef __KERNEL__

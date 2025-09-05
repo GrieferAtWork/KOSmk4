@@ -94,7 +94,7 @@ PUBLIC struct mfile mfile_dbgheap = {
 	MFILE_INIT_mf_ops(&mfile_dbgheap_ops),
 	MFILE_INIT_mf_lock,
 	MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-	MFILE_INIT_mf_initdone,
+	MFILE_INIT_mf_initdone(mfile_dbgheap),
 	MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 	MFILE_INIT_mf_meta,

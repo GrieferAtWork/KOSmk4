@@ -292,7 +292,7 @@ PUBLIC struct procctl boottask_procctl = {
 	.pc_thrds_list   = { &asyncwork_pid },
 	.pc_chlds_lock   = ATOMIC_RWLOCK_INIT,
 	.pc_chlds_list   = LIST_HEAD_INITIALIZER(boottask_procctl.pc_chlds_list),
-	.pc_chld_changed = SIG_INIT,
+	.pc_chld_changed = SIG_INIT(boottask_procctl.pc_chld_changed),
 	/* Even though it  doesn't ~really~  make sense, /bin/init  is set-up  to
 	 * behave as its own parent process. Because the parent field must always
 	 * be non-NULL, we have to fill in ~something~, and since /bin/init can't
@@ -302,7 +302,7 @@ PUBLIC struct procctl boottask_procctl = {
 	.pc_parent    = ARREF_INIT(&boottask),
 	.pc_sig_lock  = ATOMIC_RWLOCK_INIT,
 	.pc_sig_list  = SLIST_HEAD_INITIALIZER(boottask_procctl.pc_sig_list),
-	.pc_sig_more  = SIG_INIT,
+	.pc_sig_more  = SIG_INIT(boottask_procctl.pc_sig_more),
 	.pc_grp       = ARREF_INIT(&boottask_procgrp),
 	.pc_grpmember = { .le_next = NULL, .le_prev = &boottask_procgrp.pgr_memb_list.lh_first },
 	.pc_timers    = NULL,

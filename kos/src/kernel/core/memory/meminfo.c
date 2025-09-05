@@ -479,7 +479,7 @@ PUBLIC struct mpartmeta devvoid_dmapart_meta = {
 	.mpm_ftxlops  = SLIST_HEAD_INITIALIZER(devvoid_dmapart_meta.mpm_ftxlops),
 	.mpm_ftx      = NULL,
 	.mpm_dmalocks = 999,
-	.mpm_dma_done = SIG_INIT,
+	.mpm_dma_done = SIG_INIT(devvoid_dmapart_meta.mpm_dma_done),
 #ifdef ARCH_HAVE_RTM
 	.mpm_rtm_vers = 0,
 #endif /* ARCH_HAVE_RTM */

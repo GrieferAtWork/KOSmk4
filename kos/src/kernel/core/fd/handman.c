@@ -938,9 +938,9 @@ handman_fork(struct handman *__restrict self)
 	result->hm_refcnt = 1;
 	atomic_rwlock_init(&result->hm_lock);
 	SLIST_INIT(&result->hm_lops);
-	sig_init(&result->hm_changed);
-	sig_init(&result->hm_addhand);
-	sig_init(&result->hm_delhand);
+	sig_init_named(&result->hm_changed, "<handman>.hm_changed");
+	sig_init_named(&result->hm_addhand, "<handman>.hm_addhand");
+	sig_init_named(&result->hm_delhand, "<handman>.hm_delhand");
 	result->hm_maxhand = atomic_read(&self->hm_maxhand);
 	result->hm_maxfd   = atomic_read(&self->hm_maxfd);
 	return result;
@@ -998,9 +998,9 @@ handman_fork_and_closerange(struct handman *__restrict self,
 	result->hm_refcnt = 1;
 	atomic_rwlock_init(&result->hm_lock);
 	SLIST_INIT(&result->hm_lops);
-	sig_init(&result->hm_changed);
-	sig_init(&result->hm_addhand);
-	sig_init(&result->hm_delhand);
+	sig_init_named(&result->hm_changed, "<handman>.hm_changed");
+	sig_init_named(&result->hm_addhand, "<handman>.hm_addhand");
+	sig_init_named(&result->hm_delhand, "<handman>.hm_delhand");
 	result->hm_maxhand = atomic_read(&self->hm_maxhand);
 	result->hm_maxfd   = atomic_read(&self->hm_maxfd);
 	return result;
@@ -1085,9 +1085,9 @@ PUBLIC struct handman handman_kernel = {
 	.hm_lock    = ATOMIC_RWLOCK_INIT,
 	.hm_lops    = SLIST_HEAD_INITIALIZER(handman_kernel.hm_lops),
 	.hm_ranges  = NULL,
-	.hm_changed = SIG_INIT,
-	.hm_addhand = SIG_INIT,
-	.hm_delhand = SIG_INIT,
+	.hm_changed = SIG_INIT(handman_kernel.hm_changed),
+	.hm_addhand = SIG_INIT(handman_kernel.hm_addhand),
+	.hm_delhand = SIG_INIT(handman_kernel.hm_delhand),
 	.hm_handles = 0,
 	.hm_maxhand = (unsigned int)FD_MAX + 1,
 	.hm_maxfd   = (unsigned int)FD_MAX,

@@ -54,8 +54,13 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 /* Assert consistency of `__WANT_MFUTEX__mfu_lop' */
-static_assert(sizeof(struct sig) + sizeof(void *) == sizeof(Toblockop(mpart)));
-static_assert(sizeof(struct sig) + sizeof(void *) == sizeof(Tobpostlockop(mpart)));
+#if SIZEOF_SIG < (2 * __SIZEOF_POINTER__)
+#define MFUTEX_SIGNAL_PADAFTER __SIZEOF_POINTER__
+#else /* SIZEOF_SIG < (2 * __SIZEOF_POINTER__) */
+#define MFUTEX_SIGNAL_PADAFTER 0
+#endif /* SIZEOF_SIG >= (2 * __SIZEOF_POINTER__) */
+static_assert(sizeof(struct sig) + MFUTEX_SIGNAL_PADAFTER == sizeof(Toblockop(mpart)));
+static_assert(sizeof(struct sig) + MFUTEX_SIGNAL_PADAFTER == sizeof(Tobpostlockop(mpart)));
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mfutex_remove_from_mpart_postlop)(Tobpostlockop(mpart) *__restrict _lop,
@@ -568,7 +573,7 @@ PRIVATE struct mfutex void_futex = {
 	.mfu_part       = AWREF_INIT(&devvoid_dmapart),
 	.mfu_addr       = 0,
 	.mfu_mtaent     = {},
-	{ { SIG_INIT, NULL } }
+	{ SIG_INIT(void_futex.mfu_signal) }
 };
 
 /* Return the futex object that is associated with the given virtual memory address.

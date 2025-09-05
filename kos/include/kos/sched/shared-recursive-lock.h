@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c0f4c24 */
+/* HASH CRC-32:0x6a4f6ad6 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,17 +54,23 @@ __SYSDECL_BEGIN
  *       rationale, see  `<kos/sched/shared-recursive-rwlock.h>'.
  */
 
-#define SHARED_RECURSIVE_LOCK_INIT        { SHARED_LOCK_INIT, __SHARED_RECURSIVE_LOCK_BADTID, 0 }
-#define shared_recursive_lock_init(self)  (void)(shared_lock_init(&(self)->sr_lock), (self)->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID, (self)->sr_rcnt = 0)
+#define SHARED_RECURSIVE_LOCK_INIT(self)              { SHARED_LOCK_INIT(self.sr_lock), __SHARED_RECURSIVE_LOCK_BADTID, 0 }
+#define SHARED_RECURSIVE_LOCK_INIT_NAMED(self, name)  { SHARED_LOCK_INIT_NAMED(self.sr_lock, name ".sr_lock"), __SHARED_RECURSIVE_LOCK_BADTID, 0 }
+#define shared_recursive_lock_init(self)              (void)(shared_lock_init(&(self)->sr_lock), (self)->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID, (self)->sr_rcnt = 0)
+#define shared_recursive_lock_init_named(self, name)  (void)(shared_lock_init_named(&(self)->sr_lock, name ".sr_lock"), (self)->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID, (self)->sr_rcnt = 0)
 #ifdef __SHARED_RECURSIVE_LOCK_BADTID_ISZERO
-#define shared_recursive_lock_cinit(self) (shared_lock_cinit(&(self)->sr_lock), __hybrid_assert((self)->sr_owner == __SHARED_RECURSIVE_LOCK_BADTID), __hybrid_assert((self)->sr_rcnt == 0))
+#define shared_recursive_lock_cinit(self)             (shared_lock_cinit(&(self)->sr_lock), __hybrid_assert((self)->sr_owner == __SHARED_RECURSIVE_LOCK_BADTID), __hybrid_assert((self)->sr_rcnt == 0))
+#define shared_recursive_lock_cinit_named(self, name) (shared_lock_cinit_named(&(self)->sr_lock, name ".sr_lock"), __hybrid_assert((self)->sr_owner == __SHARED_RECURSIVE_LOCK_BADTID), __hybrid_assert((self)->sr_rcnt == 0))
 #else /* __SHARED_RECURSIVE_LOCK_BADTID_ISZERO */
-#define shared_recursive_lock_cinit(self) (shared_lock_cinit(&(self)->sr_lock), (self)->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID, __hybrid_assert((self)->sr_rcnt == 0))
+#define shared_recursive_lock_cinit(self)             (shared_lock_cinit(&(self)->sr_lock), (self)->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID, __hybrid_assert((self)->sr_rcnt == 0))
+#define shared_recursive_lock_cinit_named(self, name) (shared_lock_cinit_named(&(self)->sr_lock, name ".sr_lock"), (self)->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID, __hybrid_assert((self)->sr_rcnt == 0))
 #endif /* !__SHARED_RECURSIVE_LOCK_BADTID_ISZERO */
 #ifdef shared_lock_broadcast_for_fini
 #define shared_recursive_lock_broadcast_for_fini(self) \
 	shared_lock_broadcast_for_fini(&(self)->sr_lock)
 #endif /* shared_lock_broadcast_for_fini */
+#define DEFINE_SHARED_RECURSIVE_LOCK(self)             struct shared_recursive_lock self = SHARED_RECURSIVE_LOCK_INIT(self)
+#define DEFINE_SHARED_RECURSIVE_LOCK_NAMED(self, name) struct shared_recursive_lock self = SHARED_RECURSIVE_LOCK_INIT_NAMED(self, name)
 
 /* Check if locking is possible, or a lock is being held. */
 #define shared_recursive_lock_available(self) (shared_lock_available(&(self)->sr_lock) || __shared_recursive_lock_isown(self))

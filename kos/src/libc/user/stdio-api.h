@@ -139,18 +139,18 @@ struct iofile_data_novtab {
 	pos64_t                        io_fpos;   /* [lock(io_lock)] The current (assumed) position within the underlying file stream. */
 	mbstate_t                      io_mbs;    /* [lock(io_lock)] MB State used for translating unicode data. */
 };
-#define IOFILE_DATA_NOVTAB_INIT()                    \
-	{                                                \
-		.io_zero   = 0,                              \
-		.io_refcnt = 2,                              \
-		.io_lock   = SHARED_RECURSIVE_RWLOCK_INIT,   \
-		.io_chng   = NULL,                           \
-		.io_chsz   = 0,                              \
-		.io_lnch   = LIST_ENTRY_UNBOUND_INITIALIZER, \
-		.io_link   = LIST_ENTRY_UNBOUND_INITIALIZER, \
-		.io_fblk   = 0,                              \
-		.io_fpos   = 0,                              \
-		.io_mbs    = MBSTATE_INIT                    \
+#define IOFILE_DATA_NOVTAB_INIT(self)                            \
+	{                                                            \
+		.io_zero   = 0,                                          \
+		.io_refcnt = 2,                                          \
+		.io_lock   = SHARED_RECURSIVE_RWLOCK_INIT(self.io_lock), \
+		.io_chng   = NULL,                                       \
+		.io_chsz   = 0,                                          \
+		.io_lnch   = LIST_ENTRY_UNBOUND_INITIALIZER,             \
+		.io_link   = LIST_ENTRY_UNBOUND_INITIALIZER,             \
+		.io_fblk   = 0,                                          \
+		.io_fpos   = 0,                                          \
+		.io_mbs    = MBSTATE_INIT                                \
 	}
 
 /* Prototypes for the *actual* low-level callbacks that can be hooked for FILE I/O */

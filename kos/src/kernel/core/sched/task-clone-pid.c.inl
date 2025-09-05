@@ -199,11 +199,11 @@ use_boottask_as_parent:
 	LIST_INIT(&result_ctl->pc_thrds_list);
 	atomic_rwlock_init(&result_ctl->pc_chlds_lock);
 	LIST_INIT(&result_ctl->pc_chlds_list);
-	sig_init(&result_ctl->pc_chld_changed);
+	sig_init_named(&result_ctl->pc_chld_changed, "<procctl>.pc_chld_changed");
 	atomic_rwlock_init(&result_ctl->pc_sig_lock);
 	SLIST_INIT(&result_ctl->pc_sig_list);
 	result_ctl->pc_sig_pend = 0;
-	sig_init(&result_ctl->pc_sig_more);
+	sig_init_named(&result_ctl->pc_sig_more, "<procctl>.pc_sig_more");
 	_procctl_initcommon(result_ctl);
 
 	parent_pid = task_gettaskpid_of(parent_proc);
@@ -223,7 +223,7 @@ use_boottask_as_parent:
 	/* Fill in simple fields. */
 	result_pid->tp_refcnt = 2; /* +1: this_taskpid, +1: procctl_chlds_insert/procctl_thrds_insert */
 	awref_init(&result_pid->tp_thread, result);
-	sig_init(&result_pid->tp_changed);
+	sig_init_named(&result_pid->tp_changed, "<taskpid>.tp_changed");
 	result_pid->tp_status = 0;
 	result_pid->tp_SIGCLD = clone_flags & CSIGNAL;
 	if (result_pid->tp_SIGCLD == 0)

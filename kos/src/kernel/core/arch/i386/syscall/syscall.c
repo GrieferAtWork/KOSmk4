@@ -120,7 +120,11 @@ NOTHROW(FCALL __asm32_bad_sysenter_extension_impl)(struct icpustate *__restrict 
 
 #ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 INTERN ATTR_COLDBSS bool syscall_tracing_enabled = false;
-PRIVATE ATTR_COLDBSS struct shared_lock syscall_tracing_lock = SHARED_LOCK_INIT;
+#ifdef SIG_INIT_IS_ZERO
+PRIVATE ATTR_COLDBSS DEFINE_SHARED_LOCK(syscall_tracing_lock);
+#else /* SIG_INIT_IS_ZERO */
+PRIVATE ATTR_COLDDATA DEFINE_SHARED_LOCK(syscall_tracing_lock);
+#endif /* !SIG_INIT_IS_ZERO */
 
 #ifndef CONFIG_NO_SMP
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *

@@ -99,7 +99,7 @@ rising_edge_detector_waitfor(struct rising_edge_detector *__restrict self) {
 	}
 }
 
-PRIVATE struct sig mysig = SIG_INIT;
+PRIVATE DEFINE_SIG(mysig);
 PRIVATE REF struct rising_edge_detector *red;
 
 PRIVATE void demo(void) {

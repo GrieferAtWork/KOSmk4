@@ -37,14 +37,20 @@ struct semaphore {
 	uintptr_t  s_count; /* [lock(ATOMIC)] # of available tickets. */
 };
 
-#define SEMAPHORE_INIT(n) \
-	{ SIG_INIT, n }
-#define semaphore_init(x, n) \
-	(void)(sig_init(&(x)->s_avail), (x)->s_count = (n))
+#define SEMAPHORE_INIT(self, n)             { SIG_INIT(self.s_avail), n }
+#define SEMAPHORE_INIT_NAMED(self, name, n) { SIG_INIT_NAMED(self.s_avail, name ".s_avail"), n }
+#define semaphore_init(x, n)                (void)(sig_init(&(x)->s_avail), (x)->s_count = (n))
 #define semaphore_cinit(x, n)               \
 	(sig_cinit(&(x)->s_avail),              \
 	 (__builtin_constant_p(n) && (n) == 0)  \
 	 ? (__hybrid_assert((x)->s_count == 0)) \
+	 : (void)((x)->s_count = (n)))
+#define semaphore_init_named(x, name, n) \
+	(void)(sig_init_named(&(x)->s_avail), name ".s_avail", (x)->s_count = (n))
+#define semaphore_cinit_named(x, name, n)             \
+	(sig_cinit_named(&(x)->s_avail, name ".s_avail"), \
+	 (__builtin_constant_p(n) && (n) == 0)            \
+	 ? (__hybrid_assert((x)->s_count == 0))           \
 	 : (void)((x)->s_count = (n)))
 #define semaphore_count(x) \
 	__hybrid_atomic_load(&(x)->s_count, __ATOMIC_ACQUIRE)

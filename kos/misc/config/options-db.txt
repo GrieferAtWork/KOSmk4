@@ -161,6 +161,7 @@ kos/src/kernel/include/sched/epoll.h
 
 kos/src/kernel/include/sched/sig.h
 	CONFIG_TASK_STATIC_CONNECTIONS!:int=3
+	CONFIG_SIG_DEBUG_NAMES:bool=0
 	CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT:int=4
 
 kos/src/kernel/include/sched/sigcomp.h

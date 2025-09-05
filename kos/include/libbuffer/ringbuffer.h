@@ -96,10 +96,10 @@ struct ringbuffer {
 #define RINGBUFFER_FREE_THRESHOLD(limit) \
 	(((limit) >> 4) >= 32 ? ((limit) >> 4) : 32)
 
-#define RINGBUFFER_INIT_EX(limit) \
-	{ ATOMIC_RWLOCK_INIT, __NULLPTR, 0, 0, 0, 0, limit, SCHED_SIGNAL_INIT, SCHED_SIGNAL_INIT }
-#define RINGBUFFER_INIT \
-	RINGBUFFER_INIT_EX(RINGBUFFER_DEFAULT_LIMIT)
+#define RINGBUFFER_INIT_EX(self, limit) \
+	{ ATOMIC_RWLOCK_INIT, __NULLPTR, 0, 0, 0, 0, limit, SCHED_SIGNAL_INIT(self.rb_nempty), SCHED_SIGNAL_INIT(self.rb_nfull) }
+#define RINGBUFFER_INIT(self) \
+	RINGBUFFER_INIT_EX(self, RINGBUFFER_DEFAULT_LIMIT)
 
 /* Initialization / finalization */
 #define ringbuffer_init_ex(self, limit)                                           \
@@ -107,6 +107,12 @@ struct ringbuffer {
 	 (self)->rb_size = (self)->rb_rptr = (self)->rb_avail = (self)->rb_rdtot = 0, \
 	 (self)->rb_limit = (limit), sched_signal_init(&(self)->rb_nempty),           \
 	 sched_signal_init(&(self)->rb_nfull))
+#define ringbuffer_init_named_ex(self, name, limit)                               \
+	(atomic_rwlock_init(&(self)->rb_lock), (self)->rb_data = __NULLPTR,           \
+	 (self)->rb_size = (self)->rb_rptr = (self)->rb_avail = (self)->rb_rdtot = 0, \
+	 (self)->rb_limit = (limit),                                                  \
+	 sched_signal_init_named(&(self)->rb_nempty, name ".rb_nempty"),              \
+	 sched_signal_init_named(&(self)->rb_nfull, name ".rb_nfull"))
 #define ringbuffer_cinit_ex(self, limit)            \
 	(atomic_rwlock_cinit(&(self)->rb_lock),         \
 	 __hybrid_assert((self)->rb_data == __NULLPTR), \
@@ -117,8 +123,20 @@ struct ringbuffer {
 	 (self)->rb_limit = (limit),                    \
 	 sched_signal_cinit(&(self)->rb_nempty),        \
 	 sched_signal_cinit(&(self)->rb_nfull))
-#define ringbuffer_init(self)  ringbuffer_init_ex(self, RINGBUFFER_DEFAULT_LIMIT)
-#define ringbuffer_cinit(self) ringbuffer_cinit_ex(self, RINGBUFFER_DEFAULT_LIMIT)
+#define ringbuffer_cinit_named_ex(self, name, limit)                  \
+	(atomic_rwlock_cinit(&(self)->rb_lock),                           \
+	 __hybrid_assert((self)->rb_data == __NULLPTR),                   \
+	 __hybrid_assert((self)->rb_size == 0),                           \
+	 __hybrid_assert((self)->rb_rptr == 0),                           \
+	 __hybrid_assert((self)->rb_avail == 0),                          \
+	 __hybrid_assert((self)->rb_rdtot == 0),                          \
+	 (self)->rb_limit = (limit),                                      \
+	 sched_signal_cinit_named(&(self)->rb_nempty, name ".rb_nempty"), \
+	 sched_signal_cinit_named(&(self)->rb_nfull, name ".rb_nfull"))
+#define ringbuffer_init(self)              ringbuffer_init_ex(self, RINGBUFFER_DEFAULT_LIMIT)
+#define ringbuffer_cinit(self)             ringbuffer_cinit_ex(self, RINGBUFFER_DEFAULT_LIMIT)
+#define ringbuffer_init_named(self, name)  ringbuffer_init_named_ex(self, name, RINGBUFFER_DEFAULT_LIMIT)
+#define ringbuffer_cinit_named(self, name) ringbuffer_cinit_named_ex(self, name, RINGBUFFER_DEFAULT_LIMIT)
 
 #ifdef __KERNEL__
 #define ringbuffer_fini(self)                                                        \

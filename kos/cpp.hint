@@ -1395,6 +1395,38 @@
 
 
 
+// <kos/sched/shared-lock.h>
+#define DEFINE_SHARED_LOCK(x) struct shared_lock x={}
+#define DEFINE_SHARED_LOCK_LOCKED(x) struct shared_lock x={}
+#define DEFINE_SHARED_LOCK_NAMED(x,...) struct shared_lock x={}
+#define DEFINE_SHARED_LOCK_LOCKED_NAMED(x,...) struct shared_lock x={}
+
+
+
+// <kos/sched/shared-rwlock.h>
+#define DEFINE_SHARED_RWLOCK(x) struct shared_rwlock x={}
+#define DEFINE_SHARED_RWLOCK_READ(x) struct shared_rwlock x={}
+#define DEFINE_SHARED_RWLOCK_WRITE(x) struct shared_rwlock x={}
+#define DEFINE_SHARED_RWLOCK_NAMED(x,...) struct shared_rwlock x={}
+#define DEFINE_SHARED_RWLOCK_READ_NAMED(x,...) struct shared_rwlock x={}
+#define DEFINE_SHARED_RWLOCK_WRITE_NAMED(x,...) struct shared_rwlock x={}
+
+
+
+// <kos/sched/shared-recursive-rwlock.h>
+#define DEFINE_SHARED_RECURSIVE_RWLOCK(x) struct shared_recursive_rwlock x={}
+#define DEFINE_SHARED_RECURSIVE_RWLOCK_READ(x) struct shared_recursive_rwlock x={}
+#define DEFINE_SHARED_RECURSIVE_RWLOCK_NAMED(x,...) struct shared_recursive_rwlock x={}
+#define DEFINE_SHARED_RECURSIVE_RWLOCK_READ_NAMED(x,...) struct shared_recursive_rwlock x={}
+
+
+
+// <kos/sched/shared-recursive-lock.h>
+#define DEFINE_SHARED_RECURSIVE_LOCK(x) struct shared_recursive_lock x={}
+#define DEFINE_SHARED_RECURSIVE_LOCK_NAMED(x,...) struct shared_recursive_lock x={}
+
+
+
 // <bits/types.h>
 #define __FS_TYPE(x)       x##_t
 #define __FS_ALTTYPE(x)    x##_t
@@ -1928,6 +1960,9 @@
 #define PAGEDIR_P_ENDUSE(...)
 #define PAGEDIR_P_BEGINUSE_KEEP_PR(...)
 #define PAGEDIR_P_ENDUSE_KEEP_PR(...)
+
+#define DEFINE_SIG(x)           struct sig x={}
+#define DEFINE_SIG_NAMED(x,...) struct sig x={}
 
 #define IF_HAVE_PHYS_IDENTITY(...) __VA_ARGS__
 #define IF_PHYS_IDENTITY(a,b,...) do{__VA_ARGS__;}while(0)

@@ -32,6 +32,7 @@
 #define CC LIBBUFFER_CC
 
 #ifdef __KERNEL__
+#include <sched/sig.h>
 #define IF_KERNEL(...)                          __VA_ARGS__
 #define IF_NOT_KERNEL(...)                      /* nothing */
 #define KERNEL_SELECT(if_kernel, if_not_kernel) if_kernel

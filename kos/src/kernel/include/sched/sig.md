@@ -16,7 +16,7 @@ At a basic level, `struct sig` is a *thread/callback wait queue*, allowing threa
 ### Basic Example
 
 ```c
-PRIVATE struct sig mysig = SIG_INIT;
+PRIVATE DEFINE_SIG(mysig);
 
 PRIVATE void connect(void) {
 	task_connect(&mysig);
@@ -49,7 +49,7 @@ How to use `struct sig`, and what **interlocked** means:
 
 ```c
 [ 1] PRIVATE bool is_ready = false;
-[ 2] PRIVATE struct sig became_ready = SIG_INIT;
+[ 2] PRIVATE DEFINE_SIG(became_ready);
 [ 3]
 [ 4] PRIVATE void wait_until_ready(void) {
 [ 5] 	task_connect(&became_ready);

@@ -367,7 +367,7 @@ INTERN struct path deleted_path = {
 	.p_name    = &fdirent_empty,
 	.p_dir     = &fsuper_unmounted.fs_root,
 	.p_recent  = TAILQ_ENTRY_UNBOUND_INITIALIZER,
-	.p_cldlock = SHARED_RWLOCK_INIT,
+	.p_cldlock = SHARED_RWLOCK_INIT(deleted_path.p_cldlock),
 	.p_cldlops = SLIST_HEAD_INITIALIZER(deleted_path.p_cldlops),
 	{{ 0, 0, 0 }},
 	.p_cldlist = PATH_CLDLIST_DELETED,

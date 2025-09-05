@@ -464,7 +464,7 @@ epoll_controller_create(void) THROWS(E_BADALLOC) {
 	shared_lock_init(&result->ec_lock);
 	result->ec_raised  = NULL;
 	result->ec_pending = NULL;
-	sig_init(&result->ec_avail);
+	sig_init_named(&result->ec_avail, "<epoll_controller>.ec_avail");
 	result->ec_used = 0;
 	result->ec_size = 0;
 	result->ec_mask = CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK;
@@ -1927,7 +1927,8 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 	                                RPC_SYSRESTART_F_AUTO);
 	rpc->emr_rpc.pr_user.pur_refcnt = 1;
 	rpc->emr_rpc.pr_user.pur_status = PENDING_USER_RPC_STATUS_PENDING;
-	sig_init(&rpc->emr_rpc.pr_user.pur_stchng); /* Never used, but still needed... */
+	sig_init_named(&rpc->emr_rpc.pr_user.pur_stchng, /* Never used, but still needed... */
+	               "<epoll_monitor_rpc>.emr_rpc.pr_user.pur_stchng");
 	rpc->emr_rpc.pr_user.pur_mman = incref(THIS_MMAN);
 	rpc->emr_rpc.pr_user.pur_prog = program;
 	rpc->emr_rpc.pr_user.pur_argc = max_param_count;

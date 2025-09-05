@@ -87,8 +87,20 @@ handle_dead_connection:
 		/* Signal  was already sent -> possibly forward, but
 		 * no need to remove (because that was already done) */
 		if (stat == SIGCON_STAT_ST_THRSENT && (flags & __SIG_REMCON_F_FORWARD)) {
-			if (!LOCAL_sig_send(self->sc_sig))
-				printk(KERN_WARNING "[sig] Signal %p cannot be forwarded (no recipients)\n", from);
+			struct sig *target = self->sc_sig;
+			if (!LOCAL_sig_send(target)) {
+#ifdef CONFIG_SIG_DEBUG_NAMES
+				char const *name = sig_getname(target);
+				if (name && ADDR_ISKERN(name) && pagedir_ismapped(name)) {
+					printk(KERN_WARNING "[sig] Signal %q@%p cannot be forwarded (no recipients)\n",
+					       name, target);
+				} else
+#endif /* CONFIG_SIG_DEBUG_NAMES */
+				{
+					printk(KERN_WARNING "[sig] Signal %p cannot be forwarded (no recipients)\n",
+					       target);
+				}
+			}
 		}
 		DBG_memset(&self->sc_sig, 0xcc, sizeof(self->sc_sig));
 		return;

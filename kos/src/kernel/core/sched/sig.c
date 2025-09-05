@@ -700,6 +700,8 @@ DECL_BEGIN
 
 
 /* Assert offsets */
+static_assert(sizeof(struct sig) == SIZEOF_SIG);
+static_assert(alignof(struct sig) == ALIGNOF_SIG);
 static_assert(offsetof(struct sigcon, sc_sig) == OFFSET_SIGCON_SIG);
 static_assert(offsetof(struct sigcon, sc_prev) == OFFSET_SIGCON_PREV);
 static_assert(offsetof(struct sigcon, sc_next) == OFFSET_SIGCON_NEXT);
@@ -762,8 +764,9 @@ INTERN NOBLOCK ATTR_RETNONNULL struct task *
 NOTHROW(KCALL x86_repair_broken_tls_state)(void);
 #endif /* __x86_64__ || __i386__ */
 
-/* Push/pop the active  set of  connections:
- * >> struct sig a = SIG_INIT, b = SIG_INIT;
+/* Push/pop the active set of connections:
+ * >> DEFINE_SIG(a);
+ * >> DEFINE_SIG(b);
  * >> struct taskcons cons;
  * >> task_connect(&a);
  * >> assert(task_isconnectedto(&a));
@@ -1685,7 +1688,7 @@ DECL_BEGIN
 
 DEFINE_TEST(recursive_signals) {
 	struct taskcons cons;
-	struct sig s = SIG_INIT;
+	DEFINE_SIG_NAMED(s, "kernel.selftest:recursive_signals:s");
 	task_disconnectall();
 	task_connect(&s);
 	task_pushcons(&cons);
@@ -1715,7 +1718,7 @@ DEFINE_TEST(recursive_signals) {
 }
 
 DEFINE_TEST(broadcast_after_send) {
-	struct sig s = SIG_INIT;
+	DEFINE_SIG_NAMED(s, "kernel.selftest:broadcast_after_send:s");
 	task_connect(&s);
 	assert(sig_send(&s));
 	assert(sig_broadcast(&s) == 0);
@@ -1723,7 +1726,8 @@ DEFINE_TEST(broadcast_after_send) {
 }
 
 DEFINE_TEST(pushpop_connections) {
-	struct sig a = SIG_INIT, b = SIG_INIT;
+	DEFINE_SIG_NAMED(a, "kernel.selftest:pushpop_connections:a");
+	DEFINE_SIG_NAMED(b, "kernel.selftest:pushpop_connections:b");
 	struct taskcons cons;
 	assert(!sig_hascon(&a) && sig_numcon(&a) == 0);
 	assert(!sig_hascon(&b) && sig_numcon(&b) == 0);
@@ -1939,7 +1943,7 @@ run_signal_test(rst_opcode_t const *test, int line, unsigned int flags) {
 #define _L_sig_xbroadcast(x)                sig_xbroadcast(x, (flags & RST_F_NOPR) ? SIG_XSEND_F_NOPR : SIG_XSEND_F_NORMAL, NULL, THIS_TASK, NULL, NULL, NULL)
 #define L_sig_broadcast(x)                  ((flags & RST_F_XSEND) ? _L_sig_xbroadcast(x) : _L_sig_broadcast(x))
 	rst_opcode_t opcode;
-	struct sig s = SIG_INIT;
+	DEFINE_SIG_NAMED(s, "kernel.selftest:run_signal_test:s");
 	struct sigcompcon comps[RST_N];
 	struct taskcons *cons = THIS_CONS;
 	{

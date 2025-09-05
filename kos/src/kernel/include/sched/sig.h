@@ -37,15 +37,33 @@
 #endif /* !CONFIG_TASK_STATIC_CONNECTIONS */
 /*[[[end]]]*/
 
+/*[[[config CONFIG_SIG_DEBUG_NAMES: bool = 0
+ * Allow `struct sig' to carry a user-defined name
+ * ]]]*/
+#ifdef CONFIG_NO_SIG_DEBUG_NAMES
+#undef CONFIG_SIG_DEBUG_NAMES
+#elif !defined(CONFIG_SIG_DEBUG_NAMES)
+#if 0
+#define CONFIG_SIG_DEBUG_NAMES
+#else /* 0 */
+#define CONFIG_NO_SIG_DEBUG_NAMES
+#endif /* 1 */
+#elif (-CONFIG_SIG_DEBUG_NAMES - 1) == -1
+#undef CONFIG_SIG_DEBUG_NAMES
+#define CONFIG_NO_SIG_DEBUG_NAMES
+#endif /* ... */
+/*[[[end]]]*/
 
-
-/* Use a new `struct sig` implementation as per ./sig.md */
-#undef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-#if 1
-#define CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-#endif
 
 DECL_BEGIN
+
+/* `struct sig' offsets */
+#ifdef CONFIG_SIG_DEBUG_NAMES
+#define SIZEOF_SIG (__SIZEOF_POINTER__ * 2)
+#else /* CONFIG_SIG_DEBUG_NAMES */
+#define SIZEOF_SIG __SIZEOF_POINTER__
+#endif /* !CONFIG_SIG_DEBUG_NAMES */
+#define ALIGNOF_SIG __ALIGNOF_POINTER__
 
 /* `struct sigcon' offsets */
 #define OFFSET_SIGCON_SIG  0
@@ -157,14 +175,41 @@ struct sig {
 	                       * NOTE: `SIG_SMPLOCK' is NEVER set when there are no connections.
 	                       *       iow: `(uintptr_t)s_con  ==  SIG_SMPLOCK`  is  invalid,  and
 	                       *       `SIG_SMPLOCK` must *ALWAYS* be or'd with a non-NULL sigcon. */
+#ifdef CONFIG_SIG_DEBUG_NAMES
+	char const *s_name; /* [0..1][const] Signal name (for debugging) */
+#endif /* CONFIG_SIG_DEBUG_NAMES */
 };
 
-#define SIG_INIT_EX(c) { c }
-#define SIG_INIT       { __NULLPTR }
-#define sig_init(x)    (void)((x)->s_con = __NULLPTR)
-#define sig_cinit(x)   __hybrid_assert((x)->s_con == __NULLPTR)
-#define sig_isempty(x) (__hybrid_atomic_load(&(x)->s_con, __ATOMIC_ACQUIRE) == __NULLPTR)
 
+#ifdef CONFIG_SIG_DEBUG_NAMES
+#undef SIG_INIT_IS_ZERO
+#define SIG_INIT(self)                   { __NULLPTR, #self }
+#define SIG_INIT_EX(self, c)             { c, #self }
+#define SIG_INIT_NAMED(self, name)       { __NULLPTR, name }
+#define SIG_INIT_EX_NAMED(self, c, name) { c, name }
+#define sig_init(x)                      (void)((x)->s_con = __NULLPTR)
+#define sig_cinit(x)                     (__hybrid_assert((x)->s_con == __NULLPTR), __hybrid_assert((x)->s_name == __NULLPTR))
+#define sig_init_named(x, name)          (void)((x)->s_con = __NULLPTR, (x)->s_name = (name))
+#define sig_cinit_named(x, name)         (void)(__hybrid_assert((x)->s_con == __NULLPTR), (x)->s_name = (name))
+#define sig_setname(x, name)             __hybrid_atomic_store(&(x)->s_name, name, __ATOMIC_RELEASE)
+#define sig_getname(x)                   __hybrid_atomic_load(&(x)->s_name, __ATOMIC_ACQUIRE)
+#else /* CONFIG_SIG_DEBUG_NAMES */
+#define SIG_INIT_IS_ZERO
+#define SIG_INIT(self)                   { __NULLPTR }
+#define SIG_INIT_EX(self, c)             { c }
+#define SIG_INIT_NAMED(self, name)       { __NULLPTR }
+#define SIG_INIT_EX_NAMED(self, c, name) { c }
+#define sig_init(x)                      (void)((x)->s_con = __NULLPTR)
+#define sig_cinit(x)                     __hybrid_assert((x)->s_con == __NULLPTR)
+#define sig_init_named(x, name)          (void)((x)->s_con = __NULLPTR)
+#define sig_cinit_named(x, name)         __hybrid_assert((x)->s_con == __NULLPTR)
+#define sig_setname(x, name)             (void)0
+#define sig_getname(x)                   ((char const *)__NULLPTR)
+#endif /* !CONFIG_SIG_DEBUG_NAMES */
+#define DEFINE_SIG(self)             struct sig self = SIG_INIT(self)
+#define DEFINE_SIG_NAMED(self, name) struct sig self = SIG_INIT_NAMED(self, name)
+
+#define sig_isempty(x) (__hybrid_atomic_load(&(x)->s_con, __ATOMIC_ACQUIRE) == __NULLPTR)
 
 #ifdef __OPTIMIZE_SIZE__
 #define _sig_deliver_unlikely(self, expr) expr
@@ -590,8 +635,9 @@ DATDEF ATTR_PERTASK struct taskcons *this_cons;
 #define THIS_CONS PERTASK_GET(this_cons)
 
 
-/* Push/pop the active  set of  connections:
- * >> struct sig a = SIG_INIT, b = SIG_INIT;
+/* Push/pop the active set of connections:
+ * >> DEFINE_SIG(a);
+ * >> DEFINE_SIG(b);
  * >> struct taskcons cons;
  * >> task_connect(&a);
  * >> assert(task_isconnected(&a));

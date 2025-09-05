@@ -833,7 +833,7 @@ UnixSocket_Connect(struct socket *__restrict self,
 			                                           GFP_NORMAL);
 			client->uc_refcnt = 2; /* +1: unix_server_append_acceptme(), +1: con->aw_client */
 			client->uc_status = UNIX_CLIENT_STATUS_PENDING;
-			sig_init(&client->uc_status_sig);
+			sig_init_named(&client->uc_status_sig, "<unix_client>.uc_status_sig");
 
 			/* Remember credentials of the process that originally did the connect(). */
 			client->uc_cred.pid = task_getpid(); /* XXX: What about PID namespaces? */
@@ -848,8 +848,10 @@ UnixSocket_Connect(struct socket *__restrict self,
 			 * established unix socket  connection are MAX(client,  server), which  we
 			 * implement by allowing the server to increase the limit before accepting
 			 * our connection. */
-			pb_buffer_init_ex(&client->uc_fromclient, atomic_read(&me->us_sndbufsiz));
-			pb_buffer_init_ex(&client->uc_fromserver, atomic_read(&me->us_rcvbufsiz));
+			pb_buffer_init_named_ex(&client->uc_fromclient, "<unix_client>.uc_fromclient",
+			                        atomic_read(&me->us_sndbufsiz));
+			pb_buffer_init_named_ex(&client->uc_fromserver, "<unix_client>.uc_fromserver",
+			                        atomic_read(&me->us_rcvbufsiz));
 
 			TRY {
 				/* Construct an async worker for informing the server of our

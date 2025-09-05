@@ -151,7 +151,7 @@ cpu_private_function_callbuf_ex(struct task *__restrict thread,
 		memcpy(rt->cpf_data, stack_buf, bufsize);
 		rt->cpf_refcnt = 2;
 		rt->cpf_finish = 0;
-		sig_init(&rt->cpf_done);
+		sig_init_named(&rt->cpf_done, "<cpf_rtdata>.cpf_done");
 		args[CPF_IPI_RTDATA] = rt;
 		args[CPF_IPI_FUNC]   = (void *)func;
 		args[CPF_IPI_THREAD] = thread;

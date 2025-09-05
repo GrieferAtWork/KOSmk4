@@ -137,7 +137,7 @@ PRIVATE struct REF async_slist async_ready = LIST_HEAD_INITIALIZER(async_ready);
 #endif /* !async_stat__trace_IS_NOOP */
 
 /* Signal send whenever a new job is added to `async_ready' */
-PRIVATE struct sig async_ready_sig = SIG_INIT;
+PRIVATE DEFINE_SIG(async_ready_sig);
 
 /* Lock that must be held when removing threads from `async_ready' */
 PRIVATE struct atomic_lock async_ready_poplock = ATOMIC_LOCK_INIT;

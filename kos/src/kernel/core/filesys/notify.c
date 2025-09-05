@@ -304,7 +304,7 @@ notifyfd_new(unsigned int num_events) THROWS(E_BADALLOC) {
 	result->_nf_blist.sle_next = NULL;
 	result->nf_listenv         = NULL;
 	result->nf_listenc         = 0;
-	sig_init(&result->nf_avail);
+	sig_init_named(&result->nf_avail, "<notifyfd>.nf_avail");
 	result->nf_eventr = 0;
 	result->nf_eventc = 0;
 	result->nf_eventa = num_events + 1;

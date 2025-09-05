@@ -47,7 +47,7 @@ DECL_BEGIN
 
 /* Signal  that  gets  broadcast  with  whenever  the
  * connection back-end data buffer becomes non-empty. */
-INTERN struct sig GDBServer_RemoteDataAvailable = SIG_INIT;
+INTERN DEFINE_SIG(GDBServer_RemoteDataAvailable);
 
 
 typedef union {

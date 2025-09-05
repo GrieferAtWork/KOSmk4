@@ -2496,7 +2496,7 @@ send_rpc_to_main_thread:
 			RETHROW();
 		}
 		memcpy(&data->er_args, &args, sizeof(struct execargs));
-		sig_init(&data->er_error);
+		sig_init_named(&data->er_error, "<kernel_exec_rpc_data>.er_error");
 		data->er_refcnt = 2;
 		assert(!task_isconnected());
 		task_connect(&data->er_error);

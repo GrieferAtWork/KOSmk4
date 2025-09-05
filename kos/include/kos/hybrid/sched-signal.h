@@ -42,19 +42,23 @@ __DECL_BEGIN
 
 #ifdef __KERNEL__
 typedef struct sig sched_signal_t;
-#define SCHED_SIGNAL_INIT SIG_INIT
+#define SCHED_SIGNAL_INIT(self)             SIG_INIT(self)
+#define SCHED_SIGNAL_INIT_NAMED(self, name) SIG_INIT_NAMED(self, name)
 #else /* __KERNEL__ */
 typedef lfutex_t sched_signal_t;
-#define SCHED_SIGNAL_INIT 0
+#define SCHED_SIGNAL_INIT(self)             0
+#define SCHED_SIGNAL_INIT_NAMED(self, name) 0
 #endif /* !__KERNEL__ */
 
 #ifdef __INTELLISENSE__
 
 /* Initialize a given signal */
 void sched_signal_init(sched_signal_t *__self);
+void sched_signal_init_named(sched_signal_t *__self, char const *__name);
 
 /* Initialize an already zero-initialized signal */
 void sched_signal_cinit(sched_signal_t *__self);
+void sched_signal_cinit_named(sched_signal_t *__self, char const *__name);
 
 /* Broadcast a signal, waking all threads waiting on it. */
 __SIZE_TYPE__ sched_signal_broadcast(sched_signal_t *__self);
@@ -74,6 +78,8 @@ __SIZE_TYPE__ sched_signal_sendmany(sched_signal_t *__self, __SIZE_TYPE__ __max_
 
 #define sched_signal_init               sig_init
 #define sched_signal_cinit              sig_cinit
+#define sched_signal_init_named         sig_init_named
+#define sched_signal_cinit_named        sig_cinit_named
 #define sched_signal_broadcast          sig_broadcast
 #define sched_signal_broadcast_for_fini sig_broadcast_for_fini
 #define sched_signal_send               sig_send
@@ -85,6 +91,8 @@ __SIZE_TYPE__ sched_signal_sendmany(sched_signal_t *__self, __SIZE_TYPE__ __max_
 
 #define sched_signal_init(self)  (*(self) = 0)
 #define sched_signal_cinit(self) (__hybrid_assert(*(self) == 0))
+#define sched_signal_init_named(self, name)  sched_signal_init(self)
+#define sched_signal_cinit_named(self, name) sched_signal_cinit(self)
 
 #ifdef __CRT_HAVE_futexlock_wakeall
 #define sched_signal_broadcast          futexlock_wakeall

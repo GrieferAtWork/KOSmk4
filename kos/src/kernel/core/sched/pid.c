@@ -353,7 +353,7 @@ for (local x: nodes) {
 	print("	.tp_refcnt = 2, /" "* +1: ", x.val, "_pid, +1: FORTASK(", x.val, ", this_taskpid) *" "/");
 	print("	{{");
 	print("		.tp_thread  = AWREF_INIT(&", x.val == "thiscpu_idle" ? "bootidle" : x.val, "),");
-	print("		.tp_changed = SIG_INIT,");
+	print("		.tp_changed = SIG_INIT(", x.val, "_pid.tp_changed),");
 	print("		.tp_status  = 0,");
 	print("		.tp_SIGCLD  = SIGCLD,");
 	print("		._tp_pad    = {}");
@@ -383,7 +383,7 @@ INTERN struct taskpid boottask_pid = {
 	.tp_refcnt = 2, /* +1: boottask_pid, +1: FORTASK(boottask, this_taskpid) */
 	{{
 		.tp_thread  = AWREF_INIT(&boottask),
-		.tp_changed = SIG_INIT,
+		.tp_changed = SIG_INIT(boottask_pid.tp_changed),
 		.tp_status  = 0,
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
@@ -403,7 +403,7 @@ INTERN ATTR_PERCPU struct taskpid thiscpu_idle_pid = {
 	.tp_refcnt = 2, /* +1: thiscpu_idle_pid, +1: FORTASK(thiscpu_idle, this_taskpid) */
 	{{
 		.tp_thread  = AWREF_INIT(&bootidle),
-		.tp_changed = SIG_INIT,
+		.tp_changed = SIG_INIT(thiscpu_idle_pid.tp_changed),
 		.tp_status  = 0,
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
@@ -423,7 +423,7 @@ INTERN struct taskpid asyncwork_pid = {
 	.tp_refcnt = 2, /* +1: asyncwork_pid, +1: FORTASK(asyncwork, this_taskpid) */
 	{{
 		.tp_thread  = AWREF_INIT(&asyncwork),
-		.tp_changed = SIG_INIT,
+		.tp_changed = SIG_INIT(asyncwork_pid.tp_changed),
 		.tp_status  = 0,
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
@@ -457,8 +457,8 @@ PUBLIC struct pidns pidns_root = {
 	.pn_tree    = STATIC_TASKPID_TREE_ROOT,
 	.pn_tree_pg = &boottask_procgrp, /* First and initial process group */
 	.pn_npid    = 4, /* 1-3 are already in use */
-	.pn_addproc = SIG_INIT,
-	.pn_delproc = SIG_INIT,
+	.pn_addproc = SIG_INIT(pidns_root.pn_addproc),
+	.pn_delproc = SIG_INIT(pidns_root.pn_delproc),
 };
 
 
@@ -492,8 +492,8 @@ pidns_new(struct pidns *__restrict parent) THROWS(E_BADALLOC) {
 	result->pn_size = 0;
 	result->pn_tree = NULL;
 	result->pn_npid = PIDNS_FIRST_NONRESERVED_PID;
-	sig_init(&result->pn_addproc);
-	sig_init(&result->pn_delproc);
+	sig_init_named(&result->pn_addproc, "<pidns>.pn_addproc");
+	sig_init_named(&result->pn_delproc, "<pidns>.pn_delproc");
 	return result;
 }
 

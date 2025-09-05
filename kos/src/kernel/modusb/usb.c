@@ -149,7 +149,7 @@ NOTHROW(KCALL usb_unknowns_appendall)(/*inherit*/ REF struct usb_unknown_interfa
  *        and even then, recursion mustn't be allowed, with recursive
  *        calls simply ending up as no-ops. */
 PRIVATE WEAK struct task *usb_probe_unknown_lock = NULL;
-PRIVATE struct sig usb_probe_unknown_unlock = SIG_INIT;
+PRIVATE DEFINE_SIG(usb_probe_unknown_unlock);
 
 PRIVATE bool KCALL usb_probe_unknown_acquire(void) {
 	struct task *ot, *me;

@@ -52,7 +52,7 @@
 DECL_BEGIN
 
 /* Signal broadcast when a stop event is added to `GDBThread_Stopped' */
-PRIVATE struct sig GDBThread_StoppedAdded = SIG_INIT;
+PRIVATE DEFINE_SIG(GDBThread_StoppedAdded);
 
 struct gdb_thread_stop_event_with_reason {
 	GDBThreadStopEvent      e;
@@ -513,7 +513,7 @@ NOTHROW(PRPC_EXEC_CALLBACK_CC GDBThread_StopWithAsyncNotificationRPC)(struct rpc
 }
 
 
-PRIVATE struct sig GDBThread_StopWithAsyncNotificationIPI_Done = SIG_INIT;
+PRIVATE DEFINE_SIG(GDBThread_StopWithAsyncNotificationIPI_Done);
 
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL GDBThread_StopWithAsyncNotificationIPI)(struct icpustate *__restrict state,
