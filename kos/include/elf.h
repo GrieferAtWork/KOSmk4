@@ -1945,6 +1945,9 @@ typedef struct elf64_auxv_t /*[NAME(elf64_auxv)][PREFIX(a_)]*/ {
 /* Everything from here on seems to be non-portable (linux- (and KOS) specific?) */
 #define AT_PLATFORM          15         /* String identifying platform. */
 #define AT_HWCAP             16         /* Machine dependent hints about processor capabilities. */
+#define   HWCAP_X86_SSE2     0x0001    /* [i386] */
+#define   HWCAP_X86_64       0x0002    /* [x86_64] */
+#define   HWCAP_X86_AVX512_1 0x0004    /* [x86_64] */
 #define AT_CLKTCK            17         /* Frequency of times() */
 #define AT_FPUCW             18         /* Used FPU control word.
                                          * This entry gives some information about the
@@ -1959,10 +1962,10 @@ typedef struct elf64_auxv_t /*[NAME(elf64_auxv)][PREFIX(a_)]*/ {
 #define AT_BASE_PLATFORM     24         /* String identifying real platforms. */
 #define AT_RANDOM            25         /* Address of 16 random bytes. */
 #define AT_HWCAP2            26         /* More machine-dependent hints about processor capabilities. */
-/*efine AT_                  27          * ... */
-/*efine AT_                  28          * ... */
-/*efine AT_                  29          * ... */
-/*efine AT_                  30          * ... */
+#define AT_RSEQ_FEATURE_SIZE 27         /* rseq supported feature size.  */
+#define AT_RSEQ_ALIGN        28         /* rseq allocation alignment.  */
+#define AT_HWCAP3            29         /* extension of AT_HWCAP.  */
+#define AT_HWCAP4            30         /* extension of AT_HWCAP.  */
 #define AT_EXECFN            31         /* Filename of executable (absolute & normalized; s.a. `dlmodulename()') */
 #define AT_SYSINFO           32         /* Pointer to the global system page used for system calls and other nice things. */
 #define AT_SYSINFO_EHDR      33         /* *ditto* */

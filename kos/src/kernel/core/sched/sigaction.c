@@ -438,6 +438,7 @@ NOTHROW(FCALL sighand_has_nondefault_sig_ign)(struct sighand const *__restrict s
 
 /* During exec(), all signal handler dispositions of the calling thread are reset */
 DEFINE_PERMMAN_ONEXEC(onexec_posix_signals_reset_action);
+INTDEF void KCALL onexec_posix_signals_reset_action(void);
 INTERN void KCALL onexec_posix_signals_reset_action(void) {
 	REF struct sighand_ptr *handptr;
 	/* Posix says that signals set to SIG_IGN should remain SIG_IGN after exec(). */

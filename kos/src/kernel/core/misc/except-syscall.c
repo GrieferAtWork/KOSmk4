@@ -85,9 +85,9 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct user_except_handler) this_user_except_hand
  * TID. */
 PUBLIC ATTR_PERTASK ATTR_ALIGN(NCX pid_t *) this_tid_address = NULL;
 
-DEFINE_PERMMAN_ONEXEC(reset_user_except_handler);
-PRIVATE ATTR_USED NOBLOCK void
-NOTHROW(KCALL reset_user_except_handler)(void) {
+DEFINE_PERMMAN_ONEXEC(onexec_reset_user_except_handler);
+INTDEF NOBLOCK void NOTHROW(KCALL onexec_reset_user_except_handler)(void);
+INTERN NOBLOCK void NOTHROW(KCALL onexec_reset_user_except_handler)(void) {
 	struct user_except_handler *hand;
 	hand            = &PERTASK(this_user_except_handler);
 	hand->ueh_mode  = EXCEPT_HANDLER_MODE_DISABLED;

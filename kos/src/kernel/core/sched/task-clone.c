@@ -949,20 +949,20 @@ task_clone_kthread(int (*thread_main)(), size_t argc, ...)
 
 
 /* Per-task relocations */
-INTDEF uintptr_t __kernel_pertask_relocations_start[];
-INTDEF uintptr_t __kernel_pertask_relocations_end[];
+extern uintptr_t __kernel_pertask_relocations_start[];
+extern uintptr_t __kernel_pertask_relocations_end[];
 
 /* Initialize task relocations, as defined by `DEFINE_PERTASK_RELOCATION()' */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _task_init_relocations)(struct task *__restrict self) {
 	uintptr_t *p_offset;
 	/* Apply relocations */
-	for (p_offset = __kernel_pertask_relocations_start;
-	     p_offset < __kernel_pertask_relocations_end; ++p_offset) {
+	p_offset = __kernel_pertask_relocations_start;
+	do {
 		uintptr_t *reladdr;
 		reladdr = (uintptr_t *)((byte_t *)self + *p_offset);
 		*reladdr += (uintptr_t)self;
-	}
+	} while (++p_offset < __kernel_pertask_relocations_end);
 
 	/* Assert that relocations were applied correctly. */
 	assert(self->t_self == self);

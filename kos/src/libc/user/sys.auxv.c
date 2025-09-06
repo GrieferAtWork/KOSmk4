@@ -50,6 +50,14 @@
 #include <string.h> /* preadall */
 #endif /* __i386__ && !__x86_64__ */
 
+#if defined(__x86_64__) || defined(__i386__)
+#include <asm/intrin-cpuid.h>
+#endif /* ... */
+
+#if __has_include(<fpu_control.h>)
+#include <fpu_control.h>
+#endif /* __has_include(<fpu_control.h>) */
+
 DECL_BEGIN
 
 PRIVATE ATTR_SECTION(".rodata.crt.system.getauxval") char const
@@ -134,10 +142,6 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 {
 	ulongptr_t result;
 	switch (type) {
-
-	case AT_IGNORE:
-		result = 0;
-		break;
 
 	case AT_EXECFD:
 		result = dlmodulefd(dlopen(NULL, 0));
@@ -271,9 +275,67 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 	case AT_MINSIGSTKSZ:
 		return SIGSTKSZ;
 
+#ifdef __x86_64__
+	case AT_HWCAP: {
+		/* This logic here matches what is done by GLibc */
+		uint32_t eax, ebx, ecx, edx;
+		result = HWCAP_X86_64;
+		__cpuid(0, &eax, &ecx, &edx, &ebx);
+		if (ebx == 0x756e6547 && ecx == 0x6c65746e && edx == 0x49656e69 && eax >= 7) {
+			uint32_t b7 = __cpuid_ebx(0x7);
+			if ((b7 & (CPUID_7B_AVX512CD | CPUID_7B_AVX512ER | CPUID_7B_AVX512BW |
+			           CPUID_7B_AVX512DQ | CPUID_7B_AVX512VL)) ==
+			    /* */ (CPUID_7B_AVX512CD | CPUID_7B_AVX512BW | CPUID_7B_AVX512DQ | CPUID_7B_AVX512VL))
+				result |= HWCAP_X86_AVX512_1;
+		}
+	}	break;
+#elif defined(__i386__)
+	case AT_HWCAP: {
+		/* This logic here matches what is done by GLibc */
+		uint32_t eax, ebx, ecx, edx;
+		result = 0;
+		__cpuid(0, &eax, &ecx, &edx, &ebx);
+		if (eax >= 1) {
+			if (__cpuid_edx(0x1) & CPUID_1D_SSE2)
+				result |= HWCAP_X86_SSE2;
+		}
+	}	break;
+#endif /* ... */
+
+#ifdef _FPU_DEFAULT
+	case AT_FPUCW:
+		result = _FPU_DEFAULT;
+		break;
+#endif /* _FPU_DEFAULT */
+
+//TODO:#define AT_DCACHEBSIZE       19         /* Cache block sizes. Data cache block size. */
+//TODO:#define AT_ICACHEBSIZE       20         /* Instruction cache block size. */
+//TODO:#define AT_UCACHEBSIZE       21         /* Unified cache block size. */
+//TODO:#define AT_HWCAP2            26         /* More machine-dependent hints about processor capabilities. */
+//TODO:#define AT_RSEQ_FEATURE_SIZE 27         /* rseq supported feature size.  */
+//TODO:#define AT_RSEQ_ALIGN        28         /* rseq allocation alignment.  */
+//TODO:#define AT_HWCAP3            29         /* extension of AT_HWCAP.  */
+//TODO:#define AT_HWCAP4            30         /* extension of AT_HWCAP.  */
+//TODO:#define AT_SYSINFO           32         /* Pointer to the global system page used for system calls and other nice things. */
+//TODO:#define AT_SYSINFO_EHDR      33         /* *ditto* */
+//TODO:#define AT_L1I_CACHESHAPE    34         /* Shapes of the caches. Bits 0-3 contains associativity; bits 4-7 contains log2 of line size; mask those to get cache size. */
+//TODO:#define AT_L1D_CACHESHAPE    35         /* ... */
+//TODO:#define AT_L2_CACHESHAPE     36         /* ... */
+//TODO:#define AT_L3_CACHESHAPE     37         /* ... */
+//TODO:#define AT_L1I_CACHESIZE     40         /* Shapes of the caches, with more room to describe them. `AT_*GEOMETRY' are comprised of cache line size in bytes in the bottom 16 bits and the cache associativity in the next 16 bits. */
+//TODO:#define AT_L1I_CACHEGEOMETRY 41         /* ... */
+//TODO:#define AT_L1D_CACHESIZE     42         /* ... */
+//TODO:#define AT_L1D_CACHEGEOMETRY 43         /* ... */
+//TODO:#define AT_L2_CACHESIZE      44         /* ... */
+//TODO:#define AT_L2_CACHEGEOMETRY  45         /* ... */
+//TODO:#define AT_L3_CACHESIZE      46         /* ... */
+//TODO:#define AT_L3_CACHEGEOMETRY  47         /* ... */
+
 	default:
 not_found:
 		libc_seterrno(ENOENT);
+		ATTR_FALLTHROUGH
+	case AT_IGNORE:
 		result = 0;
 		break;
 	}

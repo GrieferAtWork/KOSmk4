@@ -1694,7 +1694,7 @@ driver_dlsym_drv(struct driver *__restrict self,
                  struct driver_syminfo *__restrict info)
 		THROWS(E_SEGFAULT, ...) {
 	NCX char const *name = info->dsi_name + 4;
-	if (strcmp(name, "self") == 0) {
+	if (strcmp(name, "self") == 0) { /* extern struct driver drv_self; */
 		info->dsi_addr = self;
 		info->dsi_size = sizeof(*self);
 		goto ok;
@@ -1702,43 +1702,43 @@ driver_dlsym_drv(struct driver *__restrict self,
 	if (name[0] == 'l' && name[1] == 'o' &&
 	    name[2] == 'a' && name[3] == 'd') {
 		NCX char const *load_name = name + 4;
-		if (strcmp(load_name, "addr") == 0) {
+		if (strcmp(load_name, "addr") == 0) { /* extern byte_t drv_loadaddr[]; */
 			info->dsi_addr = (void *)self->d_module.md_loadaddr;
 			goto ok_size0;
 		}
-		if (strcmp(load_name, "min") == 0) {
+		if (strcmp(load_name, "min") == 0) { /* extern byte_t drv_loadmin[]; */
 			info->dsi_addr = self->d_module.md_loadmin;
 			goto ok_size0;
 		}
-		if (strcmp(load_name, "max") == 0) {
+		if (strcmp(load_name, "max") == 0) { /* extern byte_t drv_loadmax[]; */
 			info->dsi_addr = self->d_module.md_loadmax;
 			goto ok_size0;
 		}
 	}
-	if (strcmp(name, "name") == 0) {
+	if (strcmp(name, "name") == 0) { /* extern char drv_name[]; */
 		info->dsi_addr = (void *)self->d_name;
 		info->dsi_size = (strlen(self->d_name) + 1) * sizeof(char);
 		goto ok;
 	}
-	if (strcmp(name, "file") == 0) {
+	if (strcmp(name, "file") == 0) { /* extern struct mfile *drv_file; */
 		COMPILER_UNUSED(driver_getfile(self)); /* Make sure it was initialized */
 		info->dsi_addr = &self->d_module.md_file;
 		info->dsi_size = sizeof(void *);
 		goto ok;
 	}
-	if (strcmp(name, "cmdline") == 0) {
+	if (strcmp(name, "cmdline") == 0) { /* extern char drv_cmdline[]; */
 		info->dsi_addr = (void *)self->d_cmdline;
 		info->dsi_size = (strlen(self->d_cmdline) + 1) * sizeof(char);
 		goto ok;
 	}
 	if (name[0] == 'a' && name[1] == 'r' && name[2] == 'g') {
 		NCX char const *arg_name = name + 3;
-		if (strcmp(arg_name, "c") == 0) {
+		if (strcmp(arg_name, "c") == 0) { /* extern size_t drv_argc; */
 			info->dsi_addr = &self->d_argc;
 			info->dsi_size = sizeof(self->d_argc);
 			goto ok;
 		}
-		if (strcmp(arg_name, "v") == 0) {
+		if (strcmp(arg_name, "v") == 0) { /* extern char *drv_argv[]; */
 			info->dsi_addr = self->d_argv;
 			info->dsi_size = self->d_argc * sizeof(char *);
 			goto ok;
